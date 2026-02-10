@@ -49,4 +49,11 @@ class FLEA_Acl_Table_Roles extends FLEA_Db_TableDataGateway
         ),
     );
 
+    /**
+     * 构造函数
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
 }

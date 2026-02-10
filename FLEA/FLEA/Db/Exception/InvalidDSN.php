@@ -27,7 +27,7 @@ class FLEA_Db_Exception_InvalidDSN extends FLEA_Exception
      *
      * @return FLEA_Db_Exception_InvalidDSN
      */
-    function __construct($dsn)
+    public function __construct($dsn)
     {
         unset($this->dsn['password']);
         $this->dsn = $dsn;

@@ -34,4 +34,11 @@ class FLEA_Acl_Table_Permissions extends FLEA_Db_TableDataGateway
      */
     public $tableName = 'permissions';
 
+    /**
+     * 构造函数
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
 }

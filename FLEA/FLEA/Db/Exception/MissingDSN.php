@@ -23,7 +23,7 @@ class FLEA_Db_Exception_MissingDSN extends FLEA_Exception
      *
      * @return FLEA_Db_Exception_MissingDSN
      */
-    function __construct()
+    public function __construct()
     {
         $code = 0x06ff002;
         parent::__construct(_ET($code), $code);

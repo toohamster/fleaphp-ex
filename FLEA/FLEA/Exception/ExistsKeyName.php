@@ -27,7 +27,7 @@ class FLEA_Exception_ExistsKeyName extends FLEA_Exception
      *
      * @return FLEA_Exception_ExistsKeyName
      */
-    function __construct($keyname)
+    public function __construct($keyname)
     {
         $this->keyname = $keyname;
         parent::__construct(sprintf(_ET(0x0102004), $keyname));
