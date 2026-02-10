@@ -63,7 +63,7 @@ class FLEA_Controller_Action
      *
      * @return FLEA_Controller_Action
      */
-    function FLEA_Controller_Action($controllerName)
+    function __construct($controllerName)
     {
         $this->_controllerName = $controllerName;
 

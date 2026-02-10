@@ -34,7 +34,7 @@ class FLEA_Acl_Manager
         'userHasPermissions' =>     'FLEA_Acl_Table_UserHasPermissions',
     );
 
-    function FLEA_Acl_Manager($tableClass = array())
+    function __construct($tableClass = array())
     {
         $this->_tableClass = array_merge($this->_tableClass, (array)$tableClass);
     }

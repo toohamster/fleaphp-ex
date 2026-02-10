@@ -85,7 +85,7 @@ class FLEA_Ajax
      *
      * @return FLEA_Ajax
      */
-    function FLEA_Ajax()
+    function __construct()
     {
         $this->_events = array();
     }

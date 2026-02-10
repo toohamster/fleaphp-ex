@@ -23,9 +23,9 @@ class FLEA_Db_Exception_InvalidInsertID extends FLEA_Exception
      *
      * @return FLEA_Db_Exception_InvalidInsertID
      */
-    function FLEA_Db_Exception_InvalidInsertID()
+    function __construct()
     {
         $code = 0x06ff008;
-        parent::FLEA_Exception(_ET($code), $code);
+        parent::__construct(_ET($code), $code);
     }
 }

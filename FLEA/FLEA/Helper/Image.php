@@ -59,7 +59,7 @@ class FLEA_Helper_Image
      *
      * @return FLEA_Helper_Image
      */
-    function createFromFile($filename, $fileext = null)
+    static function createFromFile($filename, $fileext = null)
     {
         if (is_null($fileext)) {
             $fileext = pathinfo($filename, PATHINFO_EXTENSION);

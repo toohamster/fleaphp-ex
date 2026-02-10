@@ -46,7 +46,7 @@ class FLEA_Dispatcher_Simple
      *
      * @return FLEA_Dispatcher_Simple
      */
-    function FLEA_Dispatcher_Simple(& $request)
+    function __construct(& $request)
     {
         $this->_requestBackup =& $request;
 

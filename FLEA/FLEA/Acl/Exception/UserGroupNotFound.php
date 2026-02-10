@@ -20,9 +20,9 @@ class FLEA_Acl_Exception_UserGroupNotFound extends FLEA_Exception
 {
     public $userGroupId;
 
-    function FLEA_Acl_Exception_UserGroupNotFound($userGroupId)
+    function __construct($userGroupId)
     {
         $this->userGroupId = $userGroupId;
-        parent::FLEA_Exception("UserGroup ID: {$userGroupId} not found.");
+        parent::__construct("UserGroup ID: {$userGroupId} not found.");
     }
 }

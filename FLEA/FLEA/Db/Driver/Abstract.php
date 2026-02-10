@@ -173,7 +173,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @param array $dsn
      */
-    function FLEA_Db_Driver_Abstract($dsn = null)
+    function __construct($dsn = null)
     {
         $tmp = (array)$dsn;
         unset($tmp['password']);

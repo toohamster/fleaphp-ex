@@ -47,7 +47,7 @@ class FLEA_Rbac
      *
      * @return FLEA_Rbac
      */
-    function FLEA_Rbac()
+    function __construct()
     {
         $this->_sessionKey = FLEA::getAppInf('RBACSessionKey');
         if ($this->_sessionKey == 'RBAC_USERDATA') {

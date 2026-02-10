@@ -27,11 +27,11 @@ class FLEA_Db_Exception_InvalidDSN extends FLEA_Exception
      *
      * @return FLEA_Db_Exception_InvalidDSN
      */
-    function FLEA_Db_Exception_InvalidDSN($dsn)
+    function __construct($dsn)
     {
         unset($this->dsn['password']);
         $this->dsn = $dsn;
         $code = 0x06ff001;
-        parent::FLEA_Exception(_ET($code), $code);
+        parent::__construct(_ET($code), $code);
     }
 }

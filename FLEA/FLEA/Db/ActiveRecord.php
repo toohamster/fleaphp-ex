@@ -73,7 +73,7 @@ class FLEA_Db_ActiveRecord
      *
      * @return FLEA_Db_ActiveRecord
      */
-    function FLEA_Db_ActiveRecord($conditions = null)
+    function __construct($conditions = null)
     {
         $this->init();
         $this->load($conditions);

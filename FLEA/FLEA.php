@@ -378,7 +378,7 @@ class FLEA
      *
      * @return object
      */
-    function getSingleton($className)
+    static function getSingleton($className)
     {
         static $instances = array();
         if (FLEA::isRegistered($className)) {
@@ -479,7 +479,7 @@ class FLEA
      *
      * @return boolean
      */
-    function isRegistered($name)
+    static function isRegistered($name)
     {
         return isset($GLOBALS[G_FLEA_VAR]['OBJECTS'][$name]);
     }
@@ -512,7 +512,7 @@ class FLEA
      *
      * @return mixed 返回缓存的内容，缓存不存在或失效则返回 false
      */
-    function getCache($cacheId, $time = 900, $timeIsLifetime = true, $cacheIdIsFilename = false)
+    static function getCache($cacheId, $time = 900, $timeIsLifetime = true, $cacheIdIsFilename = false)
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {

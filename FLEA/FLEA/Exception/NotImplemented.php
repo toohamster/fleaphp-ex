@@ -29,16 +29,16 @@ class FLEA_Exception_NotImplemented extends FLEA_Exception
      *
      * @return FLEA_Exception_NotImplemented
      */
-    function FLEA_Exception_NotImplemented($method, $class = '')
+    function __construct($method, $class = '')
     {
         $this->className = $class;
         $this->methodName = $method;
         if ($class) {
             $code = 0x010200a;
-            parent::FLEA_Exception(sprintf(_ET($code), $class, $method));
+            parent::__construct(sprintf(_ET($code), $class, $method));
         } else {
             $code = 0x010200b;
-            parent::FLEA_Exception(sprintf(_ET($code), $method));
+            parent::__construct(sprintf(_ET($code), $method));
         }
     }
 }
