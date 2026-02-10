@@ -65,19 +65,12 @@ define('ACTION_ALL',        'ACTION_ALL');
  * 初始化 FleaPHP 框架
  */
 define('G_FLEA_VAR', '__FLEA_CORE__');
-$GLOBALS[G_FLEA_VAR] = array(
-    'APP_INF'               => array(),
-    'OBJECTS'               => array(),
-    'DBO'                   => array(),
-    'CLASS_PATH'            => array(),
-    'FLEA_EXCEPTION_STACK'  => array(),
-    'FLEA_EXCEPTION_HANDLER'=> null,
-);
 
-// 定义 FleaPHP 文件所在位置，以及初始的 CLASS_PATH
-$GLOBALS[G_FLEA_VAR]['CLASS_PATH'][] = __DIR__;
-define('FLEA_DIR', $GLOBALS[G_FLEA_VAR]['CLASS_PATH'][0] . DS . 'FLEA');
-define('FLEA_3RD_DIR', $GLOBALS[G_FLEA_VAR]['CLASS_PATH'][0] . DS . '3rd');
+// 初始化配置管理器
+$config = FLEA_Config::getInstance();
+$config->addClassPath(__DIR__);
+define('FLEA_DIR', $config->getClassPath()[0] . DS . 'FLEA');
+define('FLEA_3RD_DIR', $config->getClassPath()[0] . DS . '3rd');
 
 /**
  * 载入默认设置文件
@@ -85,11 +78,11 @@ define('FLEA_3RD_DIR', $GLOBALS[G_FLEA_VAR]['CLASS_PATH'][0] . DS . '3rd');
  * 如果没有定义 DEPLOY_MODE 常量为 true，则使用调试模式初始化 FleaPHP
  */
 if (!defined('DEPLOY_MODE') || DEPLOY_MODE != true) {
-    $GLOBALS[G_FLEA_VAR]['APP_INF'] = require(FLEA_DIR . '/Config/DEBUG_MODE_CONFIG.php');
+    $config->mergeAppInf(require(FLEA_DIR . '/Config/DEBUG_MODE_CONFIG.php'));
     define('DEBUG_MODE', true);
     if (!defined('DEPLOY_MODE')) { define('DEPLOY_MODE', false); }
 } else {
-    $GLOBALS[G_FLEA_VAR]['APP_INF'] = require(FLEA_DIR . '/Config/DEPLOY_MODE_CONFIG.php');
+    $config->mergeAppInf(require(FLEA_DIR . '/Config/DEPLOY_MODE_CONFIG.php'));
     define('DEBUG_MODE', false);
 }
 
@@ -1493,12 +1486,9 @@ function __IS_EXCEPTION($exception, $type = null)
  */
 function __SET_EXCEPTION_HANDLER($callback)
 {
-    if (isset($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_HANDLER'])) {
-        $current = $GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_HANDLER'];
-    } else {
-        $current = null;
-    }
-    $GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_HANDLER'] = $callback;
+    $config = FLEA_Config::getInstance();
+    $current = $config->getExceptionHandler();
+    $config->setExceptionHandler($callback);
     return $current;
 }
 
