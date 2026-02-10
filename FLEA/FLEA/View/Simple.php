@@ -73,7 +73,7 @@ class FLEA_View_Simple
      *
      * @return FLEA_View_Simple
      */
-    function __construct($path = null) {
+    public function __construct($path = null) {
         log_message('Construction FLEA_View_Simple', 'debug');
 
         $this->path = $path;
@@ -100,7 +100,7 @@ class FLEA_View_Simple
      * @param mixed $name 模板变量名称
      * @param mixed $value 变量内容
      */
-    function assign($name, $value = null) {
+    public function assign($name, $value = null) {
         if (is_array($name) && is_null($value)) {
             $this->vars = array_merge($this->vars, $name);
         } else {
@@ -116,7 +116,7 @@ class FLEA_View_Simple
      *
      * @return string
      */
-    function fetch($file, $cacheId = null) {
+    public function fetch($file, $cacheId = null) {
         if ($this->enableCache) {
             $cacheFile = $this->_getCacheFile($file, $cacheId);
             if ($this->isCached($file, $cacheId)) {
@@ -146,7 +146,7 @@ class FLEA_View_Simple
      * @param string $file 模板文件名
      * @param string $cacheId 缓存 ID，如果指定该值则会使用该内容的缓存输出
      */
-    function display($file, $cacheId = null) {
+    public function display($file, $cacheId = null) {
         echo $this->fetch($file, $cacheId);
     }
 
@@ -158,7 +158,7 @@ class FLEA_View_Simple
      *
      * @return boolean
      */
-    function isCached($file, $cacheId = null) {
+    public function isCached($file, $cacheId = null) {
         // 如果禁用缓存则返回 false
         if (!$this->enableCache) { return false; }
 
@@ -190,14 +190,14 @@ class FLEA_View_Simple
      * @param string $file 模板资源名
      * @param string $cacheId 缓存 ID
      */
-    function cleanCache($file, $cacheId = null) {
+    public function cleanCache($file, $cacheId = null) {
         @unlink($this->_getCacheFile($file, $cacheId));
     }
 
     /**
      * 清除所有缓存
      */
-    function cleanAllCache() {
+    public function cleanAllCache() {
         foreach (glob($this->cacheDir . '/' . "*.php") as $filename) {
             @unlink($filename);
         }
@@ -211,7 +211,7 @@ class FLEA_View_Simple
      *
      * @return string
      */
-    function _getCacheFile($file, $cacheId) {
+    public function _getCacheFile($file, $cacheId) {
         return $this->cacheDir . DIRECTORY_SEPARATOR . rawurlencode($file . '-' . $cacheId) . '.php';
     }
 }

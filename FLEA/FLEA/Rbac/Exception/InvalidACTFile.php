@@ -48,7 +48,7 @@ class FLEA_Rbac_Exception_InvalidACTFile extends FLEA_Exception
      *
      * @return FLEA_Rbac_Exception_InvalidACTFile
      */
-    function __construct($actFilename, $act, $controllerName = null)
+    public function __construct($actFilename, $act, $controllerName = null)
     {
         $this->actFilename = $actFilename;
         $this->act = $act;

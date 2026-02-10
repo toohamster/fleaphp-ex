@@ -32,7 +32,7 @@ class FLEA_Exception_MissingArguments extends FLEA_Exception
      *
      * @return FLEA_Exception_MissingArguments
      */
-    function __construct($args)
+    public function __construct($args)
     {
         $this->args = $args;
         if (is_array($args)) {

@@ -10,11 +10,30 @@
 - [x] FLEA/FLEA/Db/Exception/InvalidDSN.php
 - [x] FLEA/FLEA/Db/Exception/InvalidLinkType.php
 - [x] FLEA/FLEA/Exception/ExpectedFile.php
+- [x] FLEA/FLEA/Exception/MissingArguments.php
+- [x] FLEA/FLEA/Exception/NotExistsKeyName.php
+- [x] FLEA/FLEA/Exception/FileOperation.php
+- [x] FLEA/FLEA/Exception/MustOverwrite.php
+- [x] FLEA/FLEA/Exception/ValidationFailed.php
+- [x] FLEA/FLEA/Exception/TypeMismatch.php
+- [x] FLEA/FLEA/Dispatcher/Exception/CheckFailed.php
+- [x] FLEA/FLEA/RBAC/Exception/InvalidACT.php
+- [x] FLEA/FLEA/RBAC/Exception/InvalidACTFile.php
+- [x] FLEA/FLEA/Exception/InvalidArguments.php
 
 ### 表格类 (Table Classes)
 - [x] FLEA/FLEA/Acl/Table/Permissions.php
 - [x] FLEA/FLEA/Acl/Table/Roles.php
 - [x] FLEA/FLEA/Acl/Table/Users.php
+- [x] FLEA/FLEA/Acl/Table/UsersHasRoles.php
+- [x] FLEA/FLEA/Acl/Table/UsersHasPermissions.php
+- [x] FLEA/FLEA/Acl/Table/UserGroupsHasPermissions.php
+- [x] FLEA/FLEA/Acl/Table/UserGroupsHasRoles.php
+
+### 其他类
+- [x] FLEA/FLEA/Helper/SendFile.php
+- [x] FLEA/FLEA/RBAC/RolesManager.php
+- [x] FLEA/FLEA/View/Simple.php
 
 ## 待处理的简单文件 🔜
 
@@ -25,17 +44,12 @@
 - [ ] FLEA/FLEA/Db/Exception/MissingPrimaryKey.php
 - [ ] FLEA/FLEA/Db/Exception/PrimaryKeyExists.php
 - [ ] FLEA/FLEA/Db/Exception/SqlQuery.php
-- [ ] FLEA/FLEA/Exception/InvalidArguments.php
-- [ ] FLEA/FLEA/Exception/MustOverwrite.php
-- [ ] FLEA/FLEA/Exception/NotExistsKeyName.php
-- [ ] FLEA/FLEA/Exception/TypeMismatch.php
+- [ ] FLEA/FLEA/Exception/NotImplemented.php
+- [ ] FLEA/FLEA/Exception/MissingAction.php
+- [ ] FLEA/FLEA/Exception/MissingController.php
 
 ### 表格类
 - [ ] FLEA/FLEA/Acl/Table/UserGroups.php
-- [ ] FLEA/FLEA/Acl/Table/UserGroupsHasPermissions.php
-- [ ] FLEA/FLEA/Acl/Table/UserGroupsHasRoles.php
-- [ ] FLEA/FLEA/Acl/Table/UsersHasPermissions.php
-- [ ] FLEA/FLEA/Acl/Table/UsersHasRoles.php
 
 ## 跳过的复杂文件 ⏭️
 
@@ -73,14 +87,14 @@
 
 ## 统计信息
 
-- **已处理文件**: 10个
-- **待处理简单文件**: 15个左右
+- **已处理文件**: 21个
+- **待处理简单文件**: 8个左右
 - **跳过复杂文件**: 10个以上
-- **总体进度**: ~30%
+- **总体进度**: ~65%
 
 ## 下一步计划
 
 1. 继续处理剩余的简单异常类文件
-2. 处理简单的表格类文件
+2. 处理最后几个简单的表格类文件
 3. 建立团队编码规范文档
 4. 为复杂类制定专门的处理策略
