@@ -43,7 +43,7 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
      *
      * @return FLEA_Dispatcher_Auth
      */
-    function __construct(& $request)
+    public function __construct(& $request)
     {
         parent::__construct($request);
         $this->_auth =& FLEA::getSingleton(FLEA::getAppInf('dispatcherAuthProvider'));
@@ -54,7 +54,7 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
      *
      * @return FLEA_Rbac
      */
-    function getAuthProvider()
+    public function getAuthProvider()
     {
         return $this->_auth;
     }
@@ -64,7 +64,7 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
      *
      * @param FLEA_Rbac $auth
      */
-    function setAuthProvider(& $auth)
+    public function setAuthProvider(& $auth)
     {
         $this->_auth =& $auth;
     }
@@ -75,7 +75,7 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
      * @param array $userData
      * @param mixed $rolesData
      */
-    function setUser($userData, $rolesData = null)
+    public function setUser($userData, $rolesData = null)
     {
         $this->_auth->setUser($userData, $rolesData);
     }
@@ -85,7 +85,7 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
      *
      * @return array
      */
-    function getUser()
+    public function getUser()
     {
         return $this->_auth->getUser();
     }
@@ -95,7 +95,7 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
      *
      * @return array
      */
-    function getUserRoles()
+    public function getUserRoles()
     {
         return $this->_auth->getRolesArray();
     }
@@ -105,7 +105,7 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
      *
      * @return array
      */
-    function clearUser()
+    public function clearUser()
     {
         $this->_auth->clearUser();
     }
@@ -115,7 +115,7 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
      *
      * @return mixed
      */
-    function dispatching()
+    public function dispatching()
     {
         $controllerName  = $this->getControllerName();
         $actionName      = $this->getActionName();
@@ -169,7 +169,7 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
      *
      * @return boolean
      */
-    function check($controllerName, $actionName = null, $controllerClass = null)
+    public function check($controllerName, $actionName = null, $controllerClass = null)
     {
         if (is_null($controllerClass)) {
             $controllerClass = $this->getControllerClass($controllerName);
@@ -215,7 +215,7 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
      *
      * @return array
      */
-    function getControllerACT($controllerName, $controllerClass)
+    public function getControllerACT($controllerName, $controllerClass)
     {
         // 首先尝试从全局 ACT 查询控制器的 ACT
         $ACT = FLEA::getAppInfValue('globalACT', $controllerName);
@@ -242,7 +242,7 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
      *
      * @param string $controllerName
      */
-    function getControllerACTFromDefaultFile($controllerName)
+    public function getControllerACTFromDefaultFile($controllerName)
     {
         $actFilename = realpath(FLEA::getAppInf('defaultControllerACTFile'));
         if (!$actFilename) {
@@ -269,7 +269,7 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
      *
      * @return mixed
      */
-    function _loadACTFile($actFilename)
+    protected function _loadACTFile($actFilename)
     {
         static $files = [];
 

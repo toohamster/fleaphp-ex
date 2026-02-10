@@ -33,7 +33,7 @@ class FLEA_Dispatcher_Exception_CheckFailed extends FLEA_Exception
      *
      * @return FLEA_Dispatcher_Exception_CheckFailed
      */
-    public function __construct($controllerName, $actionName,
+    function __construct($controllerName, $actionName,
             $act = null, $roles = null)
     {
         $this->controllerName = $controllerName;

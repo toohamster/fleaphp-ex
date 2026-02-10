@@ -31,7 +31,7 @@ class FLEA_Exception_TypeMismatch extends FLEA_Exception
      *
      * @return FLEA_Exception_TypeMismatch
      */
-    function __construct($arg, $expected, $actual)
+    public function __construct($arg, $expected, $actual)
     {
         $this->arg = $arg;
         $this->expected = $expected;

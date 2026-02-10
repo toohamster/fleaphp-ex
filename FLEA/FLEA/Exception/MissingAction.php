@@ -71,7 +71,7 @@ class FLEA_Exception_MissingAction extends FLEA_Exception
      *
      * @return FLEA_Exception_MissingAction
      */
-    function __construct($controllerName, $actionName,
+    public function __construct($controllerName, $actionName,
              $arguments = null, $controllerClass = null, $actionMethod = null,
              $controllerClassFilename = null)
     {

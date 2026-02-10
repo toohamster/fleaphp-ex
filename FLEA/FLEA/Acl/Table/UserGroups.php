@@ -73,7 +73,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return int
      */
-    function create($group, $parentId = 0) {
+    public function create($group, $parentId = 0) {
         $parentId = (int)$parentId;
         if ($parentId) {
             $parent = parent::find($parentId);
@@ -135,7 +135,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function update($group) {
+    public function update($group) {
         unset($group['left_value']);
         unset($group['right_value']);
         unset($group['parent_id']);
@@ -149,7 +149,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function removeByPkv($groupId) {
+    public function removeByPkv($groupId) {
         $group = parent::find((int)$groupId);
         if (!$group) {
             FLEA::loadClass('FLEA_Acl_Exception_UserGroupNotFound');
@@ -207,7 +207,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function getPath($group) {
+    public function getPath($group) {
         $group['left_value'] = (int)$group['left_value'];
         $group['right_value'] = (int)$group['right_value'];
 
@@ -227,7 +227,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function getSubGroups($group) {
+    public function getSubGroups($group) {
         $conditions = "parent_id = {$group[$this->primaryKey]}";
         $sort = 'left_value ASC';
         return $this->findAll($conditions, $sort);
@@ -240,7 +240,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function getSubTree($group) {
+    public function getSubTree($group) {
         $group['left_value'] = (int)$group['left_value'];
         $group['right_value'] = (int)$group['right_value'];
 
@@ -256,7 +256,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function getCurrentLevelGroups($group) {
+    public function getCurrentLevelGroups($group) {
         $group['parent_id'] = (int)$group['parent_id'];
         $conditions = "parent_id = {$group['parent_id']}";
         $sort = 'left_value ASC';
@@ -268,7 +268,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function getAllGroups() {
+    public function getAllGroups() {
         return parent::findAll('left_value > 1', 'left_value ASC');
     }
 
@@ -277,7 +277,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function getAllTopGroups() {
+    public function getAllTopGroups() {
         $conditions = "parent_id = 0";
         $sort = 'left_value ASC';
         return $this->findAll($conditions, $sort);
@@ -290,7 +290,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return int
      */
-    function calcAllChildCount($group) {
+    public function calcAllChildCount($group) {
         return intval(($group['right_value'] - $group['left_value'] - 1) / 2);
     }
 

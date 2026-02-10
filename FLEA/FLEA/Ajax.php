@@ -85,7 +85,7 @@ class FLEA_Ajax
      *
      * @return FLEA_Ajax
      */
-    function __construct()
+    public function __construct()
     {
         $this->_events = [];
     }
@@ -103,7 +103,7 @@ class FLEA_Ajax
      *
      * @return string
      */
-    function dumpJs($return = false, $wrapper = true)
+    public function dumpJs($return = false, $wrapper = true)
     {
         $out = '';
         if ($wrapper) {
@@ -163,7 +163,7 @@ class FLEA_Ajax
      *
      * @return string
      */
-    function registerEvent($control, $event, $url, $attribs = null)
+    public function registerEvent($control, $event, $url, $attribs = null)
     {
         $control2 = preg_replace('/[^a-z0-9_]+/i', '', $control);
         $functionName = "ajax_{$control2}_on{$event}";
@@ -176,7 +176,7 @@ class FLEA_Ajax
      *
      * @return string
      */
-    function returnCheckJs()
+    public function returnCheckJs()
     {
         $version = FLEA_VERSION;
         return <<<EOT
@@ -196,7 +196,7 @@ EOT;
      *
      * @return string
      */
-    function returnEventJs(& $eventList)
+    public function returnEventJs(& $eventList)
     {
         $bindEvents = [];
         $out = '';
@@ -215,7 +215,7 @@ EOT;
      *
      * @return string
      */
-    function _insertAjaxRequest($eventArr, & $bindEvents)
+    protected function _insertAjaxRequest($eventArr, & $bindEvents)
     {
         list($control, $event, $url, $attribs, $functionName) = $eventArr;
         $this->_formatAttribs($attribs);
@@ -320,7 +320,7 @@ EOT;
      *
      * @param array $attribs
      */
-    function _formatAttribs(& $attribs)
+    protected function _formatAttribs(& $attribs)
     {
         // 格式化参数
         foreach ($attribs as $option => $value) {

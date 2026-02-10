@@ -187,7 +187,7 @@ class FLEA_Helper_Pager
      *
      * @return FLEA_Helper_Pager
      */
-    function __construct(& $source, $currentPage, $pageSize = 20, $conditions = null, $sortby = null, $basePageIndex = 0)
+    public function __construct(& $source, $currentPage, $pageSize = 20, $conditions = null, $sortby = null, $basePageIndex = 0)
     {
         $this->_basePageIndex = $basePageIndex;
         $this->_currentPage = $this->currentPage = $currentPage;
@@ -213,7 +213,7 @@ class FLEA_Helper_Pager
      *
      * @param int $index
      */
-    function setBasePageIndex($index)
+    public function setBasePageIndex($index)
     {
         $this->_basePageIndex = $index;
         $this->currentPage = $this->_currentPage;
@@ -225,7 +225,7 @@ class FLEA_Helper_Pager
      *
      * @param int $page
      */
-    function setPage($page)
+    public function setPage($page)
     {
         $this->_currentPage = $page;
         $this->currentPage = $page;
@@ -237,7 +237,7 @@ class FLEA_Helper_Pager
      *
      * @param int $count
      */
-    function setCount($count)
+    public function setCount($count)
     {
         $this->count = $count;
         $this->computingPage();
@@ -248,7 +248,7 @@ class FLEA_Helper_Pager
      *
      * @param SDBO $dbo
      */
-    function setDBO(& $dbo)
+    public function setDBO(& $dbo)
     {
         $this->dbo =& $dbo;
     }
@@ -261,7 +261,7 @@ class FLEA_Helper_Pager
      *
      * @return array
      */
-    function findAll($fields = '*', $queryLinks = true)
+    public function findAll($fields = '*', $queryLinks = true)
     {
         if ($this->count == -1) {
             $this->count = 20;
@@ -288,7 +288,7 @@ class FLEA_Helper_Pager
      *
      * @return array
      */
-    function getPagerData($returnPageNumbers = true)
+    public function getPagerData($returnPageNumbers = true)
     {
         $data = array(
             'pageSize' => $this->pageSize,
@@ -325,7 +325,7 @@ class FLEA_Helper_Pager
      *
      * @return array
      */
-    function getNavbarIndexs($currentPage = 0, $navbarLen = 8)
+    public function getNavbarIndexs($currentPage = 0, $navbarLen = 8)
     {
         $mid = intval($navbarLen / 2);
         if ($currentPage < $this->firstPage) {
@@ -357,7 +357,7 @@ class FLEA_Helper_Pager
      * @param string $caption
      * @param string $jsfunc
      */
-    function renderPageJumper($caption = '%u', $jsfunc = 'fnOnPageChanged')
+    public function renderPageJumper($caption = '%u', $jsfunc = 'fnOnPageChanged')
     {
         $out = "<select name=\"PageJumper\" onchange=\"{$jsfunc}(this.value);\">\n";
         for ($i = $this->firstPage; $i <= $this->lastPage; $i++) {
@@ -376,7 +376,7 @@ class FLEA_Helper_Pager
     /**
      * 计算各项分页参数
      */
-    function computingPage()
+    protected function computingPage()
     {
         $this->pageCount = ceil($this->count / $this->pageSize);
         $this->firstPage = $this->_basePageIndex;

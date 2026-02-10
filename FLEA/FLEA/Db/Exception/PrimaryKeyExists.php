@@ -40,7 +40,7 @@ class FLEA_Db_Exception_PrimaryKeyExists extends FLEA_Exception
      *
      * @return FLEA_Db_Exception_PrimaryKeyExists
      */
-    function __construct($pk, $pkValue = null)
+    public function __construct($pk, $pkValue = null)
     {
         $this->primaryKey = $pk;
         $this->pkValue = $pkValue;

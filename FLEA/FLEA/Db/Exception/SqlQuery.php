@@ -34,7 +34,7 @@ class FLEA_Db_Exception_SqlQuery extends FLEA_Exception
      *
      * @return FLEA_Db_Exception_SqlQuery
      */
-    function __construct($sql, $msg = 0, $code = 0)
+    public function __construct($sql, $msg = 0, $code = 0)
     {
         $this->sql = $sql;
         if ($msg) {

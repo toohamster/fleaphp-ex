@@ -78,7 +78,7 @@ class FLEA_Helper_ImgCode
     /**
      * 构造函数
      */
-    function __construct()
+    public function __construct()
     {
         @session_start();
 
@@ -95,7 +95,7 @@ class FLEA_Helper_ImgCode
      *
      * @return boolean
      */
-    function check($code)
+    public function check($code)
     {
         $time = time();
         if ($time >= $this->_expired || strtoupper($code) != strtoupper($this->_code)) {
@@ -111,7 +111,7 @@ class FLEA_Helper_ImgCode
      *
      * @return boolean
      */
-    function checkCaseSensitive($code)
+    public function checkCaseSensitive($code)
     {
         $time = time();
         if ($time >= $this->_expired || $code != $this->_code) {
@@ -123,7 +123,7 @@ class FLEA_Helper_ImgCode
     /**
      * 清除 session 中的 imgcode 相关信息
      */
-    function clear()
+    public function clear()
     {
         unset($_SESSION['IMGCODE']);
         unset($_SESSION['IMGCODE_EXPIRED']);
@@ -149,7 +149,7 @@ class FLEA_Helper_ImgCode
      * @param int $leftime 验证码有效时间（秒）
      * @param array $options 附加选项，可以指定字体、宽度和高度等参数
      */
-    function image($type = 0, $length = 4, $lefttime = 900, $options = null)
+    public function image($type = 0, $length = 4, $lefttime = 900, $options = null)
     {
         if ($this->keepCode && $this->_code != '') {
             $code = $this->_code;
@@ -259,7 +259,7 @@ class FLEA_Helper_ImgCode
      *
      * @return array
      */
-    function _hex2rgb($color, $defualt = 'ffffff')
+    protected function _hex2rgb($color, $defualt = 'ffffff')
     {
         $color = strtolower($color);
         if (substr($color, 0, 2) == '0x') {

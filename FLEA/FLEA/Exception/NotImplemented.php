@@ -29,7 +29,7 @@ class FLEA_Exception_NotImplemented extends FLEA_Exception
      *
      * @return FLEA_Exception_NotImplemented
      */
-    function __construct($method, $class = '')
+    public function __construct($method, $class = '')
     {
         $this->className = $class;
         $this->methodName = $method;

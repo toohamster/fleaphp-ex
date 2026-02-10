@@ -147,7 +147,7 @@ class FLEA_Language
      *
      * @return FLEA_Language
      */
-    function __construct()
+    public function __construct()
     {
         $autoload = FLEA::getAppInf('autoLoadLanguage');
         if (!is_array($autoload)) {
@@ -177,7 +177,7 @@ class FLEA_Language
      * @param string $language 指定为 '' 时表示将字典载入默认语言包中
      * @param boolena $noException
      */
-    function load($dictname, $language = '', $noException = false)
+    public function load($dictname, $language = '', $noException = false)
     {
         $dictnames = explode(',', $dictname);
         foreach ($dictnames as $dictname) {
@@ -223,7 +223,7 @@ class FLEA_Language
      *
      * @return string
      */
-    function get($key, $language = '')
+    public function get($key, $language = '')
     {
         if ($language == '') { $language = 0; }
         return isset($this->_dict[$language][$key]) ?

@@ -251,7 +251,7 @@ class FLEA_Dispatcher_Simple
      *
      * @return boolean
      */
-    function _loadController($controllerClass)
+    protected function _loadController($controllerClass)
     {
         $controllerClassFilename = FLEA::getFilePath($controllerClass . '.php', true);
         if (!is_readable($controllerClassFilename)) {

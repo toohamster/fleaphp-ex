@@ -44,7 +44,7 @@ class FLEA_Acl_Manager
      *
      * @param array $conditions
      */
-    function getUserWithPermissions($conditions)
+    public function getUserWithPermissions($conditions)
     {
         $tableUsers =& FLEA::getSingleton($this->_tableClass['users']);
         /* @var $tableUsers FLEA_Acl_Table_Users */

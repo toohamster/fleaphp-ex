@@ -32,7 +32,7 @@ class FLEA_Db_Exception_MissingPrimaryKey extends FLEA_Exception
      *
      * @return FLEA_Db_Exception_MissingPrimaryKey
      */
-    function __construct($pk)
+    public function __construct($pk)
     {
         $this->primaryKey = $pk;
         $code = 0x06ff003;

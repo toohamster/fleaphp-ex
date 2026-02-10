@@ -173,7 +173,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @param array $dsn
      */
-    function __construct($dsn = null)
+    public function __construct($dsn = null)
     {
         $tmp = (array)$dsn;
         unset($tmp['password']);
@@ -191,14 +191,12 @@ class FLEA_Db_Driver_Abstract
      *
      * @return boolean
      */
-    function connect($dsn = false)
-    {
-    }
+    abstract public function connect($dsn = false);
 
     /**
      * 关闭数据库连接
      */
-    function close()
+    public function close()
     {
         $this->conn = null;
         $this->lasterr = null;
@@ -215,9 +213,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return boolean
      */
-    function selectDb($database)
-    {
-    }
+    abstract public function selectDb($database);
 
     /**
      * 执行一个查询，返回一个 resource 或者 boolean 值
@@ -228,9 +224,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return resource|boolean
      */
-    function execute($sql, $inputarr = null, $throw = true)
-    {
-    }
+    abstract public function execute($sql, $inputarr = null, $throw = true);
 
     /**
      * 转义字符串
@@ -239,9 +233,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return mixed
      */
-    function qstr($value)
-    {
-    }
+    abstract public function qstr($value);
 
     /**
      * 按照指定的类型，返回值
@@ -251,7 +243,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return mixed
      */
-    function setValueByType($value, $type)
+    public function setValueByType($value, $type)
     {
         /**
          *  C CHAR 或 VARCHAR 类型字段
@@ -284,9 +276,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return string
      */
-    function qtable($tableName, $schema = null)
-    {
-    }
+    abstract public function qtable($tableName, $schema = null);
 
     /**
      * 将字段名转换为完全限定名，避免因为字段名和数据库关键词相同导致的错误
@@ -297,9 +287,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return string
      */
-    function qfield($fieldName, $tableName = null, $schema = null)
-    {
-    }
+    abstract public function qfield($fieldName, $tableName = null, $schema = null);
 
     /**
      * 一次性将多个字段名转换为完全限定名
@@ -311,7 +299,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return string
      */
-    function qfields($fields, $tableName = null, $schema = null, $returnArray = false)
+    public function qfields($fields, $tableName = null, $schema = null, $returnArray = false)
     {
         if (!is_array($fields)) {
             $fields = explode(',', $fields);
@@ -332,7 +320,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return int
      */
-    function nextId($seqName = 'sdbo_seq', $startValue = 1)
+    public function nextId($seqName = 'sdbo_seq', $startValue = 1)
     {
         $getNextIdSql = sprintf($this->NEXT_ID_SQL, $seqName);
         $result = $this->execute($getNextIdSql, null, false);
@@ -361,7 +349,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return boolean
      */
-    function createSeq($seqName = 'sdbo_seq', $startValue = 1)
+    public function createSeq($seqName = 'sdbo_seq', $startValue = 1)
     {
         if ($this->execute(sprintf($this->CREATE_SEQ_SQL, $seqName))) {
             return $this->execute(sprintf($this->INIT_SEQ_SQL, $seqName, $startValue - 1));
@@ -377,7 +365,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @param string $seqName
      */
-    function dropSeq($seqName = 'sdbo_seq')
+    public function dropSeq($seqName = 'sdbo_seq')
     {
         return $this->execute(sprintf($this->DROP_SEQ_SQL, $seqName));
     }
@@ -387,7 +375,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return mixed
      */
-    function insertId()
+    public function insertId()
     {
         return $this->HAS_INSERT_ID ? $this->_insertId() : $this->_insertId;
     }
@@ -397,7 +385,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return int
      */
-    function affectedRows()
+    public function affectedRows()
     {
         return $this->HAS_AFFECTED_ROWS ? $this->_affectedRows() : false;
     }
@@ -409,9 +397,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function fetchRow($res)
-    {
-    }
+    abstract public function fetchRow($res);
 
     /**
      * 从记录集中返回一行数据，字段名作为键名
@@ -420,9 +406,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function fetchAssoc($res)
-    {
-    }
+    abstract public function fetchAssoc($res);
 
     /**
      * 释放查询句柄
@@ -431,9 +415,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return boolean
      */
-    function freeRes($res)
-    {
-    }
+    abstract public function freeRes($res);
 
     /**
      * 进行限定记录集的查询
@@ -444,9 +426,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return resource
      */
-    function selectLimit($sql, $length = null, $offset = null)
-    {
-    }
+    abstract public function selectLimit($sql, $length = null, $offset = null);
 
     /**
      * 执行一个查询，返回查询结果记录集、指定字段的值集合以及以该字段值分组后的记录集
@@ -458,7 +438,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function getAllWithFieldRefs($sql, $field, & $fieldValues, & $reference)
+    public function getAllWithFieldRefs($sql, $field, & $fieldValues, & $reference)
     {
         $res = is_resource($sql) ? $sql : $this->execute($sql);
         $fieldValues = [];
@@ -488,7 +468,7 @@ class FLEA_Db_Driver_Abstract
      * @param string $refKeyName
      * @param mixed $limit
      */
-    function assemble($sql, & $assocRowset, $mappingName, $oneToOne, $refKeyName, $limit = null)
+    public function assemble($sql, & $assocRowset, $mappingName, $oneToOne, $refKeyName, $limit = null)
     {
         if (is_resource($sql)) {
             $res = $sql;
@@ -531,7 +511,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function getAll($sql)
+    public function getAll($sql)
     {
         $res = is_resource($sql) ? $sql : $this->execute($sql);
         $rowset = [];
@@ -549,7 +529,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return mixed
      */
-    function getOne($sql)
+    public function getOne($sql)
     {
         $res = is_resource($sql) ? $sql : $this->execute($sql);
         $row = $this->fetchRow($res);
@@ -564,7 +544,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return mixed
      */
-    function getRow($sql)
+    public function getRow($sql)
     {
         $res = is_resource($sql) ? $sql : $this->execute($sql);
         $row = $this->fetchAssoc($res);
@@ -580,7 +560,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return mixed
      */
-    function getCol($sql, $col = 0)
+    public function getCol($sql, $col = 0)
     {
         $res = is_resource($sql) ? $sql : $this->execute($sql);
         $data = [];
@@ -602,7 +582,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function getAllGroupBy($sql, & $groupBy)
+    public function getAllGroupBy($sql, & $groupBy)
     {
         if (is_resource($sql)) {
             $res = $sql;
@@ -649,9 +629,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function metaColumns($table)
-    {
-    }
+    abstract public function metaColumns($table);
 
     /**
      * 获得所有数据表的名称
@@ -661,16 +639,14 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function metaTables($pattern = null, $schema = null)
-    {
-    }
+    abstract public function metaTables($pattern = null, $schema = null);
 
     /**
      * 返回数据库可以接受的日期格式
      *
      * @param int $timestamp
      */
-    function dbTimeStamp($timestamp)
+    public function dbTimeStamp($timestamp)
     {
         return date('Y-m-d H:i:s', $timestamp);
     }
@@ -678,7 +654,7 @@ class FLEA_Db_Driver_Abstract
     /**
      * 启动事务
      */
-    function startTrans()
+    public function startTrans()
     {
         if (!$this->HAS_TRANSACTION) { return false; }
         if ($this->_transCount == 0) {
@@ -701,7 +677,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @param $commitOnNoErrors 指示在没有错误时是否提交事务
      */
-    function completeTrans($commitOnNoErrors = true)
+    public function completeTrans($commitOnNoErrors = true)
     {
         if (!$this->HAS_TRANSACTION) { return false; }
         if ($this->_transCount == 0) { return; }
@@ -719,7 +695,7 @@ class FLEA_Db_Driver_Abstract
     /**
      * 强制指示在调用 completeTrans() 时回滚事务
      */
-    function failTrans()
+    public function failTrans()
     {
         $this->_hasFailedQuery = true;
     }
@@ -727,7 +703,7 @@ class FLEA_Db_Driver_Abstract
     /**
      * 返回事务是否失败的状态
      */
-    function hasFailedTrans()
+    public function hasFailedTrans()
     {
         return $this->HAS_TRANSACTION ? $this->_hasFailedQuery : false;
     }
@@ -740,7 +716,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return string
      */
-    function bind($sql, & $inputarr)
+    public function bind($sql, & $inputarr)
     {
         $arr = explode('?', $sql);
         $sql = array_shift($arr);
@@ -761,7 +737,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return string
      */
-    function getInsertSQL(& $row, $table, $schema = null)
+    public function getInsertSQL(& $row, $table, $schema = null)
     {
         list($holders, $values) = $this->getPlaceholder($row);
         $holders = implode(',', $holders);
@@ -771,7 +747,7 @@ class FLEA_Db_Driver_Abstract
         return $sql;
     }
 
-    function getUpdateSQL(& $row, $pk, $table, $schema = null)
+    public function getUpdateSQL(& $row, $pk, $table, $schema = null)
     {
         $pkv = $row[$pk];
         unset($row[$pk]);
@@ -792,7 +768,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function getPlaceholder(& $inputarr, $fields = null)
+    public function getPlaceholder(& $inputarr, $fields = null)
     {
         $holders = [];
         $values = [];
@@ -828,7 +804,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function getPlaceholderPair(& $inputarr, $fields = null)
+    public function getPlaceholderPair(& $inputarr, $fields = null)
     {
         $pairs = [];
         $values = [];

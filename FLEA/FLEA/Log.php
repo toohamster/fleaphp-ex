@@ -84,7 +84,7 @@ class FLEA_Log
      *
      * @return FLEA_Log
      */
-    function __construct()
+    public function __construct()
     {
         $dir = FLEA::getAppInf('logFileDir');
         if (empty($dir)) {
@@ -149,7 +149,7 @@ class FLEA_Log
      * @param string $msg
      * @param string $level
      */
-    function appendLog($msg, $level = 'log', $title = '')
+    public function appendLog($msg, $level = 'log', $title = '')
     {
         if (!$this->_enabled) { return; }
         $level = strtolower($level);
@@ -162,7 +162,7 @@ class FLEA_Log
     /**
      * 将日志信息写入缓存
      */
-    function __writeLog()
+    public function __writeLog()
     {
         global $___fleaphp_loaded_time;
 

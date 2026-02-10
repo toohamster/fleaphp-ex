@@ -48,7 +48,7 @@ class FLEA_Exception_ExpectedClass extends FLEA_Exception
      *
      * @return FLEA_Exception_ExpectedClass
      */
-    function __construct($className, $file = null, $fileExists = false)
+    public function __construct($className, $file = null, $fileExists = false)
     {
         $this->className = $className;
         $this->classFile = $file;

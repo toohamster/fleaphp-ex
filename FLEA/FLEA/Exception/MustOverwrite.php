@@ -27,7 +27,7 @@ class FLEA_Exception_MustOverwrite extends FLEA_Exception
      *
      * @return FLEA_Exception_MustOverwrite
      */
-    function __construct($prototypeMethod)
+    public function __construct($prototypeMethod)
     {
         $this->prototypeMethod = $prototypeMethod;
         $code = 0x0102008;

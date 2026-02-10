@@ -39,7 +39,7 @@ class FLEA_Exception_FileOperation extends FLEA_Exception
      *
      * @return FLEA_Exception_FileOperation
      */
-    function __construct($opeation)
+    public function __construct($opeation)
     {
         $this->operation = $opeation;
         $args = func_get_args();

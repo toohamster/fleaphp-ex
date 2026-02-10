@@ -201,7 +201,7 @@ class FLEA_Db_TableDataGateway
      * @var string
      * @access private
      */
-    public $qtableName;
+    private $qtableName;
 
     /**
      * 主键字段完全限定名
@@ -209,7 +209,7 @@ class FLEA_Db_TableDataGateway
      * @var string
      * @access private
      */
-    public $qpk;
+    private $qpk;
 
     /**
      * 用于关联查询时的主键字段别名
@@ -222,7 +222,7 @@ class FLEA_Db_TableDataGateway
      * @var string
      * @access private
      */
-    public $qpka;
+    private $qpka;
 
     /**
      * 保存最后一次数据验证的结果
@@ -252,7 +252,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return FLEA_Db_TableDataGateway
      */
-    function __construct($params = null)
+    public function __construct($params = null)
     {
         if (!empty($params['schema'])) {
             $this->schema = $params['schema'];
@@ -310,7 +310,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function setDBO(& $dbo)
+    public function setDBO(& $dbo)
     {
         $this->dbo =& $dbo;
 
@@ -372,7 +372,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return FLEA_Db_Driver_Abstract
      */
-    function getDBO()
+    public function getDBO()
     {
         return $this->dbo;
     }
@@ -387,7 +387,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function find($conditions, $sort = null, $fields = '*', $queryLinks = true)
+    public function find($conditions, $sort = null, $fields = '*', $queryLinks = true)
     {
         $rowset =& $this->findAll($conditions, $sort, 1, $fields, $queryLinks);
         if (is_array($rowset)) {
@@ -410,7 +410,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function findAll($conditions = null, $sort = null, $limit = null, $fields = '*', $queryLinks = true)
+    public function findAll($conditions = null, $sort = null, $limit = null, $fields = '*', $queryLinks = true)
     {
         list($whereby, $distinct) = $this->getWhere($conditions);
         // 处理排序
@@ -488,7 +488,7 @@ class FLEA_Db_TableDataGateway
      * @param array $row
      * @param array $enabledLinks
      */
-    function assembleRecursionRow($mappingName, & $row, $enabledLinks = null)
+    public function assembleRecursionRow($mappingName, & $row, $enabledLinks = null)
     {
         $assoclink =& $this->getLink($mappingName);
         if ($assoclink == false) { return false; }
@@ -552,7 +552,7 @@ class FLEA_Db_TableDataGateway
      * @param array $rowset
      * @param array $enabledLinks
      */
-    function assembleRecursionRowset($mappingName, & $rowset, $enabledLinks = null)
+    public function assembleRecursionRowset($mappingName, & $rowset, $enabledLinks = null)
     {
         $assoclink =& $this->getLink($mappingName);
         if ($assoclink == false) { return false; }
@@ -624,7 +624,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function findByField($field, $value, $sort = null, $fields = '*')
+    public function findByField($field, $value, $sort = null, $fields = '*')
     {
         return $this->find(array($field => $value), $sort, $fields);
     }
@@ -640,7 +640,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function findAllByField($field, $value, $sort = null, $limit = null, $fields = '*')
+    public function findAllByField($field, $value, $sort = null, $limit = null, $fields = '*')
     {
         return $this->findAll(array($field => $value), $sort, $limit, $fields);
     }
@@ -657,7 +657,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function findAllByPkvs($pkvs, $conditions = null, $sort = null, $limit = null, $fields = '*', $queryLinks = true)
+    public function findAllByPkvs($pkvs, $conditions = null, $sort = null, $limit = null, $fields = '*', $queryLinks = true)
     {
         $in = array('in()' => $pkvs);
         if (empty($conditions)) {
@@ -681,7 +681,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function findBySql($sql, $limit = null)
+    public function findBySql($sql, $limit = null)
     {
         // 处理 $limit
         if (is_array($limit)) {
@@ -711,7 +711,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return int
      */
-    function findCount($conditions = null, $fields = null)
+    public function findCount($conditions = null, $fields = null)
     {
         list($whereby, $distinct) = $this->getWhere($conditions);
         if (is_null($fields)) {
@@ -734,7 +734,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function save(& $row, $saveLinks = true, $updateCounter = true)
+    public function save(& $row, $saveLinks = true, $updateCounter = true)
     {
         if (empty($row[$this->primaryKey])) {
             return $this->create($row, $saveLinks, $updateCounter);
@@ -751,7 +751,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function saveRowset(& $rowset, $saveLinks = true)
+    public function saveRowset(& $rowset, $saveLinks = true)
     {
         $this->dbo->startTrans();
         foreach ($rowset as $row) {
@@ -771,7 +771,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return mixed
      */
-    function replace(& $row) {
+    public function replace(& $row) {
         $this->_setCreatedTimeFields($row);
         $fields = '';
         $values = '';
@@ -800,7 +800,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function replaceRowset(& $rowset)
+    public function replaceRowset(& $rowset)
     {
         $ids = [];
         $this->dbo->startTrans();
@@ -826,7 +826,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function update(& $row, $saveLinks = true)
+    public function update(& $row, $saveLinks = true)
     {
         if (!$this->_beforeUpdate($row)) {
             return false;
@@ -911,7 +911,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function updateRowset(& $rowset, $saveLinks = true)
+    public function updateRowset(& $rowset, $saveLinks = true)
     {
         $this->dbo->startTrans();
         foreach ($rowset as $row) {
@@ -934,7 +934,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return int|boolean
      */
-    function updateByConditions($conditions, & $row)
+    public function updateByConditions($conditions, & $row)
     {
         $whereby = $this->getWhere($conditions, false);
         $this->_setUpdatedTimeFields($row);
@@ -956,7 +956,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return int
      */
-    function updateField($conditions, $field, $value)
+    public function updateField($conditions, $field, $value)
     {
         $row = array($field => $value);
         return $this->updateByConditions($conditions, $row);
@@ -973,7 +973,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return mixed
      */
-    function incrField($conditions, $field, $incr = 1)
+    public function incrField($conditions, $field, $incr = 1)
     {
         $field = $this->dbo->qfield($field, $this->fullTableName, $this->schema);
         $incr = (int)$incr;
@@ -1002,7 +1002,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return mixed
      */
-    function decrField($conditions, $field, $decr = 1)
+    public function decrField($conditions, $field, $decr = 1)
     {
         $field = $this->dbo->qfield($field, $this->fullTableName, $this->schema);
         $decr = (int)$decr;
@@ -1030,7 +1030,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return mixed
      */
-    function create(& $row, $saveLinks = true)
+    public function create(& $row, $saveLinks = true)
     {
         if (!$this->_beforeCreate($row)) {
             return false;
@@ -1146,7 +1146,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function createRowset(& $rowset, $saveLinks = true)
+    public function createRowset(& $rowset, $saveLinks = true)
     {
         $insertids = [];
         $this->dbo->startTrans();
@@ -1171,7 +1171,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function remove(& $row, $removeLink = true)
+    public function remove(& $row, $removeLink = true)
     {
         if (!$this->_beforeRemove($row)) {
             return false;
@@ -1199,7 +1199,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function removeByPkv($pkv, $removeLink = true)
+    public function removeByPkv($pkv, $removeLink = true)
     {
         $this->dbo->startTrans();
 
@@ -1282,7 +1282,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function removeByConditions($conditions, $removeLink = true)
+    public function removeByConditions($conditions, $removeLink = true)
     {
         $rowset = $this->findAll($conditions, null, null, $this->primaryKey, false);
         $count = 0;
@@ -1305,7 +1305,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function removeByPkvs($pkvs, $removeLink = true)
+    public function removeByPkvs($pkvs, $removeLink = true)
     {
         $ret = true;
         $this->dbo->startTrans();
@@ -1322,7 +1322,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function removeAll()
+    public function removeAll()
     {
         $sql = "DELETE FROM {$this->qtableName}";
         $ret = $this->execute($sql);
@@ -1334,7 +1334,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function removeAllWithLinks()
+    public function removeAllWithLinks()
     {
         $this->dbo->startTrans();
 
@@ -1381,7 +1381,7 @@ class FLEA_Db_TableDataGateway
      *
      * @param string|array $links
      */
-    function enableLinks($links = null)
+    public function enableLinks($links = null)
     {
         $this->autoLink = true;
         if (is_null($links)) {
@@ -1407,7 +1407,7 @@ class FLEA_Db_TableDataGateway
      * @return FLEA_Db_TableLink
      *
      */
-    function enableLink($linkName)
+    public function enableLink($linkName)
     {
         $link =& $this->getLink($linkName);
         if ($link) { $link->enabled = true; }
@@ -1420,7 +1420,7 @@ class FLEA_Db_TableDataGateway
      *
      * @param string|array $links
      */
-    function disableLinks($links = null)
+    public function disableLinks($links = null)
     {
         if (is_null($links)) {
             $links = array_keys($this->links);
@@ -1445,7 +1445,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return FLEA_Db_TableLink
      */
-    function disableLink($linkName)
+    public function disableLink($linkName)
     {
         $link =& $this->getLink($linkName);
         if ($link) { $link->enabled = false; }
@@ -1455,7 +1455,7 @@ class FLEA_Db_TableDataGateway
     /**
      * 清除所有关联
      */
-    function clearLinks()
+    public function clearLinks()
     {
         $this->links = [];
     }
@@ -1463,7 +1463,7 @@ class FLEA_Db_TableDataGateway
     /**
      * 根据类定义的 $hasOne、$hasMany、$belongsTo 和 $manyToMany 成员变量重建所有关联
      */
-    function relink()
+    public function relink()
     {
         $this->clearLinks();
         $this->createLink($this->hasOne,     HAS_ONE);
@@ -1479,7 +1479,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return FLEA_Db_TableLink
      */
-    function getLink($linkName)
+    public function getLink($linkName)
     {
         $linkName = strtoupper($linkName);
         if (isset($this->links[$linkName])) {
@@ -1499,7 +1499,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return FLEA_Db_TableDataGateway
      */
-    function getLinkTable($linkName)
+    public function getLinkTable($linkName)
     {
         $link =& $this->getLink($linkName);
         $link->init();
@@ -1513,7 +1513,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function existsLink($name)
+    public function existsLink($name)
     {
         return isset($this->links[strtoupper($name)]);
     }
@@ -1526,7 +1526,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return FLEA_Db_TableLink
      */
-    function createLink($defines, $type)
+    public function createLink($defines, $type)
     {
         if (!is_array($defines)) { return; }
         if (!is_array(reset($defines))) {
@@ -1547,7 +1547,7 @@ class FLEA_Db_TableDataGateway
      *
      * @param string $linkName
      */
-    function removeLink($linkName)
+    public function removeLink($linkName)
     {
         $linkName = strtoupper($linkName);
         if (isset($this->links[$linkName])) {
@@ -1565,7 +1565,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function checkRowData(& $row, $skip = 0) {
+    public function checkRowData(& $row, $skip = 0) {
         if (is_null($this->verifier)) { return false; }
         $this->lastValidationResult = $this->verifier->checkAll($row, $this->meta, $skip);
         return empty($this->lastValidationResult);
@@ -1578,7 +1578,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return mixed
      */
-    function getLastValidation($info = null) {
+    public function getLastValidation($info = null) {
         if (is_null($info)) { return $this->lastValidationResult; }
 
         $arr = [];
@@ -1597,7 +1597,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return mixed
      */
-    function newInsertId() {
+    public function newInsertId() {
         return $this->dbo->nextId($this->fullTableName . '_seq');
     }
 
@@ -1609,7 +1609,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return mixed
      */
-    function execute($sql, $inputarr = false)
+    public function execute($sql, $inputarr = false)
     {
         return $this->dbo->execute($sql, $inputarr);
     }
@@ -1622,7 +1622,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return string
      */
-    function qinto($sql, $params = null)
+    public function qinto($sql, $params = null)
     {
         if (!is_array($params)) {
             FLEA::loadClass('FLEA_Exception_TypeMismatch');
@@ -1655,7 +1655,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return array|string
      */
-    function parseWhere($where, $args = null)
+    public function parseWhere($where, $args = null)
     {
         if (!is_array($args)) {
             $args = [];
@@ -1674,7 +1674,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return array|string
      */
-    function _parseWhereArray($where)
+    protected function _parseWhereArray($where)
     {
         /**
          * 模式2：
@@ -1723,7 +1723,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return array|string
      */
-    function _parseWhereString($where, $args = null)
+    protected function _parseWhereString($where, $args = null)
     {
         /**
          * 模式1：
@@ -1750,7 +1750,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return string
      */
-    function _parseWhereQfield($matches)
+    protected function _parseWhereQfield($matches)
     {
         $p = explode('.', $matches[1]);
         switch (count($p)) {
@@ -1778,7 +1778,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return string
      */
-    function qstr($value)
+    public function qstr($value)
     {
         return $this->dbo->qstr($value);
     }
@@ -1791,7 +1791,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return string
      */
-    function qfield($fieldName, $tableName = null)
+    public function qfield($fieldName, $tableName = null)
     {
         if (is_null($tableName)) {
             $tableName = $this->fullTableName;
@@ -1808,7 +1808,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return string
      */
-    function qfields($fieldsName, $tableName = null, $returnArray = false)
+    public function qfields($fieldsName, $tableName = null, $returnArray = false)
     {
         if (is_null($tableName)) {
             $tableName = $this->fullTableName;
@@ -1824,7 +1824,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return string
      */
-    function getWhere($conditions, $queryLinks = true) {
+    protected function getWhere($conditions, $queryLinks = true) {
         // 处理查询条件
         $where = FLEA_Db_SqlHelper::parseConditions($conditions, $this);
         $sqljoin = '';
@@ -1905,7 +1905,7 @@ class FLEA_Db_TableDataGateway
     /**
      * 强制刷新缓存的数据表 meta 信息
      */
-    function flushMeta()
+    public function flushMeta()
     {
         $this->_prepareMeta(true);
     }
@@ -1915,7 +1915,7 @@ class FLEA_Db_TableDataGateway
      *
      * @param array $row
      */
-    function _setUpdatedTimeFields(& $row) {
+    protected function _setUpdatedTimeFields(& $row) {
         foreach ($this->updatedTimeFields as $af) {
             $af = strtoupper($af);
             if (!isset($this->meta[$af])) { continue; }
@@ -1937,7 +1937,7 @@ class FLEA_Db_TableDataGateway
      *
      * @param array $row
      */
-    function _setCreatedTimeFields(& $row) {
+    protected function _setCreatedTimeFields(& $row) {
         $currentTime = time();
         $currentTimeStamp = $this->dbo->dbTimeStamp(time());
         foreach (array_merge($this->createdTimeFields, $this->updatedTimeFields) as $af) {
@@ -1966,7 +1966,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function _prepareMeta($flushCache = false) {
+    protected function _prepareMeta($flushCache = false) {
         $cached = FLEA::getAppInf('dbMetaCached');
         $cacheId = $this->dbo->dsn['id'] . '/' . $this->fullTableName;
 
@@ -2007,7 +2007,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function _beforeCreate(& $row)
+    protected function _beforeCreate(& $row)
     {
         return true;
     }
@@ -2021,7 +2021,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function _beforeCreateDb(& $row)
+    protected function _beforeCreateDb(& $row)
     {
         return true;
     }
@@ -2031,7 +2031,7 @@ class FLEA_Db_TableDataGateway
      *
      * @param array $row
      */
-    function _afterCreateDb(& $row)
+    protected function _afterCreateDb(& $row)
     {
     }
 
@@ -2045,7 +2045,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function _beforeUpdate(& $row)
+    protected function _beforeUpdate(& $row)
     {
         return true;
     }
@@ -2059,7 +2059,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function _beforeUpdateDb(& $row)
+    protected function _beforeUpdateDb(& $row)
     {
         return true;
     }
@@ -2069,7 +2069,7 @@ class FLEA_Db_TableDataGateway
      *
      * @param array $row
      */
-    function _afterUpdateDb(& $row)
+    protected function _afterUpdateDb(& $row)
     {
     }
 
@@ -2082,7 +2082,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function _beforeRemove(& $row)
+    protected function _beforeRemove(& $row)
     {
         return true;
     }
@@ -2092,7 +2092,7 @@ class FLEA_Db_TableDataGateway
      *
      * @param array $row
      */
-    function _afterRemoveDb($row)
+    protected function _afterRemoveDb($row)
     {
     }
 
@@ -2108,7 +2108,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function _beforeRemoveDbByPkv($pkv)
+    protected function _beforeRemoveDbByPkv($pkv)
     {
         return true;
     }
@@ -2118,7 +2118,7 @@ class FLEA_Db_TableDataGateway
      *
      * @param array $row
      */
-    function _afterRemoveDbByPkv($pkv)
+    protected function _afterRemoveDbByPkv($pkv)
     {
     }
 
@@ -2127,7 +2127,7 @@ class FLEA_Db_TableDataGateway
      *
      * @param array $row
      */
-    function _updateCounterCache(& $row)
+    protected function _updateCounterCache(& $row)
     {
         foreach (array_keys($this->links) as $linkKey) {
             $link =& $this->links[$linkKey];

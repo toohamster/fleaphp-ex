@@ -61,7 +61,7 @@ class FLEA_Helper_FileUploader
      *
      * @return FLEA_Helper_FileUploader
      */
-    function __construct($cascade = false)
+    public function __construct($cascade = false)
     {
         if (is_array($_FILES)) {
             foreach ($_FILES as $field => $struct) {
@@ -95,7 +95,7 @@ class FLEA_Helper_FileUploader
      *
      * @return int
      */
-    function getCount()
+    public function getCount()
     {
         return $this->_count;
     }
@@ -105,7 +105,7 @@ class FLEA_Helper_FileUploader
      *
      * @return array
      */
-    function getFiles()
+    public function getFiles()
     {
         return $this->_files;
     }
@@ -117,7 +117,7 @@ class FLEA_Helper_FileUploader
      *
      * @return boolean
      */
-    function existsFile($name)
+    public function existsFile($name)
     {
         return isset($this->_files[$name]);
     }
@@ -129,7 +129,7 @@ class FLEA_Helper_FileUploader
      *
      * @return FLEA_Helper_FileUploader_File
      */
-    function getFile($name)
+    public function getFile($name)
     {
         if (!isset($this->_files[$name])) {
             FLEA::loadClass('FLEA_Exception_ExpectedFile');
@@ -145,7 +145,7 @@ class FLEA_Helper_FileUploader
      *
      * @return boolean
      */
-    function isFileExist($name)
+    public function isFileExist($name)
     {
         return isset($this->_files[$name]);
     }
@@ -155,7 +155,7 @@ class FLEA_Helper_FileUploader
      *
      * @param string $destDir
      */
-    function batchMove($destDir)
+    public function batchMove($destDir)
     {
         foreach ($this->_files as $file) {
             /* @var $file FLEA_Helper_FileUploader_File */
@@ -196,7 +196,7 @@ class FLEA_Helper_FileUploader_File
      *
      * @return FLEA_Helper_FileUploader_File
      */
-    function __construct($struct, $name, $ix = false)
+    public function __construct($struct, $name, $ix = false)
     {
         if ($ix !== false) {
             $s = array(
@@ -221,7 +221,7 @@ class FLEA_Helper_FileUploader_File
      * @param string $name
      * @param mixed $value
      */
-    function setAttribute($name, $value)
+    public function setAttribute($name, $value)
     {
         $this->_file[$name] = $value;
     }
@@ -233,7 +233,7 @@ class FLEA_Helper_FileUploader_File
      *
      * @return mixed
      */
-    function getAttribute($name)
+    public function getAttribute($name)
     {
         return $this->_file[$name];
     }
@@ -243,7 +243,7 @@ class FLEA_Helper_FileUploader_File
      *
      * @return string
      */
-    function getName()
+    public function getName()
     {
         return $this->_name;
     }
@@ -253,7 +253,7 @@ class FLEA_Helper_FileUploader_File
      *
      * @return boolean
      */
-    function isSuccessed()
+    public function isSuccessed()
     {
         return $this->_file['error'] == UPLOAD_ERR_OK;
     }
@@ -263,7 +263,7 @@ class FLEA_Helper_FileUploader_File
      *
      * @return int
      */
-    function getError()
+    public function getError()
     {
         return $this->_file['error'];
     }
@@ -273,7 +273,7 @@ class FLEA_Helper_FileUploader_File
      *
      * @return boolean
      */
-    function isMoved()
+    public function isMoved()
     {
         return $this->_file['is_moved'];
     }
@@ -283,7 +283,7 @@ class FLEA_Helper_FileUploader_File
      *
      * @return string
      */
-    function getFilename()
+    public function getFilename()
     {
         return $this->_file['name'];
     }
@@ -293,7 +293,7 @@ class FLEA_Helper_FileUploader_File
      *
      * @return string
      */
-    function getExt()
+    public function getExt()
     {
         if ($this->isMoved()) {
             return pathinfo($this->getNewPath(), PATHINFO_EXTENSION);
@@ -307,7 +307,7 @@ class FLEA_Helper_FileUploader_File
      *
      * @return int
      */
-    function getSize()
+    public function getSize()
     {
         return $this->_file['size'];
     }
@@ -317,7 +317,7 @@ class FLEA_Helper_FileUploader_File
      *
      * @return string
      */
-    function getMimeType()
+    public function getMimeType()
     {
         return $this->_file['type'];
     }
@@ -327,7 +327,7 @@ class FLEA_Helper_FileUploader_File
      *
      * @return string
      */
-    function getTmpName()
+    public function getTmpName()
     {
         return $this->_file['tmp_name'];
     }
@@ -337,7 +337,7 @@ class FLEA_Helper_FileUploader_File
      *
      * @return string
      */
-    function getNewPath()
+    public function getNewPath()
     {
         return $this->_file['new_path'];
     }
@@ -352,7 +352,7 @@ class FLEA_Helper_FileUploader_File
      *
      * @return boolean
      */
-    function check($allowExts = null, $maxSize = null)
+    public function check($allowExts = null, $maxSize = null)
     {
         if (!$this->isSuccessed()) { return false; }
 
@@ -400,7 +400,7 @@ class FLEA_Helper_FileUploader_File
      *
      * @param string $destPath
      */
-    function move($destPath)
+    public function move($destPath)
     {
         $this->_file['is_moved'] = true;
         $this->_file['new_path'] = $destPath;
@@ -410,7 +410,7 @@ class FLEA_Helper_FileUploader_File
     /**
      * 删除上传的文件
      */
-    function remove()
+    public function remove()
     {
         if ($this->isMoved()) {
             unlink($this->getNewPath());
@@ -422,7 +422,7 @@ class FLEA_Helper_FileUploader_File
     /**
      * 删除移动后的文件
      */
-    function removeMovedFile()
+    public function removeMovedFile()
     {
         if ($this->isMoved()) {
             unlink($this->getNewPath());

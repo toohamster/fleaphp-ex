@@ -63,7 +63,7 @@ class FLEA_Controller_Action
      *
      * @return FLEA_Controller_Action
      */
-    function __construct($controllerName)
+    public function __construct($controllerName)
     {
         $this->_controllerName = $controllerName;
 
@@ -79,7 +79,7 @@ class FLEA_Controller_Action
      *
      * @return object
      */
-    function _getComponent($componentName)
+    protected function _getComponent($componentName)
     {
         static $instances = [];
 
@@ -97,7 +97,7 @@ class FLEA_Controller_Action
      * @param string $controllerName
      * @param string $actionName
      */
-    function __setController($controllerName, $actionName)
+    public function __setController($controllerName, $actionName)
     {
         $this->_controllerName = $controllerName;
         $this->_actionName = $actionName;
@@ -108,7 +108,7 @@ class FLEA_Controller_Action
      *
      * @param FLEA_Dispatcher_Simple $dispatcher
      */
-    function __setDispatcher(& $dispatcher)
+    public function __setDispatcher(& $dispatcher)
     {
         $this->_dispatcher =& $dispatcher;
     }
@@ -118,7 +118,7 @@ class FLEA_Controller_Action
      *
      * @return FLEA_Dispatcher_Auth
      */
-    function _getDispatcher()
+    protected function _getDispatcher()
     {
         if (!is_object($this->_dispatcher)) {
             $this->_dispatcher =& FLEA::getSingleton(FLEA::getAppInf('dispatcher'));
@@ -135,7 +135,7 @@ class FLEA_Controller_Action
      *
      * @return string
      */
-    function _url($actionName = null, $args = null, $anchor = null)
+    protected function _url($actionName = null, $args = null, $anchor = null)
     {
         return url($this->_controllerName, $actionName, $args, $anchor);
     }
@@ -146,7 +146,7 @@ class FLEA_Controller_Action
      * @param string $controllerName
      * @param string $actionName
      */
-    function _forward($controllerName = null, $actionName = null)
+    protected function _forward($controllerName = null, $actionName = null)
     {
         $this->_dispatcher->setControllerName($controllerName);
         $this->_dispatcher->setActionName($actionName);
@@ -158,7 +158,7 @@ class FLEA_Controller_Action
      *
      * @return object
      */
-    function _getView()
+    protected function _getView()
     {
         $viewClass = FLEA::getAppInf('view');
         if ($viewClass != 'PHP') {
@@ -175,7 +175,7 @@ class FLEA_Controller_Action
      * @param string $__flea_internal_viewName
      * @param array $data
      */
-    function _executeView($__flea_internal_viewName, $data = null)
+    protected function _executeView($__flea_internal_viewName, $data = null)
     {
         $viewClass = FLEA::getAppInf('view');
         if ($viewClass == 'PHP') {
@@ -203,7 +203,7 @@ class FLEA_Controller_Action
      *
      * @return boolean
      */
-    function _isPOST()
+    protected function _isPOST()
     {
         return strtolower($_SERVER['REQUEST_METHOD']) == 'post';
     }
@@ -213,7 +213,7 @@ class FLEA_Controller_Action
      *
      * @return boolean
      */
-    function _isAjax()
+    protected function _isAjax()
     {
         $r = isset($_SERVER['HTTP_X_REQUESTED_WITH']) ? strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) : '';
         return $r == 'xmlhttprequest';
@@ -229,7 +229,7 @@ class FLEA_Controller_Action
      *
      * @return string
      */
-    function _registerEvent($controlName, $event, $action, $attribs = null)
+    protected function _registerEvent($controlName, $event, $action, $attribs = null)
     {
         $ajax =& FLEA::initAjax();
         return $ajax->registerEvent($controlName, $event,
@@ -241,7 +241,7 @@ class FLEA_Controller_Action
      *
      * @param callback $callback
      */
-    function _registerRenderCallback($callback)
+    protected function _registerRenderCallback($callback)
     {
         $this->_renderCallbacks[] = $callback;
     }

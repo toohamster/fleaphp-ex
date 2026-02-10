@@ -90,7 +90,7 @@ class FLEA_Helper_Verifier
      *
      * @return array
      */
-    function checkAll(& $data, & $rules, $skip = 0)
+    public function checkAll(& $data, & $rules, $skip = 0)
     {
         $result = [];
         foreach ($rules as $rule) {
@@ -151,7 +151,7 @@ class FLEA_Helper_Verifier
      *
      * @return boolean
      */
-    function check($value, & $rule)
+    public function check($value, & $rule)
     {
         // 首先使用 simpleType 验证值（如果 simpleType 属性存在）
         $checkLength = false;
@@ -234,7 +234,7 @@ class FLEA_Helper_Verifier
     /**
      * 数字
      */
-    function isNUMBER($value)
+    protected function isNUMBER($value)
     {
         return is_numeric($value);
     }
@@ -242,7 +242,7 @@ class FLEA_Helper_Verifier
     /**
      * 整数
      */
-    function isINT($value)
+    protected function isINT($value)
     {
         return strlen(intval($value)) == strlen($value) && is_numeric($value);
     }
@@ -250,7 +250,7 @@ class FLEA_Helper_Verifier
     /**
      * ASCII 字符串（所有编码小于等于 127 的字符）
      */
-    function isASCII($value)
+    protected function isASCII($value)
     {
         $ar = [];
         $count = preg_match_all('/[\x20-\x7f]/', $value, $ar);
@@ -260,7 +260,7 @@ class FLEA_Helper_Verifier
     /**
      * Email 地址
      */
-    function isEMAIL($value)
+    protected function isEMAIL($value)
     {
         return preg_match('/^[A-Za-z0-9]+([._\-\+]*[A-Za-z0-9]+)*@([A-Za-z0-9]+[-A-Za-z0-9]*[A-Za-z0-9]+\.)+[A-Za-z0-9]+$/', $value) != 0;
     }
@@ -268,7 +268,7 @@ class FLEA_Helper_Verifier
     /**
      * 日期（所有 GNU Date Input Formats，例如 yyyy/mm/dd、yyyy-mm-dd）
      */
-    function isDATE($value)
+    protected function isDATE($value)
     {
         $test = @strtotime($value);
         return $test !== -1 && $test !== false;
@@ -277,7 +277,7 @@ class FLEA_Helper_Verifier
     /**
      * 时间（所有 GNU Date Input Formats，例如 hh:mm:ss）
      */
-    function isTIME($value)
+    protected function isTIME($value)
     {
         $test = strtotime($value);
         return $test !== -1 && $test !== false;
@@ -286,7 +286,7 @@ class FLEA_Helper_Verifier
     /**
      * IPv4 地址（格式为 a.b.c.h）
      */
-    function isIPv4($value)
+    protected function isIPv4($value)
     {
         $test = ip2long($value);
         return $test !== -1 && $test !== false;
@@ -295,7 +295,7 @@ class FLEA_Helper_Verifier
     /**
      * 八进制数值
      */
-    function isOCTAL($value)
+    protected function isOCTAL($value)
     {
         return preg_match('/0[0-7]+/', $value) != 0;
     }
@@ -303,7 +303,7 @@ class FLEA_Helper_Verifier
     /**
      * 二进制数值
      */
-    function isBINARY($value)
+    protected function isBINARY($value)
     {
         return preg_match('/[01]+/', $value) != 0;
     }
@@ -311,7 +311,7 @@ class FLEA_Helper_Verifier
     /**
      * 十六进制数值
      */
-    function isHEX($value)
+    protected function isHEX($value)
     {
         return preg_match('/[0-9a-f]+/i', $value) != 0;
     }
@@ -319,7 +319,7 @@ class FLEA_Helper_Verifier
     /**
      * Internet 域名
      */
-    function isDOMAIN($value)
+    protected function isDOMAIN($value)
     {
         return preg_match('/[a-z0-9\.]+/i', $value) != 0;
     }
@@ -327,7 +327,7 @@ class FLEA_Helper_Verifier
     /**
      * 任意类型
      */
-    function isANY()
+    protected function isANY()
     {
         return true;
     }
@@ -335,7 +335,7 @@ class FLEA_Helper_Verifier
     /**
      * 字符串（等同于任意类型）
      */
-    function isSTRING()
+    protected function isSTRING()
     {
         return true;
     }
@@ -343,7 +343,7 @@ class FLEA_Helper_Verifier
     /**
      * 文字和数字（26个字母和0－9）
      */
-    function isALPHANUM($value)
+    protected function isALPHANUM($value)
     {
         return ctype_alnum($value);
     }
@@ -351,7 +351,7 @@ class FLEA_Helper_Verifier
     /**
      * 文字（26个字母）
      */
-    function isALPHA($value)
+    protected function isALPHA($value)
     {
         return ctype_alpha($value);
     }
@@ -359,7 +359,7 @@ class FLEA_Helper_Verifier
     /**
      * 26个字母及10个数字
      */
-    function isALPHANUMX($value)
+    protected function isALPHANUMX($value)
     {
         return preg_match('/[^a-z0-9_]/i', $value) == 0;
     }
@@ -367,7 +367,7 @@ class FLEA_Helper_Verifier
     /**
      * 26个字母及 - 符号
      */
-    function isALPHAX($value)
+    protected function isALPHAX($value)
     {
         return preg_match('/[^a-z\-]/i', $value) == 0;
     }

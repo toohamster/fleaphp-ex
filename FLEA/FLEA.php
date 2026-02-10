@@ -123,7 +123,7 @@ class FLEA
      *
      * @param mixed $__config 配置数组或配置文件名
      */
-    function loadAppInf($__flea_internal_config = null)
+    public static function loadAppInf($__flea_internal_config = null)
     {
         if (!is_array($__flea_internal_config) && is_string($__flea_internal_config)) {
             if (!is_readable($__flea_internal_config)) {
@@ -153,7 +153,7 @@ class FLEA
      *
      * @return mixed
      */
-    function getAppInf($option, $default = null)
+    public static function getAppInf($option, $default = null)
     {
         return isset($GLOBALS[G_FLEA_VAR]['APP_INF'][$option]) ? $GLOBALS[G_FLEA_VAR]['APP_INF'][$option] : $default;
     }
@@ -175,7 +175,7 @@ class FLEA
      *
      * @return mixed
      */
-    function getAppInfValue($option, $keyname, $default = null)
+    public static function getAppInfValue($option, $keyname, $default = null)
     {
         if (!isset($GLOBALS[G_FLEA_VAR]['APP_INF'][$option])) {
             $GLOBALS[G_FLEA_VAR]['APP_INF'][$option] = [];
@@ -195,7 +195,7 @@ class FLEA
      * @param string $keyname
      * @param mixed $value
      */
-    function setAppInfValue($option, $keyname, $value)
+    public static function setAppInfValue($option, $keyname, $value)
     {
         if (!isset($GLOBALS[G_FLEA_VAR]['APP_INF'][$option])) {
             $GLOBALS[G_FLEA_VAR]['APP_INF'][$option] = [];
@@ -209,7 +209,7 @@ class FLEA
      * @param string $option
      * @param mixed $data
      */
-    function setAppInf($option, $data = null)
+    public static function setAppInf($option, $data = null)
     {
         if (is_array($option)) {
             $GLOBALS[G_FLEA_VAR]['APP_INF'] = array_merge($GLOBALS[G_FLEA_VAR]['APP_INF'], $option);
@@ -235,7 +235,7 @@ class FLEA
      *
      * @param string $dir
      */
-    function import($dir)
+    public static function import($dir)
     {
         if (array_search($dir, $GLOBALS[G_FLEA_VAR]['CLASS_PATH'], true)) { return; }
         if (DIRECTORY_SEPARATOR == '/') {
@@ -262,7 +262,7 @@ class FLEA
      *
      * @return boolean
      */
-    function loadFile($filename, $loadOnce = false)
+    public static function loadFile($filename, $loadOnce = false)
     {
         static $is_loaded = [];
 
@@ -299,7 +299,7 @@ class FLEA
      *
      * @return boolean
      */
-    function loadClass($className, $noException = false)
+    public static function loadClass($className, $noException = false)
     {
         if (PHP5) {
             if (class_exists($className, false) || interface_exists($className, false)) { return true; }
@@ -337,7 +337,7 @@ class FLEA
      *
      * @return string
      */
-    function getFilePath($filename, $return = false)
+    public static function getFilePath($filename, $return = false)
     {
         $filename = str_replace('_', DIRECTORY_SEPARATOR, $filename);
         if (DIRECTORY_SEPARATOR == '/') {
@@ -378,7 +378,7 @@ class FLEA
      *
      * @return object
      */
-    static function getSingleton($className)
+    public static function getSingleton($className)
     {
         static $instances = [];
         if (FLEA::isRegistered($className)) {
@@ -422,7 +422,7 @@ class FLEA
      *
      * @return object
      */
-    function register(& $obj, $name = null)
+    public static function register(& $obj, $name = null)
     {
         if (!is_object($obj)) {
             FLEA::loadClass('FLEA_Exception_TypeMismatch');
@@ -451,7 +451,7 @@ class FLEA
      *
      * @return object
      */
-    function registry($name = null)
+    public static function registry($name = null)
     {
         if (is_null($name)) {
             return $GLOBALS[G_FLEA_VAR]['OBJECTS'];
@@ -479,7 +479,7 @@ class FLEA
      *
      * @return boolean
      */
-    static function isRegistered($name)
+    public static function isRegistered($name)
     {
         return isset($GLOBALS[G_FLEA_VAR]['OBJECTS'][$name]);
     }
@@ -512,7 +512,7 @@ class FLEA
      *
      * @return mixed 返回缓存的内容，缓存不存在或失效则返回 false
      */
-    static function getCache($cacheId, $time = 900, $timeIsLifetime = true, $cacheIdIsFilename = false)
+    public static function getCache($cacheId, $time = 900, $timeIsLifetime = true, $cacheIdIsFilename = false)
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
@@ -570,7 +570,7 @@ class FLEA
      *
      * @return boolean
      */
-    function writeCache($cacheId, $data, $cacheIdIsFilename = false)
+    public static function writeCache($cacheId, $data, $cacheIdIsFilename = false)
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
@@ -607,7 +607,7 @@ class FLEA
      *
      * @return boolean
      */
-    function purgeCache($cacheId, $cacheIdIsFilename = false)
+    public static function purgeCache($cacheId, $cacheIdIsFilename = false)
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
@@ -636,7 +636,7 @@ class FLEA
      *
      * @return FLEA_WebControls
      */
-    function initWebControls()
+    public static function initWebControls()
     {
         return FLEA::getSingleton(FLEA::getAppInf('webControlsClassName'));
     }
@@ -648,7 +648,7 @@ class FLEA
      *
      * @return FLEA_Ajax
      */
-    function initAjax()
+    public static function initAjax()
     {
         return FLEA::getSingleton(FLEA::getAppInf('ajaxClassName'));
     }
@@ -661,7 +661,7 @@ class FLEA
      *
      * @param string $helperName
      */
-    function loadHelper($helperName)
+    public static function loadHelper($helperName)
     {
         $settingName = 'helper.' . strtolower($helperName);
         $setting = FLEA::getAppInf($settingName);
@@ -701,7 +701,7 @@ class FLEA
      *
      * @return FLEA_Db_Driver_Abstract
      */
-    function getDBO($dsn = 0)
+    public static function getDBO($dsn = 0)
     {
         if ($dsn == 0) {
             $dsn = FLEA::getAppInf('dbDSN');
@@ -740,7 +740,7 @@ class FLEA
      *
      * @return array
      */
-    function parseDSN($dsn)
+    public static function parseDSN($dsn)
     {
         if (is_array($dsn)) {
             $dsn['host'] = isset($dsn['host']) ? $dsn['host'] : '';
@@ -777,7 +777,7 @@ class FLEA
      *
      * 如果应用程序需要使用 FleaPHP 提供的 MVC 模式，则在载入 FLEA.php 和自定义的应用程序设置后，应该调用 FLEA::runMVC() 启动应用程序。
      */
-    function runMVC()
+    public static function runMVC()
     {
         $MVCPackageFilename = FLEA::getAppInf('MVCPackageFilename');
         if ($MVCPackageFilename != '') {
@@ -799,7 +799,7 @@ class FLEA
      *
      * @param boolean $loadMVC
      */
-    function init($loadMVC = false)
+    public static function init($loadMVC = false)
     {
         static $firstTime = true;
 

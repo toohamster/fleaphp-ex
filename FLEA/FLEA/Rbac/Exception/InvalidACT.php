@@ -32,7 +32,7 @@ class FLEA_Rbac_Exception_InvalidACT extends FLEA_Exception
      *
      * @return FLEA_Rbac_Exception_InvalidACT
      */
-    public function __construct($act)
+    function __construct($act)
     {
         $this->act = $act;
         $code = 0x0701001;

@@ -211,7 +211,7 @@ class FLEA_View_Simple
      *
      * @return string
      */
-    public function _getCacheFile($file, $cacheId) {
+    protected function _getCacheFile($file, $cacheId) {
         return $this->cacheDir . DIRECTORY_SEPARATOR . rawurlencode($file . '-' . $cacheId) . '.php';
     }
 }

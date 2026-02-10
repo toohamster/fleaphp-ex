@@ -246,7 +246,7 @@ class FLEA_Db_TableLink
      *
      * @return FLEA_Db_TableLink
      */
-    function __construct($define, $type, & $mainTDG)
+    public function __construct($define, $type, & $mainTDG)
     {
         static $defaultDsnId = null;
 
@@ -295,7 +295,7 @@ class FLEA_Db_TableLink
      *
      * @return FLEA_Db_TableLink
      */
-    function createLink($define, $type, & $mainTDG)
+    public static function createLink($define, $type, & $mainTDG)
     {
         static $typeMap = array(
             HAS_ONE         => 'FLEA_Db_HasOneLink',
@@ -346,7 +346,7 @@ class FLEA_Db_TableLink
      *
      * @return string
      */
-    function getMiddleTableName($table1, $table2)
+    public static function getMiddleTableName($table1, $table2)
     {
         if (strcmp($table1, $table2) < 0) {
             return $this->dbo->dsn['prefix'] . "{$table1}_{$table2}";
@@ -372,7 +372,7 @@ class FLEA_Db_TableLink
     /**
      * 初始化关联对象
      */
-    function init()
+    public function init()
     {
         if ($this->init) { return; }
         if (FLEA::isRegistered($this->assocTDGObjectId)) {
@@ -412,7 +412,7 @@ class FLEA_Db_TableLink
      *
      * @return string
      */
-    function _getFindSQLBase($sql, $in)
+    protected function _getFindSQLBase($sql, $in)
     {
         if ($in) {
             $sql .= " WHERE {$this->qforeignKey} {$in}";
@@ -444,7 +444,7 @@ class FLEA_Db_TableLink
      *
      * @return boolean
      */
-    function _saveAssocDataBase(& $row)
+    protected function _saveAssocDataBase(& $row)
     {
         switch (strtolower($this->saveAssocMethod)) {
         case 'create':
@@ -479,7 +479,7 @@ class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
      *
      * @return FLEA_Db_TableLink
      */
-    function __construct($define, $type, & $mainTDG)
+    public function __construct($define, $type, & $mainTDG)
     {
         parent::__construct($define, $type, $mainTDG);
     }
@@ -491,7 +491,7 @@ class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
      *
      * @return string
      */
-    function getFindSQL($in)
+    public function getFindSQL($in)
     {
         if (!$this->init) { $this->init(); }
         $fields = $this->qforeignKey . ' AS ' . $this->mainTDG->pka . ', ' . $this->dbo->qfields($this->fields, $this->assocTDG->fullTableName, $this->assocTDG->schema);
@@ -507,7 +507,7 @@ class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
      *
      * @return boolean
      */
-    function saveAssocData(& $row, $pkv)
+    public function saveAssocData(& $row, $pkv)
     {
         if (empty($row)) { return true; }
         if (!$this->init) { $this->init(); }
@@ -522,7 +522,7 @@ class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
      *
      * @return boolean
      */
-    function deleteByForeignKey($qpkv)
+    public function deleteByForeignKey($qpkv)
     {
         if (!$this->init) { $this->init(); }
         $conditions = "{$this->qforeignKey} = {$qpkv}";
@@ -536,7 +536,7 @@ class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
     /**
      * 完全初始化关联对象
      */
-    function init()
+    public function init()
     {
         parent::init();
         if (is_null($this->foreignKey)) {
@@ -589,7 +589,7 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
      *
      * @return FLEA_Db_TableLink
      */
-    function __construct($define, $type, & $mainTDG)
+    public function __construct($define, $type, & $mainTDG)
     {
         $this->linkUpdate = $this->linkCreate = $this->linkRemove = false;
         parent::__construct($define, $type, $mainTDG);
@@ -602,7 +602,7 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
      *
      * @return string
      */
-    function getFindSQL($in)
+    public function getFindSQL($in)
     {
         if (!$this->init) { $this->init(); }
         $fields = $this->mainTDG->qpk . ' AS ' . $this->mainTDG->pka . ', ' . $this->dbo->qfields($this->fields, $this->assocTDG->fullTableName, $this->assocTDG->schema);
@@ -630,7 +630,7 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
     /**
      * 完全初始化关联对象
      */
-    function init()
+    public function init()
     {
         parent::init();
         if (is_null($this->foreignKey)) {
@@ -920,7 +920,7 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
     /**
      * 完全初始化关联对象
      */
-    function init()
+    public function init()
     {
         parent::init();
         if ($this->joinTableClass) {
@@ -963,7 +963,7 @@ class FLEA_Db_SqlHelper
      *
      * @return array
      */
-    function parseConditions($conditions, & $table)
+    public static function parseConditions($conditions, & $table)
     {
         // 对于 NULL，直接返回 NULL
         if (is_null($conditions)) { return null; }
@@ -1063,7 +1063,7 @@ class FLEA_Db_SqlHelper
      *
      * @param array $log
      */
-    function dumpLog(& $log)
+    public static function dumpLog(& $log)
     {
         foreach ($log as $ix => $sql) {
             dump($sql, 'SQL ' . ($ix + 1));

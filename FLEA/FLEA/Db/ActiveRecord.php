@@ -60,7 +60,7 @@ class FLEA_Db_ActiveRecord
      *
      * @return array
      */
-    function define()
+    static function define()
     {
     }
 
@@ -73,7 +73,7 @@ class FLEA_Db_ActiveRecord
      *
      * @return FLEA_Db_ActiveRecord
      */
-    function __construct($conditions = null)
+    public function __construct($conditions = null)
     {
         $this->init();
         $this->load($conditions);
@@ -84,7 +84,7 @@ class FLEA_Db_ActiveRecord
      *
      * @param array $options
      */
-    function init()
+    public function init()
     {
         if ($this->init) { return; }
         $this->init = true;
@@ -158,7 +158,7 @@ class FLEA_Db_ActiveRecord
      *
      * @param mixed $conditions
      */
-    function load($conditions)
+    public function load($conditions)
     {
         $row = $this->_table->find($conditions);
         if (is_array($row)) { $this->attach($row); }
@@ -167,7 +167,7 @@ class FLEA_Db_ActiveRecord
     /**
      * 保存对象到数据库
      */
-    function save()
+    public function save()
     {
         $row =& $this->toArray();
         $this->_table->save($row);
@@ -176,7 +176,7 @@ class FLEA_Db_ActiveRecord
     /**
      * 从数据库删除对象
      */
-    function delete()
+    public function delete()
     {
         $this->_table->removeByPkv($this->getId());
     }
@@ -186,7 +186,7 @@ class FLEA_Db_ActiveRecord
      *
      * @param mixed $id
      */
-    function setId($id)
+    public function setId($id)
     {
         $this->{$this->_idname} = $id;
     }
@@ -196,7 +196,7 @@ class FLEA_Db_ActiveRecord
      *
      * @return mixed
      */
-    function getId()
+    public function getId()
     {
         return $this->{$this->_idname};
     }
@@ -206,7 +206,7 @@ class FLEA_Db_ActiveRecord
      *
      * @return array
      */
-    function toArray()
+    public function toArray()
     {
         $arr = [];
         foreach ($this->_mapping['p2f'] as $prop => $field) {
@@ -220,7 +220,7 @@ class FLEA_Db_ActiveRecord
      *
      * @param array $row
      */
-    function attach(& $row)
+    public function attach(& $row)
     {
         foreach ($this->_mapping['f2p'] as $field => $prop) {
             if (isset($row[$field])) {

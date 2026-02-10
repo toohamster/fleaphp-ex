@@ -40,7 +40,7 @@ class FLEA_Exception_ValidationFailed extends FLEA_Exception
      *
      * @return FLEA_Exception_ValidationFailed
      */
-    function __construct($result, $data = null)
+    public function __construct($result, $data = null)
     {
         $this->result = $result;
         $this->data = $data;

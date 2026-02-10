@@ -27,7 +27,7 @@ class FLEA_Db_Exception_MissingLink extends FLEA_Exception
      *
      * @return FLEA_Db_Exception_MissingLink
      */
-    function __construct($name)
+    public function __construct($name)
     {
         $this->name = $name;
         $code = 0x06ff009;
