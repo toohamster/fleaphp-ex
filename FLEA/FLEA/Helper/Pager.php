@@ -308,7 +308,7 @@ class FLEA_Helper_Pager
         );
 
         if ($returnPageNumbers) {
-            $data['pagesNumber'] = array();
+            $data['pagesNumber'] = [];
             for ($i = 0; $i < $this->pageCount; $i++) {
                 $data['pagesNumber'][$i] = $i + 1;
             }
@@ -344,7 +344,7 @@ class FLEA_Helper_Pager
             if ($begin < $this->firstPage) { $begin = $this->firstPage; }
         }
 
-        $data = array();
+        $data = [];
         for ($i = $begin; $i <= $end; $i++) {
             $data[] = array('index' => $i, 'number' => ($i + 1 - $this->_basePageIndex));
         }

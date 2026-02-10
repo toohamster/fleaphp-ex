@@ -379,9 +379,9 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
 
         $rs = $this->execute(sprintf($this->META_COLUMNS_SQL, $table));
         if (!$rs) { return false; }
-        $retarr = array();
+        $retarr = [];
         while (($row = $this->fetchAssoc($rs))) {
-            $field = array();
+            $field = [];
             $field['name'] = $row['Field'];
             $type = $row['Type'];
 
@@ -452,7 +452,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
             $sql .= ' LIKE ' . $this->qstr($schema);
         }
         $res = $this->execute($sql, null, false);
-        $tables = array();
+        $tables = [];
         while (($row = $this->fetchRow($res))) {
             $tables[] = reset($row);
         }

@@ -43,7 +43,7 @@
  */
 function load_yaml($filename, $cacheEnabled = true, $replace = null)
 {
-    static $objects = array();
+    static $objects = [];
 
     if (!file_exists($filename)) {
         FLEA::loadClass('FLEA_Exception_ExpectedFile');

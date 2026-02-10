@@ -25,14 +25,14 @@ class FLEA_WebControls
      *
      * @var array
      */
-    public $_extends = array();
+    public $_extends = [];
 
     /**
      * 保存扩展控件的目录
      *
      * @var array
      */
-    public $_extendsDir = array();
+    public $_extendsDir = [];
 
     /**
      * 构造函数
@@ -128,7 +128,7 @@ class FLEA_WebControls
      */
     function extractAttribs(& $attribs, $req)
     {
-        $extract = array();
+        $extract = [];
         foreach ($req as $attrib) {
             if (array_key_exists($attrib, $attribs)) {
                 $extract[$attrib] = $attribs[$attrib];
@@ -147,7 +147,7 @@ class FLEA_WebControls
      */
     function mergeAttribs(& $attribs)
     {
-        $args = array();
+        $args = [];
         foreach ($attribs as $key => $arg) {
             if (is_array($arg)) {
                 $args = array_merge($args, $arg);
@@ -651,7 +651,7 @@ class FLEA_WebControls
                 return 'INVALID ITEMS';
             }
         } else if ($key2caption) {
-            $tmp = array();
+            $tmp = [];
             foreach ($items as $caption => $key) {
                 $tmp[$key] = $caption;
             }
@@ -760,7 +760,7 @@ class FLEA_WebControls
         }
 
         // 传入的 items 是一个多维数组
-        $new = array();
+        $new = [];
         if ($key2caption) {
             foreach ($items as $item) {
                 $new[$item[$key]] = $item[$caption];

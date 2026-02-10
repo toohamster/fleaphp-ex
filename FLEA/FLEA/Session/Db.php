@@ -180,7 +180,7 @@ class FLEA_Session_Db
         if ((int)$this->dbo->getOne($sql) > 0) {
             $sql = "UPDATE {$this->tableName} SET {$this->fieldData} = {$data}, {$this->fieldActivity} = {$activity}";
             if (!empty($fields)) {
-                $arr = array();
+                $arr = [];
                 foreach ($fields as $field => $value) {
                     $arr[] = $this->dbo->qfield($field) . ' = ' . $this->dbo->qstr($value);
                 }

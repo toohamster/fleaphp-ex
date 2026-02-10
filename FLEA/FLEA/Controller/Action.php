@@ -47,14 +47,14 @@ class FLEA_Controller_Action
      *
      * @var array
      */
-    public $components = array();
+    public $components = [];
 
     /**
      * 渲染视图前要调用的 callback 方法
      *
      * @var array
      */
-    public $_renderCallbacks = array();
+    public $_renderCallbacks = [];
 
     /**
      * 构造函数
@@ -81,7 +81,7 @@ class FLEA_Controller_Action
      */
     function _getComponent($componentName)
     {
-        static $instances = array();
+        static $instances = [];
 
         if (!isset($instances[$componentName])) {
             $componentClassName = FLEA::getAppInf('component.' . $componentName);

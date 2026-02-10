@@ -92,7 +92,7 @@ function _T($key, $language = '')
 {
     static $instance = null;
     if (!isset($instance['obj'])) {
-        $instance = array();
+        $instance = [];
         $obj =& FLEA::getSingleton('FLEA_Language');
         $instance = array('obj' => & $obj);
     }
@@ -112,7 +112,7 @@ function load_language($dictname, $language = '', $noException = false)
 {
     static $instance = null;
     if (!isset($instance['obj'])) {
-        $instance = array();
+        $instance = [];
         $obj =& FLEA::getSingleton('FLEA_Language');
         $instance = array('obj' => & $obj);
     }
@@ -133,14 +133,14 @@ class FLEA_Language
      *
      * @var array
      */
-    public $_dict = array();
+    public $_dict = [];
 
     /**
      * 指示哪些语言文件已经被载入
      *
      * @var array
      */
-    public $_loadedFiles = array();
+    public $_loadedFiles = [];
 
     /**
      * 构造函数

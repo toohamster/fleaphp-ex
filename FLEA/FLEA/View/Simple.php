@@ -56,7 +56,7 @@ class FLEA_View_Simple
      * @access private
      * @var array
      */
-    public $vars = array();
+    public $vars = [];
 
     /**
      * 保存各个缓存内容的缓存状态
@@ -64,7 +64,7 @@ class FLEA_View_Simple
      * @access private
      * @var array
      */
-    public $cacheState = array();
+    public $cacheState = [];
 
     /**
      * 构造函数

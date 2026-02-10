@@ -92,7 +92,7 @@ class FLEA_Helper_Verifier
      */
     function checkAll(& $data, & $rules, $skip = 0)
     {
-        $result = array();
+        $result = [];
         foreach ($rules as $rule) {
             $name = $rule['name'];
             if ($skip === 1 || $skip === true || $skip === 'empty') {
@@ -252,7 +252,7 @@ class FLEA_Helper_Verifier
      */
     function isASCII($value)
     {
-        $ar = array();
+        $ar = [];
         $count = preg_match_all('/[\x20-\x7f]/', $value, $ar);
         return $count == strlen($value);
     }

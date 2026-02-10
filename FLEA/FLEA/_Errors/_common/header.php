@@ -38,7 +38,7 @@ function __error_dump_trace($ex)
         $id = md5("{$file}({$line})");
         $function = isset($point['class']) ? "{$point['class']}::{$point['function']}" : $point['function'];
 
-        $args = array();
+        $args = [];
         if (is_array($point['args']) && count($point['args']) > 0) {
             foreach ($point['args'] as $arg) {
                 switch (gettype($arg)) {

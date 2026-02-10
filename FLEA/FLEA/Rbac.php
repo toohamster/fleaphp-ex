@@ -212,7 +212,7 @@ class FLEA_Rbac
      */
     function prepareACT($ACT)
     {
-        $ret = array();
+        $ret = [];
         $arr = array('allow', 'deny');
         foreach ($arr as $key) {
             do {

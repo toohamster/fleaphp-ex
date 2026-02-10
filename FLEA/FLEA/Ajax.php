@@ -87,7 +87,7 @@ class FLEA_Ajax
      */
     function __construct()
     {
-        $this->_events = array();
+        $this->_events = [];
     }
 
     /**
@@ -198,7 +198,7 @@ EOT;
      */
     function returnEventJs(& $eventList)
     {
-        $bindEvents = array();
+        $bindEvents = [];
         $out = '';
         foreach ($eventList as $event) {
             $out .= $this->_insertAjaxRequest($event, $bindEvents) . "\n";
@@ -224,14 +224,14 @@ EOT;
         /**
          * 构造 ajax 请求函数
          */
-        $beforeRequest = array();
+        $beforeRequest = [];
         $call = $event == 'submit' ? "$(\"{$control}\").ajaxSubmit" : "$.ajax";
 
         /**
          * 处理 params 属性
          */
         if (isset($attribs['params'])) {
-            $params = array();
+            $params = [];
             parse_str($attribs['params'], $params);
             $params = (array)$params;
             if (!empty($params)) {

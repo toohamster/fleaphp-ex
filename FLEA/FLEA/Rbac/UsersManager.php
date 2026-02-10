@@ -249,7 +249,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
             return false;
         }
 
-        $update = array();
+        $update = [];
 
         if (isset($this->functionFields['lastLoginField'])
             && $this->functionFields['lastLoginField'] != '')
@@ -415,7 +415,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
             !is_array($user[$this->rolesField])) {
             return array();
         }
-        $roles = array();
+        $roles = [];
         foreach ($user[$this->rolesField] as $role) {
             if (!is_array($role)) {
                 return array($user[$this->rolesField][$rolenameField]);

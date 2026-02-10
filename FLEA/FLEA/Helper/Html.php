@@ -62,7 +62,7 @@ function html_radio_group($name, $arr, $checked = null, $separator = '', $extra 
  * @param string $separator
  * @param string $extra
  */
-function html_checkbox_group($name, $arr, $selected = array(), $separator = '', $extra = null) {
+function html_checkbox_group($name, $arr, $selected = [], $separator = '', $extra = null) {
     $ix = 0;
     if (!is_array($selected)) {
         $selected = array($selected);

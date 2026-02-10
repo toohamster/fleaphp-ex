@@ -23,7 +23,7 @@ class FLEA_Db_ActiveRecord
      *
      * @var array
      */
-    public $_aggregation = array();
+    public $_aggregation = [];
 
     /**
      * 用于完成数据库操作的 TableDataGateway 继承类
@@ -118,14 +118,14 @@ class FLEA_Db_ActiveRecord
         }
 
         if (!isset($options['aggregation']) || !is_array($options['aggregation'])) {
-            $options['aggregation'] = array();
+            $options['aggregation'] = [];
         }
         foreach ($options['aggregation'] as $offset => $define) {
             if (!isset($define['mappingName'])) {
                 $define['mappingName'] = substr(strtolower($define['tableClass']), 0, 1) . substr($define['tableClass'], 1);
             }
             if ($define['mappingType'] == HAS_MANY || $define['mappingType'] == MANY_TO_MANY) {
-                $this->{$define['mappingName']} = array();
+                $this->{$define['mappingName']} = [];
             } else {
                 $this->{$define['mappingName']} = null;
             }
@@ -208,7 +208,7 @@ class FLEA_Db_ActiveRecord
      */
     function toArray()
     {
-        $arr = array();
+        $arr = [];
         foreach ($this->_mapping['p2f'] as $prop => $field) {
             $arr[$field] = $this->{$prop};
         }

@@ -20,7 +20,7 @@ function log_message($msg, $level = 'log', $title = '')
     static $instance = null;
 
     if (is_null($instance)) {
-        $instance = array();
+        $instance = [];
         $obj =& FLEA::getSingleton('FLEA_Log');
         $instance = array('obj' => & $obj);
     }
@@ -103,7 +103,7 @@ class FLEA_Log
             $errorLevel = explode(',', strtolower(FLEA::getAppInf('logErrorLevel')));
             $errorLevel = array_map('trim', $errorLevel);
             $errorLevel = array_filter($errorLevel, 'trim');
-            $this->_errorLevel = array();
+            $this->_errorLevel = [];
             foreach ($errorLevel as $e) {
                $this->_errorLevel[$e] = true;
             }

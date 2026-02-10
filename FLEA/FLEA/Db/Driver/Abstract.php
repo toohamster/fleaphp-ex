@@ -117,7 +117,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @var array
      */
-    public $log = array();
+    public $log = [];
 
     /**
      * 执行的查询计数
@@ -166,7 +166,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @var array
      */
-    public $_savepointStack = array();
+    public $_savepointStack = [];
 
     /**
      * 构造函数
@@ -317,7 +317,7 @@ class FLEA_Db_Driver_Abstract
             $fields = explode(',', $fields);
             $fields = array_map('trim', $fields);
         }
-        $return = array();
+        $return = [];
         foreach ($fields as $fieldName) {
             $return[] = $this->qfield($fieldName, $tableName, $schema);
         }
@@ -461,10 +461,10 @@ class FLEA_Db_Driver_Abstract
     function getAllWithFieldRefs($sql, $field, & $fieldValues, & $reference)
     {
         $res = is_resource($sql) ? $sql : $this->execute($sql);
-        $fieldValues = array();
-        $reference = array();
+        $fieldValues = [];
+        $reference = [];
         $offset = 0;
-        $data = array();
+        $data = [];
 
         while ($row = $this->fetchAssoc($res)) {
             $fieldValue = $row[$field];
@@ -534,7 +534,7 @@ class FLEA_Db_Driver_Abstract
     function getAll($sql)
     {
         $res = is_resource($sql) ? $sql : $this->execute($sql);
-        $rowset = array();
+        $rowset = [];
         while ($row = $this->fetchAssoc($res)) {
             $rowset[] = $row;
         }
@@ -583,7 +583,7 @@ class FLEA_Db_Driver_Abstract
     function getCol($sql, $col = 0)
     {
         $res = is_resource($sql) ? $sql : $this->execute($sql);
-        $data = array();
+        $data = [];
         while ($row = $this->fetchRow($res)) {
             $data[] = $row[$col];
         }
@@ -609,7 +609,7 @@ class FLEA_Db_Driver_Abstract
         } else {
             $res = $this->execute($sql);
         }
-        $data = array();
+        $data = [];
         $row = $this->fetchAssoc($res);
         if ($row != false) {
             if ($groupBy === true) {
@@ -794,8 +794,8 @@ class FLEA_Db_Driver_Abstract
      */
     function getPlaceholder(& $inputarr, $fields = null)
     {
-        $holders = array();
-        $values = array();
+        $holders = [];
+        $values = [];
         if (is_array($fields)) {
             $fields = array_change_key_case(array_flip($fields), CASE_LOWER);
             foreach (array_keys($inputarr) as $key) {
@@ -830,8 +830,8 @@ class FLEA_Db_Driver_Abstract
      */
     function getPlaceholderPair(& $inputarr, $fields = null)
     {
-        $pairs = array();
-        $values = array();
+        $pairs = [];
+        $values = [];
         if (is_array($fields)) {
             $fields = array_change_key_case(array_flip($fields), CASE_LOWER);
             foreach (array_keys($inputarr) as $key) {

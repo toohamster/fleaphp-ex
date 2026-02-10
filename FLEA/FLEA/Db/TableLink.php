@@ -303,7 +303,7 @@ class FLEA_Db_TableLink
             HAS_MANY        => 'FLEA_Db_HasManyLink',
             MANY_TO_MANY    => 'FLEA_Db_ManyToManyLink',
         );
-        static $instances = array();
+        static $instances = [];
 
         // 检查 $type 参数
         if (!isset($typeMap[$type])) {
@@ -770,7 +770,7 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
      */
     function getFindSQL($in)
     {
-        static $joinFields = array();
+        static $joinFields = [];
 
         if (!$this->init) { $this->init(); }
 
@@ -805,8 +805,8 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
     function saveAssocData(& $row, $pkv)
     {
         if (!$this->init) { $this->init(); }
-        $apkvs = array();
-        $entityRowset = array();
+        $apkvs = [];
+        $entityRowset = [];
 
         foreach ($row as $arow) {
             if (!is_array($arow)) {
@@ -839,12 +839,12 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
         $removeAssoc = array_diff($existsMiddle, $apkvs);
 
         if ($this->joinTableIsEntity) {
-            $insertEntityRowset = array();
+            $insertEntityRowset = [];
             foreach ($insertAssoc as $assocId) {
                 if (isset($entityRowset[$assocId])) {
                     $row = $entityRowset[$assocId];
                 } else {
-                    $row = array();
+                    $row = [];
                 }
                 $row[$this->foreignKey] = $pkv;
                 $row[$this->assocForeignKey] = $assocId;
@@ -984,7 +984,7 @@ class FLEA_Db_SqlHelper
         }
 
         $where = '';
-        $linksWhere = array();
+        $linksWhere = [];
         $expr = '';
 
         foreach ($conditions as $offset => $cond) {

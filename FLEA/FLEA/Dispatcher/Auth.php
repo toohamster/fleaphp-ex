@@ -182,7 +182,7 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
         if (is_null($rawACT) || empty($rawACT)) { return true; }
 
         $ACT = $this->_auth->prepareACT($rawACT);
-        $ACT['actions'] = array();
+        $ACT['actions'] = [];
         if (isset($rawACT['actions']) && is_array($rawACT['actions'])) {
             foreach ($rawACT['actions'] as $rawActionName => $rawActionACT) {
                 if ($rawActionName !== ACTION_ALL) {
@@ -271,7 +271,7 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
      */
     function _loadACTFile($actFilename)
     {
-        static $files = array();
+        static $files = [];
 
         if (isset($files[$actFilename])) {
             return $files[$actFilename];

@@ -41,7 +41,7 @@ function array_remove_empty(& $arr, $trim = true)
  */
 function array_col_values(& $arr, $col)
 {
-    $ret = array();
+    $ret = [];
     foreach ($arr as $row) {
         if (isset($row[$col])) { $ret[] = $row[$col]; }
     }
@@ -61,7 +61,7 @@ function array_col_values(& $arr, $col)
  */
 function array_to_hashmap(& $arr, $keyField, $valueField = null)
 {
-    $ret = array();
+    $ret = [];
     if ($valueField) {
         foreach ($arr as $row) {
             $ret[$row[$keyField]] = $row[$valueField];
@@ -84,7 +84,7 @@ function array_to_hashmap(& $arr, $keyField, $valueField = null)
  */
 function array_group_by(& $arr, $keyField)
 {
-    $ret = array();
+    $ret = [];
     foreach ($arr as $row) {
         $key = $row[$keyField];
         $ret[$key][] = $row;
@@ -109,12 +109,12 @@ function array_group_by(& $arr, $keyField)
 function array_to_tree($arr, $fid, $fparent = 'parent_id',
     $fchildrens = 'childrens', $returnReferences = false)
 {
-    $pkvRefs = array();
+    $pkvRefs = [];
     foreach ($arr as $offset => $row) {
         $pkvRefs[$row[$fid]] =& $arr[$offset];
     }
 
-    $tree = array();
+    $tree = [];
     foreach ($arr as $offset => $row) {
         $parentId = $row[$fparent];
         if ($parentId) {
@@ -142,7 +142,7 @@ function array_to_tree($arr, $fid, $fparent = 'parent_id',
  */
 function tree_to_array(& $node, $fchildrens = 'childrens')
 {
-    $ret = array();
+    $ret = [];
     if (isset($node[$fchildrens]) && is_array($node[$fchildrens])) {
         foreach ($node[$fchildrens] as $child) {
             $ret = array_merge($ret, tree_to_array($child, $fchildrens));
@@ -177,7 +177,7 @@ function array_column_sort($array, $keyname, $sortDirection = SORT_ASC)
  */
 function array_sortby_multifields($rowset, $args)
 {
-    $sortArray = array();
+    $sortArray = [];
     $sortRule = '';
     foreach ($args as $sortField => $sortDir) {
         foreach ($rowset as $offset => $row) {

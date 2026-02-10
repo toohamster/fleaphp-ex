@@ -228,7 +228,7 @@ class FLEA_Dispatcher_Simple
     function parseUrl($url)
     {
         $url = parse_url($url);
-        $args = array();
+        $args = [];
         parse_str($url['query'], $args);
         $args = array_change_key_case($args, CASE_LOWER);
         $controllerAccessor = strtolower(FLEA::getAppInf('controllerAccessor'));

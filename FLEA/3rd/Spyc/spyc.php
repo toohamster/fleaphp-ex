@@ -44,7 +44,7 @@ class Spyc {
   public $result;
   public $LiteralBlockMarkers = array ('>', '|');
   public $LiteralPlaceHolder = '___YAML_Literal_Block___';
-  public $SavedGroups = array();
+  public $SavedGroups = [];
 
   /**#@+
   * @access public
@@ -277,8 +277,8 @@ class Spyc {
         array_walk($Source, array(& $this, '_replace'), $replace);
     }
     
-    $this->path = array();
-    $this->result = array();
+    $this->path = [];
+    $this->result = [];
 
 
     for ($i = 0; $i < count($Source); $i++) {
@@ -341,7 +341,7 @@ class Spyc {
     if (!$line) return array();
     $line = trim($line);
     if (!$line) return array();
-    $array = array();
+    $array = [];
 
     if ($group = $this->nodeContainsGroup($line)) {
       $this->addGroup($line, $group);
@@ -384,7 +384,7 @@ class Spyc {
       $explode = $this->_inlineEscape($matches[1]);
 
       // Propogate value array
-      $value  = array();
+      $value  = [];
       foreach ($explode as $v) {
         $value[] = $this->_toType($v);
       }
@@ -403,7 +403,7 @@ class Spyc {
       $explode = $this->_inlineEscape($matches[1]);
 
       // Propogate value array
-      $array = array();
+      $array = [];
       foreach ($explode as $v) {
         $array = $array + $this->_toType($v);
       }
@@ -441,7 +441,7 @@ class Spyc {
     // pure mappings and mappings with sequences inside can't go very
     // deep.  This needs to be fixed.
 
-    $saved_strings = array();
+    $saved_strings = [];
 
     // Check for strings
     $regex = '/(?:(")|(?:\'))((?(1)[^"]+|[^\']+))(?(1)"|\')/';
@@ -514,7 +514,7 @@ class Spyc {
 
     $key = key ($array);
     if (!isset ($array[$key])) return false;
-    if ($array[$key] === array()) { $array[$key] = ''; };
+    if ($array[$key] === []) { $array[$key] = ''; };
     $value = $array[$key];
 
     // Unfolding inner array tree as defined in $this->_arrpath.
@@ -557,7 +557,7 @@ class Spyc {
 
 
   function flatten ($array) {
-    $tempPath = array();
+    $tempPath = [];
     if (!empty ($array)) {
       foreach ($array as $_) {
         if (!is_int($_)) $_ = "'$_'";
@@ -624,7 +624,7 @@ class Spyc {
   function clearBiggerPathValues ($indent) {
 
 
-    if ($indent == 0) $this->path = array();
+    if ($indent == 0) $this->path = [];
     if (empty ($this->path)) return true;
 
     foreach ($this->path as $k => $_) {
@@ -669,14 +669,14 @@ class Spyc {
   }
 
   function returnMappedSequence ($line) {
-    $array = array();
+    $array = [];
     $key         = trim(substr(substr($line,1),0,-1));
     $array[$key] = '';
     return $array;
   }
 
   function returnMappedValue ($line) {
-    $array = array();
+    $array = [];
     $key         = trim(substr($line,0,-1));
     $array[$key] = '';
     return $array;
@@ -688,7 +688,7 @@ class Spyc {
 
   function returnKeyValuePair ($line) {
 
-    $array = array();
+    $array = [];
 
     if (preg_match('/^(.+):/',$line,$key)) {
       // It's a key/value pair most likely
@@ -720,7 +720,7 @@ class Spyc {
 
   function returnArrayElement ($line) {
      if (strlen($line) <= 1) return array(array()); // Weird %)
-     $array = array();
+     $array = [];
      $value   = trim(substr($line,1));
      $value   = $this->_toType($value);
      $array[] = $value;

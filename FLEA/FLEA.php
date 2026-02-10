@@ -178,7 +178,7 @@ class FLEA
     function getAppInfValue($option, $keyname, $default = null)
     {
         if (!isset($GLOBALS[G_FLEA_VAR]['APP_INF'][$option])) {
-            $GLOBALS[G_FLEA_VAR]['APP_INF'][$option] = array();
+            $GLOBALS[G_FLEA_VAR]['APP_INF'][$option] = [];
         }
         if (array_key_exists($keyname, $GLOBALS[G_FLEA_VAR]['APP_INF'][$option])) {
             return $GLOBALS[G_FLEA_VAR]['APP_INF'][$option][$keyname];
@@ -198,7 +198,7 @@ class FLEA
     function setAppInfValue($option, $keyname, $value)
     {
         if (!isset($GLOBALS[G_FLEA_VAR]['APP_INF'][$option])) {
-            $GLOBALS[G_FLEA_VAR]['APP_INF'][$option] = array();
+            $GLOBALS[G_FLEA_VAR]['APP_INF'][$option] = [];
         }
         $GLOBALS[G_FLEA_VAR]['APP_INF'][$option][$keyname] = $value;
     }
@@ -264,7 +264,7 @@ class FLEA
      */
     function loadFile($filename, $loadOnce = false)
     {
-        static $is_loaded = array();
+        static $is_loaded = [];
 
         $path = FLEA::getFilePath($filename);
         if ($path != '') {
@@ -380,7 +380,7 @@ class FLEA
      */
     static function getSingleton($className)
     {
-        static $instances = array();
+        static $instances = [];
         if (FLEA::isRegistered($className)) {
             // 返回已经存在的对象实例
             return FLEA::registry($className);
@@ -756,7 +756,7 @@ class FLEA
             $parse = parse_url($dsn);
             if (empty($parse['scheme'])) { return false; }
 
-            $dsn = array();
+            $dsn = [];
             $dsn['host']     = isset($parse['host']) ? $parse['host'] : 'localhost';
             $dsn['port']     = isset($parse['port']) ? $parse['port'] : '';
             $dsn['login']    = isset($parse['user']) ? $parse['user'] : '';
@@ -1493,7 +1493,7 @@ function __TRY()
     if (!isset($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK']) ||
         !is_array($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK']))
     {
-        $GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK'] = array();
+        $GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK'] = [];
     }
 
     $point++;
@@ -1764,7 +1764,7 @@ function microtime_float($time = null)
  */
 function _ET($errorCode, $appError = false)
 {
-    static $message = array();
+    static $message = [];
 
     $language = FLEA::getAppInf('defaultLanguage');
     $language = preg_replace('/[^a-z0-9\-_]+/i', '', $language);

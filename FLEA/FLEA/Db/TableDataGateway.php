@@ -193,7 +193,7 @@ class FLEA_Db_TableDataGateway
      *
      * @var array
      */
-    public $links = array();
+    public $links = [];
 
     /**
      * 包含前缀的数据表完全限定名
@@ -348,9 +348,9 @@ class FLEA_Db_TableDataGateway
         }
 
         if (is_array($this->primaryKey)) {
-            $this->qpk = array();
-            $this->pka = array();
-            $this->qpka = array();
+            $this->qpk = [];
+            $this->pka = [];
+            $this->qpka = [];
             foreach ($this->primaryKey as $pk) {
                 $qpk = $dbo->qfield($pk, $this->fullTableName, $this->schema);
                 $this->qpk[$pk] = $qpk;
@@ -445,7 +445,7 @@ class FLEA_Db_TableDataGateway
              * 查询时同时将主键值单独提取出来，
              * 并且准备一个以主键值为键名的二维数组用于关联数据的装配
              */
-            $pkvs = array();
+            $pkvs = [];
             $assocRowset = null;
             $rowset = $this->dbo->getAllWithFieldRefs($result, $this->pka, $pkvs, $assocRowset);
             $in = 'IN (' . implode(',', array_map(array(& $this->dbo, 'qstr'), $pkvs)) . ')';
@@ -514,7 +514,7 @@ class FLEA_Db_TableDataGateway
             /* @var $link FLEA_Db_TableLink */
             if (!$link->enabled || !$link->linkRead || !isset($enabledLinks[$link->mappingName])) { continue; }
 
-            $in = array();
+            $in = [];
             switch ($assoclink->type) {
             case HAS_ONE:
             case BELONGS_TO:
@@ -525,7 +525,7 @@ class FLEA_Db_TableDataGateway
                 break;
             case HAS_MANY:
             case MANY_TO_MANY:
-                $assocRowset = array();
+                $assocRowset = [];
                 foreach (array_keys($arow) as $offset) {
                     $pkv = $arow[$offset][$link->mainTDG->primaryKey];
                     $in[] = $pkv;
@@ -559,7 +559,7 @@ class FLEA_Db_TableDataGateway
 
         $assoclink->init();
         $tdg =& $assoclink->assocTDG;
-        $arowset = array();
+        $arowset = [];
         foreach (array_keys($rowset) as $offset) {
             $arowset[] =& $rowset[$offset][$mappingName];
         }
@@ -582,8 +582,8 @@ class FLEA_Db_TableDataGateway
             /* @var $link FLEA_Db_TableLink */
             if (!$link->enabled || !$link->linkRead || !isset($enabledLinks[$link->mappingName])) { continue; }
 
-            $in = array();
-            $assocRowset = array();
+            $in = [];
+            $assocRowset = [];
             switch ($assoclink->type) {
             case HAS_ONE:
             case BELONGS_TO:
@@ -802,7 +802,7 @@ class FLEA_Db_TableDataGateway
      */
     function replaceRowset(& $rowset)
     {
-        $ids = array();
+        $ids = [];
         $this->dbo->startTrans();
         foreach ($rowset as $row) {
             $id = $this->replace($row, false);
@@ -978,7 +978,7 @@ class FLEA_Db_TableDataGateway
         $field = $this->dbo->qfield($field, $this->fullTableName, $this->schema);
         $incr = (int)$incr;
 
-        $row = array();
+        $row = [];
         $this->_setUpdatedTimeFields($row);
         list($pairs, $values) = $this->dbo->getPlaceholderPair($row, $this->fields);
         $pairs = implode(',', $pairs);
@@ -1007,7 +1007,7 @@ class FLEA_Db_TableDataGateway
         $field = $this->dbo->qfield($field, $this->fullTableName, $this->schema);
         $decr = (int)$decr;
 
-        $row = array();
+        $row = [];
         $this->_setUpdatedTimeFields($row);
         list($pairs, $values) = $this->dbo->getPlaceholderPair($row, $this->fields);
         $pairs = implode(',', $pairs);
@@ -1148,7 +1148,7 @@ class FLEA_Db_TableDataGateway
      */
     function createRowset(& $rowset, $saveLinks = true)
     {
-        $insertids = array();
+        $insertids = [];
         $this->dbo->startTrans();
         foreach ($rowset as $row) {
             $insertid = $this->create($row, $saveLinks, false);
@@ -1214,7 +1214,7 @@ class FLEA_Db_TableDataGateway
         $qpkv = $this->dbo->qstr($pkv);
 
         // 处理关联数据表
-        $counterCacheLinks = array();
+        $counterCacheLinks = [];
         if ($this->autoLink && $removeLink) {
             foreach (array_keys($this->links) as $linkKey) {
                 $link =& $this->links[$linkKey];
@@ -1457,7 +1457,7 @@ class FLEA_Db_TableDataGateway
      */
     function clearLinks()
     {
-        $this->links = array();
+        $this->links = [];
     }
 
     /**
@@ -1581,7 +1581,7 @@ class FLEA_Db_TableDataGateway
     function getLastValidation($info = null) {
         if (is_null($info)) { return $this->lastValidationResult; }
 
-        $arr = array();
+        $arr = [];
         foreach ($this->lastValidationResult as $field => $check) {
             if (empty($check['rule'][$info])) {
                 $arr[] = $field;
@@ -1658,7 +1658,7 @@ class FLEA_Db_TableDataGateway
     function parseWhere($where, $args = null)
     {
         if (!is_array($args)) {
-            $args = array();
+            $args = [];
         }
         if (is_array($where)) {
             return $this->_parseWhereArray($where);
@@ -1684,7 +1684,7 @@ class FLEA_Db_TableDataGateway
          * where(array('user_id' => array($id1, $id2, $id3)))
          */
 
-        $parts = array();
+        $parts = [];
         $callback = array($this->dbo, 'qstr');
         $next_op = '';
 

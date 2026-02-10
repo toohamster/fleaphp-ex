@@ -51,7 +51,7 @@ class FLEA_Db_Driver_Sqlite
 	 *
 	 * @var array
 	 */
-	public $log = array();
+	public $log = [];
 
 	/**
 	 * 指示是否记录 SQL 语句（部署模式时该设置默认为 false）
@@ -170,7 +170,7 @@ class FLEA_Db_Driver_Sqlite
 			$len1 = strpos( $sql, '(' );
 			$len2 = strpos( $sql, ')' );
 			$len3 = strpos( $sql, 'VALUES' );
-			$temp = array();
+			$temp = [];
 			if ( $len2 < $len3 )
 			{
 				$temp[] = substr( $sql, 0, $len1 );
@@ -291,7 +291,7 @@ class FLEA_Db_Driver_Sqlite
 		{
 			$fields = explode( ',', $fields );
 		}
-		$return = array();
+		$return = [];
 		foreach ( $fields as $fieldName )
 		{
 			$fieldName = trim( $fieldName );
@@ -421,7 +421,7 @@ class FLEA_Db_Driver_Sqlite
 	function fetchRow( $res )
 	{
 		$row = $res->fetch();
-		$temp = array();
+		$temp = [];
 		foreach( $row as $key => $value )
 		{
 			$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
@@ -439,7 +439,7 @@ class FLEA_Db_Driver_Sqlite
 	function fetchAssoc( $res )
 	{
 		$row = $res->fetch( PDO::FETCH_ASSOC );
-		$temp = array();
+		$temp = [];
 		foreach( $row as $key => $value )
 		{
 			$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
@@ -504,10 +504,10 @@ class FLEA_Db_Driver_Sqlite
 		{
 			$res = $this->execute( $sql );
 		}
-		$data = array();
+		$data = [];
 		while ( $row = $res->fetch( PDO::FETCH_ASSOC ) )
 		{
-			$temp = array();
+			$temp = [];
 			foreach( $row as $key => $value )
 			{
 				$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
@@ -538,12 +538,12 @@ class FLEA_Db_Driver_Sqlite
 		{
 			$res = $this->execute( $sql );
 		}
-		$data = array();
+		$data = [];
 
 		$row = $res->fetch( PDO::FETCH_ASSOC );
 		if ( $row != false )
 		{
-			$temp = array();
+			$temp = [];
 			foreach( $row as $key => $value )
 			{
 				$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
@@ -585,13 +585,13 @@ class FLEA_Db_Driver_Sqlite
 			$res = $this->execute( $sql );
 		}
 
-		$fieldValues = array();
-		$reference = array();
+		$fieldValues = [];
+		$reference = [];
 		$offset = 0;
-		$data = array();
+		$data = [];
 		while ( $row = $res->fetch( PDO::FETCH_ASSOC ) )
 		{
-			$temp = array();
+			$temp = [];
 			foreach( $row as $key => $value )
 			{
 				$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
@@ -650,7 +650,7 @@ class FLEA_Db_Driver_Sqlite
 			// 一对一组装数据
 			while ( $row = $res->fetch( PDO::FETCH_ASSOC ) )
 			{
-				$temp = array();
+				$temp = [];
 				foreach( $row as $key => $value )
 				{
 					$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
@@ -669,7 +669,7 @@ class FLEA_Db_Driver_Sqlite
 			{
 				$rkv = $row[$refKeyName];
 				unset( $row[$refKeyName] );
-				$temp = array();
+				$temp = [];
 				foreach( $row as $key => $value )
 				{
 					$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
@@ -718,7 +718,7 @@ class FLEA_Db_Driver_Sqlite
 			$res = $this->execute( $sql );
 		}
 		$row = $res->fetch( PDO::FETCH_ASSOC );
-		$temp = array();
+		$temp = [];
 		foreach( $row as $key => $value )
 		{
 			$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
@@ -744,7 +744,7 @@ class FLEA_Db_Driver_Sqlite
 		{
 			$res = $this->execute( $sql );
 		}
-		$data = array();
+		$data = [];
 		while ( $row = $res->fetch( PDO::FETCH_NUM ) )
 		{
 			$data[] = $row[$col];
@@ -833,7 +833,7 @@ I 整数
 		{
 			return false;
 		}
-		$retarr = array();
+		$retarr = [];
 		$sql = $rs->fetch( PDO::FETCH_NUM );
 		$sql = $sql[0];
 		$firstPar = strpos( $sql, '(' );
@@ -853,7 +853,7 @@ I 整数
 		$sql = str_replace( "\n", '', $sql );
 		$sql = str_replace( "'", '', $sql );
 		$temp = explode( ',', $sql );
-		$index = array();
+		$index = [];
 		foreach ( $temp as $value )
 		{
 			$value = trim( $value );
@@ -866,7 +866,7 @@ I 整数
 		foreach ( $ligne as $ligneNum => $cont )
 		{
 			$row = explode( ' ', trim( $cont ) );
-			$field = array();
+			$field = [];
 			$field['name'] = $row[0];
 			$type = $row[1];
 			$field['scale'] = null;

@@ -34,7 +34,7 @@ class FLEA_Acl_Manager
         'userHasPermissions' =>     'FLEA_Acl_Table_UserHasPermissions',
     );
 
-    function __construct($tableClass = array())
+    function __construct($tableClass = [])
     {
         $this->_tableClass = array_merge($this->_tableClass, (array)$tableClass);
     }
@@ -62,14 +62,14 @@ class FLEA_Acl_Manager
         $tree =& $ret['tree'];
         $refs =& $ret['refs'];
         $groupid = $user['user_group_id'];
-        $path = array();
+        $path = [];
         while (isset($refs[$groupid])) {
             array_unshift($path, $refs[$groupid]);
             $groupid = $refs[$groupid]['parent_id'];
         }
 
         // 整理角色信息
-        $userRoles = array();
+        $userRoles = [];
 
         foreach ($path as $group) {
             $roles = $group['roles'];

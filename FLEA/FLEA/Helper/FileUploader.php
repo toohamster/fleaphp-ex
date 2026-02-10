@@ -45,7 +45,7 @@ class FLEA_Helper_FileUploader
      *
      * @var array
      */
-    public $_files = array();
+    public $_files = [];
 
     /**
      * 可用的上传文件对象数量
@@ -67,7 +67,7 @@ class FLEA_Helper_FileUploader
             foreach ($_FILES as $field => $struct) {
                 if (!isset($struct['error'])) { continue; }
                 if (is_array($struct['error'])) {
-                    $arr = array();
+                    $arr = [];
                     for ($i = 0; $i < count($struct['error']); $i++) {
 
                         if ($struct['error'][$i] != UPLOAD_ERR_NO_FILE) {
@@ -178,7 +178,7 @@ class FLEA_Helper_FileUploader_File
      *
      * @var array
      */
-    public $_file = array();
+    public $_file = [];
 
     /**
      * 上传文件对象的名字
