@@ -46,7 +46,7 @@ class FLEA_Dispatcher_Simple
      *
      * @return FLEA_Dispatcher_Simple
      */
-    function __construct(& $request)
+    public function __construct(& $request)
     {
         $this->_requestBackup =& $request;
 
@@ -69,7 +69,7 @@ class FLEA_Dispatcher_Simple
      *
      * @return mixed
      */
-    function dispatching()
+    public function dispatching()
     {
         $controllerName = $this->getControllerName();
         $actionName = $this->getActionName();
@@ -85,7 +85,7 @@ class FLEA_Dispatcher_Simple
      *
      * @return mixed
      */
-    function _executeAction($controllerName, $actionName, $controllerClass)
+    protected function _executeAction($controllerName, $actionName, $controllerClass)
     {
         $callback = FLEA::getAppInf('dispatcherFailedCallback');
 
@@ -152,7 +152,7 @@ class FLEA_Dispatcher_Simple
      *
      * @return string
      */
-    function getControllerName()
+    public function getControllerName()
     {
         $controllerName = preg_replace('/[^a-z0-9_]+/i', '', $this->_request['controller']);
         if ($controllerName == '') {
@@ -169,7 +169,7 @@ class FLEA_Dispatcher_Simple
      *
      * @param string $controllerName
      */
-    function setControllerName($controllerName)
+    public function setControllerName($controllerName)
     {
         $this->_request['controller'] = $controllerName;
     }
@@ -181,7 +181,7 @@ class FLEA_Dispatcher_Simple
      *
      * @return string
      */
-    function getActionName()
+    public function getActionName()
     {
         $actionName = preg_replace('/[^a-z0-9]+/i', '', $this->_request['action']);
         if ($actionName == '') {
@@ -195,7 +195,7 @@ class FLEA_Dispatcher_Simple
      *
      * @param string $actionName
      */
-    function setActionName($actionName)
+    public function setActionName($actionName)
     {
         $this->_request['action'] = $actionName;
     }
@@ -207,7 +207,7 @@ class FLEA_Dispatcher_Simple
      *
      * @return string
      */
-    function getControllerClass($controllerName)
+    public function getControllerClass($controllerName)
     {
         $controllerClass = FLEA::getAppInf('controllerClassPrefix');
         if (FLEA::getAppInf('urlLowerChar')) {
@@ -225,7 +225,7 @@ class FLEA_Dispatcher_Simple
      *
      * @return array
      */
-    function parseUrl($url)
+    public function parseUrl($url)
     {
         $url = parse_url($url);
         $args = [];
