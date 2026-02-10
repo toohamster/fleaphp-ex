@@ -4,8 +4,7 @@
 /**
  * 定义 FLEA_Helper_FileUploader 和 FLEA_Helper_FileUploader_File 对象
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: FileUploader.php 1018 2007-12-04 23:41:47Z qeeyuan $
  */
@@ -18,7 +17,7 @@
  * <code>
  * $allowExts = 'jpg,png,gif';
  * $maxSize = 150 * 1024; // 150KB
- * $uploadDir = dirname(__FILE__) . '/upload';
+ * $uploadDir = __DIR__ . '/upload';
  *
  * FLEA::loadClass('FLEA_Helper_FileUploader');
  * $uploader =& new FLEA_Helper_FileUploader();
@@ -36,7 +35,7 @@
  * </code>
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Helper_FileUploader
@@ -169,7 +168,7 @@ class FLEA_Helper_FileUploader
  * 封装一个上传的文件
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Helper_FileUploader_File

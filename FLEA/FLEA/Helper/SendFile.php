@@ -4,8 +4,7 @@
 /**
  * 定义 FLEA_Helper_SendFile 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: SendFile.php 972 2007-10-09 20:56:54Z qeeyuan $
  */
@@ -22,7 +21,7 @@ define('SENDFILE_INLINE', 'inline');
  * 浏览器无法访问的位置。然后通过程序将文件内容发送给浏览器。
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Helper_SendFile

@@ -8,8 +8,7 @@
  * 在应用程序中只需要通过 require('FLEA.php') 载入该文件，
  * 即可完成 FleaPHP 运行环境的初始化工作。
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: FLEA.php 1525 2008-11-25 08:34:37Z dualface $
  */
@@ -76,14 +75,9 @@ $GLOBALS[G_FLEA_VAR] = array(
 );
 
 // 定义 FleaPHP 文件所在位置，以及初始的 CLASS_PATH
-$GLOBALS[G_FLEA_VAR]['CLASS_PATH'][] = dirname(__FILE__);
+$GLOBALS[G_FLEA_VAR]['CLASS_PATH'][] = __DIR__;
 define('FLEA_DIR', $GLOBALS[G_FLEA_VAR]['CLASS_PATH'][0] . DS . 'FLEA');
 define('FLEA_3RD_DIR', $GLOBALS[G_FLEA_VAR]['CLASS_PATH'][0] . DS . '3rd');
-
-// 载入与早期 FleaPHP 保持兼容性的文件
-if (!defined('NO_LEGACY_FLEAPHP') || NO_LEGACY_FLEAPHP == false) {
-    require(FLEA_DIR . '/Compatibility.php');
-}
 
 /**
  * 载入默认设置文件
@@ -99,10 +93,6 @@ if (!defined('DEPLOY_MODE') || DEPLOY_MODE != true) {
     define('DEBUG_MODE', false);
 }
 
-// 消除在 PHP5 中运行时产生的警告信息
-if (!defined('E_STRICT')) {
-    define('E_STRICT', 2048);
-}
 if (DEBUG_MODE) {
     error_reporting(error_reporting(0) & ~E_STRICT);
 } else {
@@ -118,7 +108,7 @@ __SET_EXCEPTION_HANDLER('__FLEA_EXCEPTION_HANDLER');
  * 该类的所有方法都是静态方法。
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA
@@ -855,7 +845,7 @@ class FLEA
          */
         $cachedir = FLEA::getAppInf('internalCacheDir');
         if (empty($cachedir)) {
-            FLEA::setAppInf('internalCacheDir', dirname(__FILE__) . DS . '_Cache');
+            FLEA::setAppInf('internalCacheDir', __DIR__ . DS . '_Cache');
         }
 
         // 过滤 magic_quotes

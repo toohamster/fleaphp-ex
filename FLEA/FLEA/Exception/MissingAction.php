@@ -4,8 +4,7 @@
 /**
  * 定义 FLEA_Exception_MissingAction 异常
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Exception
  * @version $Id: MissingAction.php 972 2007-10-09 20:56:54Z qeeyuan $
  */
@@ -14,7 +13,7 @@
  * FLEA_Exception_MissingAction 指示请求的控制器 Action 方法没有找到
  *
  * @package Exception
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Exception_MissingAction extends FLEA_Exception

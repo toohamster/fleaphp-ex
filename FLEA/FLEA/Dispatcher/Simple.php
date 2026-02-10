@@ -11,8 +11,7 @@
 /**
  * 定义 FLEA_Dispatcher_Simple 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Simple.php 1028 2008-02-02 05:50:59Z qeeyuan $
  */
@@ -21,7 +20,7 @@
  * FLEA_Dispatcher_Simple 分析 HTTP 请求，并转发到合适的 Controller 对象处理
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Dispatcher_Simple

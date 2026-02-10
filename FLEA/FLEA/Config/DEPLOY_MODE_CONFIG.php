@@ -4,8 +4,7 @@
 /**
  * “部署”模式的 FleaPHP 应用程序的默认设置
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Config
  * @version $Id: DEPLOY_MODE_CONFIG.php 1037 2008-04-19 21:19:55Z qeeyuan $
  */

@@ -4,8 +4,7 @@
 /**
  * 定义 FLEA_Log 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Log.php 999 2007-10-30 05:39:57Z qeeyuan $
  */
@@ -33,7 +32,7 @@ function log_message($msg, $level = 'log', $title = '')
  * FLEA_Log 类提供基本的日志服务
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Log

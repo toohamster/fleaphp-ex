@@ -4,8 +4,7 @@
 /**
  * 定义 FLEA_Db_TableDataGateway 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: TableDataGateway.php 1401 2008-10-08 03:00:38Z yangkun $
  */
@@ -46,7 +45,7 @@ define('MANY_TO_MANY',  4);
  * 来分别指定数据表的名字和主键字段名。
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.2
  */
 class FLEA_Db_TableDataGateway

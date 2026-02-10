@@ -69,8 +69,7 @@
  *
  * 这样后续的 _T() 就不用指定第二个参数了。
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Language.php 1005 2007-11-03 07:43:55Z qeeyuan $
  */
@@ -124,7 +123,7 @@ function load_language($dictname, $language = '', $noException = false)
  * FLEA_Language 提供了语言转换功能
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Language

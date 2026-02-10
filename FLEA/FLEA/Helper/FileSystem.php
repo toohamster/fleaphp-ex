@@ -4,8 +4,7 @@
 /**
  * 该文件定义了一些用户简化文件系统操作的函数和对象
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: FileSystem.php 972 2007-10-09 20:56:54Z qeeyuan $
  */

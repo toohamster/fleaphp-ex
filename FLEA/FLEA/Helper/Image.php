@@ -4,8 +4,7 @@
 /**
  * 定义 FLEA_Helper_Image 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Image.php 1405 2008-10-14 09:56:43Z dualface $
  */
@@ -19,7 +18,7 @@
  * 操作大图片时，请确保 php 能够分配足够的内存。
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Helper_Image

@@ -1,5 +1,5 @@
 <?php
-require(dirname(__FILE__) . '/../_common/header.php');
+require(__DIR__ . '/../_common/header.php');
 /* @var $ex FLEA_Rbac_Exception_InvalidACT */
 ?>
 

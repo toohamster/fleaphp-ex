@@ -4,8 +4,7 @@
 /**
  * 定义 FleaPHP 中所有错误信息的代码及对应的错误信息
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: ErrorMessage.php 972 2007-10-09 20:56:54Z qeeyuan $
  */
@@ -78,20 +77,5 @@ return array(
     0x0202001 => 'Invalid table association type "%s".',
     // FLEA_Db_Exception_MissingLinkOption
     0x0202002 => 'Option "%s" is required when creating table association.',
-
-    // FLEA_View_Exception_NotConfigurationSmarty
-    0x0902001 => 'Application settings "viewConfig[\'smartyDir\']" and constant SMARTY_DIR must be defined for FLEA_View_Smarty.',
-    // FLEA_View_Exception_InitSmartyFailed
-    0x0902002 => 'Smarty file "%s" is not found.',
-
-    // FLEA_View_Exception_NotConfigurationSmartTemplate
-    0x0903001 => 'Application settings "viewConfig[\'smartDir\']" must be defined for FLEA_View_SmartTemplate.',
-    // FLEA_View_Exception_InitSmartTemplateFailed
-    0x0903002 => 'SmartTemplate file "%s" is not found.',
-
-
-    // FLEA_View_Exception_NotConfigurationLite
-    0x0904001 => 'Application settings "viewConfig[\'liteDir\']" must be defined for FLEA_View_Lite.',
-    // FLEA_View_Exception_InitLiteFailed
-    0x0904002 => 'TemplateLite file: "%s" not found.',
+    
 );

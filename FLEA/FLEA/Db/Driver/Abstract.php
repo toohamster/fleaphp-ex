@@ -4,8 +4,7 @@
 /**
  * 定义 FLEA_Db_Driver_Abstract 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Abstract.php 1025 2008-01-09 04:17:59Z qeeyuan $
  */
@@ -32,7 +31,7 @@ define('DBO_PARAM_AT_NAMED',    '@');
  * FLEA_Db_Driver_Abstract 是所有数据库驱动的抽象基础类
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.1
  */
 class FLEA_Db_Driver_Abstract

@@ -4,7 +4,6 @@
 /**
  * 定义 FLEA_Db_ActiveRecord 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
  * @author 起源科技(www.qeeyuan.com)
  * @package Core
  * @version $Id: ActiveRecord.php 972 2007-10-09 20:56:54Z qeeyuan $
@@ -13,7 +12,6 @@
 /**
  * FLEA_Db_ActiveRecord 类实现了 ActiveRecord 模式
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
  * @author 起源科技(www.qeeyuan.com)
  * @package Core
  * @version $Id: ActiveRecord.php 972 2007-10-09 20:56:54Z qeeyuan $

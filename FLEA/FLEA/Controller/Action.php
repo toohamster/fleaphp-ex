@@ -11,8 +11,7 @@
 /**
  * 定义 FLEA_Controller_Action 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Action.php 972 2007-10-09 20:56:54Z qeeyuan $
  */
@@ -25,7 +24,7 @@
  * 但从这个类派生自己的控制器可以获得一些便利性。
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Controller_Action

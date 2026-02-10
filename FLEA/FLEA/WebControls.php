@@ -4,8 +4,7 @@
 /**
  * 定义 FLEA_WebControls 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: WebControls.php 1039 2008-04-25 19:29:53Z qeeyuan $
  */
@@ -16,7 +15,7 @@
  * 开发者不应该自行加载该文件，而是调用 init_webcontrols() 来进行 WebControls 的初始化。
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_WebControls

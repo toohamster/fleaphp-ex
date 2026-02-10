@@ -4,8 +4,7 @@
 /**
  * 定义 FLEA_Db_TableLink 类及其继承类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: TableLink.php 1449 2008-10-30 06:16:17Z dualface $
  */
@@ -17,7 +16,7 @@
  * 开发者不应该直接构造 FLEA_Db_TableLink 对象。
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.2
  */
 class FLEA_Db_TableLink
@@ -464,7 +463,7 @@ class FLEA_Db_TableLink
  * FLEA_Db_HasOneLink 封装 has one 关系
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
@@ -574,7 +573,7 @@ class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
  * FLEA_Db_BelongsToLink 封装 belongs to 关系
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
@@ -645,7 +644,7 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
  * FLEA_Db_HasManyLink 封装 has many 关系
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Db_HasManyLink extends FLEA_Db_HasOneLink
@@ -680,7 +679,7 @@ class FLEA_Db_HasManyLink extends FLEA_Db_HasOneLink
  * FLEA_Db_ManyToManyLink 封装 many to many 关系
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
@@ -951,7 +950,7 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
  * FLEA_Db_SqlHelper 类提供了各种生成 SQL 语句的辅助方法
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Db_SqlHelper

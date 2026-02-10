@@ -4,8 +4,7 @@
 /**
  * 定义 FLEA_Helper_Pager 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Pager.php 1016 2007-11-21 13:53:59Z qeeyuan $
  */
@@ -16,7 +15,7 @@
  * FLEA_Helper_Pager 使用很简单，只需要构造时传入 FLEA_Db_TableDataGateway 实例以及查询条件即可。
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Helper_Pager

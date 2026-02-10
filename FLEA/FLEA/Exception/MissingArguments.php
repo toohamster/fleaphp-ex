@@ -4,8 +4,7 @@
 /**
  * 定义 FLEA_Exception_MissingArguments 异常
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Exception
  * @version $Id: MissingArguments.php 972 2007-10-09 20:56:54Z qeeyuan $
  */
@@ -14,7 +13,7 @@
  * FLEA_Exception_MissingArguments 异常指示缺少必须的参数
  *
  * @package Exception
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Exception_MissingArguments extends FLEA_Exception

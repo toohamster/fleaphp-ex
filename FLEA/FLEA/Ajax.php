@@ -27,8 +27,7 @@
  *
  * 此处的 $ajax 对象是 FLEA_Ajax 类的一个实例。通过 FLEA::initAjax() 获得。
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Ajax.php 1005 2007-11-03 07:43:55Z qeeyuan $
  */
@@ -37,7 +36,7 @@
  * Ajax 类提供了大部分 Ajax 操作
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Ajax

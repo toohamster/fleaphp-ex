@@ -4,8 +4,7 @@
 /**
  * 定义 FLEA_Db_Driver_Mysql 驱动
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Mysql.php 1077 2008-05-14 17:44:19Z dualface $
  */
@@ -18,7 +17,7 @@ FLEA::loadClass('FLEA_Db_Driver_Abstract');
  * 用于 mysql 扩展的数据库驱动程序
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.1
  */
 class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
@@ -320,7 +319,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
  * 要求表的存储引擎为 InnoDB 或者 BDB。
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.1
  */
 class FLEA_Db_Driver_Mysqlt extends FLEA_Db_Driver_Mysql

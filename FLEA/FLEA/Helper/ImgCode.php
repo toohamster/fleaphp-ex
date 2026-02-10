@@ -4,8 +4,7 @@
 /**
  * 定义 FLEA_Helper_ImgCode 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: ImgCode.php 972 2007-10-09 20:56:54Z qeeyuan $
  */
@@ -40,7 +39,7 @@
  * </code>
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Helper_ImgCode

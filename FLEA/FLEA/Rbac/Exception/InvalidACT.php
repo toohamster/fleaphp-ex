@@ -4,8 +4,7 @@
 /**
  * 定义 FLEA_Rbac_Exception_InvalidACT 异常
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Exception
  * @version $Id: InvalidACT.php 972 2007-10-09 20:56:54Z qeeyuan $
  */
@@ -14,7 +13,7 @@
  * FLEA_Rbac_Exception_InvalidACT 异常指示一个无效的 ACT
  *
  * @package Exception
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Rbac_Exception_InvalidACT extends FLEA_Exception

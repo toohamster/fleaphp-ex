@@ -4,8 +4,7 @@
 /**
  * 定义 ___uri_filter 函数
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Uri.php 1416 2008-10-16 14:44:19Z dualface $
  */

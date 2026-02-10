@@ -4,8 +4,7 @@
 /**
  * 定义 FLEA_View_Simple 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Simple.php 1304 2008-08-31 03:00:59Z dualface $
  */
@@ -15,7 +14,7 @@
  * 带有缓存功能的模版引擎
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_View_Simple

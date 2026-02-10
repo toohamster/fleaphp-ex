@@ -4,8 +4,7 @@
 /**
  * FleaPHP 中用于显示异常信息的公共文件
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Error
  * @version $Id: header.php 1005 2007-11-03 07:43:55Z qeeyuan $
  */
@@ -170,7 +169,7 @@ EOT;
 ?>
 <meta http-equiv="Content-Type" content="text/html; charset=<?php echo RESPONSE_CHARSET; ?>" />
 <style>
-<?php readfile(dirname(__FILE__) . '/style.css'); ?>
+<?php readfile(__DIR__ . '/style.css'); ?>
 </style>
 <script language="javascript" type="text/javascript">
 function switch_filedesc(id)
