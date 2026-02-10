@@ -19,7 +19,7 @@
  * $maxSize = 150 * 1024; // 150KB
  * $uploadDir = __DIR__ . '/upload';
  *
- * FLEA::loadClass('FLEA_Helper_FileUploader');
+ * // FLEA::loadClass('FLEA_Helper_FileUploader'); // 已由自动加载处理
  * $uploader = new FLEA_Helper_FileUploader();
  * $files =& $uploader->getFiles();
  * foreach ($files as $file) {
@@ -132,7 +132,7 @@ class FLEA_Helper_FileUploader
     public function getFile($name)
     {
         if (!isset($this->_files[$name])) {
-            FLEA::loadClass('FLEA_Exception_ExpectedFile');
+            // FLEA::loadClass('FLEA_Exception_ExpectedFile'); // 已由自动加载处理
             return __THROW(new FLEA_Exception_ExpectedFile('$_FILES[' . $name . ']'));
         }
         return $this->_files[$name];

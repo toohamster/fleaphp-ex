@@ -10,7 +10,7 @@
  */
 
 // {{{ includes
-FLEA::loadClass('FLEA_Db_TableDataGateway');
+// FLEA::loadClass('FLEA_Db_TableDataGateway'); // 已由自动加载处理
 // }}}
 
 /**

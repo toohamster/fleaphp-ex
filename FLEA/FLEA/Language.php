@@ -209,7 +209,7 @@ class FLEA_Language
                     $this->_dict[0] =& $this->_dict[$language];
                 }
             } else if (!$noException) {
-                FLEA::loadClass('FLEA_Exception_ExpectedFile');
+                // FLEA::loadClass('FLEA_Exception_ExpectedFile'); // 已由自动加载处理
                 return __THROW(new FLEA_Exception_ExpectedFile($filename));
             }
         }

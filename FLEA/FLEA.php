@@ -102,6 +102,9 @@ if (DEBUG_MODE) {
 // 设置异常处理例程
 __SET_EXCEPTION_HANDLER('__FLEA_EXCEPTION_HANDLER');
 
+// 注册自动加载函数
+spl_autoload_register(array('FLEA', 'autoload'));
+
 /**
  * FLEA 类提供了 FleaPHP 框架的基本服务
  *
@@ -127,7 +130,7 @@ class FLEA
     {
         if (!is_array($__flea_internal_config) && is_string($__flea_internal_config)) {
             if (!is_readable($__flea_internal_config)) {
-                FLEA::loadClass('FLEA_Exception_ExpectedFile');
+                // FLEA::loadClass('FLEA_Exception_ExpectedFile'); // 已由自动加载处理
                 return __THROW(new FLEA_Exception_ExpectedFile($__flea_internal_config));
             }
             $__flea_internal_config = require($__flea_internal_config);
@@ -247,6 +250,29 @@ class FLEA
     }
 
     /**
+     * 自动加载类文件
+     *
+     * @param string $className 要加载的类名
+     * @return boolean 加载成功返回true，失败返回false
+     */
+    public static function autoload($className)
+    {
+        // 检查类是否已经加载
+        if (PHP5) {
+            if (class_exists($className, false) || interface_exists($className, false)) { 
+                return true; 
+            }
+        } else {
+            if (class_exists($className)) { 
+                return true; 
+            }
+        }
+        
+        // 使用内部的 loadClass 方法来加载类
+        return self::loadClass($className, true);
+    }
+
+    /**
      * 载入指定的文件
      *
      * FLEA::loadFile() 会 $filename 参数中的 “_” 替换为目录，例如：
@@ -277,7 +303,7 @@ class FLEA
             }
         }
 
-        FLEA::loadClass('FLEA_Exception_ExpectedFile');
+        // FLEA::loadClass('FLEA_Exception_ExpectedFile'); // 已由自动加载处理
         __THROW(new FLEA_Exception_ExpectedFile($filename));
         return false;
     }
@@ -289,7 +315,7 @@ class FLEA
      *
      * example:
      * <code>
-     * FLEA::loadClass('Table_Posts');
+     * // FLEA::loadClass('Table_Posts'); // 已由自动加载处理
      * // 首先将类名称 Table_Posts 转换为文件名 Table/Posts.php
      * // 然后从搜索路径中查找 Table/Posts.php 文件
      * </code>
@@ -425,7 +451,7 @@ class FLEA
     public static function register(& $obj, $name = null)
     {
         if (!is_object($obj)) {
-            FLEA::loadClass('FLEA_Exception_TypeMismatch');
+            // FLEA::loadClass('FLEA_Exception_TypeMismatch'); // 已由自动加载处理
             return __THROW(new FLEA_Exception_TypeMismatch($obj, 'object', gettype($obj)));
         }
 
@@ -434,7 +460,7 @@ class FLEA
         }
 
         if (isset($GLOBALS[G_FLEA_VAR]['OBJECTS'][$name])) {
-            FLEA::loadClass('FLEA_Exception_ExistsKeyName');
+            // FLEA::loadClass('FLEA_Exception_ExistsKeyName'); // 已由自动加载处理
             return __THROW(new FLEA_Exception_ExistsKeyName($name));
         } else {
             $GLOBALS[G_FLEA_VAR]['OBJECTS'][$name] =& $obj;
@@ -459,7 +485,7 @@ class FLEA
         if (isset($GLOBALS[G_FLEA_VAR]['OBJECTS'][$name]) && is_object($GLOBALS[G_FLEA_VAR]['OBJECTS'][$name])) {
             return $GLOBALS[G_FLEA_VAR]['OBJECTS'][$name];
         }
-        FLEA::loadClass('FLEA_Exception_NotExistsKeyName');
+        // FLEA::loadClass('FLEA_Exception_NotExistsKeyName'); // 已由自动加载处理
         return __THROW(new FLEA_Exception_NotExistsKeyName($name));
     }
 
@@ -516,7 +542,7 @@ class FLEA
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
-            FLEA::loadClass('FLEA_Exception_CacheDisabled');
+            // FLEA::loadClass('FLEA_Exception_CacheDisabled'); // 已由自动加载处理
             __THROW(new FLEA_Exception_CacheDisabled($cacheDir));
             return false;
         }
@@ -574,7 +600,7 @@ class FLEA
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
-            FLEA::loadClass('FLEA_Exception_CacheDisabled');
+            // FLEA::loadClass('FLEA_Exception_CacheDisabled'); // 已由自动加载处理
             __THROW(new FLEA_Exception_CacheDisabled($cacheDir));
             return false;
         }
@@ -591,7 +617,7 @@ class FLEA
         $data = $prefix . $hash . $data;
 
         if (!safe_file_put_contents($cacheFile, $data)) {
-            FLEA::loadClass('FLEA_Exception_CacheDisabled');
+            // FLEA::loadClass('FLEA_Exception_CacheDisabled'); // 已由自动加载处理
             __THROW(new FLEA_Exception_CacheDisabled($cacheDir));
             return false;
         } else {
@@ -611,7 +637,7 @@ class FLEA
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
-            FLEA::loadClass('FLEA_Exception_CacheDisabled');
+            // FLEA::loadClass('FLEA_Exception_CacheDisabled'); // 已由自动加载处理
             __THROW(new FLEA_Exception_CacheDisabled($cacheDir));
             return false;
         }
@@ -668,7 +694,7 @@ class FLEA
         if ($setting) {
             return FLEA::loadFile($setting, true);
         } else {
-            FLEA::loadClass('FLEA_Exception_NotExistsKeyName');
+            // FLEA::loadClass('FLEA_Exception_NotExistsKeyName'); // 已由自动加载处理
             return __THROW(new FLEA_Exception_NotExistsKeyName('helper.' . $helperName));
         }
     }
@@ -709,7 +735,7 @@ class FLEA
         $dsn = FLEA::parseDSN($dsn);
 
         if (!is_array($dsn) || !isset($dsn['driver'])) {
-            FLEA::loadClass('FLEA_Db_Exception_InvalidDSN');
+            // FLEA::loadClass('FLEA_Db_Exception_InvalidDSN'); // 已由自动加载处理
             return __THROW(new FLEA_Db_Exception_InvalidDSN($dsn));
         }
 

@@ -131,14 +131,14 @@ class FLEA_Dispatcher_Simple
         }
 
         if (is_null($controller)) {
-            FLEA::loadClass('FLEA_Exception_MissingController');
+            // FLEA::loadClass('FLEA_Exception_MissingController'); // 已由自动加载处理
             __THROW(new FLEA_Exception_MissingController(
                     $controllerName, $actionName, $this->_requestBackup,
                     $controllerClass, $actionMethod, $controllerClassFilename));
             return false;
         }
 
-        FLEA::loadClass('FLEA_Exception_MissingAction');
+        // FLEA::loadClass('FLEA_Exception_MissingAction'); // 已由自动加载处理
         __THROW(new FLEA_Exception_MissingAction(
                 $controllerName, $actionName, $this->_requestBackup,
                 $controllerClass, $actionMethod, $controllerClassFilename));

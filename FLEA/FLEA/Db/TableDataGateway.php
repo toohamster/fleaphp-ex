@@ -10,8 +10,8 @@
  */
 
 // {{{ includes
-FLEA::loadClass('FLEA_Db_TableLink');
-// }}}
+// FLEA::loadClass('FLEA_Db_TableLink'); // 已由自动加载处理
+// }}}}
 
 // {{{ constants
 /**

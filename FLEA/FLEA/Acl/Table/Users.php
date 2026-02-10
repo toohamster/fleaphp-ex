@@ -10,7 +10,7 @@
  */
 
 // {{{ includes
-FLEA::loadClass('FLEA_Rbac_UsersManager');
+// FLEA::loadClass('FLEA_Rbac_UsersManager'); // 已由自动加载处理
 // }}}
 
 /**

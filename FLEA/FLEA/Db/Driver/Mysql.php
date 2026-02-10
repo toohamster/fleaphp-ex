@@ -11,7 +11,7 @@
  */
 
 // {{{ includes
-FLEA::loadClass('FLEA_Db_Driver_Abstract');
+// FLEA::loadClass('FLEA_Db_Driver_Abstract'); // 已由自动加载处理
 // }}}
 
 /**
@@ -109,7 +109,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
         } catch (PDOException $e) {
             $this->lasterr = $e->getMessage();
             $this->lasterrcode = $e->getCode();
-            FLEA::loadClass('FLEA_Db_Exception_SqlQuery');
+            // FLEA::loadClass('FLEA_Db_Exception_SqlQuery'); // 已由自动加载处理
             return __THROW(new FLEA_Db_Exception_SqlQuery(
                 "PDO Connection failed for host '{$host}'!",
                 $this->lasterr,
@@ -147,7 +147,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
         } catch (PDOException $e) {
             $this->lasterr = $e->getMessage();
             $this->lasterrcode = $e->getCode();
-            FLEA::loadClass('FLEA_Db_Exception_SqlQuery');
+            // FLEA::loadClass('FLEA_Db_Exception_SqlQuery'); // 已由自动加载处理
             return __THROW(new FLEA_Db_Exception_SqlQuery(
                 "SELECT DATABASE: '{$database}' FAILED!",
                 $this->lasterr,
@@ -190,7 +190,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
             $this->lasterrcode = $e->getCode();
 
             if ($throw) {
-                FLEA::loadClass('FLEA_Db_Exception_SqlQuery');
+                // FLEA::loadClass('FLEA_Db_Exception_SqlQuery'); // 已由自动加载处理
                 __THROW(new FLEA_Db_Exception_SqlQuery($sql, $this->lasterr, $this->lasterrcode));
             }
         }
