@@ -25,13 +25,13 @@ class FLEA_Acl_Table_Permissions extends FLEA_Db_TableDataGateway
      *
      * @var string
      */
-    var $primaryKey = 'permission_id';
+    public $primaryKey = 'permission_id';
 
     /**
      * 数据表名字
      *
      * @var string
      */
-    var $tableName = 'permissions';
+    public $tableName = 'permissions';
 
 }

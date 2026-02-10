@@ -20,7 +20,7 @@
  * $uploadDir = __DIR__ . '/upload';
  *
  * FLEA::loadClass('FLEA_Helper_FileUploader');
- * $uploader =& new FLEA_Helper_FileUploader();
+ * $uploader = new FLEA_Helper_FileUploader();
  * $files =& $uploader->getFiles();
  * foreach ($files as $file) {
  *     if (!$file->check($allowExts, $maxSize)) {
@@ -45,14 +45,14 @@ class FLEA_Helper_FileUploader
      *
      * @var array
      */
-    var $_files = array();
+    public $_files = array();
 
     /**
      * 可用的上传文件对象数量
      *
      * @var int
      */
-    var $_count;
+    public $_count;
 
     /**
      * 构造函数
@@ -71,7 +71,7 @@ class FLEA_Helper_FileUploader
                     for ($i = 0; $i < count($struct['error']); $i++) {
 
                         if ($struct['error'][$i] != UPLOAD_ERR_NO_FILE) {
-                            $arr[] =& new FLEA_Helper_FileUploader_File($struct, $field, $i);
+                            $arr[] = new FLEA_Helper_FileUploader_File($struct, $field, $i);
                             if (!$cascade) {
                                 $this->_files["{$field}{$i}"] =& $arr[count($arr) - 1];
                             }
@@ -82,7 +82,7 @@ class FLEA_Helper_FileUploader
                     }
                 } else {
                     if ($struct['error'] != UPLOAD_ERR_NO_FILE) {
-                        $this->_files[$field] =& new FLEA_Helper_FileUploader_File($struct, $field);
+                        $this->_files[$field] = new FLEA_Helper_FileUploader_File($struct, $field);
                     }
                 }
             }
@@ -105,7 +105,7 @@ class FLEA_Helper_FileUploader
      *
      * @return array
      */
-    function & getFiles()
+    function getFiles()
     {
         return $this->_files;
     }
@@ -129,7 +129,7 @@ class FLEA_Helper_FileUploader
      *
      * @return FLEA_Helper_FileUploader_File
      */
-    function & getFile($name)
+    function getFile($name)
     {
         if (!isset($this->_files[$name])) {
             FLEA::loadClass('FLEA_Exception_ExpectedFile');
@@ -178,14 +178,14 @@ class FLEA_Helper_FileUploader_File
      *
      * @var array
      */
-    var $_file = array();
+    public $_file = array();
 
     /**
      * 上传文件对象的名字
      *
      * @var string
      */
-    var $_name;
+    public $_name;
 
     /**
      * 构造函数

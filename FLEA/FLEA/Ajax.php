@@ -46,14 +46,14 @@ class FLEA_Ajax
      *
      * @var array
      */
-    var $events;
+    public $events;
 
     /**
      * 所有 FLEA_Ajax 支持的参数的类型
      *
      * @var array
      */
-    var $paramsType = array(
+    public $paramsType = array(
         'async'         => 'boolean',
         'beforeSend'    => 'function',
         'complete'      => 'function',

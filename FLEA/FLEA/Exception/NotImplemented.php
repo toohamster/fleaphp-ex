@@ -18,8 +18,8 @@
  */
 class FLEA_Exception_NotImplemented extends FLEA_Exception
 {
-    var $className;
-    var $methodName;
+    public $className;
+    public $methodName;
 
     /**
      * 构造函数

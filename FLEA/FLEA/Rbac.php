@@ -33,14 +33,14 @@ class FLEA_Rbac
      *
      * @var string
      */
-    var $_sessionKey = 'RBAC_USERDATA';
+    public $_sessionKey = 'RBAC_USERDATA';
 
     /**
      * 指示用户数据中，以什么键保存角色信息
      *
      * @var string
      */
-    var $_rolesKey = 'RBAC_ROLES';
+    public $_rolesKey = 'RBAC_ROLES';
 
     /**
      * 构造函数

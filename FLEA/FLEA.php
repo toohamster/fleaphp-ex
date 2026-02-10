@@ -378,7 +378,7 @@ class FLEA
      *
      * @return object
      */
-    function & getSingleton($className)
+    function getSingleton($className)
     {
         static $instances = array();
         if (FLEA::isRegistered($className)) {
@@ -407,7 +407,7 @@ class FLEA
      *
      * example:
      * <code>
-     * $obj =& new MyClass();
+     * $obj = new MyClass();
      * // 将对象注册到容器
      * FLEA::register($obj, 'MyClass');
      * .....
@@ -422,7 +422,7 @@ class FLEA
      *
      * @return object
      */
-    function & register(& $obj, $name = null)
+    function register(& $obj, $name = null)
     {
         if (!is_object($obj)) {
             FLEA::loadClass('FLEA_Exception_TypeMismatch');
@@ -451,7 +451,7 @@ class FLEA
      *
      * @return object
      */
-    function & registry($name = null)
+    function registry($name = null)
     {
         if (is_null($name)) {
             return $GLOBALS[G_FLEA_VAR]['OBJECTS'];
@@ -471,7 +471,7 @@ class FLEA
      * if (FLEA::isRegistered('MyClass')) {
      *      $obj =& FLEA::registry('MyClass');
      * } else {
-     *      $obj =& new MyClass();
+     *      $obj = new MyClass();
      * }
      * </code>
      *
@@ -636,7 +636,7 @@ class FLEA
      *
      * @return FLEA_WebControls
      */
-    function & initWebControls()
+    function initWebControls()
     {
         return FLEA::getSingleton(FLEA::getAppInf('webControlsClassName'));
     }
@@ -648,7 +648,7 @@ class FLEA
      *
      * @return FLEA_Ajax
      */
-    function & initAjax()
+    function initAjax()
     {
         return FLEA::getSingleton(FLEA::getAppInf('ajaxClassName'));
     }
@@ -701,7 +701,7 @@ class FLEA
      *
      * @return FLEA_Db_Driver_Abstract
      */
-    function & getDBO($dsn = 0)
+    function getDBO($dsn = 0)
     {
         if ($dsn == 0) {
             $dsn = FLEA::getAppInf('dbDSN');
@@ -725,7 +725,7 @@ class FLEA
         } else {
             FLEA::loadClass($className);
         }
-        $dbo =& new $className($dsn);
+        $dbo = new $className($dsn);
         /* @var $dbo FLEA_Db_Driver_Abstract */
         $dbo->connect();
 
@@ -789,7 +789,7 @@ class FLEA
         $dispatcherClass = FLEA::getAppInf('dispatcher');
         FLEA::loadClass($dispatcherClass);
 
-        $dispatcher =& new $dispatcherClass($_GET);
+        $dispatcher = new $dispatcherClass($_GET);
         FLEA::register($dispatcher, $dispatcherClass);
         $dispatcher->dispatching();
     }
@@ -851,14 +851,15 @@ class FLEA
         // 过滤 magic_quotes
         if (get_magic_quotes_gpc()) {
             $in = array(& $_GET, & $_POST, & $_COOKIE, & $_REQUEST);
-            while (list($k,$v) = each($in)) {
-                foreach ($v as $key => $val) {
+            foreach ($in as $key => &$v) {
+                foreach ($v as $keyInner => $val) {
                     if (!is_array($val)) {
-                        $in[$k][$key] = stripslashes($val);
+                        $in[$key][$keyInner] = stripslashes($val);
                         continue;
                     }
-                    $in[] =& $in[$k][$key];
+                    $in[] = & $in[$key][$keyInner];
                 }
+                unset($in[$key]);
             }
             unset($in);
         }

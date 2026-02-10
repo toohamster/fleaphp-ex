@@ -30,14 +30,14 @@ class FLEA_Dispatcher_Simple
      *
      * @var array
      */
-    var $_request;
+    public $_request;
 
     /**
      * 原始的请求信息数组
      *
      * @var array
      */
-    var $_requestBackup;
+    public $_requestBackup;
 
     /**
      * 构造函数
@@ -102,7 +102,7 @@ class FLEA_Dispatcher_Simple
             // 构造控制器对象
             FLEA::setAppInf('FLEA.internal.currentControllerName', $controllerName);
             FLEA::setAppInf('FLEA.internal.currentActionName', $actionName);
-            $controller =& new $controllerClass($controllerName);
+            $controller = new $controllerClass($controllerName);
             if (!method_exists($controller, $actionMethod)) { break; }
             if (method_exists($controller, '__setController')) {
                 $controller->__setController($controllerName, $actionName);

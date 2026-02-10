@@ -18,7 +18,7 @@
  */
 class FLEA_Db_Exception_InvalidLinkType extends FLEA_Exception
 {
-    var $type;
+    public $type;
 
     /**
      * 构造函数

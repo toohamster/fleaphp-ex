@@ -23,7 +23,7 @@ class FLEA_Db_Exception_MissingLinkOption extends FLEA_Exception
      *
      * @var string
      */
-    var $option;
+    public $option;
 
     /**
      * 构造函数

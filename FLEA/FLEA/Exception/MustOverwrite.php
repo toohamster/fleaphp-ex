@@ -18,7 +18,7 @@
  */
 class FLEA_Exception_MustOverwrite extends FLEA_Exception
 {
-    var $prototypeMethod;
+    public $prototypeMethod;
 
     /**
      * 构造函数

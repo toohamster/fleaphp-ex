@@ -23,7 +23,7 @@ class FLEA_Db_Exception_MissingPrimaryKey extends FLEA_Exception
      *
      * @var string
      */
-    var $primaryKey;
+    public $primaryKey;
 
     /**
      * 构造函数

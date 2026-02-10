@@ -23,7 +23,7 @@ class FLEA_Rbac_Exception_InvalidACT extends FLEA_Exception
      *
      * @var mixed
      */
-    var $act;
+    public $act;
 
     /**
      * 构造函数

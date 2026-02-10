@@ -42,42 +42,42 @@ class FLEA_Log
      *
      * @var string
      */
-    var $_log = '';
+    public $_log = '';
 
     /**
      * 日期格式
      *
      * @var string
      */
-    var $dateFormat = 'Y-m-d H:i:s';
+    public $dateFormat = 'Y-m-d H:i:s';
 
     /**
      * 保存日志文件的目录
      *
      * @var string
      */
-    var $_logFileDir;
+    public $_logFileDir;
 
     /**
      * 保存日志的文件名
      *
      * @var string
      */
-    var $_logFilename;
+    public $_logFilename;
 
     /**
      * 是否允许日志保存
      *
      * @var boolean
      */
-    var $_enabled = true;
+    public $_enabled = true;
 
     /**
      * 要写入日志文件的错误级别
      *
      * @var array
      */
-    var $_errorLevel;
+    public $_errorLevel;
 
     /**
      * 构造函数

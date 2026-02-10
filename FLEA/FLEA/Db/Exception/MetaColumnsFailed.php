@@ -18,7 +18,7 @@
  */
 class FLEA_Db_Exception_MetaColumnsFailed extends FLEA_Exception
 {
-    var $tableName;
+    public $tableName;
 
     /**
      * 构造函数

@@ -55,56 +55,56 @@ class FLEA_Db_TableDataGateway
      *
      * @var string
      */
-    var $schema = '';
+    public $schema = '';
 
     /**
      * 数据表名（没有添加前缀）
      *
      * @var string
      */
-    var $tableName = null;
+    public $tableName = null;
 
     /**
      * 包含前缀的完整数据表名称
      *
      * @var string
      */
-    var $fullTableName = null;
+    public $fullTableName = null;
 
     /**
      * 主键字段名，或者是包含多个主键字段名的数组
      *
      * @var sring|array
      */
-    var $primaryKey = null;
+    public $primaryKey = null;
 
     /**
      * 定义一对一关联
      *
      * @var array
      */
-    var $hasOne = null;
+    public $hasOne = null;
 
     /**
      * 定义从属关联
      *
      * @var array
      */
-    var $belongsTo = null;
+    public $belongsTo = null;
 
     /**
      * 定义一对多关联
      *
      * @var array
      */
-    var $hasMany = null;
+    public $hasMany = null;
 
     /**
      * 定义多对多关联
      *
      * @var array
      */
-    var $manyToMany = null;
+    public $manyToMany = null;
 
     /**
      * 当前数据表的元数据
@@ -114,14 +114,14 @@ class FLEA_Db_TableDataGateway
      *
      * @var array
      */
-    var $meta = null;
+    public $meta = null;
 
     /**
      * 当前数据表的所有字段名
      *
      * @var array
      */
-    var $fields = null;
+    public $fields = null;
 
     /**
      * 指示是否对数据进行自动验证
@@ -130,21 +130,21 @@ class FLEA_Db_TableDataGateway
      *
      * @var boolean
      */
-    var $autoValidating = false;
+    public $autoValidating = false;
 
     /**
      * 用于数据验证的对象
      *
      * @var FLEA_Helper_Verifier
      */
-    var $verifier = null;
+    public $verifier = null;
 
     /**
      * 附加的验证规则
      *
      * @var array
      */
-    var $validateRules = null;
+    public $validateRules = null;
 
     /**
      * 创建记录时，要自动填入当前时间的字段
@@ -154,7 +154,7 @@ class FLEA_Db_TableDataGateway
      *
      * @var array
      */
-    var $createdTimeFields = array('CREATED', 'CREATED_ON', 'CREATED_AT');
+    public $createdTimeFields = array('CREATED', 'CREATED_ON', 'CREATED_AT');
 
     /**
      * 创建和更新记录时，要自动填入当前时间的字段
@@ -164,7 +164,7 @@ class FLEA_Db_TableDataGateway
      *
      * @var array
      */
-    var $updatedTimeFields = array('UPDATED', 'UPDATED_ON', 'UPDATED_AT');
+    public $updatedTimeFields = array('UPDATED', 'UPDATED_ON', 'UPDATED_AT');
 
     /**
      * 指示进行 CRUD 操作时是否处理关联
@@ -173,7 +173,7 @@ class FLEA_Db_TableDataGateway
      *
      * @var boolean
      */
-    var $autoLink = true;
+    public $autoLink = true;
 
     /**
      * 数据库访问对象
@@ -183,7 +183,7 @@ class FLEA_Db_TableDataGateway
      *
      * @var FLEA_Db_Driver_Abstract
      */
-    var $dbo = null;
+    public $dbo = null;
 
     /**
      * 存储关联信息
@@ -193,7 +193,7 @@ class FLEA_Db_TableDataGateway
      *
      * @var array
      */
-    var $links = array();
+    public $links = array();
 
     /**
      * 包含前缀的数据表完全限定名
@@ -201,7 +201,7 @@ class FLEA_Db_TableDataGateway
      * @var string
      * @access private
      */
-    var $qtableName;
+    public $qtableName;
 
     /**
      * 主键字段完全限定名
@@ -209,12 +209,12 @@ class FLEA_Db_TableDataGateway
      * @var string
      * @access private
      */
-    var $qpk;
+    public $qpk;
 
     /**
      * 用于关联查询时的主键字段别名
      */
-    var $pka;
+    public $pka;
 
     /**
      * 用于关联查询时的主键字段完全限定名
@@ -222,7 +222,7 @@ class FLEA_Db_TableDataGateway
      * @var string
      * @access private
      */
-    var $qpka;
+    public $qpka;
 
     /**
      * 保存最后一次数据验证的结果
@@ -231,7 +231,7 @@ class FLEA_Db_TableDataGateway
      *
      * @var array
      */
-    var $lastValidationResult;
+    public $lastValidationResult;
 
     /**
      * 构造 FLEA_Db_TableDataGateway 实例
@@ -372,7 +372,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return FLEA_Db_Driver_Abstract
      */
-    function & getDBO()
+    function getDBO()
     {
         return $this->dbo;
     }
@@ -387,7 +387,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function & find($conditions, $sort = null, $fields = '*', $queryLinks = true)
+    function find($conditions, $sort = null, $fields = '*', $queryLinks = true)
     {
         $rowset =& $this->findAll($conditions, $sort, 1, $fields, $queryLinks);
         if (is_array($rowset)) {
@@ -410,7 +410,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function & findAll($conditions = null, $sort = null, $limit = null, $fields = '*', $queryLinks = true)
+    function findAll($conditions = null, $sort = null, $limit = null, $fields = '*', $queryLinks = true)
     {
         list($whereby, $distinct) = $this->getWhere($conditions);
         // 处理排序
@@ -624,7 +624,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function & findByField($field, $value, $sort = null, $fields = '*')
+    function findByField($field, $value, $sort = null, $fields = '*')
     {
         return $this->find(array($field => $value), $sort, $fields);
     }
@@ -640,7 +640,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function & findAllByField($field, $value, $sort = null, $limit = null, $fields = '*')
+    function findAllByField($field, $value, $sort = null, $limit = null, $fields = '*')
     {
         return $this->findAll(array($field => $value), $sort, $limit, $fields);
     }
@@ -657,7 +657,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function & findAllByPkvs($pkvs, $conditions = null, $sort = null, $limit = null, $fields = '*', $queryLinks = true)
+    function findAllByPkvs($pkvs, $conditions = null, $sort = null, $limit = null, $fields = '*', $queryLinks = true)
     {
         $in = array('in()' => $pkvs);
         if (empty($conditions)) {
@@ -681,7 +681,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function & findBySql($sql, $limit = null)
+    function findBySql($sql, $limit = null)
     {
         // 处理 $limit
         if (is_array($limit)) {
@@ -1479,7 +1479,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return FLEA_Db_TableLink
      */
-    function & getLink($linkName)
+    function getLink($linkName)
     {
         $linkName = strtoupper($linkName);
         if (isset($this->links[$linkName])) {
@@ -1499,7 +1499,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return FLEA_Db_TableDataGateway
      */
-    function & getLinkTable($linkName)
+    function getLinkTable($linkName)
     {
         $link =& $this->getLink($linkName);
         $link->init();

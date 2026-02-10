@@ -34,35 +34,35 @@ class FLEA_Session_Db
      *
      * @var FLEA_Db_Driver_Abstract
      */
-    var $dbo = null;
+    public $dbo = null;
 
     /**
      * 保存 session 的数据表名称，由应用程序设置 sessionDbTableName 指定
      *
      * @var string
      */
-    var $tableName = null;
+    public $tableName = null;
 
     /**
      * 保存 session id 的字段名，由应用程序设置 sessionDbFieldId 指定
      *
      * @var string
      */
-    var $fieldId = null;
+    public $fieldId = null;
 
     /**
      * 保存 session 数据的字段名，由应用程序设置 sessionDbFieldData 指定
      *
      * @var string
      */
-    var $fieldData = null;
+    public $fieldData = null;
 
     /**
      * 保存 session 过期时间的字段名，由应用程序设置 sessionDbFieldActivity 指定
      *
      * @var string
      */
-    var $fieldActivity = null;
+    public $fieldActivity = null;
 
     /**
      * 指示 session 的有效期
@@ -71,7 +71,7 @@ class FLEA_Session_Db
      *
      * @var int
      */
-    var $lifeTime = 0;
+    public $lifeTime = 0;
 
     /**
      * 构造函数

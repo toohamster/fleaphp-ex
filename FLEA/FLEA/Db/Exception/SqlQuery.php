@@ -23,7 +23,7 @@ class FLEA_Db_Exception_SqlQuery extends FLEA_Exception
      *
      * @var string
      */
-    var $sql;
+    public $sql;
 
     /**
      * 构造函数

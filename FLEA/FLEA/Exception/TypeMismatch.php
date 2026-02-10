@@ -18,9 +18,9 @@
  */
 class FLEA_Exception_TypeMismatch extends FLEA_Exception
 {
-    var $arg;
-    var $expected;
-    var $actual;
+    public $arg;
+    public $expected;
+    public $actual;
 
     /**
      * 构造函数

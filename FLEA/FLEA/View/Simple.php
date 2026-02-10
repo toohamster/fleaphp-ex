@@ -24,7 +24,7 @@ class FLEA_View_Simple
      *
      * @var string
      */
-    var $path;
+    public $path;
 
     /**
      * 缓存过期时间
@@ -32,7 +32,7 @@ class FLEA_View_Simple
      * @access public
      * @var int
      */
-    var $cacheLifetime;
+    public $cacheLifetime;
 
     /**
      * 指示是否使用 cache
@@ -40,7 +40,7 @@ class FLEA_View_Simple
      * @access public
      * @var boolean
      */
-    var $enableCache;
+    public $enableCache;
 
     /**
      * 缓存文件保存位置
@@ -48,7 +48,7 @@ class FLEA_View_Simple
      * @access public
      * @var string
      */
-    var $cacheDir;
+    public $cacheDir;
 
     /**
      * 模板变量
@@ -56,7 +56,7 @@ class FLEA_View_Simple
      * @access private
      * @var array
      */
-    var $vars = array();
+    public $vars = array();
 
     /**
      * 保存各个缓存内容的缓存状态
@@ -64,7 +64,7 @@ class FLEA_View_Simple
      * @access private
      * @var array
      */
-    var $cacheState = array();
+    public $cacheState = array();
 
     /**
      * 构造函数

@@ -18,7 +18,7 @@
  */
 class FLEA_Db_Exception_MissingLink extends FLEA_Exception
 {
-    var $name;
+    public $name;
 
     /**
      * 构造函数

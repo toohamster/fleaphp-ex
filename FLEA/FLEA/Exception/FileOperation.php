@@ -23,14 +23,14 @@ class FLEA_Exception_FileOperation extends FLEA_Exception
      *
      * @var string
      */
-    var $operation;
+    public $operation;
 
     /**
      * 操作的参数
      *
      * @var array
      */
-    var $args;
+    public $args;
 
     /**
      * 构造函数

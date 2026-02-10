@@ -27,21 +27,21 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @var string
      */
-    var $primaryKey = 'user_group_id';
+    public $primaryKey = 'user_group_id';
 
     /**
      * 数据表名称
      *
      * @var string
      */
-    var $tableName = 'user_groups';
+    public $tableName = 'user_groups';
 
     /**
      * 用户组关联多个角色和权限
      *
      * @var array
      */
-    var $manyToMany = array(
+    public $manyToMany = array(
         array(
             'tableClass' => 'FLEA_Acl_Table_Roles',
             'foreignKey' => 'user_group_id',
@@ -63,7 +63,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @var string
      */
-    var $_rootGroupName = '_#_ROOT_GROUP_#_';
+    public $_rootGroupName = '_#_ROOT_GROUP_#_';
 
     /**
      * 添加一个用户组，返回该用户组的 ID

@@ -18,7 +18,7 @@
  */
 class FLEA_Exception_NotExistsKeyName extends FLEA_Exception
 {
-    var $keyname;
+    public $keyname;
 
     /**
      * 构造函数

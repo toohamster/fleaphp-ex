@@ -23,35 +23,35 @@ class FLEA_Db_ActiveRecord
      *
      * @var array
      */
-    var $_aggregation = array();
+    public $_aggregation = array();
 
     /**
      * 用于完成数据库操作的 TableDataGateway 继承类
      *
      * @var FLEA_Db_TableDataGateway
      */
-    var $_table;
+    public $_table;
 
     /**
      * 该对象的主键属性名
      *
      * @var string
      */
-    var $_idname;
+    public $_idname;
 
     /**
      * 指示该对象是否已经初始化
      *
      * @var boolean
      */
-    var $init = false;
+    public $init = false;
 
     /**
      * 字段和对象属性之间的映射关系
      *
      * @var array
      */
-    var $_mapping = false;
+    public $_mapping = false;
 
     /**
      * 继承类必须覆盖此静态函数
@@ -98,7 +98,7 @@ class FLEA_Db_ActiveRecord
             $this->_table =& FLEA::registry($objid);
         } else {
             FLEA::loadClass($tableClass);
-            $this->_table =& new $tableClass(array('skipCreateLinks' => true));
+            $this->_table = new $tableClass(array('skipCreateLinks' => true));
             FLEA::register($this->_table, $objid);
         }
 
@@ -232,9 +232,9 @@ class FLEA_Db_ActiveRecord
             $mn = $define['link']->mappingName;
             if (!isset($row[$mn])) { continue; }
             if ($define['link']->oneToOne) {
-                $this->{$mn} =& new $define['class']($row[$mn]);
+                $this->{$mn} = new $define['class']($row[$mn]);
             } else {
-                $this->{$mn}[] =& new $define['class']($row[$mn]);
+                $this->{$mn}[] = new $define['class']($row[$mn]);
             }
         }
     }

@@ -40,63 +40,63 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @var string
      */
-    var $primaryKey = 'user_id';
+    public $primaryKey = 'user_id';
 
     /**
      * 数据表名字
      *
      * @var string
      */
-    var $tableName = 'users';
+    public $tableName = 'users';
 
     /**
      * 用户名字段的名字
      *
      * @var string
      */
-    var $usernameField = 'username';
+    public $usernameField = 'username';
 
     /**
      * 电子邮件字段的名字
      *
      * @var string
      */
-    var $emailField = 'email';
+    public $emailField = 'email';
 
     /**
      * 密码字段的名字
      *
      * @var string
      */
-    var $passwordField = 'password';
+    public $passwordField = 'password';
 
     /**
      * 角色字段的名字
      *
      * @var string
      */
-    var $rolesField = 'roles';
+    public $rolesField = 'roles';
 
     /**
      * 密码加密方式
      *
      * @var int
      */
-    var $encodeMethod = PWD_CRYPT;
+    public $encodeMethod = PWD_CRYPT;
 
     /**
      * 对数据进行自动验证
      *
      * @var boolean
      */
-    var $autoValidating = true;
+    public $autoValidating = true;
 
     /**
      * 指定其他具有特殊意义的字段
      *
      * @var array
      */
-    var $functionFields = array(
+    public $functionFields = array(
         'registerIpField' => null,
         'lastLoginField' => null,
         'lastLoginIpField' => null,

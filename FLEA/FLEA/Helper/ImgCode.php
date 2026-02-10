@@ -49,21 +49,21 @@ class FLEA_Helper_ImgCode
      *
      * @var string
      */
-    var $_code;
+    public $_code;
 
     /**
      * 验证码过期时间
      *
      * @var string
      */
-    var $_expired;
+    public $_expired;
 
     /**
      * 验证码图片的类型（默认为 jpeg）
      *
      * @var string
      */
-    var $imagetype = 'jpeg';
+    public $imagetype = 'jpeg';
 
     /**
      * 指示是否在生成验证码图片时保留已有的验证码
@@ -73,7 +73,7 @@ class FLEA_Helper_ImgCode
      *
      * @var boolean
      */
-    var $keepCode = false;
+    public $keepCode = false;
 
     /**
      * 构造函数

@@ -23,14 +23,14 @@ class FLEA_Exception_ValidationFailed extends FLEA_Exception
      *
      * @var mixed
      */
-    var $data;
+    public $data;
 
     /**
      * 验证结果
      *
      * @var array
      */
-    var $result;
+    public $result;
 
     /**
      * 构造函数

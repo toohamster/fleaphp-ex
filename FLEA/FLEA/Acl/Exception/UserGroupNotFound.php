@@ -18,7 +18,7 @@
  */
 class FLEA_Acl_Exception_UserGroupNotFound extends FLEA_Exception
 {
-    var $userGroupId;
+    public $userGroupId;
 
     function FLEA_Acl_Exception_UserGroupNotFound($userGroupId)
     {

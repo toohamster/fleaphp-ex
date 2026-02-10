@@ -25,21 +25,21 @@ class FLEA_Acl_Table_Roles extends FLEA_Db_TableDataGateway
      *
      * @var string
      */
-    var $primaryKey = 'role_id';
+    public $primaryKey = 'role_id';
 
     /**
      * 数据表名字
      *
      * @var string
      */
-    var $tableName = 'roles';
+    public $tableName = 'roles';
 
     /**
      * 一个角色对应多个权限，一个权限可以指派给多个角色
      *
      * @var array
      */
-    var $manyToMany = array(
+    public $manyToMany = array(
         array(
             'tableClass' => 'FLEA_Acl_Table_Permissions',
             'foreignKey' => 'role_id',

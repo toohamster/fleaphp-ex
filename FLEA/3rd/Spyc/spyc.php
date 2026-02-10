@@ -29,28 +29,28 @@ class Spyc {
   * @access private
   * @var mixed
   */
-  var $_haveRefs;
-  var $_allNodes;
-  var $_allParent;
-  var $_lastIndent;
-  var $_lastNode;
-  var $_inBlock;
-  var $_isInline;
-  var $_dumpIndent;
-  var $_dumpWordWrap;
-  var $_containsGroupAnchor = false;
-  var $_containsGroupAlias = false;
-  var $path;
-  var $result;
-  var $LiteralBlockMarkers = array ('>', '|');
-  var $LiteralPlaceHolder = '___YAML_Literal_Block___';
-  var $SavedGroups = array();
+  public $_haveRefs;
+  public $_allNodes;
+  public $_allParent;
+  public $_lastIndent;
+  public $_lastNode;
+  public $_inBlock;
+  public $_isInline;
+  public $_dumpIndent;
+  public $_dumpWordWrap;
+  public $_containsGroupAnchor = false;
+  public $_containsGroupAlias = false;
+  public $path;
+  public $result;
+  public $LiteralBlockMarkers = array ('>', '|');
+  public $LiteralPlaceHolder = '___YAML_Literal_Block___';
+  public $SavedGroups = array();
 
   /**#@+
   * @access public
   * @var mixed
   */
-  var $_nodeId;
+  public $_nodeId;
 
   /**
      * Load YAML into a PHP array statically

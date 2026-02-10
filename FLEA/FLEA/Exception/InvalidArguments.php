@@ -18,8 +18,8 @@
  */
 class FLEA_Exception_InvalidArguments extends FLEA_Exception
 {
-    var $arg;
-    var $value;
+    public $arg;
+    public $value;
 
     /**
      * 构造函数

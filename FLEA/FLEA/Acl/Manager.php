@@ -23,7 +23,7 @@ class FLEA_Acl_Manager
      *
      * @var array
      */
-    var $_tableClass = array(
+    public $_tableClass = array(
         'users' =>                  'FLEA_Acl_Table_Users',
         'roles' =>                  'FLEA_Acl_Table_Roles',
         'userGroups' =>             'FLEA_Acl_Table_UserGroups',

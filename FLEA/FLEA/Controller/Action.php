@@ -26,35 +26,35 @@ class FLEA_Controller_Action
      *
      * @var string
      */
-    var $_controllerName = null;
+    public $_controllerName = null;
 
     /**
      * 当前调用的动作名
      *
      * @var string
      */
-    var $_actionName = null;
+    public $_actionName = null;
 
     /**
      * 当前使用的调度器的名字
      *
      * @var FLEA_Dispatcher_Auth
      */
-    var $_dispatcher = null;
+    public $_dispatcher = null;
 
     /**
      * 要使用的控制器部件
      *
      * @var array
      */
-    var $components = array();
+    public $components = array();
 
     /**
      * 渲染视图前要调用的 callback 方法
      *
      * @var array
      */
-    var $_renderCallbacks = array();
+    public $_renderCallbacks = array();
 
     /**
      * 构造函数
@@ -79,14 +79,14 @@ class FLEA_Controller_Action
      *
      * @return object
      */
-    function & _getComponent($componentName)
+    function _getComponent($componentName)
     {
         static $instances = array();
 
         if (!isset($instances[$componentName])) {
             $componentClassName = FLEA::getAppInf('component.' . $componentName);
             FLEA::loadClass($componentClassName);
-            $instances[$componentName] =& new $componentClassName($this);
+            $instances[$componentName] = new $componentClassName($this);
         }
         return $instances[$componentName];
     }
@@ -118,7 +118,7 @@ class FLEA_Controller_Action
      *
      * @return FLEA_Dispatcher_Auth
      */
-    function & _getDispatcher()
+    function _getDispatcher()
     {
         if (!is_object($this->_dispatcher)) {
             $this->_dispatcher =& FLEA::getSingleton(FLEA::getAppInf('dispatcher'));
@@ -158,7 +158,7 @@ class FLEA_Controller_Action
      *
      * @return object
      */
-    function & _getView()
+    function _getView()
     {
         $viewClass = FLEA::getAppInf('view');
         if ($viewClass != 'PHP') {

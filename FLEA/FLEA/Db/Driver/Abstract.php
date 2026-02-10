@@ -39,134 +39,134 @@ class FLEA_Db_Driver_Abstract
     /**
      * 用于描绘 true、false 和 null 的数据库值
      */
-    var $TRUE_VALUE  = 1;
-    var $FALSE_VALUE = 0;
-    var $NULL_VALUE = 'NULL';
+    public $TRUE_VALUE  = 1;
+    public $FALSE_VALUE = 0;
+    public $NULL_VALUE = 'NULL';
 
     /**
      * 用于 genSeq()、dropSeq() 和 nextId() 的 SQL 查询语句
      */
-    var $NEXT_ID_SQL    = null;
-    var $CREATE_SEQ_SQL = null;
-    var $INIT_SEQ_SQL   = null;
-    var $DROP_SEQ_SQL   = null;
+    public $NEXT_ID_SQL    = null;
+    public $CREATE_SEQ_SQL = null;
+    public $INIT_SEQ_SQL   = null;
+    public $DROP_SEQ_SQL   = null;
 
     /**
      * 用于获取元数据的 SQL 查询语句
      */
-    var $META_COLUMNS_SQL = null;
+    public $META_COLUMNS_SQL = null;
 
     /**
      * 指示使用何种样式的参数占位符
      *
      * @var int
      */
-    var $PARAM_STYLE = DBO_PARAM_QM;
+    public $PARAM_STYLE = DBO_PARAM_QM;
 
     /**
      * 指示数据库是否有自增字段功能
      *
      * @var boolean
      */
-    var $HAS_INSERT_ID  = false;
+    public $HAS_INSERT_ID  = false;
 
     /**
      * 指示数据库是否能获得更新、删除操作影响的记录行数量
      *
      * @var boolean
      */
-    var $HAS_AFFECTED_ROWS = false;
+    public $HAS_AFFECTED_ROWS = false;
 
     /**
      * 指示数据库是否支持事务
      *
      * @var boolean
      */
-    var $HAS_TRANSACTION = false;
+    public $HAS_TRANSACTION = false;
 
     /**
      * 指示数据库是否支持事务中的 SAVEPOINT 功能
      *
      * @var boolean
      */
-    var $HAS_SAVEPOINT = false;
+    public $HAS_SAVEPOINT = false;
 
     /**
      * 指示是否将查询结果中的字段名转换为全小写
      *
      * @var boolean
      */
-    var $RESULT_FIELD_NAME_LOWER = false;
+    public $RESULT_FIELD_NAME_LOWER = false;
 
     /**
      * 数据库连接信息
      *
      * @var array
      */
-    var $dsn = null;
+    public $dsn = null;
 
     /**
      * 数据库连接句柄
      *
      * @var resource
      */
-    var $conn = null;
+    public $conn = null;
 
     /**
      * 所有 SQL 查询的日志
      *
      * @var array
      */
-    var $log = array();
+    public $log = array();
 
     /**
      * 执行的查询计数
      *
      * @var int
      */
-    var $querycount = 0;
+    public $querycount = 0;
 
     /**
      * 最后一次数据库操作的错误信息
      *
      * @var mixed
      */
-    var $lasterr = null;
+    public $lasterr = null;
 
     /**
      * 最后一次数据库操作的错误代码
      *
      * @var mixed
      */
-    var $lasterrcode = null;
+    public $lasterrcode = null;
 
     /**
      * 最近一次插入操作或者 nextId() 操作返回的插入 ID
      *
      * @var mixed
      */
-    var $_insertId = null;
+    public $_insertId = null;
 
     /**
      * 指示事务启动次数
      *
      * @var int
      */
-    var $_transCount = 0;
+    public $_transCount = 0;
 
     /**
      * 指示事务执行期间是否发生了错误
      *
      * @var boolean
      */
-    var $_hasFailedQuery = false;
+    public $_hasFailedQuery = false;
 
     /**
      * SAVEPOINT 堆栈
      *
      * @var array
      */
-    var $_savepointStack = array();
+    public $_savepointStack = array();
 
     /**
      * 构造函数
@@ -531,7 +531,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function & getAll($sql)
+    function getAll($sql)
     {
         $res = is_resource($sql) ? $sql : $this->execute($sql);
         $rowset = array();
@@ -564,7 +564,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return mixed
      */
-    function & getRow($sql)
+    function getRow($sql)
     {
         $res = is_resource($sql) ? $sql : $this->execute($sql);
         $row = $this->fetchAssoc($res);
@@ -580,7 +580,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return mixed
      */
-    function & getCol($sql, $col = 0)
+    function getCol($sql, $col = 0)
     {
         $res = is_resource($sql) ? $sql : $this->execute($sql);
         $data = array();
@@ -602,7 +602,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function & getAllGroupBy($sql, & $groupBy)
+    function getAllGroupBy($sql, & $groupBy)
     {
         if (is_resource($sql)) {
             $res = $sql;
@@ -649,7 +649,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function & metaColumns($table)
+    function metaColumns($table)
     {
     }
 

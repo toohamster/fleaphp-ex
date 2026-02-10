@@ -22,7 +22,7 @@ FLEA::loadClass('FLEA_Rbac_UsersManager');
  */
 class FLEA_Acl_Table_Users extends FLEA_Rbac_UsersManager
 {
-    var $belongsTo = array(
+    public $belongsTo = array(
         array(
             'tableClass' => 'FLEA_Acl_Table_UserGroups',
             'foreignKey' => 'user_group_id',
@@ -30,7 +30,7 @@ class FLEA_Acl_Table_Users extends FLEA_Rbac_UsersManager
         ),
     );
 
-    var $manyToMany = array(
+    public $manyToMany = array(
         array(
             'tableClass' => 'FLEA_Acl_Table_Roles',
             'foreignKey' => 'user_id',

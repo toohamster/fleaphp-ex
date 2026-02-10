@@ -23,21 +23,21 @@ class FLEA_Rbac_Exception_InvalidACTFile extends FLEA_Exception
      *
      * @var string
      */
-    var $actFilename;
+    public $actFilename;
 
     /**
      * 控制器名字
      *
      * @var string
      */
-    var $controllerName;
+    public $controllerName;
 
     /**
      * 无效的 ACT 内容
      *
      * @var mixed
      */
-    var $act;
+    public $act;
 
     /**
      * 构造函数

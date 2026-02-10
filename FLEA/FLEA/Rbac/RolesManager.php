@@ -29,21 +29,21 @@ class FLEA_Rbac_RolesManager extends FLEA_Db_TableDataGateway
      *
      * @var string
      */
-    var $primaryKey = 'role_id';
+    public $primaryKey = 'role_id';
 
     /**
      * 数据表名字
      *
      * @var string
      */
-    var $tableName = 'roles';
+    public $tableName = 'roles';
 
     /**
      * 角色名字段
      *
      * @var string
      */
-    var $rolesNameField = 'rolename';
+    public $rolesNameField = 'rolename';
 
     /**
      * 构造函数

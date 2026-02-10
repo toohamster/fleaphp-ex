@@ -28,7 +28,7 @@ class FLEA_Helper_Pager
      *
      * @var FLEA_Db_TableDataGateway|string
      */
-    var $source;
+    public $source;
 
     /**
      * 数据库访问对象，当 $this->source 参数为 SQL 语句时，必须调用
@@ -36,133 +36,133 @@ class FLEA_Helper_Pager
      *
      * @var SDBO
      */
-    var $dbo;
+    public $dbo;
 
     /**
      * 查询条件
      *
      * @var mixed
      */
-    var $_conditions;
+    public $_conditions;
 
     /**
      * 排序
      *
      * @var string
      */
-    var $_sortby;
+    public $_sortby;
 
     /**
      * 计算实际页码时的基数
      *
      * @var int
      */
-    var $_basePageIndex = 0;
+    public $_basePageIndex = 0;
 
     /**
      * 每页记录数
      *
      * @var int
      */
-    var $pageSize = -1;
+    public $pageSize = -1;
 
     /**
      * 数据表中符合查询条件的记录总数
      *
      * @var int
      */
-    var $totalCount = -1;
+    public $totalCount = -1;
 
     /**
      * 数据表中符合查询条件的记录总数
      *
      * @var int
      */
-    var $count = -1;
+    public $count = -1;
 
     /**
      * 符合条件的记录页数
      *
      * @var int
      */
-    var $pageCount = -1;
+    public $pageCount = -1;
 
     /**
      * 第一页的索引，从 0 开始
      *
      * @var int
      */
-    var $firstPage = -1;
+    public $firstPage = -1;
 
     /**
      * 第一页的页码
      *
      * @var int
      */
-    var $firstPageNumber = -1;
+    public $firstPageNumber = -1;
 
     /**
      * 最后一页的索引，从 0 开始
      *
      * @var int
      */
-    var $lastPage = -1;
+    public $lastPage = -1;
 
     /**
      * 最后一页的页码
      *
      * @var int
      */
-    var $lastPageNumber = -1;
+    public $lastPageNumber = -1;
 
     /**
      * 上一页的索引
      *
      * @var int
      */
-    var $prevPage = -1;
+    public $prevPage = -1;
 
     /**
      * 上一页的页码
      *
      * @var int
      */
-    var $prevPageNumber = -1;
+    public $prevPageNumber = -1;
 
     /**
      * 下一页的索引
      *
      * @var int
      */
-    var $nextPage = -1;
+    public $nextPage = -1;
 
     /**
      * 下一页的页码
      *
      * @var int
      */
-    var $nextPageNumber = -1;
+    public $nextPageNumber = -1;
 
     /**
      * 当前页的索引
      *
      * @var int
      */
-    var $currentPage = -1;
+    public $currentPage = -1;
 
     /**
      * 构造函数中提供的当前页索引，用于 setBasePageIndex() 后重新计算页码
      *
      * @var int
      */
-    var $_currentPage = -1;
+    public $_currentPage = -1;
 
     /**
      * 当前页的页码
      *
      * @var int
      */
-    var $currentPageNumber = -1;
+    public $currentPageNumber = -1;
 
     /**
      * 构造函数
@@ -261,7 +261,7 @@ class FLEA_Helper_Pager
      *
      * @return array
      */
-    function & findAll($fields = '*', $queryLinks = true)
+    function findAll($fields = '*', $queryLinks = true)
     {
         if ($this->count == -1) {
             $this->count = 20;

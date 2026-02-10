@@ -23,7 +23,7 @@ class FLEA_Exception_MissingArguments extends FLEA_Exception
      *
      * @var mixed
      */
-    var $args;
+    public $args;
 
     /**
      * 构造函数

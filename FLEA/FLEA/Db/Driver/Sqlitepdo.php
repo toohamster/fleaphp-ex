@@ -15,85 +15,85 @@ class FLEA_Db_Driver_Sqlite
 	/**
 	 * 用于 genSeq()、dropSeq() 和 nextId() 的 SQL 查询语句
 	 */
-	var $NEXT_ID_SQL = "UPDATE %s SET id = LAST_INSERT_ID(id + 1)";
-	var $CREATE_SEQ_SQL = "CREATE TABLE %s (id INT NOT NULL)";
-	var $INIT_SEQ_SQL = "INSERT INTO %s VALUES (%s)";
-	var $DROP_SEQ_SQL = "DROP TABLE %s";
+	public $NEXT_ID_SQL = "UPDATE %s SET id = LAST_INSERT_ID(id + 1)";
+	public $CREATE_SEQ_SQL = "CREATE TABLE %s (id INT NOT NULL)";
+	public $INIT_SEQ_SQL = "INSERT INTO %s VALUES (%s)";
+	public $DROP_SEQ_SQL = "DROP TABLE %s";
 
 	/**
 	 * 用于描绘 true、false 和 null 的数据库值
 	 */
-	var $TRUE_VALUE = 1;
-	var $FALSE_VALUE = 0;
-	var $NULL_VALUE = 'NULL';
+	public $TRUE_VALUE = 1;
+	public $FALSE_VALUE = 0;
+	public $NULL_VALUE = 'NULL';
 
 	/**
 	 * 用于获取元数据的 SQL 查询语句
 	 */
-	var $META_COLUMNS_SQL = "SELECT sql FROM sqlite_master WHERE type='table' and name='%s'"; //sqlite 用这个表来保存数据库的SQL
+	public $META_COLUMNS_SQL = "SELECT sql FROM sqlite_master WHERE type='table' and name='%s'"; //sqlite 用这个表来保存数据库的SQL
 
 	/**
 	 * 数据库连接信息
 	 *
 	 * @var array
 	 */
-	var $dsn = null;
+	public $dsn = null;
 
 	/**
 	 * 数据库连接句柄
 	 *
 	 * @var resource
 	 */
-	var $conn = null;
+	public $conn = null;
 
 	/**
 	 * 所有 SQL 查询的日志
 	 *
 	 * @var array
 	 */
-	var $log = array();
+	public $log = array();
 
 	/**
 	 * 指示是否记录 SQL 语句（部署模式时该设置默认为 false）
 	 *
 	 * @var boolean
 	 */
-	var $enableLog = false;
+	public $enableLog = false;
 
 	/**
 	 * 最后一次数据库操作的错误信息
 	 *
 	 * @var mixed
 	 */
-	var $lasterr = null;
+	public $lasterr = null;
 
 	/**
 	 * 最后一次数据库操作的错误代码
 	 *
 	 * @var mixed
 	 */
-	var $lasterrcode = null;
+	public $lasterrcode = null;
 
 	/**
 	 * 最近一次插入操作或者 nextId() 操作返回的插入 ID
 	 *
 	 * @var mixed
 	 */
-	var $_insertId = null;
+	public $_insertId = null;
 
 	/**
 	 * 指示事务启动次数
 	 *
 	 * @var int
 	 */
-	var $_transCount = 0;
+	public $_transCount = 0;
 
 	/**
 	 * 指示事务是否提交
 	 *
 	 * @var boolean
 	 */
-	var $_transCommit = true;
+	public $_transCommit = true;
 
 	/**
 	 * 构造函数
@@ -176,7 +176,7 @@ class FLEA_Db_Driver_Sqlite
 				$temp[] = substr( $sql, 0, $len1 );
 				$temp[] = substr( $sql, $len1, $len2 - $len1 );
 				$temp[] = substr( $sql, $len2 );
-				$temp[1] = eregi_replace( "[a-z_0-9]+\\.", "", $temp[1] );
+				$temp[1] = preg_replace( "/[a-z_0-9]+\\./i", "", $temp[1] );
 				$sql = implode( $temp );
 			}
 		}
@@ -424,7 +424,7 @@ class FLEA_Db_Driver_Sqlite
 		$temp = array();
 		foreach( $row as $key => $value )
 		{
-			$key = eregi_replace( '^[a-z0-9_]+\.', '', $key );
+			$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
 			$temp[$key] = $value;
 		}
 		return $temp;
@@ -442,7 +442,7 @@ class FLEA_Db_Driver_Sqlite
 		$temp = array();
 		foreach( $row as $key => $value )
 		{
-			$key = eregi_replace( '^[a-z0-9_]+\.', '', $key );
+			$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
 			$temp[$key] = $value;
 		}
 		return $temp;
@@ -494,7 +494,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param string $ |resource $sql
 	 * @return array
 	 */
-	function & getAll( $sql )
+	function getAll( $sql )
 	{
 		if ( is_object( $sql ) )
 		{
@@ -510,7 +510,7 @@ class FLEA_Db_Driver_Sqlite
 			$temp = array();
 			foreach( $row as $key => $value )
 			{
-				$key = eregi_replace( '^[a-z0-9_]+\.', '', $key );
+				$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
 				$temp[$key] = $value;
 			}
 			$data[] = $temp;
@@ -528,7 +528,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param string $ |int|boolean $groupBy
 	 * @return array
 	 */
-	function & getAllGroupBy( $sql, $groupBy )
+	function getAllGroupBy( $sql, $groupBy )
 	{
 		if ( is_object( $sql ) )
 		{
@@ -546,7 +546,7 @@ class FLEA_Db_Driver_Sqlite
 			$temp = array();
 			foreach( $row as $key => $value )
 			{
-				$key = eregi_replace( '^[a-z0-9_]+\.', '', $key );
+				$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
 				$temp[$key] = $value;
 			}
 			$row = $temp;
@@ -594,7 +594,7 @@ class FLEA_Db_Driver_Sqlite
 			$temp = array();
 			foreach( $row as $key => $value )
 			{
-				$key = eregi_replace( '^[a-z0-9_]+\.', '', $key );
+				$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
 				$temp[$key] = $value;
 			}
 			$row = $temp;
@@ -653,7 +653,7 @@ class FLEA_Db_Driver_Sqlite
 				$temp = array();
 				foreach( $row as $key => $value )
 				{
-					$key = eregi_replace( '^[a-z0-9_]+\.', '', $key );
+					$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
 					$temp[$key] = $value;
 				}
 				$row = $temp;
@@ -672,7 +672,7 @@ class FLEA_Db_Driver_Sqlite
 				$temp = array();
 				foreach( $row as $key => $value )
 				{
-					$key = eregi_replace( '^[a-z0-9_]+\.', '', $key );
+					$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
 					$temp[$key] = $value;
 				}
 				$assocRowset[$rkv][$mappingName][] = $temp;
@@ -707,7 +707,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param string $ |resource $sql
 	 * @return mixed
 	 */
-	function & getRow( $sql )
+	function getRow( $sql )
 	{
 		if ( is_object( $sql ) )
 		{
@@ -721,7 +721,7 @@ class FLEA_Db_Driver_Sqlite
 		$temp = array();
 		foreach( $row as $key => $value )
 		{
-			$key = eregi_replace( '^[a-z0-9_]+\.', '', $key );
+			$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
 			$temp[$key] = $value;
 		}
 		return $temp;
@@ -734,7 +734,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param int $col 要返回的列，0 为第一列
 	 * @return mixed
 	 */
-	function & getCol( $sql, $col = 0 )
+	function getCol( $sql, $col = 0 )
 	{
 		if ( is_object( $sql ) )
 		{
@@ -775,7 +775,7 @@ defaultValue:    默认值
 	 * @param string $table
 	 * @return array
 	 */
-	function & metaColumns( $table )
+	function metaColumns( $table )
 	{
 		/**
 		 * C 长度小于等于 250 的字符串
@@ -863,7 +863,7 @@ I 整数
 			}
 		}
 
-		while ( list( $ligneNum, $cont ) = each( $ligne ) )
+		foreach ( $ligne as $ligneNum => $cont )
 		{
 			$row = explode( ' ', trim( $cont ) );
 			$field = array();
@@ -899,7 +899,7 @@ I 整数
 				$field['simpleType'] = 'X';
 			}
 
-			$temp = eregi( 'PRIMARY[[:space:]]KEY', $cont );
+			$temp = preg_match( '/PRIMARY[[:space:]]KEY/i', $cont );
 			$field['primaryKey'] = $temp || $index[$row[0]];
 			$field['notNull'] = $field['primaryKey'] || ( strtoupper( $row[2] ) == 'NOT' );
 			$field['autoIncrement'] = $temp;

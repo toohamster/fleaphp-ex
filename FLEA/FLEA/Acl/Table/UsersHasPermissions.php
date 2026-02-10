@@ -27,13 +27,13 @@ class FLEA_Acl_Table_UsersHasPermissions extends FLEA_Db_TableDataGateway
      *
      * @var string
      */
-    var $primaryKey = 'user_id';
+    public $primaryKey = 'user_id';
 
     /**
      * 数据表名称
      *
      * @var string
      */
-    var $tableName = 'users_has_permissions';
+    public $tableName = 'users_has_permissions';
 
 }

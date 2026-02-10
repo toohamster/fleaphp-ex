@@ -23,21 +23,21 @@ class FLEA_Exception_ExpectedClass extends FLEA_Exception
      *
      * @var string
      */
-    var $className;
+    public $className;
 
     /**
      * 类定义文件
      *
      * @var string
      */
-    var $classFile;
+    public $classFile;
 
     /**
      * 指示文件是否存在
      *
      * @var boolean
      */
-    var $fileExists;
+    public $fileExists;
 
     /**
      * 构造函数

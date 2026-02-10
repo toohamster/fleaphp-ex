@@ -18,7 +18,7 @@
  */
 class FLEA_Db_Exception_InvalidDSN extends FLEA_Exception
 {
-    var $dsn;
+    public $dsn;
 
     /**
      * 构造函数

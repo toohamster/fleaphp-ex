@@ -21,7 +21,7 @@ class FLEA_Exception_CacheDisabled extends FLEA_Exception
     /**
      * 缓存目录
      */
-    var $cacheDir;
+    public $cacheDir;
 
     /**
      * 构造函数

@@ -23,14 +23,14 @@ class FLEA_Db_Exception_PrimaryKeyExists extends FLEA_Exception
      *
      * @var string
      */
-    var $primaryKey;
+    public $primaryKey;
 
     /**
      * 主键字段值
      *
      * @var mixed
      */
-    var $pkValue;
+    public $pkValue;
 
     /**
      * 构造函数

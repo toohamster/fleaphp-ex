@@ -18,7 +18,7 @@
  */
 class FLEA_Exception_ExpectedFile extends FLEA_Exception
 {
-    var $filename;
+    public $filename;
 
     /**
      * 构造函数

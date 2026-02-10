@@ -25,14 +25,14 @@ class FLEA_WebControls
      *
      * @var array
      */
-    var $_extends = array();
+    public $_extends = array();
 
     /**
      * 保存扩展控件的目录
      *
      * @var array
      */
-    var $_extendsDir = array();
+    public $_extendsDir = array();
 
     /**
      * 构造函数
@@ -163,7 +163,7 @@ class FLEA_WebControls
      *
      * @return object
      */
-    function & _getView()
+    function _getView()
     {
         $viewClass = FLEA::getAppInf('view');
         if ($viewClass != 'PHP') {

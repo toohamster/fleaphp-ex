@@ -133,14 +133,14 @@ class FLEA_Language
      *
      * @var array
      */
-    var $_dict = array();
+    public $_dict = array();
 
     /**
      * 指示哪些语言文件已经被载入
      *
      * @var array
      */
-    var $_loadedFiles = array();
+    public $_loadedFiles = array();
 
     /**
      * 构造函数

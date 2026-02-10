@@ -18,10 +18,10 @@
  */
 class FLEA_Dispatcher_Exception_CheckFailed extends FLEA_Exception
 {
-    var $controllerName;
-    var $actionName;
-    var $roles;
-    var $act;
+    public $controllerName;
+    public $actionName;
+    public $roles;
+    public $act;
 
     /**
      * 构造函数

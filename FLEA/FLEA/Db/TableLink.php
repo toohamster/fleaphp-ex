@@ -29,70 +29,70 @@ class FLEA_Db_TableLink
      *
      * @var string
      */
-    var $name;
+    public $name;
 
     /**
      * 该关联所使用的表数据入口对象名
      *
      * @var string
      */
-    var $tableClass;
+    public $tableClass;
 
     /**
      * 外键字段名
      *
      * @var string
      */
-    var $foreignKey;
+    public $foreignKey;
 
     /**
      * 关联数据表结果映射到主表结果中的字段名
      *
      * @var string
      */
-    var $mappingName;
+    public $mappingName;
 
     /**
      * 指示连接两个数据集的行时，是一对一连接还是一对多连接
      *
      * @var boolean
      */
-    var $oneToOne;
+    public $oneToOne;
 
     /**
      * 关联的类型
      *
      * @var enum
      */
-    var $type;
+    public $type;
 
     /**
      * 对关联表进行查询时使用的排序参数
      *
      * @var string
      */
-    var $sort;
+    public $sort;
 
     /**
      * 对关联表进行查询时使用的条件参数
      *
      * @var string
      */
-    var $conditions;
+    public $conditions;
 
     /**
      * 对关联表进行查询时要获取的关联表字段
      *
      * @var string|array
      */
-    var $fields = '*';
+    public $fields = '*';
 
     /**
      * 对关联表进行查询时限制查出的记录数
      *
      * @var int
      */
-    var $limit = null;
+    public $limit = null;
 
     /**
      * 当 enabled 为 false 时，表数据入口的任何操作都不会处理该关联
@@ -101,84 +101,84 @@ class FLEA_Db_TableLink
      *
      * @var boolean
      */
-    var $enabled = true;
+    public $enabled = true;
 
     /**
      * 指示在查询关联表时是否仅仅统计记录数，而不实际查询数据
      *
      * @var boolean
      */
-    var $countOnly = false;
+    public $countOnly = false;
 
     /**
      * 将关联记录总数缓存到指定的字段
      *
      * @var string
      */
-    var $counterCache = null;
+    public $counterCache = null;
 
     /**
      * 指示是否在主表读取记录时也读取该关联对应的关联表的记录
      *
      * @var boolean
      */
-    var $linkRead = true;
+    public $linkRead = true;
 
     /**
      * 指示是否在主表创建记录时也创建该关联对应的关联表的记录
      *
      * @var boolean
      */
-    var $linkCreate = true;
+    public $linkCreate = true;
 
     /**
      * 指示是否在主表更新记录时也更新该关联对应的关联表的记录
      *
      * @var boolean
      */
-    var $linkUpdate = true;
+    public $linkUpdate = true;
 
     /**
      * 指示是否在主表删除记录时也删除该关联对应的关联表的记录
      *
      * @var boolean
      */
-    var $linkRemove = true;
+    public $linkRemove = true;
 
     /**
      * 当删除主表记录而不删除关联表记录时，用什么值填充关联表记录的外键字段
      *
      * @var mixed
      */
-    var $linkRemoveFillValue = 0;
+    public $linkRemoveFillValue = 0;
 
     /**
      * 指示当保存关联数据时，采用何种方法，默认为 save，可以设置为 create、update 或 replace
      *
      * @var string
      */
-    var $saveAssocMethod = 'save';
+    public $saveAssocMethod = 'save';
 
     /**
      * 主表的表数据入口对象
      *
      * @var FLEA_Db_TableDataGateway
      */
-    var $mainTDG;
+    public $mainTDG;
 
     /**
      * 关联表的表数据入口对象
      *
      * @var FLEA_Db_TableDataGateway
      */
-    var $assocTDG = null;
+    public $assocTDG = null;
 
     /**
      * 必须设置的对象属性
      *
      * @var array
      */
-    var $_req = array(
+    public $_req = array(
         'name',             // 关联的名字
         'tableClass',       // 关联的表数据入口对象名
         'mappingName',      // 字段映射名
@@ -189,7 +189,7 @@ class FLEA_Db_TableLink
      *
      * @var array
      */
-    var $_optional = array(
+    public $_optional = array(
         'foreignKey',
         'sort',
         'conditions',
@@ -211,28 +211,28 @@ class FLEA_Db_TableLink
      *
      * @var string
      */
-    var $qforeignKey;
+    public $qforeignKey;
 
     /**
      * 数据访问对象
      *
      * @var FLEA_Db_Driver_Abstract
      */
-    var $dbo;
+    public $dbo;
 
     /**
      * 关联表数据入口的对象名
      *
      * @var string
      */
-    var $assocTDGObjectId;
+    public $assocTDGObjectId;
 
     /**
      * 指示关联的表数据入口是否已经初始化
      *
      * @var boolean
      */
-    var $init = false;
+    public $init = false;
 
     /**
      * 构造函数
@@ -295,7 +295,7 @@ class FLEA_Db_TableLink
      *
      * @return FLEA_Db_TableLink
      */
-    function & createLink($define, $type, & $mainTDG)
+    function createLink($define, $type, & $mainTDG)
     {
         static $typeMap = array(
             HAS_ONE         => 'FLEA_Db_HasOneLink',
@@ -334,7 +334,7 @@ class FLEA_Db_TableLink
             }
         }
 
-        $instances[$define['name']] =& new $typeMap[$type]($define, $type, $mainTDG);
+        $instances[$define['name']] = new $typeMap[$type]($define, $type, $mainTDG);
         return $instances[$define['name']];
     }
 
@@ -380,7 +380,7 @@ class FLEA_Db_TableLink
         } else {
             if ($this->assocTDGObjectId) {
                 FLEA::loadClass($this->tableClass);
-                $this->assocTDG =& new $this->tableClass(array('dbo' => & $this->dbo));
+                $this->assocTDG = new $this->tableClass(array('dbo' => & $this->dbo));
                 FLEA::register($this->assocTDG, $this->assocTDGObjectId);
             } else {
                 $this->assocTDG =& FLEA::getSingleton($this->tableClass);
@@ -468,7 +468,7 @@ class FLEA_Db_TableLink
  */
 class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
 {
-    var $oneToOne = true;
+    public $oneToOne = true;
 
     /**
      * 构造函数
@@ -578,7 +578,7 @@ class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
  */
 class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
 {
-    var $oneToOne = true;
+    public $oneToOne = true;
 
     /**
      * 构造函数
@@ -649,7 +649,7 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
  */
 class FLEA_Db_HasManyLink extends FLEA_Db_HasOneLink
 {
-    var $oneToOne = false;
+    public $oneToOne = false;
 
     /**
      * 创建或更新主表记录时，保存关联的数据
@@ -689,56 +689,56 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
      *
      * @var boolean
      */
-    var $oneToOne = false;
+    public $oneToOne = false;
 
     /**
      * 在处理中间表时，是否要将中间表当做实体
      *
      * @var boolean
      */
-    var $joinTableIsEntity = false;
+    public $joinTableIsEntity = false;
 
     /**
      * 中间表是实体时对应的表数据入口
      *
      * @var FLEA_Db_TableDataGateway
      */
-    var $joinTDG = null;
+    public $joinTDG = null;
 
     /**
      * 中间表的名字
      *
      * @var string
      */
-    var $joinTable = null;
+    public $joinTable = null;
 
     /**
      * 中间表的完全限定名
      *
      * @var string
      */
-    var $qjoinTable = null;
+    public $qjoinTable = null;
 
     /**
      * 中间表中保存关联表主键值的字段
      *
      * @var string
      */
-    var $assocForeignKey = null;
+    public $assocForeignKey = null;
 
     /**
      * 中间表中保存关联表主键值的字段的完全限定名
      *
      * @var string
      */
-    var $qassocForeignKey = null;
+    public $qassocForeignKey = null;
 
     /**
      * 中间表对应的表数据入口
      *
      * @var FLEA_Db_TableDataGateway
      */
-    var $joinTableClass = null;
+    public $joinTableClass = null;
 
     /**
      * 构造函数

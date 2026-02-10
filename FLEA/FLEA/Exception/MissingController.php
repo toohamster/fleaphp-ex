@@ -23,42 +23,42 @@ class FLEA_Exception_MissingController extends FLEA_Exception
      *
      * @var string
      */
-    var $controllerName;
+    public $controllerName;
 
     /**
      * 控制器类名称
      *
      * @var string
      */
-    var $controllerClass;
+    public $controllerClass;
 
     /**
      * 动作名
      *
      * @var string
      */
-    var $actionName;
+    public $actionName;
 
     /**
      * 动作方法名
      *
      * @var string
      */
-    var $actionMethod;
+    public $actionMethod;
 
     /**
      * 调用参数
      *
      * @var mixed
      */
-    var $arguments;
+    public $arguments;
 
     /**
      * 控制器的类定义文件
      *
      * @var string
      */
-    var $controllerClassFilename;
+    public $controllerClassFilename;
 
     /**
      * 构造函数

@@ -28,7 +28,7 @@ class FLEA_Helper_Image
      *
      * @var resource
      */
-    var $_handle = null;
+    public $_handle = null;
 
     /**
      * 构造函数
@@ -59,7 +59,7 @@ class FLEA_Helper_Image
      *
      * @return FLEA_Helper_Image
      */
-    function & createFromFile($filename, $fileext = null)
+    function createFromFile($filename, $fileext = null)
     {
         if (is_null($fileext)) {
             $fileext = pathinfo($filename, PATHINFO_EXTENSION);
@@ -78,7 +78,7 @@ class FLEA_Helper_Image
         }
 
         $handle = $ext2functions[$fileext]($filename);
-        $img =& new FLEA_Helper_Image($handle);
+        $img = new FLEA_Helper_Image($handle);
         return $img;
     }
 

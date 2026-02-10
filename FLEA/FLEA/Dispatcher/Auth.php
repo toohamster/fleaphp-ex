@@ -34,7 +34,7 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
      *
      * @var FLEA_Rbac
      */
-    var $_auth;
+    public $_auth;
 
     /**
      * 构造函数
@@ -54,7 +54,7 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
      *
      * @return FLEA_Rbac
      */
-    function & getAuthProvider()
+    function getAuthProvider()
     {
         return $this->_auth;
     }
