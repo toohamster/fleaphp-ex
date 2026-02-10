@@ -199,7 +199,7 @@ class FLEA_Helper_Verifier
             $func = 'is' . $rule['complexType'];
             if (!method_exists($this, $func)) {
                 // FLEA::loadClass('FLEA_Exception_InvalidArguments'); // 已由自动加载处理
-                __THROW(new FLEA_Exception_InvalidArguments('$rule[\'complexType\']',
+                throw new FLEA_Exception_InvalidArguments('$rule[\'complexType\']',
                         $rule['complexType']));
                 return null;
             }

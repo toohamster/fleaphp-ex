@@ -835,7 +835,7 @@ class FLEA_Db_TableDataGateway
         // 检查是否提供了主键值
         if (!isset($row[$this->primaryKey])) {
             FLEA::loadClass('FLEA_Db_Exception_MissingPrimaryKey');
-            return __THROW(new FLEA_Db_Exception_MissingPrimaryKey($this->primaryKey));
+            throw new FLEA_Db_Exception_MissingPrimaryKey($this->primaryKey);
         }
 
         // 自动填写记录的最后更新时间字段
@@ -846,7 +846,7 @@ class FLEA_Db_TableDataGateway
             if (!$this->checkRowData($row, true)) {
                 // 验证失败抛出异常
                 FLEA::loadClass('FLEA_Exception_ValidationFailed');
-                return __THROW(new FLEA_Exception_ValidationFailed($this->getLastValidation(), $row));
+                throw new FLEA_Exception_ValidationFailed($this->getLastValidation(), $row);
             }
         }
 
@@ -1070,7 +1070,7 @@ class FLEA_Db_TableDataGateway
         if ($this->autoValidating && !is_null($this->verifier)) {
             if (!$this->checkRowData($row)) {
                 FLEA::loadClass('FLEA_Exception_ValidationFailed');
-                __THROW(new FLEA_Exception_ValidationFailed($this->getLastValidation(), $row));
+                throw new FLEA_Exception_ValidationFailed($this->getLastValidation(), $row);
                 return false;
             }
         }
@@ -1104,7 +1104,7 @@ class FLEA_Db_TableDataGateway
                 if ($unsetpk) { unset($row[$this->primaryKey]); }
                 $this->dbo->completeTrans(false);
                 FLEA::loadClass('FLEA_Db_Exception_InvalidInsertID');
-                return __THROW(new FLEA_Db_Exception_InvalidInsertID());
+                throw new FLEA_Db_Exception_InvalidInsertID();
             }
         }
 
@@ -1179,7 +1179,7 @@ class FLEA_Db_TableDataGateway
 
         if (!isset($row[$this->primaryKey])) {
             FLEA::loadClass('FLEA_Db_Exception_MissingPrimaryKey');
-            __THROW(new FLEA_Db_Exception_MissingPrimaryKey($this->primaryKey));
+            throw new FLEA_Db_Exception_MissingPrimaryKey($this->primaryKey);
             return false;
         }
         $ret = $this->removeByPkv($row[$this->primaryKey], $removeLink);
@@ -1487,7 +1487,7 @@ class FLEA_Db_TableDataGateway
         }
 
         FLEA::loadClass('FLEA_Db_Exception_MissingLink');
-        __THROW(new FLEA_Db_Exception_MissingLink($linkName));
+        throw new FLEA_Db_Exception_MissingLink($linkName);
         $ret = false;
         return $ret;
     }
@@ -1626,7 +1626,7 @@ class FLEA_Db_TableDataGateway
     {
         if (!is_array($params)) {
             FLEA::loadClass('FLEA_Exception_TypeMismatch');
-            return __THROW(new FLEA_Exception_TypeMismatch('$params', 'array', gettype($params)));
+            throw new FLEA_Exception_TypeMismatch('$params', 'array', gettype($params));
         }
         $arr = explode('?', $sql);
         $sql = array_shift($arr);
@@ -1988,7 +1988,7 @@ class FLEA_Db_TableDataGateway
         $this->meta = $this->dbo->metaColumns($this->qtableName);
         if (!is_array($this->meta) || empty($this->meta)) {
             FLEA::loadClass('FLEA_Db_Exception_MetaColumnsFailed');
-            return __THROW(new FLEA_Db_Exception_MetaColumnsFailed($this->qtableName));
+            throw new FLEA_Db_Exception_MetaColumnsFailed($this->qtableName);
         }
 
         if ($cached) {

@@ -210,7 +210,7 @@ class FLEA_Language
                 }
             } else if (!$noException) {
                 // FLEA::loadClass('FLEA_Exception_ExpectedFile'); // 已由自动加载处理
-                return __THROW(new FLEA_Exception_ExpectedFile($filename));
+                throw new FLEA_Exception_ExpectedFile($filename);
             }
         }
     }

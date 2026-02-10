@@ -148,7 +148,7 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
                 return call_user_func_array($callback, $args);
             } else {
                 // FLEA::loadClass('FLEA_Dispatcher_Exception_CheckFailed'); // 已由自动加载处理
-                __THROW(new FLEA_Dispatcher_Exception_CheckFailed($controllerName, $actionName, $rawACT, $roles));
+                throw new FLEA_Dispatcher_Exception_CheckFailed($controllerName, $actionName, $rawACT, $roles);
                 return false;
             }
         }
@@ -285,7 +285,7 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
 
         // 当控制器的 ACT 文件没有返回 ACT 时抛出异常
         // FLEA::loadClass('FLEA_Rbac_Exception_InvalidACTFile'); // 已由自动加载处理
-        __THROW(new FLEA_Rbac_Exception_InvalidACTFile($actFilename, $ACT));
+        throw new FLEA_Rbac_Exception_InvalidACTFile($actFilename, $ACT);
         return false;
     }
 }

@@ -80,7 +80,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
             if (!$parent) {
                 // 指定的父用户组不存在
                 // FLEA::loadClass('FLEA_Acl_Exception_UserGroupNotFound'); // 已由自动加载处理
-                __THROW(new FLEA_Acl_Exception_UserGroupNotFound($parentId));
+                throw new FLEA_Acl_Exception_UserGroupNotFound($parentId);
                 return false;
             }
         } else {
@@ -153,7 +153,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
         $group = parent::find((int)$groupId);
         if (!$group) {
             // FLEA::loadClass('FLEA_Acl_Exception_UserGroupNotFound'); // 已由自动加载处理
-            __THROW(new FLEA_Acl_Exception_UserGroupNotFound($groupId));
+            throw new FLEA_Acl_Exception_UserGroupNotFound($groupId);
             return false;
         }
 

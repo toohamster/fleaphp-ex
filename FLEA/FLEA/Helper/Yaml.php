@@ -47,7 +47,7 @@ function load_yaml($filename, $cacheEnabled = true, $replace = null)
 
     if (!file_exists($filename)) {
         // FLEA::loadClass('FLEA_Exception_ExpectedFile'); // 已由自动加载处理
-        return __THROW(new FLEA_Exception_ExpectedFile($filename));
+        throw new FLEA_Exception_ExpectedFile($filename);
     }
     
     if ($cacheEnabled) {

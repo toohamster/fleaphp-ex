@@ -131,7 +131,7 @@ class FLEA
         if (!is_array($__flea_internal_config) && is_string($__flea_internal_config)) {
             if (!is_readable($__flea_internal_config)) {
                 // FLEA::loadClass('FLEA_Exception_ExpectedFile'); // 已由自动加载处理
-                return __THROW(new FLEA_Exception_ExpectedFile($__flea_internal_config));
+                throw new FLEA_Exception_ExpectedFile($__flea_internal_config);
             }
             $__flea_internal_config = require($__flea_internal_config);
         }
@@ -304,7 +304,7 @@ class FLEA
         }
 
         // FLEA::loadClass('FLEA_Exception_ExpectedFile'); // 已由自动加载处理
-        __THROW(new FLEA_Exception_ExpectedFile($filename));
+        throw new FLEA_Exception_ExpectedFile($filename);
         return false;
     }
 
@@ -543,7 +543,7 @@ class FLEA
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
             // FLEA::loadClass('FLEA_Exception_CacheDisabled'); // 已由自动加载处理
-            __THROW(new FLEA_Exception_CacheDisabled($cacheDir));
+            throw new FLEA_Exception_CacheDisabled($cacheDir);
             return false;
         }
 
@@ -601,7 +601,7 @@ class FLEA
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
             // FLEA::loadClass('FLEA_Exception_CacheDisabled'); // 已由自动加载处理
-            __THROW(new FLEA_Exception_CacheDisabled($cacheDir));
+            throw new FLEA_Exception_CacheDisabled($cacheDir);
             return false;
         }
 
@@ -618,7 +618,7 @@ class FLEA
 
         if (!safe_file_put_contents($cacheFile, $data)) {
             // FLEA::loadClass('FLEA_Exception_CacheDisabled'); // 已由自动加载处理
-            __THROW(new FLEA_Exception_CacheDisabled($cacheDir));
+            throw new FLEA_Exception_CacheDisabled($cacheDir);
             return false;
         } else {
             return true;
@@ -638,7 +638,7 @@ class FLEA
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
             // FLEA::loadClass('FLEA_Exception_CacheDisabled'); // 已由自动加载处理
-            __THROW(new FLEA_Exception_CacheDisabled($cacheDir));
+            throw new FLEA_Exception_CacheDisabled($cacheDir);
             return false;
         }
 
@@ -695,7 +695,7 @@ class FLEA
             return FLEA::loadFile($setting, true);
         } else {
             // FLEA::loadClass('FLEA_Exception_NotExistsKeyName'); // 已由自动加载处理
-            return __THROW(new FLEA_Exception_NotExistsKeyName('helper.' . $helperName));
+            throw new FLEA_Exception_NotExistsKeyName('helper.' . $helperName);
         }
     }
 
@@ -736,7 +736,7 @@ class FLEA
 
         if (!is_array($dsn) || !isset($dsn['driver'])) {
             // FLEA::loadClass('FLEA_Db_Exception_InvalidDSN'); // 已由自动加载处理
-            return __THROW(new FLEA_Db_Exception_InvalidDSN($dsn));
+            throw new FLEA_Db_Exception_InvalidDSN($dsn);
         }
 
         $dsnid = $dsn['id'];
@@ -1383,113 +1383,6 @@ if (!function_exists('file_put_contents'))
 /**
  * 调试和错误处理相关的全局函数
  */
-
-/**
- * 抛出一个异常
- *
- * FleaPHP 为了兼容 PHP4，模拟了一种异常机制。但这种模拟机制和真正的异常机制有本质区别。
- * FleaPHP 模拟的异常机制有下列特点：
- *   - 用 __TRY() 而不是 try 设置捕获点；
- *   - 用 __CATCH() 捕获异常，而不是 catch；
- *   - 用 __THROW() 抛出异常；
- *   - __TRY() 和 __CATCH() 并不能够捕获 PHP5 中用 throw 抛出的异常；
- *   - 程序在使用 __THROW() 抛出异常后，必须使用 return false 退出函数或类方法的执行；
- *   - __TRY() 和 __CATCH() 必须成对调用，并且 __CATCH() 只能捕获一个异常；
- *   - 用 __IS_EXCEPTION() 来判断 __CATCH() 的返回值是否是一个异常；
- *   - 如果 __TRY() 调用后没有用 __CATCH() 捕获异常，必须用 __CANCEL_TRY() 取消捕获。
- *
- * 虽然 __THROW() 并不强制要求抛出的异常必须是从 FLEA_Exception 继承的类，但应用程序
- * 应该抛出 FleaPHP 已经定义的异常。或者从 FLEA_Exception 派生应用程序自己的异常。
- * FLEA_Exception 提供了一些方法，可以让应用程序更好的处理异常。
- *
- * 下面的代码片段是模拟异常最常见的使用形式。
- * <code>
- * __TRY();
- * $ret = doSomething(); // 调用可能会发生异常的代码
- * $ex = __CATCH();
- * if (__IS_EXCEPTION($ex)) {
- *     // 处理异常
- * } else {
- *     echo $ret;
- * }
- *
- * function doSomething() {
- *     if (rand(0, 9) % 2) {
- *         __THROW(new MyException());
- *         return false;
- *     }
- *     return true;
- * }
- * </code>
- *
- * <strong>特别要注意的就是使用 __THROW() 抛出异常后，必须 return false</strong>
- *
- * 由于 doSomething() 中的 __THROW() 实际上并不中断程序执行，所以调用 doSomething() 的
- * 代码要负责检查返回值，或者在调用 doSomething() 以后理解捕获异常。
- *
- * 为此，__TRY() 和 __CATCH() 之间的代码要尽可能的少。
- *
- * <strong>对于 __TRY() 和 __CATCH() 的嵌套问题：</strong>
- *
- * FleaPHP 是允许 __TRY() 嵌套的。例如在上面代码中，doSomething() 函数调用了其他可能抛出
- * 异常的代码。则在 doSomething() 中也可以通过 __TRY() 和 __CATCH() 来捕获异常。
- *
- * <code>
- * function doSomething() {
- *     if (rand(0, 9) % 2) {
- *         __THROW(new MyException());
- *         return false;
- *     } else {
- *         __TRY();
- *         callAnotherFunc();
- *         $ex = __CATCH();
- *         if (__IS_EXCEPTION($ex)) {
- *             // 处理 callAnotherFunc() 函数抛出的异常
- *             ...
- *             // 根据处理结果，可以用 __THROW() 重新抛出这个异常，
- *             // 让调用 doSomething() 的代码去处理该异常
- *             __THROW($ex);
- *             return false;
- *         }
- *         return true;
- *     }
- * }
- * </code>
- *
- * 如果调用 __TRY() 之后不需要调用 __CATCH() 捕获异常，则必须用 __CANCEL_TRY()
- * 撤销用 __TRY() 设置的捕获点。
- *
- * @package Core
- *
- * @param FLEA_Exception $exception
- *
- * @return boolean
- */
-function __THROW($exception)
-{
-    // 写入日志
-    if (function_exists('log_message')) {
-        log_message(get_class($exception) . ': ' . $exception->getMessage(), 'exception');
-    }
-
-    // 确定是否将异常保存在栈中
-    if (isset($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK']) && is_array($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK']))
-    {
-        $point = array_pop($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK']);
-        if ($point != null) {
-            array_push($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK'], $exception);
-            $ret = false;
-            return $ret;
-        }
-    }
-
-    if (isset($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_HANDLER'])) {
-        call_user_func_array($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_HANDLER'], array(& $exception));
-    } else {
-        __FLEA_EXCEPTION_HANDLER($exception);
-    }
-    exit;
-}
 
 /**
  * 设置异常拦截点

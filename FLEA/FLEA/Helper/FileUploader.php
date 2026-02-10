@@ -133,7 +133,7 @@ class FLEA_Helper_FileUploader
     {
         if (!isset($this->_files[$name])) {
             // FLEA::loadClass('FLEA_Exception_ExpectedFile'); // 已由自动加载处理
-            return __THROW(new FLEA_Exception_ExpectedFile('$_FILES[' . $name . ']'));
+            throw new FLEA_Exception_ExpectedFile('$_FILES[' . $name . ']');
         }
         return $this->_files[$name];
     }
