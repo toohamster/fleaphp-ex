@@ -848,23 +848,6 @@ class FLEA
             FLEA::setAppInf('internalCacheDir', __DIR__ . DS . '_Cache');
         }
 
-        // 过滤 magic_quotes
-        if (get_magic_quotes_gpc()) {
-            $in = array(& $_GET, & $_POST, & $_COOKIE, & $_REQUEST);
-            foreach ($in as $key => &$v) {
-                foreach ($v as $keyInner => $val) {
-                    if (!is_array($val)) {
-                        $in[$key][$keyInner] = stripslashes($val);
-                        continue;
-                    }
-                    $in[] = & $in[$key][$keyInner];
-                }
-                unset($in[$key]);
-            }
-            unset($in);
-        }
-        set_magic_quotes_runtime(0);
-
         // 根据 URL 模式设置，决定是否要载入 URL 分析过滤器
         if (FLEA::getAppInf('urlMode') != URL_STANDARD) {
             require(FLEA_DIR . '/Filter/Uri.php');

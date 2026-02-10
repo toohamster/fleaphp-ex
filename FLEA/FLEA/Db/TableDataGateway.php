@@ -74,7 +74,7 @@ class FLEA_Db_TableDataGateway
     /**
      * 主键字段名，或者是包含多个主键字段名的数组
      *
-     * @var sring|array
+     * @var string|array
      */
     public $primaryKey = null;
 
@@ -464,7 +464,7 @@ class FLEA_Db_TableDataGateway
          *
          * 查询获得数据后，将关联表的数据和主表数据装配在一起
          */
-        $callback = create_function('& $r, $o, $m', '$r[$m] = null;');
+        $callback = function (&$r, $o, $m) { $r[$m] = null; };
         foreach ($this->links as $link) {
             /* @var $link FLEA_Db_TableLink */
             $mn = $link->mappingName;
@@ -486,7 +486,7 @@ class FLEA_Db_TableDataGateway
      *
      * @param string $mappingName
      * @param array $row
-     * @param array $enabledLinks
+     * @param string|array $enabledLinks
      */
     public function assembleRecursionRow($mappingName, & $row, $enabledLinks = null)
     {
@@ -550,7 +550,7 @@ class FLEA_Db_TableDataGateway
      *
      * @param string $mappingName
      * @param array $rowset
-     * @param array $enabledLinks
+     * @param string|array $enabledLinks
      */
     public function assembleRecursionRowset($mappingName, & $rowset, $enabledLinks = null)
     {

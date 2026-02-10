@@ -266,8 +266,8 @@ class FLEA_Db_TableLink
             }
         }
         $this->type = $type;
-        $this->mainTDG =& $mainTDG;
-        $this->dbo =& $this->mainTDG->getDBO();
+        $this->mainTDG = $mainTDG;
+        $this->dbo = $this->mainTDG->getDBO();
         $dsnid = $this->dbo->dsn['id'];
 
         if (is_null($defaultDsnId)) {
@@ -376,11 +376,11 @@ class FLEA_Db_TableLink
     {
         if ($this->init) { return; }
         if (FLEA::isRegistered($this->assocTDGObjectId)) {
-            $this->assocTDG =& FLEA::registry($this->assocTDGObjectId);
+            $this->assocTDG = FLEA::registry($this->assocTDGObjectId);
         } else {
             if ($this->assocTDGObjectId) {
                 FLEA::loadClass($this->tableClass);
-                $this->assocTDG = new $this->tableClass(array('dbo' => & $this->dbo));
+                $this->assocTDG = new $this->tableClass(array('dbo' => $this->dbo));
                 FLEA::register($this->assocTDG, $this->assocTDGObjectId);
             } else {
                 $this->assocTDG = FLEA::getSingleton($this->tableClass);
