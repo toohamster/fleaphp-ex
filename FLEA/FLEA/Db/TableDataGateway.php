@@ -201,15 +201,15 @@ class FLEA_Db_TableDataGateway
      * @var string
      * @access private
      */
-    private $qtableName;
+    public $qtableName;
 
     /**
      * 主键字段完全限定名
      *
      * @var string
-     * @access private
+     * @access protected
      */
-    private $qpk;
+    public $qpk;
 
     /**
      * 用于关联查询时的主键字段别名
@@ -276,7 +276,7 @@ class FLEA_Db_TableDataGateway
                 $provider = FLEA::getAppInf('helper.verifier');
             }
             if (!empty($provider)) {
-                $this->verifier =& FLEA::getSingleton($provider);
+                $this->verifier = FLEA::getSingleton($provider);
             }
         }
 
@@ -288,12 +288,12 @@ class FLEA_Db_TableDataGateway
         // 初始化数据访问对象
         if (!isset($params['dbo'])) {
             if (isset($params['dbDSN'])) {
-                $dbo =& FLEA::getDBO($params['dbDSN']);
+                $dbo = FLEA::getDBO($params['dbDSN']);
             } else {
-                $dbo =& FLEA::getDBO();
+                $dbo = FLEA::getDBO();
             }
         } else {
-            $dbo =& $params['dbo'];
+            $dbo = $params['dbo'];
         }
         $this->setDBO($dbo);
 
@@ -310,9 +310,9 @@ class FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    public function setDBO(& $dbo)
+    public function setDBO(FLEA_Db_Driver_Abstract $dbo)
     {
-        $this->dbo =& $dbo;
+        $this->dbo = $dbo;
 
         if (empty($this->schema) && !empty($dbo->dsn['schema'])) {
             $this->schema = $dbo->dsn['schema'];
@@ -389,7 +389,7 @@ class FLEA_Db_TableDataGateway
      */
     public function find($conditions, $sort = null, $fields = '*', $queryLinks = true)
     {
-        $rowset =& $this->findAll($conditions, $sort, 1, $fields, $queryLinks);
+        $rowset = $this->findAll($conditions, $sort, 1, $fields, $queryLinks);
         if (is_array($rowset)) {
             $row = reset($rowset);
         } else {
@@ -490,11 +490,11 @@ class FLEA_Db_TableDataGateway
      */
     public function assembleRecursionRow($mappingName, & $row, $enabledLinks = null)
     {
-        $assoclink =& $this->getLink($mappingName);
+        $assoclink = $this->getLink($mappingName);
         if ($assoclink == false) { return false; }
 
         $assoclink->init();
-        $tdg =& $assoclink->assocTDG;
+        $tdg = $assoclink->assocTDG;
         $arow =& $row[$mappingName];
 
         if (!is_array($enabledLinks)) {
@@ -554,11 +554,11 @@ class FLEA_Db_TableDataGateway
      */
     public function assembleRecursionRowset($mappingName, & $rowset, $enabledLinks = null)
     {
-        $assoclink =& $this->getLink($mappingName);
+        $assoclink = $this->getLink($mappingName);
         if ($assoclink == false) { return false; }
 
         $assoclink->init();
-        $tdg =& $assoclink->assocTDG;
+        $tdg = $assoclink->assocTDG;
         $arowset = [];
         foreach (array_keys($rowset) as $offset) {
             $arowset[] =& $rowset[$offset][$mappingName];
@@ -1409,7 +1409,7 @@ class FLEA_Db_TableDataGateway
      */
     public function enableLink($linkName)
     {
-        $link =& $this->getLink($linkName);
+        $link = $this->getLink($linkName);
         if ($link) { $link->enabled = true; }
         $this->autoLink = true;
         return $link;
@@ -1447,7 +1447,7 @@ class FLEA_Db_TableDataGateway
      */
     public function disableLink($linkName)
     {
-        $link =& $this->getLink($linkName);
+        $link = $this->getLink($linkName);
         if ($link) { $link->enabled = false; }
         return $link;
     }
@@ -1501,7 +1501,7 @@ class FLEA_Db_TableDataGateway
      */
     public function getLinkTable($linkName)
     {
-        $link =& $this->getLink($linkName);
+        $link = $this->getLink($linkName);
         $link->init();
         return $link->assocTDG;
     }
@@ -1537,7 +1537,7 @@ class FLEA_Db_TableDataGateway
         foreach ($defines as $define) {
             if (!is_array($define)) { continue; }
             // 构造连接对象实例
-            $link =& FLEA_Db_TableLink::createLink($define, $type, $this);
+            $link = FLEA_Db_TableLink::createLink($define, $type, $this);
             $this->links[strtoupper($link->name)] =& $link;
         }
     }

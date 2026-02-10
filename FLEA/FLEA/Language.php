@@ -93,8 +93,8 @@ function _T($key, $language = '')
     static $instance = null;
     if (!isset($instance['obj'])) {
         $instance = [];
-        $obj =& FLEA::getSingleton('FLEA_Language');
-        $instance = array('obj' => & $obj);
+        $obj = FLEA::getSingleton('FLEA_Language');
+        $instance = array('obj' => $obj);
     }
     return $instance['obj']->get($key, $language);
 }
@@ -113,8 +113,8 @@ function load_language($dictname, $language = '', $noException = false)
     static $instance = null;
     if (!isset($instance['obj'])) {
         $instance = [];
-        $obj =& FLEA::getSingleton('FLEA_Language');
-        $instance = array('obj' => & $obj);
+        $obj = FLEA::getSingleton('FLEA_Language');
+        $instance = array('obj' => $obj);
     }
     return $instance['obj']->load($dictname, $language, $noException);
 }

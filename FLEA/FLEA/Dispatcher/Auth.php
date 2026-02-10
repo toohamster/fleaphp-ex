@@ -46,7 +46,7 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
     public function __construct(& $request)
     {
         parent::__construct($request);
-        $this->_auth =& FLEA::getSingleton(FLEA::getAppInf('dispatcherAuthProvider'));
+        $this->_auth = FLEA::getSingleton(FLEA::getAppInf('dispatcherAuthProvider'));
     }
 
     /**

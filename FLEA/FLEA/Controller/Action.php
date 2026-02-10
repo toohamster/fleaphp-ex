@@ -121,7 +121,7 @@ class FLEA_Controller_Action
     protected function _getDispatcher()
     {
         if (!is_object($this->_dispatcher)) {
-            $this->_dispatcher =& FLEA::getSingleton(FLEA::getAppInf('dispatcher'));
+            $this->_dispatcher = FLEA::getSingleton(FLEA::getAppInf('dispatcher'));
         }
         return $this->_dispatcher;
     }

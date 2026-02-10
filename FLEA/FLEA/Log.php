@@ -21,8 +21,8 @@ function log_message($msg, $level = 'log', $title = '')
 
     if (is_null($instance)) {
         $instance = [];
-        $obj =& FLEA::getSingleton('FLEA_Log');
-        $instance = array('obj' => & $obj);
+        $obj = FLEA::getSingleton('FLEA_Log');
+        $instance = array('obj' => $obj);
     }
 
     return $instance['obj']->appendLog($msg, $level, $title);

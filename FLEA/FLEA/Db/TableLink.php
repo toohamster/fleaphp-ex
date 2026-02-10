@@ -2,7 +2,7 @@
 
 
 /**
- * 定义 FLEA_Db_TableLink 类及其继承类
+ * 定义 FLEA_Db_TableLink 类
  *
  * @author toohamster
  * @package Core
@@ -346,7 +346,7 @@ class FLEA_Db_TableLink
      *
      * @return string
      */
-    public static function getMiddleTableName($table1, $table2)
+    public function getMiddleTableName($table1, $table2)
     {
         if (strcmp($table1, $table2) < 0) {
             return $this->dbo->dsn['prefix'] . "{$table1}_{$table2}";
@@ -383,7 +383,7 @@ class FLEA_Db_TableLink
                 $this->assocTDG = new $this->tableClass(array('dbo' => & $this->dbo));
                 FLEA::register($this->assocTDG, $this->assocTDGObjectId);
             } else {
-                $this->assocTDG =& FLEA::getSingleton($this->tableClass);
+                $this->assocTDG = FLEA::getSingleton($this->tableClass);
             }
         }
         $this->init = true;
@@ -459,115 +459,7 @@ class FLEA_Db_TableLink
     }
 }
 
-/**
- * FLEA_Db_HasOneLink 封装 has one 关系
- *
- * @package Core
- * @author toohamster
- * @version 1.0
- */
-class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
-{
-    public $oneToOne = true;
 
-    /**
-     * 构造函数
-     *
-     * @param array $define
-     * @param enum $type
-     * @param FLEA_Db_TableDataGateway $mainTDG
-     *
-     * @return FLEA_Db_TableLink
-     */
-    public function __construct($define, $type, & $mainTDG)
-    {
-        parent::__construct($define, $type, $mainTDG);
-    }
-
-    /**
-     * 返回用于查询关联表数据的SQL语句
-     *
-     * @param string $in
-     *
-     * @return string
-     */
-    public function getFindSQL($in)
-    {
-        if (!$this->init) { $this->init(); }
-        $fields = $this->qforeignKey . ' AS ' . $this->mainTDG->pka . ', ' . $this->dbo->qfields($this->fields, $this->assocTDG->fullTableName, $this->assocTDG->schema);
-        $sql = "SELECT {$fields} FROM {$this->assocTDG->qtableName} ";
-        return parent::_getFindSQLBase($sql, $in);
-    }
-
-    /**
-     * 创建或更新主表记录时，保存关联的数据
-     *
-     * @param array $row 要保存的关联数据
-     * @param mixed $pkv 主表的主键字段值
-     *
-     * @return boolean
-     */
-    public function saveAssocData(& $row, $pkv)
-    {
-        if (empty($row)) { return true; }
-        if (!$this->init) { $this->init(); }
-        $row[$this->foreignKey] = $pkv;
-        return $this->_saveAssocDataBase($row);
-    }
-
-    /**
-     * 删除关联的数据
-     *
-     * @param mixed $qpkv
-     *
-     * @return boolean
-     */
-    public function deleteByForeignKey($qpkv)
-    {
-        if (!$this->init) { $this->init(); }
-        $conditions = "{$this->qforeignKey} = {$qpkv}";
-        if ($this->linkRemove) {
-            return $this->assocTDG->removeByConditions($conditions);
-        } else {
-            return $this->assocTDG->updateField($conditions, $this->foreignKey, $this->linkRemoveFillValue);
-        }
-    }
-
-    /**
-     * 完全初始化关联对象
-     */
-    public function init()
-    {
-        parent::init();
-        if (is_null($this->foreignKey)) {
-            $this->foreignKey = $this->mainTDG->primaryKey;
-        }
-        $this->qforeignKey = $this->dbo->qfield($this->foreignKey, $this->assocTDG->fullTableName, $this->assocTDG->schema);
-    }
-
-    /**
-     * 统计关联记录数
-     *
-     * @param array $assocRowset
-     * @param string $mappingName
-     * @param string $in
-     *
-     * @return int
-     */
-    function calcCount(& $assocRowset, $mappingName, $in)
-    {
-        if (!$this->init) { $this->init(); }
-        $sql = "SELECT {$this->qforeignKey} AS pid, COUNT({$this->qforeignKey}) AS c FROM {$this->assocTDG->qtableName} ";
-        $sql = parent::_getFindSQLBase($sql, $in);
-        $sql .= " GROUP BY {$this->qforeignKey}";
-
-        $r = $this->dbo->execute($sql);
-        while ($row = $this->dbo->fetchAssoc($r)) {
-            $assocRowset[$row['pid']][$mappingName] = (int)$row['c'];
-        }
-        $this->dbo->freeRes($r);
-    }
-}
 
 /**
  * FLEA_Db_BelongsToLink 封装 belongs to 关系
@@ -640,40 +532,7 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
     }
 }
 
-/**
- * FLEA_Db_HasManyLink 封装 has many 关系
- *
- * @package Core
- * @author toohamster
- * @version 1.0
- */
-class FLEA_Db_HasManyLink extends FLEA_Db_HasOneLink
-{
-    public $oneToOne = false;
 
-    /**
-     * 创建或更新主表记录时，保存关联的数据
-     *
-     * @param array $row 要保存的关联数据
-     * @param mixed $pkv 主表的主键字段值
-     *
-     * @return boolean
-     */
-    function saveAssocData(& $row, $pkv)
-    {
-        if (empty($row)) { return true; }
-        if (!$this->init) { $this->init(); }
-
-        foreach ($row as $arow) {
-            if (!is_array($arow)) { continue; }
-            $arow[$this->foreignKey] = $pkv;
-            if (!$this->_saveAssocDataBase($arow)) {
-                return false;
-            }
-        }
-        return true;
-    }
-}
 
 /**
  * FLEA_Db_ManyToManyLink 封装 many to many 关系
@@ -924,7 +783,7 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
     {
         parent::init();
         if ($this->joinTableClass) {
-            $this->joinTDG =& FLEA::getSingleton($this->joinTableClass);
+            $this->joinTDG = FLEA::getSingleton($this->joinTableClass);
             $this->joinTable = $this->joinTDG->tableName;
             $joinSchema = $this->joinTDG->schema;
         } else {
@@ -946,127 +805,4 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
     }
 }
 
-/**
- * FLEA_Db_SqlHelper 类提供了各种生成 SQL 语句的辅助方法
- *
- * @package Core
- * @author toohamster
- * @version 1.0
- */
-class FLEA_Db_SqlHelper
-{
-    /**
-     * 分析查询条件
-     *
-     * @param mixed $conditions
-     * @param FLEA_Db_TableDataGateway $table
-     *
-     * @return array
-     */
-    public static function parseConditions($conditions, & $table)
-    {
-        // 对于 NULL，直接返回 NULL
-        if (is_null($conditions)) { return null; }
 
-        // 如果是数字，则假定为主键字段值
-        if (is_numeric($conditions)) {
-            return "{$table->qpk} = {$conditions}";
-        }
-
-        // 如果是字符串，则假定为自定义条件
-        if (is_string($conditions)) {
-            return $conditions;
-        }
-
-        // 如果不是数组，说明提供的查询条件有误
-        if (!is_array($conditions)) {
-            return null;
-        }
-
-        $where = '';
-        $linksWhere = [];
-        $expr = '';
-
-        foreach ($conditions as $offset => $cond) {
-            $expr = 'AND';
-            /**
-             * 不过何种条件形式，一律转换为 (字段名, 值, 操作, 连接运算符, 值是否是SQL命令) 的形式
-             */
-            if (is_string($offset)) {
-                if (!is_array($cond)) {
-                    // 字段名 => 值
-                    $cond = array($offset, $cond);
-                } else {
-                    if (strtolower($offset) == 'in()') {
-                        if (count($cond) == 1 && is_array(reset($cond)) && is_string(key($cond))) {
-                            $tmp = $table->qfield(key($cond)) . ' IN (' . implode(',', array_map(array(& $table->dbo, 'qstr'), reset($cond))). ')';
-                        } else {
-                            $tmp = $table->qpk . ' IN (' . implode(',', array_map(array(& $table->dbo, 'qstr'), $cond)). ')';
-                        }
-                        $cond = array('', $tmp, '', $expr, true);
-                    } else {
-                        // 字段名 => 数组
-                        array_unshift($cond, $offset);
-                    }
-                }
-            } elseif (is_int($offset)) {
-                if (!is_array($cond)) {
-                    // 值
-                    $cond = array('', $cond, '', $expr, true);
-                }
-            } else {
-                continue;
-            }
-
-            if (!isset($cond[0])) { continue; }
-            if (!isset($cond[2])) { $cond[2] = '='; }
-            if (!isset($cond[3])) { $cond[3] = $expr; }
-            if (!isset($cond[4])) { $cond[4] = false; }
-
-            list($field, $value, $op, $expr, $isCommand) = $cond;
-
-            $str = '';
-            do {
-                if (strpos($field, '.') !== false) {
-                    list($scheme, $field) = explode('.', $field);
-                    $linkname = strtoupper($scheme);
-                    if (isset($table->links[$linkname])) {
-                        $linksWhere[$linkname][] = array($field, $value, $op, $expr, $isCommand);
-                        break;
-                    } else {
-                        $field = "{$scheme}.{$field}";
-                    }
-                }
-
-                if (!$isCommand) {
-                    $field = $table->qfield($field);
-                    $value = $table->dbo->qstr($value);
-                    $str = "{$field} {$op} {$value} {$expr} ";
-                } else {
-                    $str = "{$value} {$expr} ";
-                }
-            } while (false);
-
-            $where .= $str;
-        }
-
-        $where = substr($where, 0, - (strlen($expr) + 2));
-        if (empty($linksWhere)) {
-            return $where;
-        } else {
-            return array($where, $linksWhere);
-        }
-    }
-
-    /**
-     * 格式化输出 SQL 日志
-     *
-     * @param array $log
-     */
-    public static function dumpLog(& $log)
-    {
-        foreach ($log as $ix => $sql) {
-            dump($sql, 'SQL ' . ($ix + 1));
-        }
-    }
-}

@@ -46,13 +46,13 @@ class FLEA_Acl_Manager
      */
     public function getUserWithPermissions($conditions)
     {
-        $tableUsers =& FLEA::getSingleton($this->_tableClass['users']);
+        $tableUsers = FLEA::getSingleton($this->_tableClass['users']);
         /* @var $tableUsers FLEA_Acl_Table_Users */
         $user = $tableUsers->find($conditions);
         if (empty($user)) { return false; }
 
         // 取得用户所在用户组的层次数据
-        $tableUserGroups =& FLEA::getSingleton($this->_tableClass['userGroups']);
+        $tableUserGroups = FLEA::getSingleton($this->_tableClass['userGroups']);
         /* @var $tableUserGroups FLEA_Acl_Table_UserGroups */
         $rowset = $tableUserGroups->getPath($user['group']);
 

@@ -22,7 +22,7 @@
  * 接下来为显示验证码的控制器编写 imgcode 方法：
  * <code>
  * function actionImgcode() {
- *     $imgcode =& FLEA::getSingleton('FLEA_Helper_ImgCode');
+ *     $imgcode = FLEA::getSingleton('FLEA_Helper_ImgCode');
  *     $imgcode->image();
  * }
  * </code>
@@ -30,7 +30,7 @@
  * 最后，对于用户提交的表单做如下验证：
  * <code>
  * function actionSubmit() {
- *     $imgcode =& FLEA::getSingleton('FLEA_Helper_ImgCode');
+ *     $imgcode = FLEA::getSingleton('FLEA_Helper_ImgCode');
  *     // 假定验证码在表单中的字段名是 imgcode
  *     if ($imgcode->check($_POST['imgcode'])) {
  *         // 验证通过
