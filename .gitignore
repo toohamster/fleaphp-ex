@@ -1,0 +1,15 @@
+.buildpath
+.settings/
+.project
+*.patch
+.idea/
+.git/
+runtime/
+uploads/
+.phpintel/
+.env
+.DS_Store
+.phpunit*
+*.cache
+.phpstorm.meta.php
+.vscode/
