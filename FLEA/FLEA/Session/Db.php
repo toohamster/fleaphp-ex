@@ -78,7 +78,7 @@ class FLEA_Session_Db
      *
      * @return FLEA_Session_Db
      */
-    function FLEA_Session_Db()
+    function __construct()
     {
         $this->tableName = FLEA::getAppInf('sessionDbTableName');
         $this->fieldId = FLEA::getAppInf('sessionDbFieldId');

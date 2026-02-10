@@ -40,12 +40,12 @@ class FLEA_Exception_ValidationFailed extends FLEA_Exception
      *
      * @return FLEA_Exception_ValidationFailed
      */
-    function FLEA_Exception_ValidationFailed($result, $data = null)
+    function __construct($result, $data = null)
     {
         $this->result = $result;
         $this->data = $data;
         $code = 0x0407001;
         $msg = sprintf(_ET($code), implode(', ', array_keys((array)$result)));
-        parent::FLEA_Exception($msg, $code);
+        parent::__construct($msg, $code);
     }
 }

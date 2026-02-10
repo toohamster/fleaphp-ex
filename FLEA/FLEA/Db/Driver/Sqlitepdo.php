@@ -100,7 +100,7 @@ class FLEA_Db_Driver_Sqlite
 	 *
 	 * @param array $dsn
 	 */
-	function FLEA_Db_Driver_Sqlite( $dsn = false )
+	function __construct( $dsn = false )
 	{
 		$tmp = ( array )$dsn;
 		unset( $tmp['password'] );

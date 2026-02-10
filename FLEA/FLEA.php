@@ -1790,7 +1790,7 @@ function _ET($errorCode, $appError = false)
 
 class FLEA_Exception extends Exception
 {
-    function FLEA_Exception($message = '', $code = 0)
+    function __construct($message = '', $code = 0)
     {
         parent::__construct($message, $code);
     }

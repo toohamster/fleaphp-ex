@@ -31,6 +31,6 @@ class FLEA_Db_Exception_InvalidLinkType extends FLEA_Exception
     {
         $this->type = $type;
         $code = 0x0202001;
-        parent::FLEA_Exception(sprintf(_ET($code), $type), $code);
+        parent::__construct(sprintf(_ET($code), $type), $code);
     }
 }

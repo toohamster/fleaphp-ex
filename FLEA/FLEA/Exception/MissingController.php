@@ -71,7 +71,7 @@ class FLEA_Exception_MissingController extends FLEA_Exception
      *
      * @return FLEA_Exception_MissingController
      */
-    function FLEA_Exception_MissingController($controllerName, $actionName,
+    function __construct($controllerName, $actionName,
              $arguments = null, $controllerClass = null, $actionMethod = null,
              $controllerClassFilename = null)
     {
@@ -82,6 +82,6 @@ class FLEA_Exception_MissingController extends FLEA_Exception
         $this->actionMethod = $actionMethod;
         $this->controllerClassFilename = $controllerClassFilename;
         $code = 0x0103002;
-        parent::FLEA_Exception(sprintf(_ET($code), $controllerName));
+        parent::__construct(sprintf(_ET($code), $controllerName));
     }
 }

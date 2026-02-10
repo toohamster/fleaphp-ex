@@ -107,9 +107,9 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
     /**
      * 构造函数
      */
-    function FLEA_Rbac_UsersManager()
+    function __construct()
     {
-        parent::FLEA_Db_TableDataGateway();
+        parent::__construct();
         $mn = strtoupper($this->emailField);
         if (isset($this->meta[$mn])) {
             $this->meta[$mn]['complexType'] = 'EMAIL';

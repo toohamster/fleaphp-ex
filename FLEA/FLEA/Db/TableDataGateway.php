@@ -252,7 +252,7 @@ class FLEA_Db_TableDataGateway
      *
      * @return FLEA_Db_TableDataGateway
      */
-    function FLEA_Db_TableDataGateway($params = null)
+    function __construct($params = null)
     {
         if (!empty($params['schema'])) {
             $this->schema = $params['schema'];

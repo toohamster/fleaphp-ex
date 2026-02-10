@@ -34,7 +34,7 @@ class FLEA_Db_Exception_SqlQuery extends FLEA_Exception
      *
      * @return FLEA_Db_Exception_SqlQuery
      */
-    function FLEA_Db_Exception_SqlQuery($sql, $msg = 0, $code = 0)
+    function __construct($sql, $msg = 0, $code = 0)
     {
         $this->sql = $sql;
         if ($msg) {
@@ -44,6 +44,6 @@ class FLEA_Db_Exception_SqlQuery extends FLEA_Exception
             $code = 0x06ff006;
             $msg = sprintf(_ET($code), $sql, $code);
         }
-        parent::FLEA_Exception($msg, $code);
+        parent::__construct($msg, $code);
     }
 }

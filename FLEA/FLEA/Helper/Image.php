@@ -39,7 +39,7 @@ class FLEA_Helper_Image
      *
      * @return FLEA_Helper_Image
      */
-    function FLEA_Helper_Image($handle)
+    function __construct($handle)
     {
         $this->_handle = $handle;
     }

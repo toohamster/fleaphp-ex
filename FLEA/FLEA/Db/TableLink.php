@@ -246,7 +246,7 @@ class FLEA_Db_TableLink
      *
      * @return FLEA_Db_TableLink
      */
-    function FLEA_Db_TableLink($define, $type, & $mainTDG)
+    function __construct($define, $type, & $mainTDG)
     {
         static $defaultDsnId = null;
 
@@ -479,9 +479,9 @@ class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
      *
      * @return FLEA_Db_TableLink
      */
-    function FLEA_Db_HasOneLink($define, $type, & $mainTDG)
+    function __construct($define, $type, & $mainTDG)
     {
-        parent::FLEA_Db_TableLink($define, $type, $mainTDG);
+        parent::__construct($define, $type, $mainTDG);
     }
 
     /**
@@ -589,10 +589,10 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
      *
      * @return FLEA_Db_TableLink
      */
-    function FLEA_Db_BelongsToLink($define, $type, & $mainTDG)
+    function __construct($define, $type, & $mainTDG)
     {
         $this->linkUpdate = $this->linkCreate = $this->linkRemove = false;
-        parent::FLEA_Db_TableLink($define, $type, $mainTDG);
+        parent::__construct($define, $type, $mainTDG);
     }
 
     /**
@@ -749,12 +749,12 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
      *
      * @return FLEA_Db_TableLink
      */
-    function FLEA_Db_ManyToManyLink($define, $type, & $mainTDG)
+    function __construct($define, $type, & $mainTDG)
     {
         $this->_optional[] = 'joinTable';
         $this->_optional[] = 'joinTableClass';
         $this->_optional[] = 'assocForeignKey';
-        parent::FLEA_Db_TableLink($define, $type, $mainTDG);
+        parent::__construct($define, $type, $mainTDG);
 
         if ($this->joinTableClass != '') {
             $this->joinTableIsEntity = true;

@@ -84,7 +84,7 @@ class FLEA_Log
      *
      * @return FLEA_Log
      */
-    function FLEA_Log()
+    function __construct()
     {
         $dir = FLEA::getAppInf('logFileDir');
         if (empty($dir)) {

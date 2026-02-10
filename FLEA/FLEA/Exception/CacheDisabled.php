@@ -30,9 +30,9 @@ class FLEA_Exception_CacheDisabled extends FLEA_Exception
      *
      * @return FLEA_Exception_CacheDisabled
      */
-    function FLEA_Exception_CacheDisabled($cacheDir)
+    function __construct($cacheDir)
     {
         $this->cacheDir = $cacheDir;
-        parent::FLEA_Exception(_ET(0x010200d));
+        parent::__construct(_ET(0x010200d));
     }
 }

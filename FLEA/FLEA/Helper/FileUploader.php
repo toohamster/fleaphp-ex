@@ -61,7 +61,7 @@ class FLEA_Helper_FileUploader
      *
      * @return FLEA_Helper_FileUploader
      */
-    function FLEA_Helper_FileUploader($cascade = false)
+    function __construct($cascade = false)
     {
         if (is_array($_FILES)) {
             foreach ($_FILES as $field => $struct) {
@@ -196,7 +196,7 @@ class FLEA_Helper_FileUploader_File
      *
      * @return FLEA_Helper_FileUploader_File
      */
-    function FLEA_Helper_FileUploader_File($struct, $name, $ix = false)
+    function __construct($struct, $name, $ix = false)
     {
         if ($ix !== false) {
             $s = array(

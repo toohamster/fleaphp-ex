@@ -187,7 +187,7 @@ class FLEA_Helper_Pager
      *
      * @return FLEA_Helper_Pager
      */
-    function FLEA_Helper_Pager(& $source, $currentPage, $pageSize = 20, $conditions = null, $sortby = null, $basePageIndex = 0)
+    function __construct(& $source, $currentPage, $pageSize = 20, $conditions = null, $sortby = null, $basePageIndex = 0)
     {
         $this->_basePageIndex = $basePageIndex;
         $this->_currentPage = $this->currentPage = $currentPage;

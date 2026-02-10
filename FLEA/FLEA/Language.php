@@ -147,7 +147,7 @@ class FLEA_Language
      *
      * @return FLEA_Language
      */
-    function FLEA_Language()
+    function __construct()
     {
         $autoload = FLEA::getAppInf('autoLoadLanguage');
         if (!is_array($autoload)) {

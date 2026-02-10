@@ -33,7 +33,7 @@ class FLEA_Dispatcher_Exception_CheckFailed extends FLEA_Exception
      *
      * @return FLEA_Dispatcher_Exception_CheckFailed
      */
-    function FLEA_Dispatcher_Exception_CheckFailed($controllerName, $actionName,
+    function __construct($controllerName, $actionName,
             $act = null, $roles = null)
     {
         $this->controllerName = $controllerName;
@@ -42,6 +42,6 @@ class FLEA_Dispatcher_Exception_CheckFailed extends FLEA_Exception
         $this->roles = $roles;
         $code = 0x0701004;
         $msg = sprintf(_ET($code), $controllerName, $actionName);
-        parent::FLEA_Exception($msg, $code);
+        parent::__construct($msg, $code);
     }
 }

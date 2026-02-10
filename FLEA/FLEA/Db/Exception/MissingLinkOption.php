@@ -32,10 +32,10 @@ class FLEA_Db_Exception_MissingLinkOption extends FLEA_Exception
      *
      * @return FLEA_Db_Exception_MissingLinkOption
      */
-    function FLEA_Db_Exception_MissingLinkOption($option)
+    function __construct($option)
     {
         $this->option = $option;
         $code = 0x0202002;
-        parent::FLEA_Exception(sprintf(_ET($code), $option));
+        parent::__construct(sprintf(_ET($code), $option));
     }
 }

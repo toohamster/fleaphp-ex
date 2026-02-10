@@ -27,9 +27,9 @@ class FLEA_Db_Exception_MetaColumnsFailed extends FLEA_Exception
      *
      * @return FLEA_Db_Exception_MetaColumnsFailed
      */
-    function FLEA_Db_Exception_MetaColumnsFailed($tableName)
+    function __construct($tableName)
     {
         $code = 0x06ff007;
-        parent::FLEA_Exception(sprintf(_ET($code), $tableName), $code);
+        parent::__construct(sprintf(_ET($code), $tableName), $code);
     }
 }

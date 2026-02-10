@@ -48,7 +48,7 @@ class FLEA_Rbac_Exception_InvalidACTFile extends FLEA_Exception
      *
      * @return FLEA_Rbac_Exception_InvalidACTFile
      */
-    function FLEA_Rbac_Exception_InvalidACTFile($actFilename, $act, $controllerName = null)
+    function __construct($actFilename, $act, $controllerName = null)
     {
         $this->actFilename = $actFilename;
         $this->act = $act;
@@ -61,6 +61,6 @@ class FLEA_Rbac_Exception_InvalidACTFile extends FLEA_Exception
             $code = 0x0701003;
             $msg = sprintf(_ET($code), $actFilename);
         }
-        parent::FLEA_Exception($msg, $code);
+        parent::__construct($msg, $code);
     }
 }

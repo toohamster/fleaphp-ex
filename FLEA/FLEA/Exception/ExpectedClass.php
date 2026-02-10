@@ -48,7 +48,7 @@ class FLEA_Exception_ExpectedClass extends FLEA_Exception
      *
      * @return FLEA_Exception_ExpectedClass
      */
-    function FLEA_Exception_ExpectedClass($className, $file = null, $fileExists = false)
+    function __construct($className, $file = null, $fileExists = false)
     {
         $this->className = $className;
         $this->classFile = $file;
@@ -60,6 +60,6 @@ class FLEA_Exception_ExpectedClass extends FLEA_Exception
             $code = 0x0102003;
             $msg = sprintf(_ET($code), $className);
         }
-        parent::FLEA_Exception($msg, $code);
+        parent::__construct($msg, $code);
     }
 }

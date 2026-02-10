@@ -40,12 +40,12 @@ class FLEA_Db_Exception_PrimaryKeyExists extends FLEA_Exception
      *
      * @return FLEA_Db_Exception_PrimaryKeyExists
      */
-    function FLEA_Db_Exception_PrimaryKeyExists($pk, $pkValue = null)
+    function __construct($pk, $pkValue = null)
     {
         $this->primaryKey = $pk;
         $this->pkValue = $pkValue;
         $code = 0x06ff004;
         $msg = sprintf(_ET($code), $pk, $pkValue);
-        parent::FLEA_Exception($msg, $code);
+        parent::__construct($msg, $code);
     }
 }

@@ -29,10 +29,10 @@ class FLEA_Exception_InvalidArguments extends FLEA_Exception
      *
      * @return FLEA_Exception_InvalidArguments
      */
-    function FLEA_Exception_InvalidArguments($arg, $value = null)
+    function __construct($arg, $value = null)
     {
         $this->arg = $arg;
         $this->value = $value;
-        parent::FLEA_Exception(sprintf(_ET(0x0102006), $arg));
+        parent::__construct(sprintf(_ET(0x0102006), $arg));
     }
 }

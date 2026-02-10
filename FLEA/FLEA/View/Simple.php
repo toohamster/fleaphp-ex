@@ -73,7 +73,7 @@ class FLEA_View_Simple
      *
      * @return FLEA_View_Simple
      */
-    function FLEA_View_Simple($path = null) {
+    function __construct($path = null) {
         log_message('Construction FLEA_View_Simple', 'debug');
 
         $this->path = $path;

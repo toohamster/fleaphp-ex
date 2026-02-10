@@ -39,13 +39,13 @@ class FLEA_Exception_FileOperation extends FLEA_Exception
      *
      * @return FLEA_Exception_FileOperation
      */
-    function FLEA_Exception_FileOperation($opeation)
+    function __construct($opeation)
     {
         $this->operation = $opeation;
         $args = func_get_args();
         array_shift($args);
         $this->args = $args;
         $func = $opeation . '(' . implode(', ', $args) . ')';
-        parent::FLEA_Exception(sprintf(_ET(0x0102005), $func));
+        parent::__construct(sprintf(_ET(0x0102005), $func));
     }
 }

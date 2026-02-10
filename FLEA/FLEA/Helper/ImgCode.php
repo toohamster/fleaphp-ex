@@ -78,7 +78,7 @@ class FLEA_Helper_ImgCode
     /**
      * 构造函数
      */
-    function FLEA_Helper_ImgCode()
+    function __construct()
     {
         @session_start();
 

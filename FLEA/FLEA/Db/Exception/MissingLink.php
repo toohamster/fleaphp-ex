@@ -27,10 +27,10 @@ class FLEA_Db_Exception_MissingLink extends FLEA_Exception
      *
      * @return FLEA_Db_Exception_MissingLink
      */
-    function FLEA_Db_Exception_MissingLink($name)
+    function __construct($name)
     {
         $this->name = $name;
         $code = 0x06ff009;
-        parent::FLEA_Exception(sprintf(_ET($code), $name), $code);
+        parent::__construct(sprintf(_ET($code), $name), $code);
     }
 }

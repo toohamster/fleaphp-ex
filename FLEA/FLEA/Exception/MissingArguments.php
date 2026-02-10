@@ -32,7 +32,7 @@ class FLEA_Exception_MissingArguments extends FLEA_Exception
      *
      * @return FLEA_Exception_MissingArguments
      */
-    function FLEA_Exception_MissingArguments($args)
+    function __construct($args)
     {
         $this->args = $args;
         if (is_array($args)) {
@@ -40,6 +40,6 @@ class FLEA_Exception_MissingArguments extends FLEA_Exception
         }
         $code = 0x0102007;
         $msg = sprintf(_ET($code), $args);
-        parent::FLEA_Exception($msg, $code);
+        parent::__construct($msg, $code);
     }
 }

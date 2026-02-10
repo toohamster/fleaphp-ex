@@ -31,13 +31,13 @@ class FLEA_Exception_TypeMismatch extends FLEA_Exception
      *
      * @return FLEA_Exception_TypeMismatch
      */
-    function FLEA_Exception_TypeMismatch($arg, $expected, $actual)
+    function __construct($arg, $expected, $actual)
     {
         $this->arg = $arg;
         $this->expected = $expected;
         $this->actual = $actual;
         $code = 0x010200c;
         $msg = sprintf(_ET($code), $arg, $expected, $actual);
-        parent::FLEA_Exception($msg, $code);
+        parent::__construct($msg, $code);
     }
 }

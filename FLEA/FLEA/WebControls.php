@@ -41,7 +41,7 @@ class FLEA_WebControls
      *
      * @return FLEA_WebControls
      */
-    function FLEA_WebControls($extendsDir = null)
+    function __construct($extendsDir = null)
     {
         if (is_array($extendsDir)) {
             $this->_extendsDir = array_merge($this->_extendsDir, $extendsDir);
