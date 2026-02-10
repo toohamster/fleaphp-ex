@@ -46,4 +46,12 @@ class FLEA_Acl_Table_Users extends FLEA_Rbac_UsersManager
             'mappingName' => 'permissions',
         ),
     );
+
+    /**
+     * 构造函数
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
 }

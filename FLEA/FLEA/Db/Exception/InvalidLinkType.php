@@ -27,7 +27,7 @@ class FLEA_Db_Exception_InvalidLinkType extends FLEA_Exception
      *
      * @return FLEA_Db_Exception_InvalidDSN
      */
-    function __construct($type)
+    public function __construct($type)
     {
         $this->type = $type;
         $code = 0x0202001;

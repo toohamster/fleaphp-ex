@@ -8,22 +8,23 @@
 - [x] FLEA/FLEA/Exception/ExistsKeyName.php
 - [x] FLEA/FLEA/Exception/CacheDisabled.php
 - [x] FLEA/FLEA/Db/Exception/InvalidDSN.php
+- [x] FLEA/FLEA/Db/Exception/InvalidLinkType.php
+- [x] FLEA/FLEA/Exception/ExpectedFile.php
 
 ### 表格类 (Table Classes)
 - [x] FLEA/FLEA/Acl/Table/Permissions.php
 - [x] FLEA/FLEA/Acl/Table/Roles.php
+- [x] FLEA/FLEA/Acl/Table/Users.php
 
 ## 待处理的简单文件 🔜
 
 ### 异常类
-- [ ] FLEA/FLEA/Db/Exception/InvalidLinkType.php
 - [ ] FLEA/FLEA/Db/Exception/MetaColumnsFailed.php
 - [ ] FLEA/FLEA/Db/Exception/MissingLink.php
 - [ ] FLEA/FLEA/Db/Exception/MissingLinkOption.php
 - [ ] FLEA/FLEA/Db/Exception/MissingPrimaryKey.php
 - [ ] FLEA/FLEA/Db/Exception/PrimaryKeyExists.php
 - [ ] FLEA/FLEA/Db/Exception/SqlQuery.php
-- [ ] FLEA/FLEA/Exception/ExpectedFile.php
 - [ ] FLEA/FLEA/Exception/InvalidArguments.php
 - [ ] FLEA/FLEA/Exception/MustOverwrite.php
 - [ ] FLEA/FLEA/Exception/NotExistsKeyName.php
@@ -33,7 +34,6 @@
 - [ ] FLEA/FLEA/Acl/Table/UserGroups.php
 - [ ] FLEA/FLEA/Acl/Table/UserGroupsHasPermissions.php
 - [ ] FLEA/FLEA/Acl/Table/UserGroupsHasRoles.php
-- [ ] FLEA/FLEA/Acl/Table/Users.php
 - [ ] FLEA/FLEA/Acl/Table/UsersHasPermissions.php
 - [ ] FLEA/FLEA/Acl/Table/UsersHasRoles.php
 
@@ -65,12 +65,18 @@
 - **protected**: 内部实现方法(以下划线开头)、受保护的属性
 - **private**: 严格的私有实现、不打算被继承的方法
 
+### 安全准则（重要）：
+- ✅ 只处理类级别的属性和方法声明
+- ✅ 绝不在方法体内的局部变量前添加访问控制符
+- ✅ 精确识别类结构边界
+- ✅ 保持原有代码逻辑不变
+
 ## 统计信息
 
-- **已处理文件**: 7个
-- **待处理简单文件**: 18个左右
+- **已处理文件**: 10个
+- **待处理简单文件**: 15个左右
 - **跳过复杂文件**: 10个以上
-- **总体进度**: ~20%
+- **总体进度**: ~30%
 
 ## 下一步计划
 
