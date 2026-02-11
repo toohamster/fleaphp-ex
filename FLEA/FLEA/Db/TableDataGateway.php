@@ -9,8 +9,6 @@
  * @version $Id: TableDataGateway.php 1401 2008-10-08 03:00:38Z yangkun $
  */
 
-// {{{ includes
-// FLEA::loadClass('FLEA_Db_TableLink'); // 已由自动加载处理
 // }}}}
 
 // {{{ constants
@@ -33,7 +31,6 @@ define('HAS_MANY',      3);
  * MANY_TO_MANY 关联表示两个数据表的数据互相引用
  */
 define('MANY_TO_MANY',  4);
-// }}}
 
 /**
  * FLEA_Db_TableDataGateway 类（表数据入口）封装了数据表的 CRUD 操作
@@ -1180,7 +1177,6 @@ class FLEA_Db_TableDataGateway
         if (!isset($row[$this->primaryKey])) {
             FLEA::loadClass('FLEA_Db_Exception_MissingPrimaryKey');
             throw new FLEA_Db_Exception_MissingPrimaryKey($this->primaryKey);
-            return false;
         }
         $ret = $this->removeByPkv($row[$this->primaryKey], $removeLink);
         if ($ret) {

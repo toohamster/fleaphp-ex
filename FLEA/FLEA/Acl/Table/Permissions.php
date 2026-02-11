@@ -9,9 +9,6 @@
  * @version $Id: Permissions.php 1060 2008-05-04 05:02:59Z qeeyuan $
  */
 
-// {{{ includes
-// FLEA::loadClass('FLEA_Db_TableDataGateway'); // 已由自动加载处理
-// }}}
 
 /**
  * FLEA_Acl_Table_Permissions 提供了权限数据的存储服务

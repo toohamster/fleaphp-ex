@@ -9,9 +9,6 @@
  * @version $Id: UserGroups.php 1060 2008-05-04 05:02:59Z qeeyuan $
  */
 
-// {{{ includes
-// FLEA::loadClass('FLEA_Db_TableDataGateway'); // 已由自动加载处理
-// }}}
 
 /**
  * FLEA_Acl_Table_UserGroups 类提供了用户组数据的存储服务
@@ -79,7 +76,6 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
             $parent = parent::find($parentId);
             if (!$parent) {
                 // 指定的父用户组不存在
-                // FLEA::loadClass('FLEA_Acl_Exception_UserGroupNotFound'); // 已由自动加载处理
                 throw new FLEA_Acl_Exception_UserGroupNotFound($parentId);
                 return false;
             }
@@ -152,7 +148,6 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
     public function removeByPkv($groupId) {
         $group = parent::find((int)$groupId);
         if (!$group) {
-            // FLEA::loadClass('FLEA_Acl_Exception_UserGroupNotFound'); // 已由自动加载处理
             throw new FLEA_Acl_Exception_UserGroupNotFound($groupId);
             return false;
         }

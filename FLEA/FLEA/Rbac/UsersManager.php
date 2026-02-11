@@ -18,11 +18,7 @@ define('PWD_CRYPT',     2);
 define('PWD_CLEARTEXT', 3);
 define('PWD_SHA1',      4);
 define('PWD_SHA2',      5);
-// }}}
 
-// {{{ includes
-// FLEA::loadClass('FLEA_Db_TableDataGateway'); // 已由自动加载处理
-// }}}
 
 /**
  * UsersManager 派生自 FLEA_Db_TableDataGateway，用于访问保存用户信息的数据表

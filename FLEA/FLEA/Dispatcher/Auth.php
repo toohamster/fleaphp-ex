@@ -16,9 +16,6 @@
  * @version $Id: Auth.php 1005 2007-11-03 07:43:55Z qeeyuan $
  */
 
-// {{{ includes
-// FLEA::loadClass('FLEA_Dispatcher_Simple'); // 已由自动加载处理
-// }}}
 
 /**
  * FLEA_Dispatcher_Auth 分析 HTTP 请求，并转发到合适的 Controller 对象处理
@@ -147,7 +144,6 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
             if ($callback) {
                 return call_user_func_array($callback, $args);
             } else {
-                // FLEA::loadClass('FLEA_Dispatcher_Exception_CheckFailed'); // 已由自动加载处理
                 throw new FLEA_Dispatcher_Exception_CheckFailed($controllerName, $actionName, $rawACT, $roles);
                 return false;
             }
@@ -284,8 +280,6 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
         }
 
         // 当控制器的 ACT 文件没有返回 ACT 时抛出异常
-        // FLEA::loadClass('FLEA_Rbac_Exception_InvalidACTFile'); // 已由自动加载处理
         throw new FLEA_Rbac_Exception_InvalidACTFile($actFilename, $ACT);
-        return false;
     }
 }

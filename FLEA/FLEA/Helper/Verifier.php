@@ -198,7 +198,6 @@ class FLEA_Helper_Verifier
         if (isset($rule['complexType'])) {
             $func = 'is' . $rule['complexType'];
             if (!method_exists($this, $func)) {
-                // FLEA::loadClass('FLEA_Exception_InvalidArguments'); // 已由自动加载处理
                 throw new FLEA_Exception_InvalidArguments('$rule[\'complexType\']',
                         $rule['complexType']));
                 return null;

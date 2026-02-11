@@ -10,9 +10,6 @@
  * Updated: Converted to PDO for PHP 7.4 compatibility
  */
 
-// {{{ includes
-// FLEA::loadClass('FLEA_Db_Driver_Abstract'); // 已由自动加载处理
-// }}}
 
 /**
  * 用于 PDO MySQL 的数据库驱动程序
@@ -148,7 +145,6 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
         } catch (PDOException $e) {
             $this->lasterr = $e->getMessage();
             $this->lasterrcode = $e->getCode();
-            // FLEA::loadClass('FLEA_Db_Exception_SqlQuery'); // 已由自动加载处理
             throw new FLEA_Db_Exception_SqlQuery(
                 "SELECT DATABASE: '{$database}' FAILED!",
                 $this->lasterr,
@@ -191,7 +187,6 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
             $this->lasterrcode = $e->getCode();
 
             if ($throw) {
-                // FLEA::loadClass('FLEA_Db_Exception_SqlQuery'); // 已由自动加载处理
                 throw new FLEA_Db_Exception_SqlQuery($sql, $this->lasterr, $this->lasterrcode);
             }
         }

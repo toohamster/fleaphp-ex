@@ -72,7 +72,6 @@ class FLEA_Helper_Image
             'gif' => 'imagecreatefromgif',
         );
         if (!isset($ext2functions[$fileext])) {
-            // FLEA::loadClass('FLEA_Exception_NotImplemented'); // 已由自动加载处理
             throw new FLEA_Exception_NotImplemented('imagecreatefrom' . $fileext);
             return false;
         }

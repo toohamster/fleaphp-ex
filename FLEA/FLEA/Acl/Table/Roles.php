@@ -9,9 +9,6 @@
  * @version $Id: Roles.php 1060 2008-05-04 05:02:59Z qeeyuan $
  */
 
-// {{{ includes
-// FLEA::loadClass('FLEA_Db_TableDataGateway'); // 已由自动加载处理
-// }}}
 
 /**
  * FLEA_Acl_Table_Roles 提供了角色数据的存储服务

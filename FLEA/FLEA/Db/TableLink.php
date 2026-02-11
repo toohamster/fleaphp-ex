@@ -253,7 +253,6 @@ class FLEA_Db_TableLink
         // 检查必须的属性是否都已经提供
         foreach ($this->_req as $key) {
             if (!isset($define[$key]) || $define[$key] == '') {
-                // FLEA::loadClass('FLEA_Db_Exception_MissingLinkOption'); // 已由自动加载处理
                 throw new FLEA_Db_Exception_MissingLinkOption($key);
             } else {
                 $this->{$key} = $define[$key];
@@ -307,13 +306,11 @@ class FLEA_Db_TableLink
 
         // 检查 $type 参数
         if (!isset($typeMap[$type])) {
-            // FLEA::loadClass('FLEA_Db_Exception_InvalidLinkType'); // 已由自动加载处理
             throw new FLEA_Db_Exception_InvalidLinkType($type);
         }
 
         // tableClass 属性是必须提供的
         if (!isset($define['tableClass'])) {
-            // FLEA::loadClass('FLEA_Db_Exception_MissingLinkOption'); // 已由自动加载处理
             throw new FLEA_Db_Exception_MissingLinkOption('tableClass');
         }
         // 如果没有提供 mappingName 属性，则使用 tableClass 作为 mappingName
@@ -329,7 +326,6 @@ class FLEA_Db_TableLink
         // 以及assocForeignKey 属性
         if ($type == MANY_TO_MANY) {
             if (!isset($define['joinTable']) && !isset($define['joinTableClass'])) {
-                // FLEA::loadClass('FLEA_Db_Exception_MissingLinkOption'); // 已由自动加载处理
                 throw new FLEA_Db_Exception_MissingLinkOption('joinTable');
             }
         }
@@ -365,7 +361,6 @@ class FLEA_Db_TableLink
      */
     function saveAssocData(& $row, $pkv)
     {
-        // FLEA::loadClass('FLEA_Exception_NotImplemented'); // 已由自动加载处理
         throw new FLEA_Exception_NotImplemented('saveAssocData()', 'FLEA_Db_TableLink');
     }
 
@@ -400,7 +395,6 @@ class FLEA_Db_TableLink
      */
     function calcCount(& $assocRowset, $mappingName, $in)
     {
-        // FLEA::loadClass('FLEA_Exception_NotImplemented'); // 已由自动加载处理
         throw new FLEA_Exception_NotImplemented('calcCount()', 'FLEA_Db_TableLink');
     }
 

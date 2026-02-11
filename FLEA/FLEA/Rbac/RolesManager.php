@@ -9,9 +9,6 @@
  * @version $Id: RolesManager.php 972 2007-10-09 20:56:54Z qeeyuan $
  */
 
-// {{{ includes
-// FLEA::loadClass('FLEA_Db_TableDataGateway'); // 已由自动加载处理
-// }}}
 
 /**
  * FLEA_Rbac_RolesManager 派生自 FLEA_Db_TableDataGateway，
