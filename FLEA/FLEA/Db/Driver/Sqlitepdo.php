@@ -136,9 +136,7 @@ class FLEA_Db_Driver_Sqlite
 			}
 		}
 
-		FLEA::loadClass( 'FLEA_Db_Exception_SqlQuery' );
-		throw new FLEA_Db_Exception_SqlQuery( "connect('{$dsn['db']}') failed! debug message:" . $ex->getMessage() );
-		return false;
+		throw new FLEA_Db_Exception_SqlQuery( "connect('{$dsn['db']}') failed!");
 	}
 
 	/**
@@ -204,9 +202,7 @@ class FLEA_Db_Driver_Sqlite
 			return false;
 		}
 
-		FLEA::loadClass( 'FLEA_Db_Exception_SqlQuery' );
 		throw new FLEA_Db_Exception_SqlQuery( $sql, $this->lasterr[2], $this->lasterrcode );
-		return false;
 	}
 
 	/**

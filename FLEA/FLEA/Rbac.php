@@ -142,7 +142,6 @@ class FLEA_Rbac
             // 如果 deny 也为 RBAC_EVERYONE，则表示 ACT 出现了冲突
             if ($ACT['deny'] == RBAC_EVERYONE) {
                 throw new FLEA_Rbac_Exception_InvalidACT($ACT);
-                return false;
             }
 
             // 只有 deny 中没有用户的角色信息，则检查通过

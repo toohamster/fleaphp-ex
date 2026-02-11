@@ -95,7 +95,7 @@ class FLEA_Db_ActiveRecord
 
         $objid = "{$myclass}_tdg";
         if (FLEA::isRegistered($objid)) {
-            $this->_table =& FLEA::registry($objid);
+            $this->_table = FLEA::registry($objid);
         } else {
             FLEA::loadClass($tableClass);
             $this->_table = new $tableClass(array('skipCreateLinks' => true));

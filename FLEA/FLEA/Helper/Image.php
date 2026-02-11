@@ -73,7 +73,6 @@ class FLEA_Helper_Image
         );
         if (!isset($ext2functions[$fileext])) {
             throw new FLEA_Exception_NotImplemented('imagecreatefrom' . $fileext);
-            return false;
         }
 
         $handle = $ext2functions[$fileext]($filename);

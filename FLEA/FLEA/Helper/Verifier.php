@@ -199,7 +199,7 @@ class FLEA_Helper_Verifier
             $func = 'is' . $rule['complexType'];
             if (!method_exists($this, $func)) {
                 throw new FLEA_Exception_InvalidArguments('$rule[\'complexType\']',
-                        $rule['complexType']));
+                        $rule['complexType']);
                 return null;
             }
             if (!$this->{$func}($value)) { return $ret; }

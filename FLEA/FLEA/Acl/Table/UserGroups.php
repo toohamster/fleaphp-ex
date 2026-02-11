@@ -77,7 +77,6 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
             if (!$parent) {
                 // 指定的父用户组不存在
                 throw new FLEA_Acl_Exception_UserGroupNotFound($parentId);
-                return false;
             }
         } else {
             // 如果未指定 $parentId 为 0 或 null，则创建一个顶级用户组
@@ -149,7 +148,6 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
         $group = parent::find((int)$groupId);
         if (!$group) {
             throw new FLEA_Acl_Exception_UserGroupNotFound($groupId);
-            return false;
         }
 
         $this->dbo->startTrans();

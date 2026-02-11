@@ -145,7 +145,6 @@ class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
                 return call_user_func_array($callback, $args);
             } else {
                 throw new FLEA_Dispatcher_Exception_CheckFailed($controllerName, $actionName, $rawACT, $roles);
-                return false;
             }
         }
     }

@@ -831,7 +831,6 @@ class FLEA_Db_TableDataGateway
 
         // 检查是否提供了主键值
         if (!isset($row[$this->primaryKey])) {
-            FLEA::loadClass('FLEA_Db_Exception_MissingPrimaryKey');
             throw new FLEA_Db_Exception_MissingPrimaryKey($this->primaryKey);
         }
 
@@ -842,7 +841,6 @@ class FLEA_Db_TableDataGateway
         if ($this->autoValidating && !is_null($this->verifier)) {
             if (!$this->checkRowData($row, true)) {
                 // 验证失败抛出异常
-                FLEA::loadClass('FLEA_Exception_ValidationFailed');
                 throw new FLEA_Exception_ValidationFailed($this->getLastValidation(), $row);
             }
         }
@@ -1066,9 +1064,7 @@ class FLEA_Db_TableDataGateway
         // 自动验证数据
         if ($this->autoValidating && !is_null($this->verifier)) {
             if (!$this->checkRowData($row)) {
-                FLEA::loadClass('FLEA_Exception_ValidationFailed');
                 throw new FLEA_Exception_ValidationFailed($this->getLastValidation(), $row);
-                return false;
             }
         }
 
@@ -1100,7 +1096,6 @@ class FLEA_Db_TableDataGateway
             if (!$insertId) {
                 if ($unsetpk) { unset($row[$this->primaryKey]); }
                 $this->dbo->completeTrans(false);
-                FLEA::loadClass('FLEA_Db_Exception_InvalidInsertID');
                 throw new FLEA_Db_Exception_InvalidInsertID();
             }
         }
@@ -1175,7 +1170,6 @@ class FLEA_Db_TableDataGateway
         }
 
         if (!isset($row[$this->primaryKey])) {
-            FLEA::loadClass('FLEA_Db_Exception_MissingPrimaryKey');
             throw new FLEA_Db_Exception_MissingPrimaryKey($this->primaryKey);
         }
         $ret = $this->removeByPkv($row[$this->primaryKey], $removeLink);
@@ -1351,7 +1345,7 @@ class FLEA_Db_TableDataGateway
                     $sql = "DELETE FROM {$link->assocTDG->qtableName}";
                     break;
                 default:
-                    continue;
+                    break;
                 }
                 if ($this->dbo->execute($sql) == false) {
                     $this->dbo->completeTrans(false);
@@ -1482,10 +1476,7 @@ class FLEA_Db_TableDataGateway
             return $this->links[$linkName];
         }
 
-        FLEA::loadClass('FLEA_Db_Exception_MissingLink');
         throw new FLEA_Db_Exception_MissingLink($linkName);
-        $ret = false;
-        return $ret;
     }
 
     /**
@@ -1621,7 +1612,6 @@ class FLEA_Db_TableDataGateway
     public function qinto($sql, $params = null)
     {
         if (!is_array($params)) {
-            FLEA::loadClass('FLEA_Exception_TypeMismatch');
             throw new FLEA_Exception_TypeMismatch('$params', 'array', gettype($params));
         }
         $arr = explode('?', $sql);

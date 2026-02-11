@@ -160,3 +160,4 @@ class FLEA_Helper_FileUploader
             $file->move($destDir . '/' . $file->getFilename());
         }
     }
+}

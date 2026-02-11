@@ -296,7 +296,6 @@ class FLEA
         }
 
         throw new FLEA_Exception_ExpectedFile($filename);
-        return false;
     }
 
     /**
@@ -530,7 +529,6 @@ class FLEA
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
             throw new FLEA_Exception_CacheDisabled($cacheDir);
-            return false;
         }
 
         if ($cacheIdIsFilename) {
@@ -587,7 +585,6 @@ class FLEA
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
             throw new FLEA_Exception_CacheDisabled($cacheDir);
-            return false;
         }
 
         if ($cacheIdIsFilename) {
@@ -603,7 +600,6 @@ class FLEA
 
         if (!safe_file_put_contents($cacheFile, $data)) {
             throw new FLEA_Exception_CacheDisabled($cacheDir);
-            return false;
         } else {
             return true;
         }
@@ -622,7 +618,6 @@ class FLEA
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
             throw new FLEA_Exception_CacheDisabled($cacheDir);
-            return false;
         }
 
         if ($cacheIdIsFilename) {
