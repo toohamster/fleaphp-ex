@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * 定义 FLEA_Db_Driver_Abstract 类
  *
@@ -34,7 +33,7 @@ define('DBO_PARAM_AT_NAMED',    '@');
  * @author toohamster
  * @version 1.1
  */
-class FLEA_Db_Driver_Abstract
+abstract class FLEA_Db_Driver_Abstract
 {
     /**
      * 用于描绘 true、false 和 null 的数据库值
@@ -145,28 +144,28 @@ class FLEA_Db_Driver_Abstract
      *
      * @var mixed
      */
-    public $_insertId = null;
+    protected $_insertId = null;
 
     /**
      * 指示事务启动次数
      *
      * @var int
      */
-    public $_transCount = 0;
+    protected $_transCount = 0;
 
     /**
      * 指示事务执行期间是否发生了错误
      *
      * @var boolean
      */
-    public $_hasFailedQuery = false;
+    protected $_hasFailedQuery = false;
 
     /**
      * SAVEPOINT 堆栈
      *
      * @var array
      */
-    public $_savepointStack = [];
+    protected $_savepointStack = [];
 
     /**
      * 构造函数
@@ -629,7 +628,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    abstract public function metaColumns($table);
+    abstract public function metaColumns(string $table);
 
     /**
      * 获得所有数据表的名称
@@ -675,7 +674,7 @@ class FLEA_Db_Driver_Abstract
      * 如果 $commitOnNoErrors 参数为 true，当事务中所有查询都成功完成时，则提交事务，否则回滚事务
      * 如果 $commitOnNoErrors 参数为 false，则强制回滚事务
      *
-     * @param $commitOnNoErrors 指示在没有错误时是否提交事务
+     * @param bool $commitOnNoErrors 指示在没有错误时是否提交事务
      */
     public function completeTrans($commitOnNoErrors = true)
     {
@@ -751,7 +750,7 @@ class FLEA_Db_Driver_Abstract
     {
         $pkv = $row[$pk];
         unset($row[$pk]);
-        list($pairs, $values) = $this->getPlaceholderPair($row);
+        [$pairs, ] = $this->getPlaceholderPair($row);
         $row[$pk] = $pkv;
         $pairs = implode(',', $pairs);
         $table = $this->qtable($table, $schema);
@@ -764,11 +763,11 @@ class FLEA_Db_Driver_Abstract
      * 根据驱动的参数占位符样式，返回包含参数占位符及有效数据的数组
      *
      * @param array $inputarr
-     * @param array $fields
+     * @param array|null $fields
      *
      * @return array
      */
-    public function getPlaceholder(& $inputarr, $fields = null)
+    public function getPlaceholder(&$inputarr, $fields = null)
     {
         $holders = [];
         $values = [];

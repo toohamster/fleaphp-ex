@@ -68,7 +68,7 @@ class FLEA_Controller_Action
         $this->_controllerName = $controllerName;
 
         foreach ((array)$this->components as $componentName) {
-            $this->{$componentName} =& $this->_getComponent($componentName);
+            $this->{$componentName} = $this->_getComponent($componentName);
         }
     }
 
@@ -189,7 +189,7 @@ class FLEA_Controller_Action
             if (is_array($data)) { extract($data); }
             include($__flea_internal_viewName);
         } else {
-            $view =& $this->_getView();
+            $view = $this->_getView();
             foreach ((array)$this->_renderCallbacks as $callback) {
                 call_user_func_array($callback, array(& $data, & $view));
             }
@@ -231,7 +231,7 @@ class FLEA_Controller_Action
      */
     protected function _registerEvent($controlName, $event, $action, $attribs = null)
     {
-        $ajax =& FLEA::initAjax();
+        $ajax = FLEA::initAjax();
         return $ajax->registerEvent($controlName, $event,
                 url($this->_controllerName, $action), $attribs);
     }

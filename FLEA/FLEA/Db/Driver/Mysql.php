@@ -52,6 +52,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
      *
      * @param array|false $dsn
      * @return bool
+     * @throws FLEA_Db_Exception_SqlQuery
      */
     public function connect($dsn = false): bool
     {
@@ -109,12 +110,11 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
         } catch (PDOException $e) {
             $this->lasterr = $e->getMessage();
             $this->lasterrcode = $e->getCode();
-            // FLEA::loadClass('FLEA_Db_Exception_SqlQuery'); // 已由自动加载处理
             throw new FLEA_Db_Exception_SqlQuery(
                 "PDO Connection failed for host '{$host}'!",
                 $this->lasterr,
                 $this->lasterrcode
-            ));
+            );
         }
 
         return true;
@@ -138,6 +138,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
      *
      * @param string $database
      * @return bool
+     * @throws FLEA_Db_Exception_SqlQuery
      */
     public function selectDb(string $database): bool
     {
@@ -152,7 +153,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
                 "SELECT DATABASE: '{$database}' FAILED!",
                 $this->lasterr,
                 $this->lasterrcode
-            ));
+            );
         }
     }
 
@@ -301,6 +302,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
      * @param int|null $length
      * @param int|null $offset
      * @return PDOStatement|false
+     * @throws FLEA_Db_Exception_SqlQuery
      */
     public function selectLimit(string $sql, ?int $length = null, ?int $offset = null)
     {
@@ -322,6 +324,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
      *
      * @param string $table
      * @return array|false
+     * @throws FLEA_Db_Exception_SqlQuery
      */
     public function metaColumns(string $table)
     {
@@ -349,7 +352,6 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
             'FLOAT'         => 'N',
             'DOUBLE'        => 'N',
             'DOUBLEPRECISION' => 'N',
-            'FLOAT'         => 'N',
             'DECIMAL'       => 'N',
             'DEC'           => 'N',
 
@@ -441,6 +443,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
      * @param string|null $pattern
      * @param string|null $schema
      * @return array
+     * @@throws Exception
      */
     public function metaTables(?string $pattern = null, ?string $schema = null): array
     {

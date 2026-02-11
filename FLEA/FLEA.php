@@ -386,9 +386,9 @@ class FLEA
      *
      * example:
      * <code>
-     * $obj =& FLEA::getSingleton('Table_Posts);
+     * $obj = FLEA::getSingleton('Table_Posts);
      * ......
-     * $obj2 =& FLEA::getSingleton('Table_Posts);
+     * $obj2 = FLEA::getSingleton('Table_Posts);
      * // 检查调用两次获取的是否是同一个实例
      * echo $obj === $obj2 ? 'Equals' : 'Not equals';
      * </code>
@@ -431,7 +431,7 @@ class FLEA
      * FLEA::register($obj, 'MyClass');
      * .....
      * // 从容器查找指定的对象
-     * $obj2 =&  FLEA::registry('MyClass');
+     * $obj2 = FLEA::registry('MyClass');
      * // 检查是否是同一个实例
      * echo $obj === $obj2 ? 'Equals' : 'Not equals';
      * </code>
