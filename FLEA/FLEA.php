@@ -119,7 +119,7 @@ class FLEA
      *
      * @param mixed $__config 配置数组或配置文件名
      */
-    public static function loadAppInf($__flea_internal_config = null)
+    public static function loadAppInf($flea_internal_config = null): void
     {
         if (!is_array($__flea_internal_config) && is_string($__flea_internal_config)) {
             if (!is_readable($__flea_internal_config)) {
@@ -130,7 +130,6 @@ class FLEA
         if (is_array($__flea_internal_config)) {
             $GLOBALS[G_FLEA_VAR]['APP_INF'] = array_merge($GLOBALS[G_FLEA_VAR]['APP_INF'], $__flea_internal_config);
         }
-        return null;
     }
 
     /**
@@ -148,7 +147,7 @@ class FLEA
      *
      * @return mixed
      */
-    public static function getAppInf($option, $default = null)
+    public static function getAppInf(string $option, $default = null)
     {
         return isset($GLOBALS[G_FLEA_VAR]['APP_INF'][$option]) ? $GLOBALS[G_FLEA_VAR]['APP_INF'][$option] : $default;
     }
@@ -170,7 +169,7 @@ class FLEA
      *
      * @return mixed
      */
-    public static function getAppInfValue($option, $keyname, $default = null)
+    public static function getAppInfValue(string $option, string $keyname, $default = null)
     {
         if (!isset($GLOBALS[G_FLEA_VAR]['APP_INF'][$option])) {
             $GLOBALS[G_FLEA_VAR]['APP_INF'][$option] = [];
@@ -190,7 +189,7 @@ class FLEA
      * @param string $keyname
      * @param mixed $value
      */
-    public static function setAppInfValue($option, $keyname, $value)
+    public static function setAppInfValue(string $option, string $keyname, $value): void
     {
         if (!isset($GLOBALS[G_FLEA_VAR]['APP_INF'][$option])) {
             $GLOBALS[G_FLEA_VAR]['APP_INF'][$option] = [];
@@ -204,7 +203,7 @@ class FLEA
      * @param string $option
      * @param mixed $data
      */
-    public static function setAppInf($option, $data = null)
+    public static function setAppInf($option, $data = null): void
     {
         if (is_array($option)) {
             $GLOBALS[G_FLEA_VAR]['APP_INF'] = array_merge($GLOBALS[G_FLEA_VAR]['APP_INF'], $option);
@@ -230,7 +229,7 @@ class FLEA
      *
      * @param string $dir
      */
-    public static function import($dir)
+    public static function import(string $dir): void
     {
         if (array_search($dir, $GLOBALS[G_FLEA_VAR]['CLASS_PATH'], true)) { return; }
         if (DIRECTORY_SEPARATOR == '/') {
@@ -247,17 +246,11 @@ class FLEA
      * @param string $className 要加载的类名
      * @return boolean 加载成功返回true，失败返回false
      */
-    public static function autoload($className)
+    public static function autoload(string $className): bool
     {
         // 检查类是否已经加载
-        if (PHP5) {
-            if (class_exists($className, false) || interface_exists($className, false)) { 
-                return true; 
-            }
-        } else {
-            if (class_exists($className)) { 
-                return true; 
-            }
+        if (class_exists($className, false) || interface_exists($className, false)) { 
+            return true; 
         }
         
         // 使用内部的 loadClass 方法来加载类
@@ -280,7 +273,7 @@ class FLEA
      *
      * @return boolean
      */
-    public static function loadFile($filename, $loadOnce = false)
+    public static function loadFile(string $filename, bool $loadOnce = false): bool
     {
         static $is_loaded = [];
 
@@ -314,32 +307,22 @@ class FLEA
      *
      * @return boolean
      */
-    public static function loadClass($className, $noException = false)
+    public static function loadClass(string $className, bool $noException = false): bool
     {
-        if (PHP5) {
-            if (class_exists($className, false) || interface_exists($className, false)) { return true; }
-        } else {
-            if (class_exists($className)) { return true; }
-        }
+        if (class_exists($className, false) || interface_exists($className, false)) { return true; }
 
         if (preg_match('/[^a-z0-9\-_.]/i', $className) === 0) {
             $filename = FLEA::getFilePath($className . '.php');
             if ($filename) {
                 require($filename);
-                if (PHP5) {
-                    if (class_exists($className, false) || interface_exists($className, false)) { return true; }
-                } else {
-                    if (class_exists($className)) { return true; }
-                }
+                if (class_exists($className, false) || interface_exists($className, false)) { return true; }
             }
         }
 
         if ($noException) { return false; }
 
         $filename = FLEA::getFilePath($className . '.php', true);
-        require_once(FLEA_DIR . '/Exception/ExpectedClass.php');
-        __THROW(new FLEA_Exception_ExpectedClass($className, $filename, file_exists($filename)));
-        return false;
+        throw new FLEA_Exception_ExpectedClass($className, $filename, file_exists($filename));
     }
 
     /**
@@ -352,7 +335,7 @@ class FLEA
      *
      * @return string
      */
-    public static function getFilePath($filename, $return = false)
+    public static function getFilePath(string $filename, bool $return = false): ?string
     {
         $filename = str_replace('_', DIRECTORY_SEPARATOR, $filename);
         if (DIRECTORY_SEPARATOR == '/') {
@@ -393,18 +376,14 @@ class FLEA
      *
      * @return object
      */
-    public static function getSingleton($className)
+    public static function getSingleton(string $className): object
     {
         static $instances = [];
         if (FLEA::isRegistered($className)) {
             // 返回已经存在的对象实例
             return FLEA::registry($className);
         }
-        if (PHP5) {
-            $classExists = class_exists($className, false);
-        } else {
-            $classExists = class_exists($className);
-        }
+        $classExists = class_exists($className, false);
         if (!$classExists) {
             if (!FLEA::loadClass($className)) {
                 $return = false;
@@ -437,10 +416,10 @@ class FLEA
      *
      * @return object
      */
-    public static function register(& $obj, $name = null)
+    public static function register(object $obj, ?string $name = null): ?object
     {
         if (!is_object($obj)) {
-            return __THROW(new FLEA_Exception_TypeMismatch($obj, 'object', gettype($obj)));
+            throw new FLEA_Exception_TypeMismatch($obj, 'object', gettype($obj));
         }
 
         if (is_null($name)) {
@@ -448,11 +427,11 @@ class FLEA
         }
 
         if (isset($GLOBALS[G_FLEA_VAR]['OBJECTS'][$name])) {
-            return __THROW(new FLEA_Exception_ExistsKeyName($name));
-        } else {
-            $GLOBALS[G_FLEA_VAR]['OBJECTS'][$name] =& $obj;
-            return $obj;
+            throw new FLEA_Exception_ExistsKeyName($name);
         }
+
+        $GLOBALS[G_FLEA_VAR]['OBJECTS'][$name] = $obj;
+        return $obj;
     }
 
     /**
@@ -464,7 +443,7 @@ class FLEA
      *
      * @return object
      */
-    public static function registry($name = null)
+    public static function registry(?string $name = null)
     {
         if (is_null($name)) {
             return $GLOBALS[G_FLEA_VAR]['OBJECTS'];
@@ -472,7 +451,7 @@ class FLEA
         if (isset($GLOBALS[G_FLEA_VAR]['OBJECTS'][$name]) && is_object($GLOBALS[G_FLEA_VAR]['OBJECTS'][$name])) {
             return $GLOBALS[G_FLEA_VAR]['OBJECTS'][$name];
         }
-        return __THROW(new FLEA_Exception_NotExistsKeyName($name));
+        throw new FLEA_Exception_NotExistsKeyName($name);
     }
 
     /**
@@ -491,7 +470,7 @@ class FLEA
      *
      * @return boolean
      */
-    public static function isRegistered($name)
+    public static function isRegistered(string $name): bool
     {
         return isset($GLOBALS[G_FLEA_VAR]['OBJECTS'][$name]);
     }
@@ -524,7 +503,7 @@ class FLEA
      *
      * @return mixed 返回缓存的内容，缓存不存在或失效则返回 false
      */
-    public static function getCache($cacheId, $time = 900, $timeIsLifetime = true, $cacheIdIsFilename = false)
+    public static function getCache(string $cacheId, int $time = 900, bool $timeIsLifetime = true, bool $cacheIdIsFilename = false)
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
@@ -580,7 +559,7 @@ class FLEA
      *
      * @return boolean
      */
-    public static function writeCache($cacheId, $data, $cacheIdIsFilename = false)
+    public static function writeCache(string $cacheId, $data, bool $cacheIdIsFilename = false): bool
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
@@ -613,7 +592,7 @@ class FLEA
      *
      * @return boolean
      */
-    public static function purgeCache($cacheId, $cacheIdIsFilename = false)
+    public static function purgeCache(string $cacheId, bool $cacheIdIsFilename = false): bool
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
@@ -640,7 +619,7 @@ class FLEA
      *
      * @return FLEA_WebControls
      */
-    public static function initWebControls()
+    public static function initWebControls(): FLEA_WebControls
     {
         return FLEA::getSingleton(FLEA::getAppInf('webControlsClassName'));
     }
@@ -652,7 +631,7 @@ class FLEA
      *
      * @return FLEA_Ajax
      */
-    public static function initAjax()
+    public static function initAjax(): FLEA_Ajax
     {
         return FLEA::getSingleton(FLEA::getAppInf('ajaxClassName'));
     }
@@ -665,12 +644,12 @@ class FLEA
      *
      * @param string $helperName
      */
-    public static function loadHelper($helperName)
+    public static function loadHelper(string $helperName): void
     {
         $settingName = 'helper.' . strtolower($helperName);
         $setting = FLEA::getAppInf($settingName);
         if ($setting) {
-            return FLEA::loadFile($setting, true);
+            FLEA::loadFile($setting, true);
         } else {
             throw new FLEA_Exception_NotExistsKeyName('helper.' . $helperName);
         }
@@ -704,7 +683,7 @@ class FLEA
      *
      * @return FLEA_Db_Driver_Abstract
      */
-    public static function getDBO($dsn = 0)
+    public static function getDBO($dsn = 0): FLEA_Db_Driver_Abstract
     {
         if ($dsn == 0) {
             $dsn = FLEA::getAppInf('dbDSN');
@@ -742,7 +721,7 @@ class FLEA
      *
      * @return array
      */
-    public static function parseDSN($dsn)
+    public static function parseDSN($dsn): ?array
     {
         if (is_array($dsn)) {
             $dsn['host'] = isset($dsn['host']) ? $dsn['host'] : '';
@@ -779,7 +758,7 @@ class FLEA
      *
      * 如果应用程序需要使用 FleaPHP 提供的 MVC 模式，则在载入 FLEA.php 和自定义的应用程序设置后，应该调用 FLEA::runMVC() 启动应用程序。
      */
-    public static function runMVC()
+    public static function runMVC(): void
     {
         $MVCPackageFilename = FLEA::getAppInf('MVCPackageFilename');
         if ($MVCPackageFilename != '') {
@@ -801,7 +780,7 @@ class FLEA
      *
      * @param boolean $loadMVC
      */
-    public static function init($loadMVC = false)
+    public static function init(bool $loadMVC = false): void
     {
         static $firstTime = true;
 
@@ -827,9 +806,7 @@ class FLEA
          * 安装应用程序指定的异常处理例程
          */
         __SET_EXCEPTION_HANDLER(FLEA::getAppInf('exceptionHandler'));
-        if (PHP5) {
-            set_exception_handler(FLEA::getAppInf('exceptionHandler'));
-        }
+        set_exception_handler(FLEA::getAppInf('exceptionHandler'));
 
         /**
          * 载入日志服务提供程序
@@ -914,7 +891,7 @@ class FLEA
  * @param bool $jsWrapped 指示返回 JavaScript 代码时是否使用 <script> 标签进行包装
  * @param bool $return 指示是否返回生成的 JavaScript 代码
  */
-function redirect($url, $delay = 0, $js = false, $jsWrapped = true, $return = false)
+function redirect(string $url, int $delay = 0, bool $js = false, bool $jsWrapped = true, bool $return = false): ?string
 {
     $delay = (int)$delay;
     if (!$js) {
@@ -993,7 +970,7 @@ EOT;
  *
  * @return string
  */
-function url($controllerName = null, $actionName = null, $params = null, $anchor = null, $options = null)
+function url(?string $controllerName = null, ?string $actionName = null, ?array $params = null, ?string $anchor = null, ?array $options = null): string
 {
     static $baseurl = null, $currentBootstrap = null;
 
@@ -1103,7 +1080,7 @@ function url($controllerName = null, $actionName = null, $params = null, $anchor
  *
  * @return string
  */
-function detect_uri_base()
+function detect_uri_base(): string
 {
     static $baseuri = null;
 
@@ -1191,7 +1168,7 @@ function detect_uri_base()
  *
  * @return string
  */
-function encode_url_args($args, $urlMode = URL_STANDARD, $parameterPairStyle = null)
+function encode_url_args(array $args, string $urlMode = URL_STANDARD, ?string $parameterPairStyle = null): string
 {
     $str = '';
     switch ($urlMode) {
@@ -1232,7 +1209,7 @@ function encode_url_args($args, $urlMode = URL_STANDARD, $parameterPairStyle = n
  *
  * @return string
  */
-function h($text)
+function h(string $text): string
 {
     return htmlspecialchars($text);
 }
@@ -1246,7 +1223,7 @@ function h($text)
  *
  * @return string
  */
-function t($text)
+function t(string $text): string
 {
     return nl2br(str_replace(' ', '&nbsp;', htmlspecialchars($text)));
 }
@@ -1265,7 +1242,7 @@ function t($text)
  * @param string $after_action 显示消息后要执行的动作
  * @param string $url 重定向位置
  */
-function js_alert($message = '', $after_action = '', $url = '')
+function js_alert(string $message = '', string $after_action = '', string $url = ''): void
 {
     $out = "<script language=\"javascript\" type=\"text/javascript\">\n";
     if (!empty($message)) {
@@ -1293,7 +1270,7 @@ function js_alert($message = '', $after_action = '', $url = '')
  *
  * @return string
  */
-function t2js($content)
+function t2js(string $content): string
 {
     return str_replace(array("\r", "\n"), array('', '\n'), addslashes($content));
 }
@@ -1307,7 +1284,7 @@ function t2js($content)
  *
  * @return boolean
  */
-function safe_file_put_contents($filename, & $content)
+function safe_file_put_contents(string $filename, string $content): bool
 {
     $fp = fopen($filename, 'wb');
     if ($fp) {
@@ -1328,7 +1305,7 @@ function safe_file_put_contents($filename, & $content)
  *
  * @return mixed
  */
-function safe_file_get_contents($filename)
+function safe_file_get_contents(string $filename): ?string
 {
     $fp = fopen($filename, 'rb');
     if ($fp) {
@@ -1350,7 +1327,7 @@ function safe_file_get_contents($filename)
 
 if (!function_exists('file_put_contents'))
 {
-    function file_put_contents($filename, & $content)
+    function file_put_contents(string $filename, string $content): bool
     {
         return safe_file_put_contents($filename, $content);
     }
@@ -1365,7 +1342,7 @@ if (!function_exists('file_put_contents'))
  *
  * @package Core
  */
-function __TRY()
+function __TRY(): void
 {
     static $point = 0;
     if (!isset($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK']) ||
@@ -1402,7 +1379,7 @@ function __CATCH()
  *
  * @package Core
  */
-function __CANCEL_TRY()
+function __CANCEL_TRY(): void
 {
     if (is_array($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK'])) {
         array_pop($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK']);
@@ -1419,7 +1396,7 @@ function __CANCEL_TRY()
  * @param FLEA_Exception $exception
  * @param string $type
  */
-function __IS_EXCEPTION($exception, $type = null)
+function __IS_EXCEPTION($exception, ?string $type = null): bool
 {
     if (!is_object($exception) || !is_a($exception, 'FLEA_Exception')) {
         return false;
@@ -1482,7 +1459,7 @@ function __SET_EXCEPTION_HANDLER($callback)
  *
  * @param FLEA_Exception $ex
  */
-function __FLEA_EXCEPTION_HANDLER($ex)
+function __FLEA_EXCEPTION_HANDLER(FLEA_Exception $ex): void
 {
     if (!FLEA::getAppInf('displayErrors')) { exit; }
     if (FLEA::getAppInf('friendlyErrorsMessage')) {
@@ -1512,7 +1489,7 @@ function __FLEA_EXCEPTION_HANDLER($ex)
  * @param FLEA_Exception $ex
  * @param boolean $return 为 true 时返回输出信息，而不是直接显示
  */
-function print_ex($ex, $return = false)
+function print_ex(FLEA_Exception $ex, bool $return = false): ?string
 {
     $out = "exception '" . get_class($ex) . "'";
     if ($ex->getMessage() != '') {
@@ -1545,7 +1522,7 @@ function print_ex($ex, $return = false)
  * @param string $label
  * @param boolean $return
  */
-function dump($vars, $label = '', $return = false)
+function dump($vars, string $label = '', bool $return = false): ?string
 {
     if (ini_get('html_errors')) {
         $content = "<pre>\n";
@@ -1569,7 +1546,7 @@ function dump($vars, $label = '', $return = false)
  *
  * @return string
  */
-function dump_trace()
+function dump_trace(): void
 {
     $debug = debug_backtrace();
     $lines = '';
@@ -1613,7 +1590,7 @@ function dump_trace()
  *
  * @return float
  */
-function microtime_float($time = null)
+function microtime_float(?string $time = null): float
 {
     list($usec, $sec) = explode(' ', $time ? $time : microtime());
     return ((float)$usec + (float)$sec);
@@ -1637,7 +1614,7 @@ function microtime_float($time = null)
  *
  * @return string
  */
-function _ET($errorCode, $appError = false)
+function _ET(int $errorCode, bool $appError = false): string
 {
     static $message = [];
 

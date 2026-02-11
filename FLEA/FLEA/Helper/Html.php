@@ -17,7 +17,8 @@
  * @param mixed $selected
  * @param string $extra
  */
-function html_dropdown_list($name, $arr, $selected = null, $extra = null) {
+function html_dropdown_list(string $name, array $arr, $selected = null, ?string $extra = null): void
+{
     echo "<select name=\"{$name}\" {$extra} >\n";
     foreach ($arr as $value => $title) {
         echo '<option value="' . h($value) . '"';
@@ -36,7 +37,8 @@ function html_dropdown_list($name, $arr, $selected = null, $extra = null) {
  * @param string $separator
  * @param string $extra
  */
-function html_radio_group($name, $arr, $checked = null, $separator = '', $extra = null) {
+function html_radio_group(string $name, array $arr, $checked = null, string $separator = '', ?string $extra = null): void
+{
     $ix = 0;
     foreach ($arr as $value => $title) {
         $value_h = h($value);
@@ -62,7 +64,8 @@ function html_radio_group($name, $arr, $checked = null, $separator = '', $extra 
  * @param string $separator
  * @param string $extra
  */
-function html_checkbox_group($name, $arr, $selected = [], $separator = '', $extra = null) {
+function html_checkbox_group(string $name, array $arr, $selected = [], string $separator = '', ?string $extra = null): void
+{
     $ix = 0;
     if (!is_array($selected)) {
         $selected = array($selected);
@@ -91,7 +94,8 @@ function html_checkbox_group($name, $arr, $selected = [], $separator = '', $extr
  * @param string $label
  * @param string $extra
  */
-function html_checkbox($name, $value = 1, $checked = false, $label = '', $extra = null) {
+function html_checkbox(string $name, int $value = 1, bool $checked = false, string $label = '', ?string $extra = null): void
+{
     echo "<input name=\"{$name}\" type=\"checkbox\" id=\"{$name}_1\" value=\"{$value}\"";
     if ($checked) { echo " checked"; }
     echo " {$extra} />\n";
@@ -109,7 +113,8 @@ function html_checkbox($name, $value = 1, $checked = false, $label = '', $extra 
  * @param int $maxLength
  * @param string $extra
  */
-function html_textbox($name, $value = '', $width = null, $maxLength = null, $extra = null) {
+function html_textbox(string $name, string $value = '', ?int $width = null, ?int $maxLength = null, ?string $extra = null): void
+{
     echo "<input name=\"{$name}\" type=\"text\" value=\"" . h($value) . "\" ";
     if ($width) {
         echo "size=\"{$width}\" ";
@@ -129,7 +134,8 @@ function html_textbox($name, $value = '', $width = null, $maxLength = null, $ext
  * @param int $maxLength
  * @param string $extra
  */
-function html_password($name, $value = '', $width = null, $maxLength = null, $extra = null) {
+function html_password(string $name, string $value = '', ?int $width = null, ?int $maxLength = null, ?string $extra = null): void
+{
     echo "<input name=\"{$name}\" type=\"password\" value=\"" . h($value) . "\" ";
     if ($width) {
         echo "size=\"{$width}\" ";
@@ -149,7 +155,8 @@ function html_password($name, $value = '', $width = null, $maxLength = null, $ex
  * @param int $height
  * @param string $extra
  */
-function html_textarea($name, $value = '', $width = null, $height = null, $extra = null) {
+function html_textarea(string $name, string $value = '', ?int $width = null, ?int $height = null, ?string $extra = null): void
+{
     echo "<textarea name=\"{$name}\"";
     if ($width) { echo "cols=\"{$width}\" "; }
     if ($height) { echo "rows=\"{$height}\" "; }
@@ -165,7 +172,8 @@ function html_textarea($name, $value = '', $width = null, $height = null, $extra
  * @param string $value
  * @param string $extra
  */
-function html_hidden($name, $value = '', $extra = null) {
+function html_hidden(string $name, string $value = '', ?string $extra = null): void
+{
     echo "<input name=\"{$name}\" type=\"hidden\" value=\"";
     echo h($value);
     echo "\" {$extra} />\n";
@@ -178,7 +186,8 @@ function html_hidden($name, $value = '', $extra = null) {
  * @param int $width
  * @param string $extra
  */
-function html_filefield($name, $width = null, $extra = null) {
+function html_filefield(string $name, ?int $width = null, ?string $extra = null): void
+{
     echo "<input name=\"{$name}\" type=\"file\"";
     if ($width) {
         echo " size=\"{$width}\"";
@@ -195,7 +204,8 @@ function html_filefield($name, $width = null, $extra = null) {
  * @param string $onsubmit
  * @param string $extra
  */
-function html_form($name, $action, $method='post', $onsubmit='', $extra = null) {
+function html_form(string $name, string $action, string $method='post', string $onsubmit='', ?string $extra = null): void
+{
     echo "<form name=\"{$name}\" action=\"{$action}\" method=\"{$method}\" ";
     if ($onsubmit) {
         echo "onsubmit=\"{$onsubmit}\"";
@@ -206,6 +216,7 @@ function html_form($name, $action, $method='post', $onsubmit='', $extra = null) 
 /**
  * 关闭 form 标记
  */
-function html_form_close() {
+function html_form_close(): void
+{
     echo "</form>\n";
 }

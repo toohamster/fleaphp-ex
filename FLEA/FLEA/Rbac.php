@@ -61,7 +61,7 @@ class FLEA_Rbac
      * @param array $userData
      * @param mixed $rolesData
      */
-    public function setUser($userData, $rolesData = null)
+    public function setUser(array $userData, $rolesData = null): void
     {
         if ($rolesData) {
             $userData[$this->_rolesKey] = $rolesData;
@@ -74,7 +74,7 @@ class FLEA_Rbac
      *
      * @return array
      */
-    public function getUser()
+    public function getUser(): ?array
     {
         return isset($_SESSION[$this->_sessionKey]) ?
                 $_SESSION[$this->_sessionKey] :
@@ -84,7 +84,7 @@ class FLEA_Rbac
     /**
      * 从 session 中清除用户数据
      */
-    public function clearUser()
+    public function clearUser(): void
     {
         unset($_SESSION[$this->_sessionKey]);
     }
@@ -107,7 +107,7 @@ class FLEA_Rbac
      *
      * @return array
      */
-    public function getRolesArray()
+    public function getRolesArray(): array
     {
         $roles = $this->getRoles();
         if (is_array($roles)) { return $roles; }
@@ -123,7 +123,7 @@ class FLEA_Rbac
      *
      * @return boolean
      */
-    public function check(& $roles, & $ACT)
+    public function check(array &$roles, array &$ACT): bool
     {
         $roles = array_map('strtoupper', $roles);
         if ($ACT['allow'] == RBAC_EVERYONE) {
@@ -208,7 +208,7 @@ class FLEA_Rbac
      *
      * @return array
      */
-    public function prepareACT($ACT)
+    public function prepareACT(array $ACT): array
     {
         $ret = [];
         $arr = array('allow', 'deny');

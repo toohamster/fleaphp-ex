@@ -63,7 +63,7 @@ class FLEA_Controller_Action
      *
      * @return FLEA_Controller_Action
      */
-    public function __construct($controllerName)
+    public function __construct(string $controllerName)
     {
         $this->_controllerName = $controllerName;
 
@@ -79,7 +79,7 @@ class FLEA_Controller_Action
      *
      * @return object
      */
-    protected function _getComponent($componentName)
+    protected function _getComponent(string $componentName): object
     {
         static $instances = [];
 
@@ -97,7 +97,7 @@ class FLEA_Controller_Action
      * @param string $controllerName
      * @param string $actionName
      */
-    public function __setController($controllerName, $actionName)
+    public function __setController(string $controllerName, string $actionName): void
     {
         $this->_controllerName = $controllerName;
         $this->_actionName = $actionName;
@@ -108,7 +108,7 @@ class FLEA_Controller_Action
      *
      * @param FLEA_Dispatcher_Simple $dispatcher
      */
-    public function __setDispatcher(& $dispatcher)
+    public function __setDispatcher(FLEA_Dispatcher_Simple &$dispatcher): void
     {
         $this->_dispatcher =& $dispatcher;
     }
@@ -118,7 +118,7 @@ class FLEA_Controller_Action
      *
      * @return FLEA_Dispatcher_Auth
      */
-    protected function _getDispatcher()
+    protected function _getDispatcher(): FLEA_Dispatcher_Auth
     {
         if (!is_object($this->_dispatcher)) {
             $this->_dispatcher = FLEA::getSingleton(FLEA::getAppInf('dispatcher'));
@@ -135,7 +135,7 @@ class FLEA_Controller_Action
      *
      * @return string
      */
-    protected function _url($actionName = null, $args = null, $anchor = null)
+    protected function _url(?string $actionName = null, ?array $args = null, ?string $anchor = null): string
     {
         return url($this->_controllerName, $actionName, $args, $anchor);
     }
@@ -146,7 +146,7 @@ class FLEA_Controller_Action
      * @param string $controllerName
      * @param string $actionName
      */
-    protected function _forward($controllerName = null, $actionName = null)
+    protected function _forward(?string $controllerName = null, ?string $actionName = null): void
     {
         $this->_dispatcher->setControllerName($controllerName);
         $this->_dispatcher->setActionName($actionName);
@@ -158,7 +158,7 @@ class FLEA_Controller_Action
      *
      * @return object
      */
-    protected function _getView()
+    protected function _getView(): object
     {
         $viewClass = FLEA::getAppInf('view');
         if ($viewClass != 'PHP') {
@@ -175,7 +175,7 @@ class FLEA_Controller_Action
      * @param string $__flea_internal_viewName
      * @param array $data
      */
-    protected function _executeView($__flea_internal_viewName, $data = null)
+    protected function _executeView(string $__flea_internal_viewName, ?array $data = null): void
     {
         $viewClass = FLEA::getAppInf('view');
         if ($viewClass == 'PHP') {
@@ -203,7 +203,7 @@ class FLEA_Controller_Action
      *
      * @return boolean
      */
-    protected function _isPOST()
+    protected function _isPOST(): bool
     {
         return strtolower($_SERVER['REQUEST_METHOD']) == 'post';
     }
@@ -213,7 +213,7 @@ class FLEA_Controller_Action
      *
      * @return boolean
      */
-    protected function _isAjax()
+    protected function _isAjax(): bool
     {
         $r = isset($_SERVER['HTTP_X_REQUESTED_WITH']) ? strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) : '';
         return $r == 'xmlhttprequest';
@@ -229,7 +229,7 @@ class FLEA_Controller_Action
      *
      * @return string
      */
-    protected function _registerEvent($controlName, $event, $action, $attribs = null)
+    protected function _registerEvent(string $controlName, string $event, string $action, ?array $attribs = null): string
     {
         $ajax = FLEA::initAjax();
         return $ajax->registerEvent($controlName, $event,
@@ -241,7 +241,7 @@ class FLEA_Controller_Action
      *
      * @param callback $callback
      */
-    protected function _registerRenderCallback($callback)
+    protected function _registerRenderCallback($callback): void
     {
         $this->_renderCallbacks[] = $callback;
     }

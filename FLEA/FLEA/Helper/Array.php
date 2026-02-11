@@ -15,7 +15,7 @@
  * @param array $arr
  * @param boolean $trim
  */
-function array_remove_empty(& $arr, $trim = true)
+function array_remove_empty(array &$arr, bool $trim = true): void
 {
     foreach ($arr as $key => $value) {
         if (is_array($value)) {
@@ -39,7 +39,7 @@ function array_remove_empty(& $arr, $trim = true)
  *
  * @return array
  */
-function array_col_values(& $arr, $col)
+function array_col_values(array &$arr, string $col): array
 {
     $ret = [];
     foreach ($arr as $row) {
@@ -59,7 +59,7 @@ function array_col_values(& $arr, $col)
  *
  * @return array
  */
-function array_to_hashmap(& $arr, $keyField, $valueField = null)
+function array_to_hashmap(array &$arr, string $keyField, ?string $valueField = null): array
 {
     $ret = [];
     if ($valueField) {
@@ -82,7 +82,7 @@ function array_to_hashmap(& $arr, $keyField, $valueField = null)
  *
  * @return array
  */
-function array_group_by(& $arr, $keyField)
+function array_group_by(array &$arr, string $keyField): array
 {
     $ret = [];
     foreach ($arr as $row) {
@@ -106,8 +106,7 @@ function array_group_by(& $arr, $keyField)
  *
  * return array
  */
-function array_to_tree($arr, $fid, $fparent = 'parent_id',
-    $fchildrens = 'childrens', $returnReferences = false)
+function array_to_tree(array $arr, string $fid, string $fparent = 'parent_id', string $fchildrens = 'childrens', bool $returnReferences = false): array
 {
     $pkvRefs = [];
     foreach ($arr as $offset => $row) {
@@ -140,7 +139,7 @@ function array_to_tree($arr, $fid, $fparent = 'parent_id',
  *
  * @return array
  */
-function tree_to_array(& $node, $fchildrens = 'childrens')
+function tree_to_array(array &$node, string $fchildrens = 'childrens'): array
 {
     $ret = [];
     if (isset($node[$fchildrens]) && is_array($node[$fchildrens])) {
@@ -164,7 +163,7 @@ function tree_to_array(& $node, $fchildrens = 'childrens')
  *
  * @return array
  */
-function array_column_sort($array, $keyname, $sortDirection = SORT_ASC)
+function array_column_sort(array $array, string $keyname, int $sortDirection = SORT_ASC): array
 {
     return array_sortby_multifields($array, array($keyname => $sortDirection));
 }
@@ -175,7 +174,7 @@ function array_column_sort($array, $keyname, $sortDirection = SORT_ASC)
  * @param array $rowset
  * @param array $args
  */
-function array_sortby_multifields($rowset, $args)
+function array_sortby_multifields(array $rowset, array $args): array
 {
     $sortArray = [];
     $sortRule = '';

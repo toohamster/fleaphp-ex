@@ -93,7 +93,7 @@ class FLEA_Config
      * @param mixed $default 默认值
      * @return mixed
      */
-    public function getAppInf($option, $default = null)
+    public function getAppInf(string $option, $default = null)
     {
         return isset($this->appInf[$option]) ? $this->appInf[$option] : $default;
     }
@@ -105,7 +105,7 @@ class FLEA_Config
      * @param mixed $data 配置值
      * @return void
      */
-    public function setAppInf($option, $data = null)
+    public function setAppInf($option, $data = null): void
     {
         if (is_array($option)) {
             $this->appInf = array_merge($this->appInf, $option);
@@ -122,7 +122,7 @@ class FLEA_Config
      * @param mixed $default 默认值
      * @return mixed
      */
-    public function getAppInfValue($option, $keyname, $default = null)
+    public function getAppInfValue(string $option, string $keyname, $default = null)
     {
         if (!isset($this->appInf[$option])) {
             $this->appInf[$option] = [];
@@ -143,7 +143,7 @@ class FLEA_Config
      * @param mixed $value 值
      * @return void
      */
-    public function setAppInfValue($option, $keyname, $value)
+    public function setAppInfValue(string $option, string $keyname, $value): void
     {
         if (!isset($this->appInf[$option])) {
             $this->appInf[$option] = [];
@@ -157,7 +157,7 @@ class FLEA_Config
      * @param array $config 要合并的配置数组
      * @return void
      */
-    public function mergeAppInf(array $config)
+    public function mergeAppInf(array $config): void
     {
         $this->appInf = array_merge($this->appInf, $config);
     }
@@ -170,7 +170,7 @@ class FLEA_Config
      * @return object
      * @throws Exception 如果参数不是对象
      */
-    public function registerObject($obj, $name = null)
+    public function registerObject(object $obj, ?string $name = null): object
     {
         if (!is_object($obj)) {
             throw new Exception('First parameter must be an object');
@@ -194,7 +194,7 @@ class FLEA_Config
      * @param string|null $name 对象名称，为 null 时返回所有对象
      * @return object|array|null
      */
-    public function getRegistry($name = null)
+    public function getRegistry(?string $name = null)
     {
         if (is_null($name)) {
             return $this->objects;
@@ -211,7 +211,7 @@ class FLEA_Config
      * @param string $name 对象名称
      * @return bool
      */
-    public function isRegistered($name)
+    public function isRegistered(string $name): bool
     {
         return isset($this->objects[$name]);
     }
@@ -223,7 +223,7 @@ class FLEA_Config
      * @param string $dsnid 数据源ID
      * @return void
      */
-    public function registerDbo($dbo, $dsnid)
+    public function registerDbo(object $dbo, string $dsnid): void
     {
         $this->dbo[$dsnid] = $dbo;
     }
@@ -234,7 +234,7 @@ class FLEA_Config
      * @param string $dsnid 数据源ID
      * @return object|null
      */
-    public function getDbo($dsnid)
+    public function getDbo(string $dsnid): ?object
     {
         return isset($this->dbo[$dsnid]) ? $this->dbo[$dsnid] : null;
     }
@@ -245,7 +245,7 @@ class FLEA_Config
      * @param string $dsnid 数据源ID
      * @return bool
      */
-    public function hasDbo($dsnid)
+    public function hasDbo(string $dsnid): bool
     {
         return isset($this->dbo[$dsnid]);
     }
@@ -256,7 +256,7 @@ class FLEA_Config
      * @param string $dir 目录路径
      * @return void
      */
-    public function addClassPath($dir)
+    public function addClassPath(string $dir): void
     {
         if (array_search($dir, $this->classPath, true)) {
             return;
@@ -274,7 +274,7 @@ class FLEA_Config
      *
      * @return array
      */
-    public function getClassPath()
+    public function getClassPath(): array
     {
         return $this->classPath;
     }
@@ -284,7 +284,7 @@ class FLEA_Config
      *
      * @return callable|null
      */
-    public function getExceptionHandler()
+    public function getExceptionHandler(): ?callable
     {
         return $this->exceptionHandler;
     }
@@ -295,7 +295,7 @@ class FLEA_Config
      * @param callable $callback 异常处理回调函数
      * @return callable|null 返回之前的异常处理器
      */
-    public function setExceptionHandler($callback)
+    public function setExceptionHandler($callback): ?callable
     {
         $current = $this->exceptionHandler;
         $this->exceptionHandler = $callback;
@@ -308,7 +308,7 @@ class FLEA_Config
      * @param mixed $exception 异常对象或点标记
      * @return void
      */
-    public function pushException($exception)
+    public function pushException($exception): void
     {
         if (!is_array($this->exceptionStack)) {
             $this->exceptionStack = [];
@@ -334,7 +334,7 @@ class FLEA_Config
      *
      * @return array
      */
-    public function getExceptionStack()
+    public function getExceptionStack(): array
     {
         return $this->exceptionStack;
     }
@@ -344,7 +344,7 @@ class FLEA_Config
      *
      * @return bool
      */
-    public function hasExceptionStack()
+    public function hasExceptionStack(): bool
     {
         return is_array($this->exceptionStack);
     }
