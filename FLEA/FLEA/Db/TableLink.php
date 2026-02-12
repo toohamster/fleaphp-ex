@@ -294,7 +294,7 @@ class FLEA_Db_TableLink
      *
      * @return FLEA_Db_TableLink
      */
-    public static function createLink($define, $type, & $mainTDG)
+    public static function createLink(array $define, int $type, FLEA_Db_TableDataGateway &$mainTDG): FLEA_Db_TableLink
     {
         static $typeMap = array(
             HAS_ONE         => 'FLEA_Db_HasOneLink',
@@ -342,7 +342,7 @@ class FLEA_Db_TableLink
      *
      * @return string
      */
-    public function getMiddleTableName($table1, $table2)
+    public function getMiddleTableName(string $table1, string $table2): string
     {
         if (strcmp($table1, $table2) < 0) {
             return $this->dbo->dsn['prefix'] . "{$table1}_{$table2}";
@@ -359,7 +359,7 @@ class FLEA_Db_TableLink
      *
      * @return boolean
      */
-    function saveAssocData(& $row, $pkv)
+    function saveAssocData(array &$row, $pkv): bool
     {
         throw new FLEA_Exception_NotImplemented('saveAssocData()', 'FLEA_Db_TableLink');
     }
@@ -367,7 +367,7 @@ class FLEA_Db_TableLink
     /**
      * 初始化关联对象
      */
-    public function init()
+    public function init(): void
     {
         if ($this->init) { return; }
         if (FLEA::isRegistered($this->assocTDGObjectId)) {
@@ -393,7 +393,7 @@ class FLEA_Db_TableLink
      *
      * @return int
      */
-    function calcCount(& $assocRowset, $mappingName, $in)
+    function calcCount(array &$assocRowset, string $mappingName, string $in): void
     {
         throw new FLEA_Exception_NotImplemented('calcCount()', 'FLEA_Db_TableLink');
     }
@@ -406,7 +406,7 @@ class FLEA_Db_TableLink
      *
      * @return string
      */
-    protected function _getFindSQLBase($sql, $in)
+    protected function _getFindSQLBase(string $sql, string $in): string
     {
         if ($in) {
             $sql .= " WHERE {$this->qforeignKey} {$in}";
@@ -438,7 +438,7 @@ class FLEA_Db_TableLink
      *
      * @return boolean
      */
-    protected function _saveAssocDataBase(& $row)
+    protected function _saveAssocDataBase(array &$row): bool
     {
         switch (strtolower($this->saveAssocMethod)) {
         case 'create':
@@ -506,7 +506,7 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
      *
      * @return boolean
      */
-    function saveAssocData(& $row, $pkv)
+    function saveAssocData(array &$row, $pkv): bool
     {
         if (empty($row)) { return true; }
         if (!$this->init) { $this->init(); }
@@ -516,7 +516,7 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
     /**
      * 完全初始化关联对象
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
         if (is_null($this->foreignKey)) {
@@ -655,7 +655,7 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
      *
      * @return boolean
      */
-    function saveAssocData(& $row, $pkv)
+    function saveAssocData(array &$row, $pkv): bool
     {
         if (!$this->init) { $this->init(); }
         $apkvs = [];
@@ -773,7 +773,7 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
     /**
      * 完全初始化关联对象
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
         if ($this->joinTableClass) {

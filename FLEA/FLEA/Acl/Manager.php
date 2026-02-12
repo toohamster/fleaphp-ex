@@ -34,7 +34,7 @@ class FLEA_Acl_Manager
         'userHasPermissions' =>     'FLEA_Acl_Table_UserHasPermissions',
     );
 
-    function __construct($tableClass = [])
+    function __construct(array $tableClass = [])
     {
         $this->_tableClass = array_merge($this->_tableClass, (array)$tableClass);
     }
@@ -44,7 +44,7 @@ class FLEA_Acl_Manager
      *
      * @param array $conditions
      */
-    public function getUserWithPermissions($conditions)
+    public function getUserWithPermissions($conditions): ?array
     {
         $tableUsers = FLEA::getSingleton($this->_tableClass['users']);
         /* @var $tableUsers FLEA_Acl_Table_Users */

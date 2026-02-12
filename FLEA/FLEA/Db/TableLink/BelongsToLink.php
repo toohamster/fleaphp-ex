@@ -29,7 +29,7 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
      *
      * @return FLEA_Db_TableLink
      */
-    public function __construct($define, $type, $mainTDG)
+    public function __construct(array $define, int $type, FLEA_Db_TableDataGateway $mainTDG)
     {
         $this->linkUpdate = $this->linkCreate = $this->linkRemove = false;
         parent::__construct($define, $type, $mainTDG);
@@ -42,7 +42,7 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
      *
      * @return string
      */
-    public function getFindSQL($in)
+    public function getFindSQL(string $in): string
     {
         if (!$this->init) { $this->init(); }
         $fields = $this->mainTDG->qpk . ' AS ' . $this->mainTDG->pka . ', ' . $this->dbo->qfields($this->fields, $this->assocTDG->fullTableName, $this->assocTDG->schema);
@@ -60,7 +60,7 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
      *
      * @return boolean
      */
-    function saveAssocData($row, $pkv)
+    function saveAssocData(array $row, $pkv): bool
     {
         if (empty($row)) { return true; }
         if (!$this->init) { $this->init(); }
@@ -70,7 +70,7 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
     /**
      * 完全初始化关联对象
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
         if (is_null($this->foreignKey)) {

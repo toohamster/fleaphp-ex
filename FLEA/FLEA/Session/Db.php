@@ -112,7 +112,7 @@ class FLEA_Session_Db
      *
      * @return boolean
      */
-    public function sessionOpen($savePath, $sessionName)
+    public function sessionOpen(string $savePath, string $sessionName): bool
     {
         $dsnName = FLEA::getAppInf('sessionDbDSN');
         $dsn = FLEA::getAppInf($dsnName);
@@ -137,7 +137,7 @@ class FLEA_Session_Db
      *
      * @return boolean
      */
-    public function sessionClose()
+    public function sessionClose(): bool
     {
         return true;
     }
@@ -149,7 +149,7 @@ class FLEA_Session_Db
      *
      * @return string
      */
-    public function sessionRead($sessid)
+    public function sessionRead(string $sessid): string
     {
         $sessid = $this->dbo->qstr($sessid);
         $sql = "SELECT {$this->fieldData} FROM {$this->tableName} WHERE {$this->fieldId} = {$sessid}";
@@ -169,7 +169,7 @@ class FLEA_Session_Db
      *
      * @return boolean
      */
-    public function sessionWrite($sessid, $data)
+    public function sessionWrite(string $sessid, string $data): bool
     {
         $sessid = $this->dbo->qstr($sessid);
         $sql = "SELECT COUNT(*) FROM {$this->tableName} WHERE {$this->fieldId} = {$sessid}";
@@ -213,7 +213,7 @@ class FLEA_Session_Db
      *
      * @return boolean
      */
-    public function sessionDestroy($sessid)
+    public function sessionDestroy(string $sessid): bool
     {
         $sessid = $this->dbo->qstr($sessid);
         $sql = "DELETE FROM {$this->tableName} WHERE {$this->fieldId} = {$sessid}";
@@ -227,7 +227,7 @@ class FLEA_Session_Db
      *
      * @return boolean
      */
-    public function sessionGc($maxlifetime)
+    public function sessionGc(int $maxlifetime): bool
     {
         if ($this->lifeTime > 0) {
             $maxlifetime = $this->lifeTime;
@@ -243,7 +243,7 @@ class FLEA_Session_Db
      *
      * @return int
      */
-    public function getOnlineCount($lifetime = -1)
+    public function getOnlineCount(int $lifetime = -1): int
     {
         if ($this->lifeTime > 0) {
             $lifetime = $this->lifeTime;
@@ -275,7 +275,7 @@ class FLEA_Session_Db
      *
      * @return array
      */
-    protected function _beforeWrite($sessid)
+    protected function _beforeWrite(string $sessid): array
     {
         return array();
     }

@@ -83,7 +83,7 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
      *
      * @return FLEA_Db_TableLink
      */
-    function __construct($define, $type, $mainTDG)
+    function __construct(array $define, int $type, FLEA_Db_TableDataGateway $mainTDG)
     {
         $this->_optional[] = 'joinTable';
         $this->_optional[] = 'joinTableClass';
@@ -102,7 +102,7 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
      *
      * @return string
      */
-    function getFindSQL($in)
+    function getFindSQL(string $in): string
     {
         static $joinFields = [];
 
@@ -136,7 +136,7 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
      *
      * @return boolean
      */
-    function saveAssocData($row, $pkv)
+    function saveAssocData(array $row, $pkv): bool
     {
         if (!$this->init) { $this->init(); }
         $apkvs = [];
@@ -229,7 +229,7 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
      *
      * @return boolean
      */
-    function deleteMiddleTableDataByMainForeignKey($qpkv)
+    function deleteMiddleTableDataByMainForeignKey($qpkv): bool
     {
         if (!$this->init) { $this->init(); }
         $sql = "DELETE FROM {$this->qjoinTable} WHERE {$this->qforeignKey} = {$qpkv} ";
@@ -243,7 +243,7 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
      *
      * @return boolean
      */
-    function deleteMiddleTableDataByAssocForeignKey($pkv)
+    function deleteMiddleTableDataByAssocForeignKey($pkv): bool
     {
         if (!$this->init) { $this->init(); }
         $qpkv = $this->dbo->qstr($pkv);
@@ -254,7 +254,7 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
     /**
      * 完全初始化关联对象
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
         if ($this->joinTableClass) {

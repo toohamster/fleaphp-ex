@@ -120,7 +120,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    public function findByUserId($id, $fields = '*')
+    public function findByUserId($id, $fields = '*'): ?array
     {
         return $this->findByField($this->primaryKey, $id, null, $fields);
     }
@@ -133,7 +133,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    public function findByUsername($username, $fields = '*')
+    public function findByUsername(string $username, $fields = '*'): ?array
     {
         return $this->findByField($this->usernameField, $username, null, $fields);
     }
@@ -146,7 +146,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    public function findByEmail($email, $fields = '*')
+    public function findByEmail(string $email, $fields = '*'): ?array
     {
         return $this->findByField($this->emailField, $email, null, $fields);
     }
@@ -158,7 +158,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    public function existsUserId($id)
+    public function existsUserId($id): bool
     {
         return $this->findCount(array($this->primaryKey => $id)) > 0;
     }
@@ -170,7 +170,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    public function existsUsername($username)
+    public function existsUsername(string $username): bool
     {
         return $this->findCount(array($this->usernameField => $username)) > 0;
     }
@@ -182,7 +182,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    public function existsEmail($email)
+    public function existsEmail(string $email): bool
     {
         return $this->findCount(array($this->emailField => $email)) > 0;
     }
@@ -194,7 +194,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return mixed
      */
-    public function create(& $row)
+    public function create(array &$row)
     {
         if (isset($this->functionFields['registerIpField'])
             && $this->functionFields['registerIpField'] != '')
@@ -215,7 +215,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @access public
      */
-    public function validateUser($username, $password, $returnUserdata = false)
+    public function validateUser(string $username, string $password, bool $returnUserdata = false)
     {
         if ($returnUserdata) {
             $user = $this->findByField($this->usernameField, $username);
@@ -285,7 +285,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @access public
      */
-    public function changePassword($username, $oldPassword, $newPassword)
+    public function changePassword(string $username, string $oldPassword, string $newPassword): bool
     {
         $user = $this->findByField(
             $this->usernameField, $username, null,
@@ -308,7 +308,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    public function updatePassword($username, $newPassword)
+    public function updatePassword(string $username, string $newPassword): bool
     {
         $user = $this->findByField($this->usernameField, $username, null, $this->primaryKey);
         if (!$user) { return false; }
@@ -325,7 +325,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    public function updatePasswordById($userid, $newPassword)
+    public function updatePasswordById($userid, string $newPassword): bool
     {
         $user = $this->findByField($this->primaryKey, $userid, null, $this->primaryKey);
         if (!$user) { return false; }
@@ -344,7 +344,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @access public
      */
-    public function checkPassword($cleartext, $cryptograph)
+    public function checkPassword(string $cleartext, string $cryptograph): bool
     {
         switch ($this->encodeMethod) {
         case PWD_MD5:
@@ -372,7 +372,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @access public
      */
-    public function encodePassword($cleartext)
+    public function encodePassword(string $cleartext): ?string
     {
         switch ($this->encodeMethod) {
         case PWD_MD5:
@@ -398,7 +398,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    public function fetchRoles($user)
+    public function fetchRoles(array $user): array
     {
         if ($this->existsLink($this->rolesField)) {
             $link =& $this->getLink($this->rolesField);
@@ -428,7 +428,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    public function update(& $row)
+    public function update(array &$row): bool
     {
         unset($row[$this->passwordField]);
         return parent::update($row);
@@ -437,7 +437,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
     /**
      * 在更新到数据库之前加密密码
      */
-    protected function _beforeUpdateDb(& $row)
+    protected function _beforeUpdateDb(array &$row): bool
     {
         $this->_encodeRecordPassword($row);
         return true;
@@ -446,7 +446,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
     /**
      * 在更新到数据库之前加密密码
      */
-    protected function _beforeCreateDb(& $row)
+    protected function _beforeCreateDb(array &$row): bool
     {
         $this->_encodeRecordPassword($row);
         return true;
@@ -457,7 +457,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @param array $row
      */
-    protected function _encodeRecordPassword(& $row)
+    protected function _encodeRecordPassword(array &$row): void
     {
         if (isset($row[$this->passwordField])) {
             $row[$this->passwordField] =

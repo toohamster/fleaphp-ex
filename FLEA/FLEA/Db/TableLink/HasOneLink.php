@@ -29,7 +29,7 @@ class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
      *
      * @return FLEA_Db_TableLink
      */
-    public function __construct($define, $type, $mainTDG)
+    public function __construct(array $define, int $type, FLEA_Db_TableDataGateway $mainTDG)
     {
         parent::__construct($define, $type, $mainTDG);
     }
@@ -41,7 +41,7 @@ class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
      *
      * @return string
      */
-    public function getFindSQL($in)
+    public function getFindSQL(string $in): string
     {
         if (!$this->init) { $this->init(); }
         $fields = $this->qforeignKey . ' AS ' . $this->mainTDG->pka . ', ' . $this->dbo->qfields($this->fields, $this->assocTDG->fullTableName, $this->assocTDG->schema);
@@ -57,7 +57,7 @@ class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
      *
      * @return boolean
      */
-    public function saveAssocData($row, $pkv)
+    public function saveAssocData(array $row, $pkv): bool
     {
         if (empty($row)) { return true; }
         if (!$this->init) { $this->init(); }
@@ -72,7 +72,7 @@ class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
      *
      * @return boolean
      */
-    public function deleteByForeignKey($qpkv)
+    public function deleteByForeignKey($qpkv): bool
     {
         if (!$this->init) { $this->init(); }
         $conditions = "{$this->qforeignKey} = {$qpkv}";
@@ -86,7 +86,7 @@ class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
     /**
      * 完全初始化关联对象
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
         if (is_null($this->foreignKey)) {
@@ -104,7 +104,7 @@ class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
      *
      * @return int
      */
-    function calcCount($assocRowset, $mappingName, $in)
+    function calcCount(array $assocRowset, string $mappingName, string $in): void
     {
         if (!$this->init) { $this->init(); }
         $sql = "SELECT {$this->qforeignKey} AS pid, COUNT({$this->qforeignKey}) AS c FROM {$this->assocTDG->qtableName} ";

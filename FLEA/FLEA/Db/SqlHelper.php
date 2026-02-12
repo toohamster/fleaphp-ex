@@ -26,7 +26,7 @@ class FLEA_Db_SqlHelper
      *
      * @return array
      */
-    public static function parseConditions($conditions, $table)
+    public static function parseConditions($conditions, $table): ?array
     {
         // 对于 NULL，直接返回 NULL
         if (is_null($conditions)) { return null; }
@@ -126,7 +126,7 @@ class FLEA_Db_SqlHelper
      *
      * @param array $log
      */
-    public static function dumpLog($log)
+    public static function dumpLog(array $log): void
     {
         foreach ($log as $ix => $sql) {
             dump($sql, 'SQL ' . ($ix + 1));

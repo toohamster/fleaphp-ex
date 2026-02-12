@@ -28,7 +28,7 @@ class FLEA_Db_HasManyLink extends FLEA_Db_HasOneLink
      *
      * @return boolean
      */
-    function saveAssocData($row, $pkv)
+    function saveAssocData(array $row, $pkv): bool
     {
         if (empty($row)) { return true; }
         if (!$this->init) { $this->init(); }

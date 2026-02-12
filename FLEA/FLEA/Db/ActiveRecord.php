@@ -60,7 +60,7 @@ class FLEA_Db_ActiveRecord
      *
      * @return array
      */
-    static function define()
+    static function define(): array
     {
     }
 
@@ -84,7 +84,7 @@ class FLEA_Db_ActiveRecord
      *
      * @param array $options
      */
-    public function init()
+    public function init(): void
     {
         if ($this->init) { return; }
         $this->init = true;
@@ -158,7 +158,7 @@ class FLEA_Db_ActiveRecord
      *
      * @param mixed $conditions
      */
-    public function load($conditions)
+    public function load($conditions): void
     {
         $row = $this->_table->find($conditions);
         if (is_array($row)) { $this->attach($row); }
@@ -167,7 +167,7 @@ class FLEA_Db_ActiveRecord
     /**
      * 保存对象到数据库
      */
-    public function save()
+    public function save(): void
     {
         $row =& $this->toArray();
         $this->_table->save($row);
@@ -176,7 +176,7 @@ class FLEA_Db_ActiveRecord
     /**
      * 从数据库删除对象
      */
-    public function delete()
+    public function delete(): void
     {
         $this->_table->removeByPkv($this->getId());
     }
@@ -186,7 +186,7 @@ class FLEA_Db_ActiveRecord
      *
      * @param mixed $id
      */
-    public function setId($id)
+    public function setId($id): void
     {
         $this->{$this->_idname} = $id;
     }
@@ -206,7 +206,7 @@ class FLEA_Db_ActiveRecord
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $arr = [];
         foreach ($this->_mapping['p2f'] as $prop => $field) {
@@ -220,7 +220,7 @@ class FLEA_Db_ActiveRecord
      *
      * @param array $row
      */
-    public function attach(& $row)
+    public function attach(array &$row): void
     {
         foreach ($this->_mapping['f2p'] as $field => $prop) {
             if (isset($row[$field])) {

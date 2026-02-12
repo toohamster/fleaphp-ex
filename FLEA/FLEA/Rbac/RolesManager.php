@@ -49,7 +49,7 @@ class FLEA_Rbac_RolesManager extends FLEA_Db_TableDataGateway
      *
      * @return FLEA_Rbac_RolesManager
      */
-    public function __construct($params = null)
+    public function __construct(?array $params = null)
     {
         parent::__construct($params);
     }
