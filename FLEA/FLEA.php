@@ -117,18 +117,18 @@ class FLEA
      * FLEA::loadAppInf('./config/MyConfig.php');
      * </code>
      *
-     * @param mixed $__config 配置数组或配置文件名
+     * @param mixed $flea_internal_config 配置数组或配置文件名
      */
     public static function loadAppInf($flea_internal_config = null): void
     {
-        if (!is_array($__flea_internal_config) && is_string($__flea_internal_config)) {
-            if (!is_readable($__flea_internal_config)) {
-                throw new FLEA_Exception_ExpectedFile($__flea_internal_config);
+        if (!is_array($flea_internal_config) && is_string($flea_internal_config)) {
+            if (!is_readable($flea_internal_config)) {
+                throw new FLEA_Exception_ExpectedFile($flea_internal_config);
             }
-            $__flea_internal_config = require($__flea_internal_config);
+            $flea_internal_config = require($flea_internal_config);
         }
-        if (is_array($__flea_internal_config)) {
-            $GLOBALS[G_FLEA_VAR]['APP_INF'] = array_merge($GLOBALS[G_FLEA_VAR]['APP_INF'], $__flea_internal_config);
+        if (is_array($flea_internal_config)) {
+            $GLOBALS[G_FLEA_VAR]['APP_INF'] = array_merge($GLOBALS[G_FLEA_VAR]['APP_INF'], $flea_internal_config);
         }
     }
 

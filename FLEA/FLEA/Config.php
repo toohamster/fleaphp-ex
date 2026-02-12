@@ -173,7 +173,7 @@ class FLEA_Config
     public function registerObject(object $obj, ?string $name = null): object
     {
         if (!is_object($obj)) {
-            throw new Exception('First parameter must be an object');
+            throw new FLEA_Exception_TypeMismatch($obj, 'object', gettype($obj));
         }
 
         if (is_null($name)) {
@@ -181,7 +181,7 @@ class FLEA_Config
         }
 
         if (isset($this->objects[$name])) {
-            throw new Exception("Object with name '{$name}' already exists");
+            throw new FLEA_Exception_ExistsKeyName("Object with name '{$name}' already exists");
         }
 
         $this->objects[$name] = $obj;
