@@ -27,7 +27,7 @@ class FLEA_Exception_ExpectedFile extends FLEA_Exception
      *
      * @return FLEA_Exception_ExpectedFile
      */
-    public function __construct($filename)
+    public function __construct(string $filename)
     {
         $this->filename = $filename;
         $code = 0x0102001;

@@ -103,7 +103,7 @@ class FLEA_Ajax
      *
      * @return string
      */
-    public function dumpJs($return = false, $wrapper = true)
+    public function dumpJs(bool $return = false, bool $wrapper = true): ?string
     {
         $out = '';
         if ($wrapper) {
@@ -163,7 +163,7 @@ class FLEA_Ajax
      *
      * @return string
      */
-    public function registerEvent($control, $event, $url, $attribs = null)
+    public function registerEvent(string $control, string $event, string $url, ?array $attribs = null): string
     {
         $control2 = preg_replace('/[^a-z0-9_]+/i', '', $control);
         $functionName = "ajax_{$control2}_on{$event}";
@@ -176,7 +176,7 @@ class FLEA_Ajax
      *
      * @return string
      */
-    public function returnCheckJs()
+    public function returnCheckJs(): string
     {
         $version = FLEA_VERSION;
         return <<<EOT
@@ -196,7 +196,7 @@ EOT;
      *
      * @return string
      */
-    public function returnEventJs(& $eventList)
+    public function returnEventJs(array &$eventList): string
     {
         $bindEvents = [];
         $out = '';
@@ -215,7 +215,7 @@ EOT;
      *
      * @return string
      */
-    protected function _insertAjaxRequest($eventArr, & $bindEvents)
+    protected function _insertAjaxRequest(array $eventArr, array &$bindEvents): string
     {
         list($control, $event, $url, $attribs, $functionName) = $eventArr;
         $this->_formatAttribs($attribs);

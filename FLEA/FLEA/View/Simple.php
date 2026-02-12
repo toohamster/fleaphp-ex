@@ -82,7 +82,7 @@ class FLEA_View_Simple
         $this->enableCache = true;
         $this->cacheDir = './cache';
 
-		$viewConfig = (array)FLEA::getAppInf('viewConfig');
+        $viewConfig = (array)FLEA::getAppInf('viewConfig');
         $keys = array(
             'templateDir', 'cacheDir', 'cacheLifeTime', 'enableCache',
         );
@@ -102,6 +102,7 @@ class FLEA_View_Simple
      * @param mixed $value 变量内容
      */
     public function assign($name, $value = null): void
+    {
         if (is_array($name) && is_null($value)) {
             $this->vars = array_merge($this->vars, $name);
         } else {
@@ -118,6 +119,7 @@ class FLEA_View_Simple
      * @return string
      */
     public function fetch(string $file, ?string $cacheId = null): string
+    {
         if ($this->enableCache) {
             $cacheFile = $this->_getCacheFile($file, $cacheId);
             if ($this->isCached($file, $cacheId)) {
@@ -148,6 +150,7 @@ class FLEA_View_Simple
      * @param string $cacheId 缓存 ID，如果指定该值则会使用该内容的缓存输出
      */
     public function display(string $file, ?string $cacheId = null): void
+    {
         echo $this->fetch($file, $cacheId);
     }
 
@@ -160,6 +163,7 @@ class FLEA_View_Simple
      * @return boolean
      */
     public function isCached(string $file, ?string $cacheId = null): bool
+    {
         // 如果禁用缓存则返回 false
         if (!$this->enableCache) { return false; }
 
@@ -192,6 +196,7 @@ class FLEA_View_Simple
      * @param string $cacheId 缓存 ID
      */
     public function cleanCache(string $file, ?string $cacheId = null): void
+    {
         @unlink($this->_getCacheFile($file, $cacheId));
     }
 
@@ -199,6 +204,7 @@ class FLEA_View_Simple
      * 清除所有缓存
      */
     public function cleanAllCache(): void
+    {
         foreach (glob($this->cacheDir . '/' . "*.php") as $filename) {
             @unlink($filename);
         }
@@ -213,6 +219,7 @@ class FLEA_View_Simple
      * @return string
      */
     protected function _getCacheFile(string $file, ?string $cacheId = null): string
+    {
         return $this->cacheDir . DIRECTORY_SEPARATOR . rawurlencode($file . '-' . $cacheId) . '.php';
     }
 }

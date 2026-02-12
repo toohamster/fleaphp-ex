@@ -29,7 +29,7 @@ class FLEA_Exception_InvalidArguments extends FLEA_Exception
      *
      * @return FLEA_Exception_InvalidArguments
      */
-    public function __construct($arg, $value = null)
+    public function __construct(string $arg, $value = null)
     {
         $this->arg = $arg;
         $this->value = $value;

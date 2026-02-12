@@ -66,7 +66,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    public function control($type, $name, $attribs = null, $return = false)
+    public function control(string $type, string $name, ?array $attribs = null, bool $return = false): ?string
     {
         $type = strtolower($type);
         $render = '_ctl' . ucfirst($type);
@@ -109,7 +109,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    public function attribsToString($attribs)
+    public function attribsToString(array $attribs): string
     {
         $__ctl_out = '';
         foreach ($attribs as $attrib => $value) {
@@ -126,7 +126,7 @@ class FLEA_WebControls
      *
      * @return array
      */
-    public function extractAttribs(& $attribs, $req)
+    public function extractAttribs(array &$attribs, array $req): array
     {
         $extract = [];
         foreach ($req as $attrib) {
@@ -145,7 +145,7 @@ class FLEA_WebControls
      *
      * @param array $attribs
      */
-    public function mergeAttribs(& $attribs)
+    public function mergeAttribs(array &$attribs): void
     {
         $args = [];
         foreach ($attribs as $key => $arg) {
@@ -182,7 +182,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    public function _ctlTextbox($name, $attribs)
+    public function _ctlTextbox(string $name, ?array $attribs = null): string
     {
         return $this->__baseCtlInput($name, $attribs, 'text');
     }
@@ -195,7 +195,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    public function _ctlPassword($name, $attribs)
+    public function _ctlPassword(string $name, ?array $attribs = null): string
     {
         return $this->__baseCtlInput($name, $attribs, 'password');
     }
@@ -208,7 +208,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    public function _ctlMemo($name, $attribs)
+    public function _ctlMemo(string $name, ?array $attribs = null): string
     {
         extract($this->extractAttribs($attribs, array('id', 'value', 'disabled')));
         if (empty($id)) { $id = $name; }
@@ -236,7 +236,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    public function _ctlCheckbox($name, $attribs)
+    public function _ctlCheckbox(string $name, ?array $attribs = null): string
     {
         return $this->__baseCtlCheckboxOrRadio($name, $attribs, 'checkbox');
     }
@@ -249,7 +249,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    public function _ctlCheckBoxGroup($name, $attribs)
+    public function _ctlCheckBoxGroup(string $name, ?array $attribs = null): string
     {
         return $this->__baseCtlCheckboxOrRadioGroup($name, $attribs, 'checkbox', '[]');
     }
@@ -262,7 +262,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    public function _ctlRadio($name, $attribs)
+    public function _ctlRadio(string $name, ?array $attribs = null): string
     {
         return $this->__baseCtlCheckboxOrRadio($name, $attribs, 'radio');
     }
@@ -275,7 +275,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    public function _ctlRadioGroup($name, $attribs)
+    public function _ctlRadioGroup(string $name, ?array $attribs = null): string
     {
         return $this->__baseCtlCheckboxOrRadioGroup($name, $attribs, 'radio', '');
     }
@@ -288,7 +288,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    public function _ctlListBox($name, $attribs)
+    public function _ctlListBox(string $name, ?array $attribs = null): string
     {
         extract($this->extractAttribs($attribs,
                 array('id', 'size', 'items', 'selected', 'multiple', 'disabled', 'key', 'caption')));
@@ -367,7 +367,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    public function _ctlDropdownList($name, $attribs)
+    public function _ctlDropdownList(string $name, ?array $attribs = null): string
     {
         extract($this->extractAttribs($attribs,
                 array('id', 'items', 'selected', 'disabled', 'key', 'caption')));
@@ -430,7 +430,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    public function _ctlFileUpload($name, $attribs)
+    public function _ctlFileUpload(string $name, ?array $attribs = null): string
     {
         return $this->__baseCtlInput($name, $attribs, 'file');
     }
@@ -444,7 +444,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    public function _ctlButton($name, $attribs, $buttonType = 'button')
+    public function _ctlButton(string $name, ?array $attribs = null, string $buttonType = 'button'): string
     {
         extract($this->extractAttribs($attribs, array('caption')));
         if ($caption != '') { $attribs['value'] = $caption; }
@@ -459,7 +459,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    public function _ctlSubmit($name, $attribs)
+    public function _ctlSubmit(string $name, ?array $attribs = null): string
     {
         return $this->_ctlButton($name, $attribs, 'submit');
     }
@@ -472,7 +472,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    public function _ctlReset($name, $attribs)
+    public function _ctlReset(string $name, ?array $attribs = null): string
     {
         return $this->_ctlButton($name, $attribs, 'reset');
     }
@@ -485,7 +485,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    public function _ctlLabel($name, $attribs)
+    public function _ctlLabel(string $name, ?array $attribs = null): string
     {
         extract($this->extractAttribs($attribs, array('id', 'caption')));
         if (empty($id)) { $id = $name; }
@@ -511,7 +511,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    public function _ctlStatic($name, $attribs)
+    public function _ctlStatic(string $name, ?array $attribs = null): string
     {
         extract($this->extractAttribs($attribs, array('id', 'value')));
         if (empty($id)) { $id = $name; }
@@ -536,7 +536,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    public function _ctlHidden($name, $attribs)
+    public function _ctlHidden(string $name, ?array $attribs = null): string
     {
         return $this->__baseCtlInput($name, $attribs, 'hidden');
     }

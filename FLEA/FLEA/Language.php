@@ -88,7 +88,7 @@
  *
  * @return string
  */
-function _T($key, $language = '')
+function _T(string $key, string $language = ''): string
 {
     static $instance = null;
     if (!isset($instance['obj'])) {
@@ -108,7 +108,7 @@ function _T($key, $language = '')
  *
  * @return boolean
  */
-function load_language($dictname, $language = '', $noException = false)
+function load_language(string $dictname, string $language = '', bool $noException = false): bool
 {
     static $instance = null;
     if (!isset($instance['obj'])) {
@@ -177,7 +177,7 @@ class FLEA_Language
      * @param string $language 指定为 '' 时表示将字典载入默认语言包中
      * @param boolena $noException
      */
-    public function load($dictname, $language = '', $noException = false)
+    public function load(string $dictname, string $language = '', bool $noException = false): bool
     {
         $dictnames = explode(',', $dictname);
         foreach ($dictnames as $dictname) {
