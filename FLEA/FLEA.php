@@ -16,8 +16,7 @@
 /**
  * 保存文件载入的时间
  */
-global $___fleaphp_loaded_time;
-$___fleaphp_loaded_time = microtime();
+define('FLEA_LOADED_TIME', microtime());
 
 /**
  * 定义一些有用的常量
@@ -172,8 +171,7 @@ class FLEA
      */
     public static function getAppInfValue(string $option, string $keyname, $default = null)
     {
-        $config = FLEA_Config::getInstance();
-        return $config->getAppInfValue($option, $keyname, $default);
+        return FLEA_Config::getInstance()->getAppInfValue($option, $keyname, $default);
     }
 
     /**
@@ -185,8 +183,7 @@ class FLEA
      */
     public static function setAppInfValue(string $option, string $keyname, $value): void
     {
-        $config = FLEA_Config::getInstance();
-        $config->setAppInfValue($option, $keyname, $value);
+        FLEA_Config::getInstance()->setAppInfValue($option, $keyname, $value);
     }
 
     /**
@@ -197,8 +194,7 @@ class FLEA
      */
     public static function setAppInf($option, $data = null): void
     {
-        $config = FLEA_Config::getInstance();
-        $config->setAppInf($option, $data);
+        FLEA_Config::getInstance()->setAppInf($option, $data);
     }
 
     /**
@@ -220,8 +216,7 @@ class FLEA
      */
     public static function import(string $dir): void
     {
-        $config = FLEA_Config::getInstance();
-        $config->addClassPath($dir);
+        FLEA_Config::getInstance()->addClassPath($dir);
     }
 
     /**
@@ -548,9 +543,9 @@ class FLEA
 
         if (!safe_file_put_contents($cacheFile, $data)) {
             throw new FLEA_Exception_CacheDisabled($cacheDir);
-        } else {
-            return true;
         }
+
+        return true;
     }
 
     /**
@@ -645,7 +640,7 @@ class FLEA
      *      'charset'  => 'utf8',
      * );
      *
-     * $dbo =& FLEA::getDBO($dsn);
+     * $dbo = FLEA::getDBO($dsn);
      * </code>
      *
      * @param array|string|int $dsn
@@ -1308,78 +1303,6 @@ if (!function_exists('file_put_contents'))
  */
 
 /**
- * 设置异常拦截点
- *
- * @package Core
- */
-function __TRY(): void
-{
-    static $point = 0;
-    $config = FLEA_Config::getInstance();
-    if (!$config->hasExceptionStack()) {
-        $config->exceptionStack = [];
-    }
-
-    $point++;
-    $config->pushException($point);
-}
-
-/**
- * 返回抛出的异常，如果没有异常抛出，返回 false
- *
- * @package Core
- *
- * @return FLEA_Exception
- */
-function __CATCH()
-{
-    $config = FLEA_Config::getInstance();
-    if (!$config->hasExceptionStack()) {
-        return false;
-    }
-    $exception = $config->popException();
-    if (!is_object($exception)) {
-        $exception = false;
-    }
-    return $exception;
-}
-
-/**
- * 清除最后一个 __TRY() 异常捕获设置
- *
- * @package Core
- */
-function __CANCEL_TRY(): void
-{
-    $config = FLEA_Config::getInstance();
-    if ($config->hasExceptionStack()) {
-        $config->popException();
-    }
-}
-
-/**
- * 判断是否是一个异常
- *
- * $type 参数用于判断异常是否是指定的类型。
- *
- * @package Core
- *
- * @param FLEA_Exception $exception
- * @param string $type
- */
-function __IS_EXCEPTION($exception, ?string $type = null): bool
-{
-    if (!is_object($exception) || !is_a($exception, 'FLEA_Exception')) {
-        return false;
-    }
-    if (is_null($type)) {
-        return true;
-    } else {
-        return strtoupper($type) == strtoupper(get_class($exception));
-    }
-}
-
-/**
  * 设置新的异常处理例程，返回当前使用的异常处理例程
  *
  * 当抛出的异常没有任何 __TRY() 捕获时，将调用异常处理例程。FleaPHP 默认的
@@ -1609,12 +1532,4 @@ function _ET(int $errorCode, bool $appError = false): string
     return isset($message[$language][$errorCode]) ?
         $message[$language][$errorCode] :
         '';
-}
-
-class FLEA_Exception extends Exception
-{
-    function __construct($message = '', $code = 0)
-    {
-        parent::__construct($message, $code);
-    }
 }

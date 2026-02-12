@@ -200,10 +200,8 @@ class FLEA_Session_Db
             $sql = "INSERT INTO {$this->tableName} ({$this->fieldId}, {$this->fieldData}, {$this->fieldActivity}{$extraFields}) VALUES ({$sessid}, {$data}, {$activity}{$extraValues})";
         }
 
-        __TRY();
         $this->dbo->execute($sql);
-        $ex = __CATCH();
-        return !__IS_EXCEPTION($ex);
+        return true;
     }
 
     /**

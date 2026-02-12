@@ -108,8 +108,7 @@ class FLEA_Log
                $this->_errorLevel[$e] = true;
             }
 
-            global $___fleaphp_loaded_time;
-            list($usec, $sec) = explode(" ", $___fleaphp_loaded_time);
+            list($usec, $sec) = explode(" ", FLEA_LOADED_TIME);
             $this->_log = sprintf("[%s %s] ======= FleaPHP Loaded =======\n",
                 date($this->dateFormat, $sec), $usec);
 
@@ -164,10 +163,8 @@ class FLEA_Log
      */
     public function __writeLog()
     {
-        global $___fleaphp_loaded_time;
-
         // 计算应用程序执行时间（不包含入口文件）
-        list($usec, $sec) = explode(" ", $___fleaphp_loaded_time);
+        list($usec, $sec) = explode(" ", FLEA_LOADED_TIME);
         $beginTime = (float)$sec + (float)$usec;
         $endTime = microtime();
         list($usec, $sec) = explode(" ", $endTime);
