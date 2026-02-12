@@ -9,12 +9,14 @@
 5. [类加载与自动加载](#类加载与自动加载)
 6. [对象注册与单例模式](#对象注册与单例模式)
 7. [数据库操作](#数据库操作)
-8. [MVC 模式](#mvc-模式)
-9. [缓存管理](#缓存管理)
-10. [异常处理](#异常处理)
-11. [助手函数](#助手函数)
-12. [URL 生成](#url-生成)
-13. [最佳实践](#最佳实践)
+8. [TableDataGateway - 表数据入口](#tabledatagateway---表数据入口)
+9. [MVC 模式](#mvc-模式)
+10. [缓存管理](#缓存管理)
+11. [RBAC 权限控制](#rbac-权限控制)
+12. [异常处理](#异常处理)
+13. [助手函数](#助手函数)
+14. [URL 生成](#url-生成)
+15. [最佳实践](#最佳实践)
 
 ---
 
@@ -425,6 +427,636 @@ var_dump($dbo1 === $dbo2); // bool(true)
 
 ---
 
+## TableDataGateway - 表数据入口
+
+FleaPHP 提供了 `FLEA_Db_TableDataGateway` 类（表数据入口），用于封装数据表的 CRUD（创建、读取、更新、删除）操作。开发者应该从该类派生自己的数据访问类。
+
+### 定义数据表入口类
+
+创建数据表入口类，继承自 `FLEA_Db_TableDataGateway`：
+
+```php
+class Table_Users extends FLEA_Db_TableDataGateway
+{
+    /**
+     * 数据表名（不包含前缀）
+     */
+    public $tableName = 'users';
+
+    /**
+     * 主键字段名
+     */
+    public $primaryKey = 'user_id';
+}
+```
+
+使用该类：
+
+```php
+$userTable = FLEA::getSingleton('Table_Users');
+```
+
+### 表关系定义
+
+FleaPHP 支持四种表关系类型：
+
+| 关系类型 | 常量 | 说明 |
+|---------|------|------|
+| 一对一 | `HAS_ONE` | 一个记录拥有另一个关联的记录 |
+| 一对多 | `HAS_MANY` | 一个记录拥有多个关联的记录 |
+| 从属 | `BELONGS_TO` | 一个记录属于另一个记录 |
+| 多对多 | `MANY_TO_MANY` | 两个数据表的数据互相引用 |
+
+#### 一对一关系（HAS_ONE）
+
+一个用户对应一个详细资料：
+
+```php
+class Table_Users extends FLEA_Db_TableDataGateway
+{
+    public $tableName = 'users';
+    public $primaryKey = 'user_id';
+
+    /**
+     * 定义一对一关系
+     */
+    public $hasOne = [
+        'Profile' => [
+            'tableClass' => 'Table_UserProfiles',
+            'foreignKey' => 'user_id',
+            'mappingName' => 'profile',
+        ],
+    ];
+}
+```
+
+使用示例：
+
+```php
+$userTable = FLEA::getSingleton('Table_Users');
+$user = $userTable->find(1);
+
+// 访问关联的数据
+$profile = $user['profile'];
+```
+
+#### 一对多关系（HAS_MANY）
+
+一个部门拥有多个员工：
+
+```php
+class Table_Departments extends FLEA_Db_TableDataGateway
+{
+    public $tableName = 'departments';
+    public $primaryKey = 'dept_id';
+
+    /**
+     * 定义一对多关系
+     */
+    public $hasMany = [
+        'Employees' => [
+            'tableClass' => 'Table_Employees',
+            'foreignKey' => 'dept_id',
+            'mappingName' => 'employees',
+            'sort' => 'employee_id DESC',
+        ],
+    ];
+}
+```
+
+使用示例：
+
+```php
+$deptTable = FLEA::getSingleton('Table_Departments');
+$dept = $deptTable->find(1);
+
+// 访问关联的员工列表
+$employees = $dept['employees'];
+```
+
+#### 从属关系（BELONGS_TO）
+
+一个用户属于一个角色：
+
+```php
+class Table_Users extends FLEA_Db_TableDataGateway
+{
+    public $tableName = 'users';
+    public $primaryKey = 'user_id';
+
+    /**
+     * 定义从属关系
+     */
+    public $belongsTo = [
+        'Role' => [
+            'tableClass' => 'Table_Roles',
+            'foreignKey' => 'role_id',
+            'mappingName' => 'role',
+        ],
+    ];
+}
+```
+
+使用示例：
+
+```php
+$userTable = FLEA::getSingleton('Table_Users');
+$user = $userTable->find(1);
+
+// 访问所属的角色
+$role = $user['role'];
+```
+
+#### 多对多关系（MANY_TO_MANY）
+
+学生与课程是多对多关系，通过中间表关联：
+
+```php
+class Table_Students extends FLEA_Db_TableDataGateway
+{
+    public $tableName = 'students';
+    public $primaryKey = 'student_id';
+
+    /**
+     * 定义多对多关系
+     */
+    public $manyToMany = [
+        'Courses' => [
+            'tableClass' => 'Table_Courses',
+            'joinTable' => 'student_courses', // 中间表
+            'foreignKey' => 'student_id',    // 中间表中指向本表的字段
+            'assocForeignKey' => 'course_id', // 中间表中指向关联表的字段
+            'mappingName' => 'courses',
+        ],
+    ];
+}
+```
+
+使用示例：
+
+```php
+$studentTable = FLEA::getSingleton('Table_Students');
+$student = $studentTable->find(1);
+
+// 访问选修的课程列表
+$courses = $student['courses'];
+```
+
+### 查询数据
+
+#### 查找单条记录（find）
+
+```php
+// 根据主键查找
+$user = $userTable->find(1);
+
+// 根据条件查找
+$user = $userTable->find(['username' => 'john']);
+
+// 指定排序
+$user = $userTable->find(['status' => 'active'], 'user_id DESC');
+
+// 指定查询字段
+$user = $userTable->find(1, null, 'user_id, username, email');
+
+// 不查询关联数据
+$user = $userTable->find(1, null, '*', false);
+```
+
+#### 查找多条记录（findAll）
+
+```php
+// 查询所有记录
+$users = $userTable->findAll();
+
+// 根据条件查询
+$users = $userTable->findAll(['status' => 'active']);
+
+// 指定排序和分页
+$users = $userTable->findAll(
+    ['status' => 'active'],
+    'user_id DESC',
+    10,    // 限制 10 条
+    0       // 从第 0 条开始
+);
+
+// 使用数组形式指定分页
+$users = $userTable->findAll(
+    null,
+    null,
+    [10, 0], // array(length, offset)
+);
+
+// 指定查询字段
+$users = $userTable->findAll(null, null, null, 'user_id, username');
+```
+
+#### 根据字段查找（findByField / findAllByField）
+
+```php
+// 查找单条记录
+$user = $userTable->findByField('username', 'john');
+
+// 查找多条记录
+$users = $userTable->findAllByField('status', 'active', 'user_id DESC');
+
+// 带分页
+$users = $userTable->findAllByField('status', 'active', null, [10, 0]);
+```
+
+#### 根据多个主键查找（findAllByPkvs）
+
+```php
+// 根据多个主键值查找
+$users = $userTable->findAllByPkvs([1, 2, 3, 4]);
+
+// 带条件查询
+$users = $userTable->findAllByPkvs([1, 2, 3], ['status' => 'active']);
+```
+
+#### 使用 SQL 查询（findBySql）
+
+```php
+// 使用自定义 SQL 查询
+$sql = "SELECT * FROM users WHERE status = 'active'";
+$users = $userTable->findBySql($sql);
+
+// 带分页
+$users = $userTable->findBySql($sql, 10); // 前 10 条
+$users = $userTable->findBySql($sql, [10, 0]); // 第 0-10 条
+```
+
+### 条件表达式
+
+#### 简单条件
+
+```php
+// 字段 = 值
+$users = $userTable->findAll(['username' => 'john']);
+
+// 多个条件（AND 关系）
+$users = $userTable->findAll([
+    'status' => 'active',
+    'age' => 25,
+]);
+```
+
+#### OR 条件
+
+```php
+$users = $userTable->findAll([
+    'or',
+    'status' => 'active',
+    'status' => 'pending',
+]);
+```
+
+#### IN 条件
+
+```php
+$users = $userTable->findAll([
+    'user_id' => ['in()' => [1, 2, 3, 4]],
+]);
+
+// 等价于 SQL: WHERE user_id IN (1, 2, 3, 4)
+```
+
+#### LIKE 条件
+
+```php
+$users = $userTable->findAll([
+    'username' => ['like' => 'john%'],
+]);
+
+// 等价于 SQL: WHERE username LIKE 'john%'
+```
+
+#### 比较条件
+
+```php
+$users = $userTable->findAll([
+    'age' => ['>' => 18],
+    'created_at' => ['<=' => '2024-01-01'],
+]);
+
+// 等价于 SQL: WHERE age > 18 AND created_at <= '2024-01-01'
+```
+
+#### 复杂条件
+
+```php
+$users = $userTable->findAll([
+    'or',
+    [
+        'and',
+        'status' => 'active',
+        'age' => ['>' => 18],
+    ],
+    [
+        'and',
+        'status' => 'vip',
+        'age' => ['>' => 25],
+    ],
+]);
+
+// 等价于 SQL: WHERE (status = 'active' AND age > 18) OR (status = 'vip' AND age > 25)
+```
+
+### 创建记录（create）
+
+```php
+// 创建单条记录
+$row = [
+    'username' => 'john',
+    'email' => 'john@example.com',
+    'status' => 'active',
+];
+
+$newUserId = $userTable->create($row);
+
+// $newUserId 包含新插入记录的主键值
+echo "新用户 ID: " . $newUserId;
+
+// 创建时自动填充时间字段
+// 如果数据表有 CREATED, CREATED_ON, CREATED_AT 字段
+// 会自动填充当前时间
+```
+
+#### 创建多条记录（createRowset）
+
+```php
+$rows = [
+    [
+        'username' => 'user1',
+        'email' => 'user1@example.com',
+    ],
+    [
+        'username' => 'user2',
+        'email' => 'user2@example.com',
+    ],
+];
+
+$userTable->createRowset($rows);
+```
+
+#### 不处理关联创建
+
+```php
+// 创建记录时处理关联数据
+$userTable->create($row, true);  // 处理关联（默认）
+
+// 不处理关联
+$userTable->create($row, false);
+```
+
+### 更新记录（update）
+
+```php
+// 根据主键更新
+$row = [
+    'user_id' => 1,
+    'email' => 'newemail@example.com',
+    'status' => 'active',
+];
+
+$userTable->update($row);
+```
+
+#### 根据条件更新（updateByConditions）
+
+```php
+$conditions = ['status' => 'pending'];
+$row = ['status' => 'active'];
+
+$userTable->updateByConditions($conditions, $row);
+
+// 等价于 SQL: UPDATE users SET status = 'active' WHERE status = 'pending'
+```
+
+#### 更新单个字段（updateField）
+
+```php
+$conditions = ['user_id' => 1];
+$userTable->updateField($conditions, 'email', 'newemail@example.com');
+
+// 等价于 SQL: UPDATE users SET email = 'newemail@example.com' WHERE user_id = 1
+```
+
+#### 更新多条记录（updateRowset）
+
+```php
+$rows = [
+    ['user_id' => 1, 'status' => 'active'],
+    ['user_id' => 2, 'status' => 'active'],
+];
+
+$userTable->updateRowset($rows);
+```
+
+### 删除记录（remove）
+
+```php
+// 根据主键删除
+$row = $userTable->find(1);
+$userTable->remove($row);
+
+// 或者直接根据主键值删除
+$userTable->removeByPkv(1);
+```
+
+#### 根据条件删除（removeByConditions）
+
+```php
+$conditions = ['status' => 'deleted'];
+$userTable->removeByConditions($conditions);
+
+// 等价于 SQL: DELETE FROM users WHERE status = 'deleted'
+```
+
+#### 根据多个主键删除（removeByPkvs）
+
+```php
+$userTable->removeByPkvs([1, 2, 3, 4]);
+
+// 等价于 SQL: DELETE FROM users WHERE user_id IN (1, 2, 3, 4)
+```
+
+#### 删除所有记录（removeAll / removeAllWithLinks）
+
+```php
+// 删除所有记录（不处理关联）
+$userTable->removeAll();
+
+// 删除所有记录（处理关联）
+$userTable->removeAllWithLinks();
+```
+
+#### 删除时处理关联
+
+```php
+// 删除记录时处理关联数据
+$userTable->remove($row, true);  // 处理关联（默认）
+
+// 不处理关联
+$userTable->remove($row, false);
+```
+
+### 保存记录（save）
+
+`save()` 方法自动判断是创建新记录还是更新现有记录：
+
+```php
+$row = [
+    'username' => 'john',
+    'email' => 'john@example.com',
+];
+
+// 第一次调用会创建记录
+$userTable->save($row);
+// $row 现在包含主键值
+echo "用户 ID: " . $row['user_id'];
+
+// 修改后再保存会更新记录
+$row['email'] = 'newemail@example.com';
+$userTable->save($row);
+```
+
+#### 保存多条记录（saveRowset）
+
+```php
+$rows = [
+    [
+        'username' => 'user1',
+        'email' => 'user1@example.com',
+    ],
+    [
+        'username' => 'user2',
+        'email' => 'user2@example.com',
+    ],
+];
+
+$userTable->saveRowset($rows);
+```
+
+### 关联操作
+
+#### 启用/禁用关联
+
+```php
+// 禁用所有关联
+$userTable->disableLinks();
+
+// 启用所有关联
+$userTable->enableLinks();
+
+// 启用指定的关联
+$userTable->enableLinks(['profile', 'role']);
+
+// 禁用指定的关联
+$userTable->disableLinks(['profile', 'role']);
+```
+
+#### 动态创建关联
+
+```php
+// 创建关联
+$defines = [
+    'tableClass' => 'Table_UserProfiles',
+    'foreignKey' => 'user_id',
+    'mappingName' => 'profile',
+];
+
+$userTable->createLink($defines, HAS_ONE);
+
+// 删除关联
+$userTable->removeLink('profile');
+```
+
+### 数据验证
+
+#### 启用自动验证
+
+```php
+class Table_Users extends FLEA_Db_TableDataGateway
+{
+    public $tableName = 'users';
+    public $primaryKey = 'user_id';
+
+    /**
+     * 启用自动验证
+     */
+    public $autoValidating = true;
+
+    /**
+     * 验证规则
+     */
+    public $validateRules = [
+        'username' => [
+            'required' => true,
+            'minLength' => 3,
+            'maxLength' => 20,
+        ],
+        'email' => [
+            'required' => true,
+            'email' => true,
+        ],
+    ];
+}
+```
+
+#### 验证数据
+
+```php
+$row = [
+    'username' => 'john',
+    'email' => 'invalid-email',
+];
+
+$result = $userTable->create($row);
+
+if (!$result) {
+    // 获取验证错误
+    $errors = $userTable->lastValidationResult;
+    print_r($errors);
+}
+```
+
+### 自动填充时间字段
+
+如果数据表包含以下字段，会自动填充当前时间：
+
+```php
+class Table_Users extends FLEA_Db_TableDataGateway
+{
+    public $tableName = 'users';
+    public $primaryKey = 'user_id';
+
+    /**
+     * 创建记录时自动填充的字段
+     */
+    public $createdTimeFields = ['CREATED', 'CREATED_ON', 'CREATED_AT'];
+
+    /**
+     * 创建和更新记录时自动填充的字段
+     */
+    public $updatedTimeFields = ['UPDATED', 'UPDATED_ON', 'UPDATED_AT'];
+}
+```
+
+使用示例：
+
+```php
+// 创建记录时，CREATED 字段会自动填充
+$row = ['username' => 'john'];
+$userTable->create($row);
+
+// 更新记录时，UPDATED 字段会自动填充
+$row['email'] = 'newemail@example.com';
+$userTable->update($row);
+```
+
+---
+
 ## MVC 模式
 
 ### 运行 MVC 应用
@@ -568,6 +1200,433 @@ return [
 ```
 
 如果未设置缓存目录，缓存功能将不可用。
+
+---
+
+## RBAC 权限控制
+
+FleaPHP 提供了完整的 RBAC（基于角色的访问控制）支持，通过 `FLEA_Rbac` 类实现权限检查功能。
+
+### RBAC 常量
+
+框架预定义了几个 RBAC 相关的常量：
+
+| 常量 | 说明 |
+|------|------|
+| `RBAC_EVERYONE` | 任何用户（不管该用户是否具有角色信息） |
+| `RBAC_HAS_ROLE` | 具有任何角色的用户 |
+| `RBAC_NO_ROLE` | 不具有任何角色的用户 |
+| `RBAC_NULL` | 该设置没有值 |
+| `ACTION_ALL` | 控制器中的所有动作 |
+
+### 初始化 RBAC
+
+创建 RBAC 实例：
+
+```php
+$rbac = new FLEA_Rbac();
+```
+
+或者在控制器中使用：
+
+```php
+$rbac = FLEA::getSingleton('FLEA_Rbac');
+```
+
+### 配置 RBAC
+
+在配置文件中设置 RBAC 相关选项：
+
+```php
+return [
+    // RBAC Session 键名
+    'RBACSessionKey' => 'MY_APP_RBAC_USER',
+];
+```
+
+### 用户管理
+
+#### 设置用户信息
+
+使用 `setUser()` 方法将用户信息保存到 session 中：
+
+```php
+$rbac = new FLEA_Rbac();
+
+// 设置用户信息
+$userData = [
+    'user_id' => 1,
+    'username' => 'john',
+    'email' => 'john@example.com',
+];
+
+// 设置角色数据
+$rolesData = ['ADMIN', 'EDITOR'];
+
+$rbac->setUser($userData, $rolesData);
+```
+
+只设置用户信息，不设置角色：
+
+```php
+$rbac->setUser($userData);
+```
+
+#### 获取用户信息
+
+使用 `getUser()` 方法获取 session 中的用户信息：
+
+```php
+$user = $rbac->getUser();
+
+if ($user) {
+    echo "当前用户: " . $user['username'];
+}
+```
+
+#### 获取用户角色
+
+使用 `getRoles()` 方法获取用户的角色：
+
+```php
+$roles = $rbac->getRoles();
+
+// 返回可能是一个字符串（如 "ADMIN,EDITOR"）
+// 或者是一个数组
+```
+
+使用 `getRolesArray()` 方法确保返回数组：
+
+```php
+$roles = $rbac->getRolesArray();
+
+print_r($roles);
+// 输出: Array ( [0] => ADMIN [1] => EDITOR )
+```
+
+#### 清除用户信息
+
+使用 `clearUser()` 方法清除 session 中的用户信息（通常用于登出）：
+
+```php
+$rbac->clearUser();
+
+// 用户已登出
+```
+
+### 权限检查
+
+#### 访问控制表（ACT）
+
+ACT（Access Control Table）是一个数组，包含以下键：
+
+- `allow`: 允许访问的角色列表或特殊常量
+- `deny`: 拒绝访问的角色列表或特殊常量
+
+ACT 示例：
+
+```php
+// 允许所有用户访问
+$ACT = [
+    'allow' => RBAC_EVERYONE,
+    'deny' => RBAC_NULL,
+];
+
+// 只允许管理员访问
+$ACT = [
+    'allow' => ['ADMIN'],
+    'deny' => RBAC_NULL,
+];
+
+// 允许管理员和编辑器，但拒绝普通用户
+$ACT = [
+    'allow' => ['ADMIN', 'EDITOR'],
+    'deny' => ['USER'],
+];
+
+// 要求用户必须有角色
+$ACT = [
+    'allow' => RBAC_HAS_ROLE,
+    'deny' => RBAC_NULL,
+];
+
+// 要求用户不能有任何角色
+$ACT = [
+    'allow' => RBAC_NO_ROLE,
+    'deny' => RBAC_NULL,
+];
+```
+
+#### 检查权限
+
+使用 `check()` 方法检查访问权限：
+
+```php
+$rbac = new FLEA_Rbac();
+
+// 设置用户及其角色
+$userData = ['user_id' => 1, 'username' => 'john'];
+$rolesData = ['ADMIN', 'EDITOR'];
+$rbac->setUser($userData, $rolesData);
+
+// 定义访问控制表
+$ACT = [
+    'allow' => ['ADMIN', 'EDITOR'],
+    'deny' => RBAC_NULL,
+];
+
+// 检查权限
+$roles = $rbac->getRolesArray();
+if ($rbac->check($roles, $ACT)) {
+    echo "允许访问";
+} else {
+    echo "拒绝访问";
+}
+```
+
+#### 准备 ACT
+
+使用 `prepareACT()` 方法对原始 ACT 进行分析和整理：
+
+```php
+// 原始 ACT（可能包含字符串格式的角色列表）
+$rawACT = [
+    'allow' => 'ADMIN,EDITOR',
+    'deny' => 'USER,BLOCKED',
+];
+
+// 准备 ACT
+$ACT = $rbac->prepareACT($rawACT);
+
+// 输出整理后的 ACT
+print_r($ACT);
+// 输出:
+// Array (
+//     [allow] => Array ( [0] => ADMIN [1] => EDITOR )
+//     [deny] => Array ( [0] => USER [1] => BLOCKED )
+// )
+```
+
+### 权限检查示例
+
+#### 示例 1：简单角色检查
+
+```php
+$ACT = [
+    'allow' => ['ADMIN'],
+    'deny' => RBAC_NULL,
+];
+
+// 检查用户是否为管理员
+if ($rbac->check($roles, $ACT)) {
+    // 用户是管理员
+    // 执行管理员操作
+}
+```
+
+#### 示例 2：多角色支持
+
+```php
+$ACT = [
+    'allow' => ['ADMIN', 'EDITOR', 'MODERATOR'],
+    'deny' => RBAC_NULL,
+];
+
+// 用户具有 ADMIN, EDITOR, MODERATOR 其中任一角色即可访问
+if ($rbac->check($roles, $ACT)) {
+    // 用户有权限
+}
+```
+
+#### 示例 3：拒绝特定角色
+
+```php
+$ACT = [
+    'allow' => RBAC_EVERYONE,
+    'deny' => ['BLOCKED', 'BANNED'],
+];
+
+// 所有用户都可以访问，除了被阻止或被封禁的用户
+if ($rbac->check($roles, $ACT)) {
+    // 用户未被阻止
+}
+```
+
+#### 示例 4：必须具有角色
+
+```php
+$ACT = [
+    'allow' => RBAC_HAS_ROLE,
+    'deny' => RBAC_NULL,
+];
+
+// 用户必须至少有一个角色才能访问
+if ($rbac->check($roles, $ACT)) {
+    // 用户有角色
+}
+```
+
+#### 示例 5：必须没有角色
+
+```php
+$ACT = [
+    'allow' => RBAC_NO_ROLE,
+    'deny' => RBAC_NULL,
+];
+
+// 用户必须没有任何角色才能访问
+if ($rbac->check($roles, $ACT)) {
+    // 用户没有角色
+}
+```
+
+### 在控制器中使用 RBAC
+
+#### 登录时设置用户和角色
+
+```php
+class Controller_Login extends FLEA_Controller_Action
+{
+    public function actionLogin()
+    {
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+
+        // 验证用户
+        $userTable = FLEA::getSingleton('Table_Users');
+        $user = $userTable->findByField('username', $username);
+
+        if ($user && $user['password'] === md5($password)) {
+            // 获取用户角色
+            $roleTable = FLEA::getSingleton('Table_UserRoles');
+            $roles = $roleTable->getUserRoles($user['user_id']);
+
+            // 设置用户和角色
+            $rbac = new FLEA_Rbac();
+            $rbac->setUser($user, $roles);
+
+            // 跳转到首页
+            redirect(url('Index', 'index'));
+        } else {
+            echo "用户名或密码错误";
+        }
+    }
+
+    public function actionLogout()
+    {
+        $rbac = new FLEA_Rbac();
+        $rbac->clearUser();
+
+        redirect(url('Login', 'index'));
+    }
+}
+```
+
+#### 在控制器中检查权限
+
+```php
+class Controller_Admin extends FLEA_Controller_Action
+{
+    public function actionIndex()
+    {
+        $rbac = new FLEA_Rbac();
+        $roles = $rbac->getRolesArray();
+
+        // 定义访问控制表
+        $ACT = [
+            'allow' => ['ADMIN'],
+            'deny' => RBAC_NULL,
+        ];
+
+        // 检查权限
+        if (!$rbac->check($roles, $ACT)) {
+            echo "无权访问";
+            return;
+        }
+
+        // 执行管理员操作
+        echo "欢迎，管理员";
+    }
+}
+```
+
+#### 使用 RBAC 中间件
+
+创建 RBAC 检查中间件：
+
+```php
+function checkPermission($requiredRoles)
+{
+    $rbac = new FLEA_Rbac();
+    $roles = $rbac->getRolesArray();
+
+    $ACT = [
+        'allow' => $requiredRoles,
+        'deny' => RBAC_NULL,
+    ];
+
+    if (!$rbac->check($roles, $ACT)) {
+        js_alert('无权访问', '', url('Index', 'index'));
+        exit;
+    }
+}
+```
+
+在控制器中使用中间件：
+
+```php
+class Controller_Admin extends FLEA_Controller_Action
+{
+    public function actionIndex()
+    {
+        // 检查管理员权限
+        checkPermission(['ADMIN']);
+
+        // 执行操作
+    }
+
+    public function actionEdit()
+    {
+        // 检查编辑权限
+        checkPermission(['ADMIN', 'EDITOR']);
+
+        // 执行操作
+    }
+}
+```
+
+### RBAC 最佳实践
+
+1. **集中管理 ACT**：将访问控制表定义在配置文件或常量中，便于维护
+
+```php
+// config/permissions.php
+return [
+    'ACT_ADMIN' => [
+        'allow' => ['ADMIN'],
+        'deny' => RBAC_NULL,
+    ],
+    'ACT_EDITOR' => [
+        'allow' => ['ADMIN', 'EDITOR'],
+        'deny' => RBAC_NULL,
+    ],
+];
+```
+
+2. **角色命名规范**：使用大写字母，便于识别
+
+3. **权限继承**：通过组合多个角色实现更复杂的权限控制
+
+4. **日志记录**：记录权限检查失败的情况，便于审计
+
+```php
+if (!$rbac->check($roles, $ACT)) {
+    log_message("权限检查失败: 用户 " . $user['username'] . " 试图访问受保护的资源");
+    js_alert('无权访问');
+}
+```
+
+5. **最小权限原则**：只赋予用户所需的最小权限
 
 ---
 

@@ -101,3 +101,108 @@
 为开发者提供全面的使用指南，帮助快速上手并充分利用 FleaPHP 框架的功能。
 
 ---
+
+## 2026-02-12 - 增强用户手册内容
+
+### 修改文件
+- `USER_GUIDE.md`
+
+### 新增内容
+
+#### 1. 新增 "TableDataGateway - 表数据入口" 章节
+
+详细介绍了 `FLEA_Db_TableDataGateway` 类的使用方法，包括：
+
+- **定义数据表入口类**：如何继承 `FLEA_Db_TableDataGateway` 创建数据访问类
+- **表关系定义**：完整介绍了四种表关系类型
+  - 一对一关系（HAS_ONE）
+  - 一对多关系（HAS_MANY）
+  - 从属关系（BELONGS_TO）
+  - 多对多关系（MANY_TO_MANY）
+- **查询数据**：
+  - 查找单条记录（find）
+  - 查找多条记录（findAll）
+  - 根据字段查找（findByField / findAllByField）
+  - 根据多个主键查找（findAllByPkvs）
+  - 使用 SQL 查询（findBySql）
+- **条件表达式**：详细说明各种查询条件的使用方法
+  - 简单条件
+  - OR 条件
+  - IN 条件
+  - LIKE 条件
+  - 比较条件
+  - 复杂条件
+- **创建记录**：
+  - 创建单条记录（create）
+  - 创建多条记录（createRowset）
+  - 不处理关联创建
+- **更新记录**：
+  - 根据主键更新（update）
+  - 根据条件更新（updateByConditions）
+  - 更新单个字段（updateField）
+  - 更新多条记录（updateRowset）
+- **删除记录**：
+  - 根据主键删除（remove）
+  - 根据条件删除（removeByConditions）
+  - 根据多个主键删除（removeByPkvs）
+  - 删除所有记录（removeAll / removeAllWithLinks）
+  - 删除时处理关联
+- **保存记录**：
+  - 智能保存（save）- 自动判断创建或更新
+  - 保存多条记录（saveRowset）
+- **关联操作**：
+  - 启用/禁用关联
+  - 动态创建/删除关联
+- **数据验证**：
+  - 启用自动验证
+  - 定义验证规则
+  - 获取验证错误
+- **自动填充时间字段**：CREATED、UPDATED 等字段的自动填充
+
+#### 2. 新增 "RBAC 权限控制" 章节
+
+完整介绍了 FleaPHP 的 RBAC（基于角色的访问控制）功能，包括：
+
+- **RBAC 常量**：预定义的 RBAC 相关常量
+  - RBAC_EVERYONE
+  - RBAC_HAS_ROLE
+  - RBAC_NO_ROLE
+  - RBAC_NULL
+  - ACTION_ALL
+- **初始化 RBAC**：如何创建和使用 RBAC 实例
+- **配置 RBAC**：RBAC Session 键名等配置项
+- **用户管理**：
+  - 设置用户信息（setUser）
+  - 获取用户信息（getUser）
+  - 获取用户角色（getRoles / getRolesArray）
+  - 清除用户信息（clearUser）
+- **权限检查**：
+  - 访问控制表（ACT）的定义和格式
+  - 权限检查方法（check）
+  - 准备 ACT（prepareACT）
+- **权限检查示例**：提供了多个实用的示例
+  - 简单角色检查
+  - 多角色支持
+  - 拒绝特定角色
+  - 必须具有角色
+  - 必须没有角色
+- **在控制器中使用 RBAC**：
+  - 登录时设置用户和角色
+  - 在控制器中检查权限
+  - 使用 RBAC 中间件
+- **RBAC 最佳实践**：
+  - 集中管理 ACT
+  - 角色命名规范
+  - 权限继承
+  - 日志记录
+  - 最小权限原则
+
+### 目的
+补充用户手册中缺失的重要内容，特别是：
+1. 数据库操作的详细说明，特别是 `FLEA_Db_TableDataGateway` 类的完整使用指南
+2. 表关系的定义和使用方法，包括一对一、一对多、从属、多对多关系
+3. RBAC 权限控制系统的完整使用文档，包括用户管理、角色管理、权限检查等
+
+这些内容对于开发者充分利用 FleaPHP 框架的功能至关重要。
+
+---
