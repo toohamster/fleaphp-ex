@@ -19,7 +19,7 @@ $dbo->startTrans();
 /**
  * 建立全部需要的权限
  */
-$tablePermissions =& FLEA::getSingleton('FLEA_Acl_Table_Permissions');
+$tablePermissions = FLEA::getSingleton('FLEA_Acl_Table_Permissions');
 /* @var $tablePermissions FLEA_Acl_Table_Permissions */
 $permissions = array(
     array('name' => '/Project/Create'),
@@ -43,7 +43,7 @@ $permissions = array_to_hashmap($permissions, 'name');
 /**
  * 建立角色，并将权限绑定到角色上
  */
-$tableRoles =& FLEA::getSingleton('FLEA_Acl_Table_Roles');
+$tableRoles = FLEA::getSingleton('FLEA_Acl_Table_Roles');
 /* @var $tableRoles FLEA_Acl_Table_Roles */
 $role = array(
     'name' => 'ProjectManager',
@@ -99,7 +99,7 @@ $roles = array_to_hashmap($roles, 'name');
  *   |
  *   \----- 测试组
  */
-$tableUserGroups =& FLEA::getSingleton('FLEA_Acl_Table_UserGroups');
+$tableUserGroups = FLEA::getSingleton('FLEA_Acl_Table_UserGroups');
 /* @var $tableUserGroups FLEA_Acl_Table_UserGroups */
 $group = array(
     'name' => '开发组',
@@ -147,7 +147,7 @@ $groups = array_to_hashmap($groups, 'name');
 /**
  * 创建用户，并分配到各个组
  */
-$tableUsers =& FLEA::getSingleton('FLEA_Acl_Table_Users');
+$tableUsers = FLEA::getSingleton('FLEA_Acl_Table_Users');
 /* @var $tableUsers FLEA_Acl_Table_Users */
 $users = array(
     array(

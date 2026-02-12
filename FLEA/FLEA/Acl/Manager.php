@@ -1,18 +1,10 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * 定义 FLEA_Acl_Manager 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Manager.php 1060 2008-05-04 05:02:59Z qeeyuan $
  */
@@ -21,7 +13,7 @@
  * FLEA_Acl_Manager 提供 ACL 数据的全面管理功能
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Acl_Manager
@@ -31,7 +23,7 @@ class FLEA_Acl_Manager
      *
      * @var array
      */
-    var $_tableClass = array(
+    public $_tableClass = array(
         'users' =>                  'FLEA_Acl_Table_Users',
         'roles' =>                  'FLEA_Acl_Table_Roles',
         'userGroups' =>             'FLEA_Acl_Table_UserGroups',
@@ -42,7 +34,7 @@ class FLEA_Acl_Manager
         'userHasPermissions' =>     'FLEA_Acl_Table_UserHasPermissions',
     );
 
-    function FLEA_Acl_Manager($tableClass = array())
+    function __construct(array $tableClass = [])
     {
         $this->_tableClass = array_merge($this->_tableClass, (array)$tableClass);
     }
@@ -52,15 +44,15 @@ class FLEA_Acl_Manager
      *
      * @param array $conditions
      */
-    function getUserWithPermissions($conditions)
+    public function getUserWithPermissions($conditions): ?array
     {
-        $tableUsers =& FLEA::getSingleton($this->_tableClass['users']);
+        $tableUsers = FLEA::getSingleton($this->_tableClass['users']);
         /* @var $tableUsers FLEA_Acl_Table_Users */
         $user = $tableUsers->find($conditions);
         if (empty($user)) { return false; }
 
         // 取得用户所在用户组的层次数据
-        $tableUserGroups =& FLEA::getSingleton($this->_tableClass['userGroups']);
+        $tableUserGroups = FLEA::getSingleton($this->_tableClass['userGroups']);
         /* @var $tableUserGroups FLEA_Acl_Table_UserGroups */
         $rowset = $tableUserGroups->getPath($user['group']);
 
@@ -70,14 +62,14 @@ class FLEA_Acl_Manager
         $tree =& $ret['tree'];
         $refs =& $ret['refs'];
         $groupid = $user['user_group_id'];
-        $path = array();
+        $path = [];
         while (isset($refs[$groupid])) {
             array_unshift($path, $refs[$groupid]);
             $groupid = $refs[$groupid]['parent_id'];
         }
 
         // 整理角色信息
-        $userRoles = array();
+        $userRoles = [];
 
         foreach ($path as $group) {
             $roles = $group['roles'];

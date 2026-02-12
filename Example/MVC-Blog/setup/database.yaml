@@ -1,6 +1,0 @@
-mvcblog_posts:
-  - id I NOTNULL AUTO PRIMARY
-  - title C(255) NOTNULL
-  - body XL NOTNULL
-  - created D NOTNULL
-  - updated D NOTNULL

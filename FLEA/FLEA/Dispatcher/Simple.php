@@ -11,8 +11,7 @@
 /**
  * 定义 FLEA_Dispatcher_Simple 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Simple.php 1028 2008-02-02 05:50:59Z qeeyuan $
  */
@@ -21,7 +20,7 @@
  * FLEA_Dispatcher_Simple 分析 HTTP 请求，并转发到合适的 Controller 对象处理
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Dispatcher_Simple
@@ -31,14 +30,14 @@ class FLEA_Dispatcher_Simple
      *
      * @var array
      */
-    var $_request;
+    public $_request;
 
     /**
      * 原始的请求信息数组
      *
      * @var array
      */
-    var $_requestBackup;
+    public $_requestBackup;
 
     /**
      * 构造函数
@@ -47,7 +46,7 @@ class FLEA_Dispatcher_Simple
      *
      * @return FLEA_Dispatcher_Simple
      */
-    function FLEA_Dispatcher_Simple(& $request)
+    public function __construct(array &$request)
     {
         $this->_requestBackup =& $request;
 
@@ -70,7 +69,7 @@ class FLEA_Dispatcher_Simple
      *
      * @return mixed
      */
-    function dispatching()
+    public function dispatching()
     {
         $controllerName = $this->getControllerName();
         $actionName = $this->getActionName();
@@ -86,7 +85,7 @@ class FLEA_Dispatcher_Simple
      *
      * @return mixed
      */
-    function _executeAction($controllerName, $actionName, $controllerClass)
+    protected function _executeAction(string $controllerName, string $actionName, string $controllerClass)
     {
         $callback = FLEA::getAppInf('dispatcherFailedCallback');
 
@@ -103,7 +102,7 @@ class FLEA_Dispatcher_Simple
             // 构造控制器对象
             FLEA::setAppInf('FLEA.internal.currentControllerName', $controllerName);
             FLEA::setAppInf('FLEA.internal.currentActionName', $actionName);
-            $controller =& new $controllerClass($controllerName);
+            $controller = new $controllerClass($controllerName);
             if (!method_exists($controller, $actionMethod)) { break; }
             if (method_exists($controller, '__setController')) {
                 $controller->__setController($controllerName, $actionName);
@@ -132,18 +131,14 @@ class FLEA_Dispatcher_Simple
         }
 
         if (is_null($controller)) {
-            FLEA::loadClass('FLEA_Exception_MissingController');
-            __THROW(new FLEA_Exception_MissingController(
+            throw new FLEA_Exception_MissingController(
                     $controllerName, $actionName, $this->_requestBackup,
-                    $controllerClass, $actionMethod, $controllerClassFilename));
-            return false;
+                    $controllerClass, $actionMethod, $controllerClassFilename);
         }
 
-        FLEA::loadClass('FLEA_Exception_MissingAction');
-        __THROW(new FLEA_Exception_MissingAction(
+        throw new FLEA_Exception_MissingAction(
                 $controllerName, $actionName, $this->_requestBackup,
-                $controllerClass, $actionMethod, $controllerClassFilename));
-        return false;
+                $controllerClass, $actionMethod, $controllerClassFilename);
     }
 
     /**
@@ -153,7 +148,7 @@ class FLEA_Dispatcher_Simple
      *
      * @return string
      */
-    function getControllerName()
+    public function getControllerName(): string
     {
         $controllerName = preg_replace('/[^a-z0-9_]+/i', '', $this->_request['controller']);
         if ($controllerName == '') {
@@ -170,7 +165,7 @@ class FLEA_Dispatcher_Simple
      *
      * @param string $controllerName
      */
-    function setControllerName($controllerName)
+    public function setControllerName(string $controllerName): void
     {
         $this->_request['controller'] = $controllerName;
     }
@@ -182,7 +177,7 @@ class FLEA_Dispatcher_Simple
      *
      * @return string
      */
-    function getActionName()
+    public function getActionName(): string
     {
         $actionName = preg_replace('/[^a-z0-9]+/i', '', $this->_request['action']);
         if ($actionName == '') {
@@ -196,7 +191,7 @@ class FLEA_Dispatcher_Simple
      *
      * @param string $actionName
      */
-    function setActionName($actionName)
+    public function setActionName(string $actionName): void
     {
         $this->_request['action'] = $actionName;
     }
@@ -208,7 +203,7 @@ class FLEA_Dispatcher_Simple
      *
      * @return string
      */
-    function getControllerClass($controllerName)
+    public function getControllerClass(string $controllerName): string
     {
         $controllerClass = FLEA::getAppInf('controllerClassPrefix');
         if (FLEA::getAppInf('urlLowerChar')) {
@@ -226,10 +221,10 @@ class FLEA_Dispatcher_Simple
      *
      * @return array
      */
-    function parseUrl($url)
+    public function parseUrl(string $url): array
     {
         $url = parse_url($url);
-        $args = array();
+        $args = [];
         parse_str($url['query'], $args);
         $args = array_change_key_case($args, CASE_LOWER);
         $controllerAccessor = strtolower(FLEA::getAppInf('controllerAccessor'));
@@ -252,7 +247,7 @@ class FLEA_Dispatcher_Simple
      *
      * @return boolean
      */
-    function _loadController($controllerClass)
+    protected function _loadController(string $controllerClass): bool
     {
         $controllerClassFilename = FLEA::getFilePath($controllerClass . '.php', true);
         if (!is_readable($controllerClassFilename)) {

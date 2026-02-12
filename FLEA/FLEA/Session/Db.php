@@ -1,18 +1,10 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * 定义 FLEA_Session_Db 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Db.php 1032 2008-02-22 06:20:48Z qeeyuan $
  */
@@ -32,7 +24,7 @@
  * - 修改应用程序设置 sessionProvider 为 FLEA_Session_Db
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Session_Db
@@ -42,35 +34,35 @@ class FLEA_Session_Db
      *
      * @var FLEA_Db_Driver_Abstract
      */
-    var $dbo = null;
+    public $dbo = null;
 
     /**
      * 保存 session 的数据表名称，由应用程序设置 sessionDbTableName 指定
      *
      * @var string
      */
-    var $tableName = null;
+    public $tableName = null;
 
     /**
      * 保存 session id 的字段名，由应用程序设置 sessionDbFieldId 指定
      *
      * @var string
      */
-    var $fieldId = null;
+    public $fieldId = null;
 
     /**
      * 保存 session 数据的字段名，由应用程序设置 sessionDbFieldData 指定
      *
      * @var string
      */
-    var $fieldData = null;
+    public $fieldData = null;
 
     /**
      * 保存 session 过期时间的字段名，由应用程序设置 sessionDbFieldActivity 指定
      *
      * @var string
      */
-    var $fieldActivity = null;
+    public $fieldActivity = null;
 
     /**
      * 指示 session 的有效期
@@ -79,24 +71,20 @@ class FLEA_Session_Db
      *
      * @var int
      */
-    var $lifeTime = 0;
+    public $lifeTime = 0;
 
     /**
      * 构造函数
      *
      * @return FLEA_Session_Db
      */
-    function FLEA_Session_Db()
+    public function __construct()
     {
         $this->tableName = FLEA::getAppInf('sessionDbTableName');
         $this->fieldId = FLEA::getAppInf('sessionDbFieldId');
         $this->fieldData = FLEA::getAppInf('sessionDbFieldData');
         $this->fieldActivity = FLEA::getAppInf('sessionDbFieldActivity');
         $this->lifeTime = (int)FLEA::getAppInf('sessionDbLifeTime');
-
-        if (PHP4) {
-            register_shutdown_function('session_write_close');
-        }
 
         session_set_save_handler(
             array(& $this, 'sessionOpen'),
@@ -111,7 +99,7 @@ class FLEA_Session_Db
     /**
      * 析构函数
      */
-    function __destruct()
+    public function __destruct()
     {
         session_write_close();
     }
@@ -124,7 +112,7 @@ class FLEA_Session_Db
      *
      * @return boolean
      */
-    function sessionOpen($savePath, $sessionName)
+    public function sessionOpen(string $savePath, string $sessionName): bool
     {
         $dsnName = FLEA::getAppInf('sessionDbDSN');
         $dsn = FLEA::getAppInf($dsnName);
@@ -149,7 +137,7 @@ class FLEA_Session_Db
      *
      * @return boolean
      */
-    function sessionClose()
+    public function sessionClose(): bool
     {
         return true;
     }
@@ -161,7 +149,7 @@ class FLEA_Session_Db
      *
      * @return string
      */
-    function sessionRead($sessid)
+    public function sessionRead(string $sessid): string
     {
         $sessid = $this->dbo->qstr($sessid);
         $sql = "SELECT {$this->fieldData} FROM {$this->tableName} WHERE {$this->fieldId} = {$sessid}";
@@ -181,7 +169,7 @@ class FLEA_Session_Db
      *
      * @return boolean
      */
-    function sessionWrite($sessid, $data)
+    public function sessionWrite(string $sessid, string $data): bool
     {
         $sessid = $this->dbo->qstr($sessid);
         $sql = "SELECT COUNT(*) FROM {$this->tableName} WHERE {$this->fieldId} = {$sessid}";
@@ -192,7 +180,7 @@ class FLEA_Session_Db
         if ((int)$this->dbo->getOne($sql) > 0) {
             $sql = "UPDATE {$this->tableName} SET {$this->fieldData} = {$data}, {$this->fieldActivity} = {$activity}";
             if (!empty($fields)) {
-                $arr = array();
+                $arr = [];
                 foreach ($fields as $field => $value) {
                     $arr[] = $this->dbo->qfield($field) . ' = ' . $this->dbo->qstr($value);
                 }
@@ -212,10 +200,8 @@ class FLEA_Session_Db
             $sql = "INSERT INTO {$this->tableName} ({$this->fieldId}, {$this->fieldData}, {$this->fieldActivity}{$extraFields}) VALUES ({$sessid}, {$data}, {$activity}{$extraValues})";
         }
 
-        __TRY();
         $this->dbo->execute($sql);
-        $ex = __CATCH();
-        return !__IS_EXCEPTION($ex);
+        return true;
     }
 
     /**
@@ -225,7 +211,7 @@ class FLEA_Session_Db
      *
      * @return boolean
      */
-    function sessionDestroy($sessid)
+    public function sessionDestroy(string $sessid): bool
     {
         $sessid = $this->dbo->qstr($sessid);
         $sql = "DELETE FROM {$this->tableName} WHERE {$this->fieldId} = {$sessid}";
@@ -239,7 +225,7 @@ class FLEA_Session_Db
      *
      * @return boolean
      */
-    function sessionGc($maxlifetime)
+    public function sessionGc(int $maxlifetime): bool
     {
         if ($this->lifeTime > 0) {
             $maxlifetime = $this->lifeTime;
@@ -255,7 +241,7 @@ class FLEA_Session_Db
      *
      * @return int
      */
-    function getOnlineCount($lifetime = -1)
+    public function getOnlineCount(int $lifetime = -1): int
     {
         if ($this->lifeTime > 0) {
             $lifetime = $this->lifeTime;
@@ -287,7 +273,7 @@ class FLEA_Session_Db
      *
      * @return array
      */
-    function _beforeWrite($sessid)
+    protected function _beforeWrite(string $sessid): array
     {
         return array();
     }

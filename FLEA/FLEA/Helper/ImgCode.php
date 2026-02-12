@@ -1,18 +1,10 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * 定义 FLEA_Helper_ImgCode 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: ImgCode.php 972 2007-10-09 20:56:54Z qeeyuan $
  */
@@ -30,7 +22,7 @@
  * 接下来为显示验证码的控制器编写 imgcode 方法：
  * <code>
  * function actionImgcode() {
- *     $imgcode =& FLEA::getSingleton('FLEA_Helper_ImgCode');
+ *     $imgcode = FLEA::getSingleton('FLEA_Helper_ImgCode');
  *     $imgcode->image();
  * }
  * </code>
@@ -38,7 +30,7 @@
  * 最后，对于用户提交的表单做如下验证：
  * <code>
  * function actionSubmit() {
- *     $imgcode =& FLEA::getSingleton('FLEA_Helper_ImgCode');
+ *     $imgcode = FLEA::getSingleton('FLEA_Helper_ImgCode');
  *     // 假定验证码在表单中的字段名是 imgcode
  *     if ($imgcode->check($_POST['imgcode'])) {
  *         // 验证通过
@@ -47,7 +39,7 @@
  * </code>
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Helper_ImgCode
@@ -57,21 +49,21 @@ class FLEA_Helper_ImgCode
      *
      * @var string
      */
-    var $_code;
+    public $_code;
 
     /**
      * 验证码过期时间
      *
      * @var string
      */
-    var $_expired;
+    public $_expired;
 
     /**
      * 验证码图片的类型（默认为 jpeg）
      *
      * @var string
      */
-    var $imagetype = 'jpeg';
+    public $imagetype = 'jpeg';
 
     /**
      * 指示是否在生成验证码图片时保留已有的验证码
@@ -81,12 +73,12 @@ class FLEA_Helper_ImgCode
      *
      * @var boolean
      */
-    var $keepCode = false;
+    public $keepCode = false;
 
     /**
      * 构造函数
      */
-    function FLEA_Helper_ImgCode()
+    public function __construct()
     {
         @session_start();
 
@@ -103,7 +95,7 @@ class FLEA_Helper_ImgCode
      *
      * @return boolean
      */
-    function check($code)
+    public function check($code)
     {
         $time = time();
         if ($time >= $this->_expired || strtoupper($code) != strtoupper($this->_code)) {
@@ -119,7 +111,7 @@ class FLEA_Helper_ImgCode
      *
      * @return boolean
      */
-    function checkCaseSensitive($code)
+    public function checkCaseSensitive($code)
     {
         $time = time();
         if ($time >= $this->_expired || $code != $this->_code) {
@@ -131,7 +123,7 @@ class FLEA_Helper_ImgCode
     /**
      * 清除 session 中的 imgcode 相关信息
      */
-    function clear()
+    public function clear()
     {
         unset($_SESSION['IMGCODE']);
         unset($_SESSION['IMGCODE_EXPIRED']);
@@ -157,7 +149,7 @@ class FLEA_Helper_ImgCode
      * @param int $leftime 验证码有效时间（秒）
      * @param array $options 附加选项，可以指定字体、宽度和高度等参数
      */
-    function image($type = 0, $length = 4, $lefttime = 900, $options = null)
+    public function image($type = 0, $length = 4, $lefttime = 900, $options = null)
     {
         if ($this->keepCode && $this->_code != '') {
             $code = $this->_code;
@@ -267,7 +259,7 @@ class FLEA_Helper_ImgCode
      *
      * @return array
      */
-    function _hex2rgb($color, $defualt = 'ffffff')
+    protected function _hex2rgb($color, $defualt = 'ffffff')
     {
         $color = strtolower($color);
         if (substr($color, 0, 2) == '0x') {

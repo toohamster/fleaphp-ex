@@ -1,18 +1,10 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * 定义 FleaPHP 中所有错误信息的代码及对应的错误信息
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: ErrorMessage.php 972 2007-10-09 20:56:54Z qeeyuan $
  */
@@ -86,18 +78,4 @@ return array(
     // FLEA_Db_Exception_MissingLinkOption
     0x0202002 => '创建数据表关联时缺少必须的 "%s" 选项.',
 
-    // FLEA_View_Exception_NotConfigurationSmarty
-    0x0902001 => 'FLEA_View_Smarty 需要应用程序设置 "viewConfig[\'smartyDir\']"，并定义常量 SMARTY_DIR.',
-    // FLEA_View_Exception_InitSmartyFailed
-    0x0902002 => 'Smarty 模板引擎文件 "%s" 没有找到.',
-
-    // FLEA_View_Exception_NotConfigurationSmartTemplate
-    0x0903001 => 'FLEA_View_SmartTemplate 需要应用程序设置 "viewConfig[\'smartDir\']".',
-    // FLEA_View_Exception_InitSmartTemplateFailed
-    0x0903002 => 'SmartTemplate 模板引擎文件 "%s" 没有找到.',
-
-    // FLEA_View_Exception_NotConfigurationLite
-    0x0904001 => 'FLEA_View_Lite 需要应用程序设置 "viewConfig[\'liteDir\']".',
-    // FLEA_View_Exception_InitLiteFailed
-    0x0904002 => 'TemplateLite 模板引擎文件 "%s" 没有找到.',
 );

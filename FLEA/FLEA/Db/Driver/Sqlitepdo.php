@@ -15,92 +15,92 @@ class FLEA_Db_Driver_Sqlite
 	/**
 	 * 用于 genSeq()、dropSeq() 和 nextId() 的 SQL 查询语句
 	 */
-	var $NEXT_ID_SQL = "UPDATE %s SET id = LAST_INSERT_ID(id + 1)";
-	var $CREATE_SEQ_SQL = "CREATE TABLE %s (id INT NOT NULL)";
-	var $INIT_SEQ_SQL = "INSERT INTO %s VALUES (%s)";
-	var $DROP_SEQ_SQL = "DROP TABLE %s";
+	public $NEXT_ID_SQL = "UPDATE %s SET id = LAST_INSERT_ID(id + 1)";
+	public $CREATE_SEQ_SQL = "CREATE TABLE %s (id INT NOT NULL)";
+	public $INIT_SEQ_SQL = "INSERT INTO %s VALUES (%s)";
+	public $DROP_SEQ_SQL = "DROP TABLE %s";
 
 	/**
 	 * 用于描绘 true、false 和 null 的数据库值
 	 */
-	var $TRUE_VALUE = 1;
-	var $FALSE_VALUE = 0;
-	var $NULL_VALUE = 'NULL';
+	public $TRUE_VALUE = 1;
+	public $FALSE_VALUE = 0;
+	public $NULL_VALUE = 'NULL';
 
 	/**
 	 * 用于获取元数据的 SQL 查询语句
 	 */
-	var $META_COLUMNS_SQL = "SELECT sql FROM sqlite_master WHERE type='table' and name='%s'"; //sqlite 用这个表来保存数据库的SQL
+	public $META_COLUMNS_SQL = "SELECT sql FROM sqlite_master WHERE type='table' and name='%s'"; //sqlite 用这个表来保存数据库的SQL
 
 	/**
 	 * 数据库连接信息
 	 *
 	 * @var array
 	 */
-	var $dsn = null;
+	public $dsn = null;
 
 	/**
 	 * 数据库连接句柄
 	 *
 	 * @var resource
 	 */
-	var $conn = null;
+	public $conn = null;
 
 	/**
 	 * 所有 SQL 查询的日志
 	 *
 	 * @var array
 	 */
-	var $log = array();
+	public $log = [];
 
 	/**
 	 * 指示是否记录 SQL 语句（部署模式时该设置默认为 false）
 	 *
 	 * @var boolean
 	 */
-	var $enableLog = false;
+	public $enableLog = false;
 
 	/**
 	 * 最后一次数据库操作的错误信息
 	 *
 	 * @var mixed
 	 */
-	var $lasterr = null;
+	public $lasterr = null;
 
 	/**
 	 * 最后一次数据库操作的错误代码
 	 *
 	 * @var mixed
 	 */
-	var $lasterrcode = null;
+	public $lasterrcode = null;
 
 	/**
 	 * 最近一次插入操作或者 nextId() 操作返回的插入 ID
 	 *
 	 * @var mixed
 	 */
-	var $_insertId = null;
+	public $_insertId = null;
 
 	/**
 	 * 指示事务启动次数
 	 *
 	 * @var int
 	 */
-	var $_transCount = 0;
+	public $_transCount = 0;
 
 	/**
 	 * 指示事务是否提交
 	 *
 	 * @var boolean
 	 */
-	var $_transCommit = true;
+	public $_transCommit = true;
 
 	/**
 	 * 构造函数
 	 *
 	 * @param array $dsn
 	 */
-	function FLEA_Db_Driver_Sqlite( $dsn = false )
+	public function __construct( $dsn = false )
 	{
 		$tmp = ( array )$dsn;
 		unset( $tmp['password'] );
@@ -118,7 +118,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param array $dsn
 	 * @return boolean
 	 */
-	function connect( $dsn = false )
+	public function connect( $dsn = false )
 	{
 		$dsn = $dsn? $dsn : $this->dsn;
 		$this->conn = false;
@@ -136,15 +136,13 @@ class FLEA_Db_Driver_Sqlite
 			}
 		}
 
-		FLEA::loadClass( 'FLEA_Db_Exception_SqlQuery' );
-		__THROW( new FLEA_Db_Exception_SqlQuery( "connect('{$dsn['db']}') failed! debug message:" . $ex->getMessage() ) );
-		return false;
+		throw new FLEA_Db_Exception_SqlQuery( "connect('{$dsn['db']}') failed!");
 	}
 
 	/**
 	 * 关闭数据库连接
 	 */
-	function close()
+	public function close()
 	{
 		$this->conn = null;
 		$this->lasterr = null;
@@ -162,7 +160,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param boolean $throw 指示查询出错时是否抛出异常
 	 * @return resource |boolean
 	 */
-	function execute( $sql, $inputarr = null, $throw = true )
+	public function execute( $sql, $inputarr = null, $throw = true )
 	{
 		if ( substr( $sql, 0, 11 ) == "INSERT INTO" )
 		{
@@ -170,13 +168,13 @@ class FLEA_Db_Driver_Sqlite
 			$len1 = strpos( $sql, '(' );
 			$len2 = strpos( $sql, ')' );
 			$len3 = strpos( $sql, 'VALUES' );
-			$temp = array();
+			$temp = [];
 			if ( $len2 < $len3 )
 			{
 				$temp[] = substr( $sql, 0, $len1 );
 				$temp[] = substr( $sql, $len1, $len2 - $len1 );
 				$temp[] = substr( $sql, $len2 );
-				$temp[1] = eregi_replace( "[a-z_0-9]+\\.", "", $temp[1] );
+				$temp[1] = preg_replace( "/[a-z_0-9]+\\./i", "", $temp[1] );
 				$sql = implode( $temp );
 			}
 		}
@@ -204,9 +202,7 @@ class FLEA_Db_Driver_Sqlite
 			return false;
 		}
 
-		FLEA::loadClass( 'FLEA_Db_Exception_SqlQuery' );
-		__THROW( new FLEA_Db_Exception_SqlQuery( $sql, $this->lasterr[2], $this->lasterrcode ) );
-		return false;
+		throw new FLEA_Db_Exception_SqlQuery( $sql, $this->lasterr[2], $this->lasterrcode );
 	}
 
 	/**
@@ -215,7 +211,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param string $value
 	 * @return mixed
 	 */
-	function qstr( $value )
+	public function qstr( $value )
 	{
 		if ( is_bool( $value ) )
 		{
@@ -234,7 +230,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param string $tableName
 	 * @return string
 	 */
-	function qtable( $tableName )
+	public function qtable( $tableName )
 	{
 		return $tableName; //SQLite 对转换支持不是很好，经常出错
 	}
@@ -246,7 +242,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param string $tableName
 	 * @return string
 	 */
-	function qfield( $fieldName, $tableName = null )
+	public function qfield( $fieldName, $tableName = null )
 	{
 		$pos = strpos( $fieldName, '.' );
 		if ( $pos !== false )
@@ -285,13 +281,13 @@ class FLEA_Db_Driver_Sqlite
 	 * @param string $tableName
 	 * @return string
 	 */
-	function qfields( $fields, $tableName = null )
+	public function qfields( $fields, $tableName = null )
 	{
 		if ( !is_array( $fields ) )
 		{
 			$fields = explode( ',', $fields );
 		}
-		$return = array();
+		$return = [];
 		foreach ( $fields as $fieldName )
 		{
 			$fieldName = trim( $fieldName );
@@ -338,7 +334,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param string $startValue
 	 * @return int
 	 */
-	function nextId( $seqName = 'sdboseq', $startValue = 1 )
+	public function nextId( $seqName = 'sdboseq', $startValue = 1 )
 	{
 		$result = $this->execute( sprintf( $this->NEXT_ID_SQL, $seqName ), null, false );
 		if ( $result === false )
@@ -368,7 +364,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param int $startValue
 	 * @return boolean
 	 */
-	function createSeq( $seqName = 'sdboseq', $startValue = 1 )
+	public function createSeq( $seqName = 'sdboseq', $startValue = 1 )
 	{
 		if ( $this->execute( sprintf( $this->CREATE_SEQ_SQL, $seqName ) ) )
 		{
@@ -387,7 +383,7 @@ class FLEA_Db_Driver_Sqlite
 	 *
 	 * @param string $seqName
 	 */
-	function dropSeq( $seqName = 'sdboseq' )
+	public function dropSeq( $seqName = 'sdboseq' )
 	{
 		return $this->execute( sprintf( $this->DROP_SEQ_SQL, $seqName ) );
 	}
@@ -397,7 +393,7 @@ class FLEA_Db_Driver_Sqlite
 	 *
 	 * @return mixed
 	 */
-	function insertId()
+	public function insertId()
 	{
 		return $this->conn->lastInsertId();
 	}
@@ -407,7 +403,7 @@ class FLEA_Db_Driver_Sqlite
 	 *
 	 * @return int
 	 */
-	function affectedRows()
+	public function affectedRows()
 	{
 		return $this->conn->exec(); //这里仅对select有效
 	}
@@ -418,13 +414,13 @@ class FLEA_Db_Driver_Sqlite
 	 * @param resouce $res
 	 * @return array
 	 */
-	function fetchRow( $res )
+	public function fetchRow( $res )
 	{
 		$row = $res->fetch();
-		$temp = array();
+		$temp = [];
 		foreach( $row as $key => $value )
 		{
-			$key = eregi_replace( '^[a-z0-9_]+\.', '', $key );
+			$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
 			$temp[$key] = $value;
 		}
 		return $temp;
@@ -436,13 +432,13 @@ class FLEA_Db_Driver_Sqlite
 	 * @param resouce $res
 	 * @return array
 	 */
-	function fetchAssoc( $res )
+	public function fetchAssoc( $res )
 	{
 		$row = $res->fetch( PDO::FETCH_ASSOC );
-		$temp = array();
+		$temp = [];
 		foreach( $row as $key => $value )
 		{
-			$key = eregi_replace( '^[a-z0-9_]+\.', '', $key );
+			$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
 			$temp[$key] = $value;
 		}
 		return $temp;
@@ -454,7 +450,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param resource $res
 	 * @return boolean
 	 */
-	function freeRes( $res )
+	public function freeRes( $res )
 	{
 		// return sqlite_free_result($res);
 		return true; //sqlite 没有这样的函数
@@ -468,7 +464,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param int $offset
 	 * @return resource
 	 */
-	function selectLimit( $sql, $length = null, $offset = null )
+	public function selectLimit( $sql, $length = null, $offset = null )
 	{
 		if ( $offset !== null )
 		{
@@ -494,7 +490,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param string $ |resource $sql
 	 * @return array
 	 */
-	function & getAll( $sql )
+	public function getAll( $sql )
 	{
 		if ( is_object( $sql ) )
 		{
@@ -504,13 +500,13 @@ class FLEA_Db_Driver_Sqlite
 		{
 			$res = $this->execute( $sql );
 		}
-		$data = array();
+		$data = [];
 		while ( $row = $res->fetch( PDO::FETCH_ASSOC ) )
 		{
-			$temp = array();
+			$temp = [];
 			foreach( $row as $key => $value )
 			{
-				$key = eregi_replace( '^[a-z0-9_]+\.', '', $key );
+				$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
 				$temp[$key] = $value;
 			}
 			$data[] = $temp;
@@ -528,7 +524,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param string $ |int|boolean $groupBy
 	 * @return array
 	 */
-	function & getAllGroupBy( $sql, $groupBy )
+	public function getAllGroupBy( $sql, $groupBy )
 	{
 		if ( is_object( $sql ) )
 		{
@@ -538,15 +534,15 @@ class FLEA_Db_Driver_Sqlite
 		{
 			$res = $this->execute( $sql );
 		}
-		$data = array();
+		$data = [];
 
 		$row = $res->fetch( PDO::FETCH_ASSOC );
 		if ( $row != false )
 		{
-			$temp = array();
+			$temp = [];
 			foreach( $row as $key => $value )
 			{
-				$key = eregi_replace( '^[a-z0-9_]+\.', '', $key );
+				$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
 				$temp[$key] = $value;
 			}
 			$row = $temp;
@@ -574,7 +570,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param array $reference
 	 * @return array
 	 */
-	function getAllWithFieldRefs( $sql, $field, & $fieldValues, & $reference )
+	public function getAllWithFieldRefs( $sql, $field, & $fieldValues, & $reference )
 	{
 		if ( is_object( $sql ) )
 		{
@@ -585,16 +581,16 @@ class FLEA_Db_Driver_Sqlite
 			$res = $this->execute( $sql );
 		}
 
-		$fieldValues = array();
-		$reference = array();
+		$fieldValues = [];
+		$reference = [];
 		$offset = 0;
-		$data = array();
+		$data = [];
 		while ( $row = $res->fetch( PDO::FETCH_ASSOC ) )
 		{
-			$temp = array();
+			$temp = [];
 			foreach( $row as $key => $value )
 			{
-				$key = eregi_replace( '^[a-z0-9_]+\.', '', $key );
+				$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
 				$temp[$key] = $value;
 			}
 			$row = $temp;
@@ -618,7 +614,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param string $refKeyName
 	 * @param mixed $limit
 	 */
-	function assemble( $sql, & $assocRowset, $mappingName, $oneToOne, $refKeyName, $limit = null )
+	public function assemble( $sql, & $assocRowset, $mappingName, $oneToOne, $refKeyName, $limit = null )
 	{
 		if ( is_object( $sql ) )
 		{
@@ -650,10 +646,10 @@ class FLEA_Db_Driver_Sqlite
 			// 一对一组装数据
 			while ( $row = $res->fetch( PDO::FETCH_ASSOC ) )
 			{
-				$temp = array();
+				$temp = [];
 				foreach( $row as $key => $value )
 				{
-					$key = eregi_replace( '^[a-z0-9_]+\.', '', $key );
+					$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
 					$temp[$key] = $value;
 				}
 				$row = $temp;
@@ -669,10 +665,10 @@ class FLEA_Db_Driver_Sqlite
 			{
 				$rkv = $row[$refKeyName];
 				unset( $row[$refKeyName] );
-				$temp = array();
+				$temp = [];
 				foreach( $row as $key => $value )
 				{
-					$key = eregi_replace( '^[a-z0-9_]+\.', '', $key );
+					$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
 					$temp[$key] = $value;
 				}
 				$assocRowset[$rkv][$mappingName][] = $temp;
@@ -686,7 +682,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param string $ |resource $sql
 	 * @return mixed
 	 */
-	function getOne( $sql )
+	public function getOne( $sql )
 	{
 		if ( is_object( $sql ) )
 		{
@@ -707,7 +703,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param string $ |resource $sql
 	 * @return mixed
 	 */
-	function & getRow( $sql )
+	public function getRow( $sql )
 	{
 		if ( is_object( $sql ) )
 		{
@@ -718,10 +714,10 @@ class FLEA_Db_Driver_Sqlite
 			$res = $this->execute( $sql );
 		}
 		$row = $res->fetch( PDO::FETCH_ASSOC );
-		$temp = array();
+		$temp = [];
 		foreach( $row as $key => $value )
 		{
-			$key = eregi_replace( '^[a-z0-9_]+\.', '', $key );
+			$key = preg_replace( '/^[a-z0-9_]+\.|^/i', '', $key );
 			$temp[$key] = $value;
 		}
 		return $temp;
@@ -734,7 +730,7 @@ class FLEA_Db_Driver_Sqlite
 	 * @param int $col 要返回的列，0 为第一列
 	 * @return mixed
 	 */
-	function & getCol( $sql, $col = 0 )
+	public function getCol( $sql, $col = 0 )
 	{
 		if ( is_object( $sql ) )
 		{
@@ -744,7 +740,7 @@ class FLEA_Db_Driver_Sqlite
 		{
 			$res = $this->execute( $sql );
 		}
-		$data = array();
+		$data = [];
 		while ( $row = $res->fetch( PDO::FETCH_NUM ) )
 		{
 			$data[] = $row[$col];
@@ -775,7 +771,7 @@ defaultValue:    默认值
 	 * @param string $table
 	 * @return array
 	 */
-	function & metaColumns( $table )
+	public function metaColumns( $table )
 	{
 		/**
 		 * C 长度小于等于 250 的字符串
@@ -833,7 +829,7 @@ I 整数
 		{
 			return false;
 		}
-		$retarr = array();
+		$retarr = [];
 		$sql = $rs->fetch( PDO::FETCH_NUM );
 		$sql = $sql[0];
 		$firstPar = strpos( $sql, '(' );
@@ -853,7 +849,7 @@ I 整数
 		$sql = str_replace( "\n", '', $sql );
 		$sql = str_replace( "'", '', $sql );
 		$temp = explode( ',', $sql );
-		$index = array();
+		$index = [];
 		foreach ( $temp as $value )
 		{
 			$value = trim( $value );
@@ -863,10 +859,10 @@ I 整数
 			}
 		}
 
-		while ( list( $ligneNum, $cont ) = each( $ligne ) )
+		foreach ( $ligne as $ligneNum => $cont )
 		{
 			$row = explode( ' ', trim( $cont ) );
-			$field = array();
+			$field = [];
 			$field['name'] = $row[0];
 			$type = $row[1];
 			$field['scale'] = null;
@@ -899,7 +895,7 @@ I 整数
 				$field['simpleType'] = 'X';
 			}
 
-			$temp = eregi( 'PRIMARY[[:space:]]KEY', $cont );
+			$temp = preg_match( '/PRIMARY[[:space:]]KEY/i', $cont );
 			$field['primaryKey'] = $temp || $index[$row[0]];
 			$field['notNull'] = $field['primaryKey'] || ( strtoupper( $row[2] ) == 'NOT' );
 			$field['autoIncrement'] = $temp;
@@ -933,7 +929,7 @@ I 整数
 	 *
 	 * @param int $timestamp
 	 */
-	function dbTimeStamp( $timestamp )
+	public function dbTimeStamp( $timestamp )
 	{
 		return date( 'Y-m-d H:i:s', $timestamp );
 	}
@@ -941,7 +937,7 @@ I 整数
 	/**
 	 * 启动事务
 	 */
-	function startTrans()
+	public function startTrans()
 	{
 		$this->_transCount += 1;
 		try{
@@ -960,7 +956,7 @@ I 整数
 	 *
 	 * @param  $commitOnNoErrors 指示在没有错误时是否提交事务
 	 */
-	function completeTrans( $commitOnNoErrors = true )
+	public function completeTrans( $commitOnNoErrors = true )
 	{
 		if ( $this->_transCount < 1 )
 		{
@@ -986,7 +982,7 @@ I 整数
 	/**
 	 * 强制指示在调用 completeTrans() 时回滚事务
 	 */
-	function failTrans()
+	public function failTrans()
 	{
 		$this->_transCommit = true;
 	}
@@ -994,7 +990,7 @@ I 整数
 	/**
 	 * 反复事务是否失败的状态
 	 */
-	function hasFailedTrans()
+	public function hasFailedTrans()
 	{
 		if ( $this->_transCount > 0 )
 		{
@@ -1010,7 +1006,7 @@ I 整数
 	 * @param array $inputarr
 	 * @return string
 	 */
-	function _prepareSql( $sql, & $inputarr )
+	protected function _prepareSql( $sql, & $inputarr )
 	{
 		$sqlarr = explode( '?', $sql );
 		$sql = '';

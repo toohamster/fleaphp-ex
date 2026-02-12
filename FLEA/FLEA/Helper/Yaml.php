@@ -43,11 +43,10 @@
  */
 function load_yaml($filename, $cacheEnabled = true, $replace = null)
 {
-    static $objects = array();
+    static $objects = [];
 
     if (!file_exists($filename)) {
-        FLEA::loadClass('FLEA_Exception_ExpectedFile');
-        return __THROW(new FLEA_Exception_ExpectedFile($filename));
+        throw new FLEA_Exception_ExpectedFile($filename);
     }
     
     if ($cacheEnabled) {
@@ -57,7 +56,7 @@ function load_yaml($filename, $cacheEnabled = true, $replace = null)
 
     if (!isset($objects[0])) {
         require_once FLEA_3RD_DIR . '/Spyc/spyc.php';
-        $objects[0] =& new Spyc();
+        $objects[0] = new Spyc();
     }
     
     $arr = $objects[0]->load($filename, $replace);

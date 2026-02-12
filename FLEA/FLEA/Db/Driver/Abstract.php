@@ -1,18 +1,9 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
 
 /**
  * 定义 FLEA_Db_Driver_Abstract 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Abstract.php 1025 2008-01-09 04:17:59Z qeeyuan $
  */
@@ -39,149 +30,149 @@ define('DBO_PARAM_AT_NAMED',    '@');
  * FLEA_Db_Driver_Abstract 是所有数据库驱动的抽象基础类
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.1
  */
-class FLEA_Db_Driver_Abstract
+abstract class FLEA_Db_Driver_Abstract
 {
     /**
      * 用于描绘 true、false 和 null 的数据库值
      */
-    var $TRUE_VALUE  = 1;
-    var $FALSE_VALUE = 0;
-    var $NULL_VALUE = 'NULL';
+    public $TRUE_VALUE  = 1;
+    public $FALSE_VALUE = 0;
+    public $NULL_VALUE = 'NULL';
 
     /**
      * 用于 genSeq()、dropSeq() 和 nextId() 的 SQL 查询语句
      */
-    var $NEXT_ID_SQL    = null;
-    var $CREATE_SEQ_SQL = null;
-    var $INIT_SEQ_SQL   = null;
-    var $DROP_SEQ_SQL   = null;
+    public $NEXT_ID_SQL    = null;
+    public $CREATE_SEQ_SQL = null;
+    public $INIT_SEQ_SQL   = null;
+    public $DROP_SEQ_SQL   = null;
 
     /**
      * 用于获取元数据的 SQL 查询语句
      */
-    var $META_COLUMNS_SQL = null;
+    public $META_COLUMNS_SQL = null;
 
     /**
      * 指示使用何种样式的参数占位符
      *
      * @var int
      */
-    var $PARAM_STYLE = DBO_PARAM_QM;
+    public $PARAM_STYLE = DBO_PARAM_QM;
 
     /**
      * 指示数据库是否有自增字段功能
      *
      * @var boolean
      */
-    var $HAS_INSERT_ID  = false;
+    public $HAS_INSERT_ID  = false;
 
     /**
      * 指示数据库是否能获得更新、删除操作影响的记录行数量
      *
      * @var boolean
      */
-    var $HAS_AFFECTED_ROWS = false;
+    public $HAS_AFFECTED_ROWS = false;
 
     /**
      * 指示数据库是否支持事务
      *
      * @var boolean
      */
-    var $HAS_TRANSACTION = false;
+    public $HAS_TRANSACTION = false;
 
     /**
      * 指示数据库是否支持事务中的 SAVEPOINT 功能
      *
      * @var boolean
      */
-    var $HAS_SAVEPOINT = false;
+    public $HAS_SAVEPOINT = false;
 
     /**
      * 指示是否将查询结果中的字段名转换为全小写
      *
      * @var boolean
      */
-    var $RESULT_FIELD_NAME_LOWER = false;
+    public $RESULT_FIELD_NAME_LOWER = false;
 
     /**
      * 数据库连接信息
      *
      * @var array
      */
-    var $dsn = null;
+    public $dsn = null;
 
     /**
      * 数据库连接句柄
      *
      * @var resource
      */
-    var $conn = null;
+    public $conn = null;
 
     /**
      * 所有 SQL 查询的日志
      *
      * @var array
      */
-    var $log = array();
+    public $log = [];
 
     /**
      * 执行的查询计数
      *
      * @var int
      */
-    var $querycount = 0;
+    public $querycount = 0;
 
     /**
      * 最后一次数据库操作的错误信息
      *
      * @var mixed
      */
-    var $lasterr = null;
+    public $lasterr = null;
 
     /**
      * 最后一次数据库操作的错误代码
      *
      * @var mixed
      */
-    var $lasterrcode = null;
+    public $lasterrcode = null;
 
     /**
      * 最近一次插入操作或者 nextId() 操作返回的插入 ID
      *
      * @var mixed
      */
-    var $_insertId = null;
+    protected $_insertId = null;
 
     /**
      * 指示事务启动次数
      *
      * @var int
      */
-    var $_transCount = 0;
+    protected $_transCount = 0;
 
     /**
      * 指示事务执行期间是否发生了错误
      *
      * @var boolean
      */
-    var $_hasFailedQuery = false;
+    protected $_hasFailedQuery = false;
 
     /**
      * SAVEPOINT 堆栈
      *
      * @var array
      */
-    var $_savepointStack = array();
+    protected $_savepointStack = [];
 
     /**
      * 构造函数
      *
      * @param array $dsn
      */
-    function FLEA_Db_Driver_Abstract($dsn = null)
+    public function __construct(?array $dsn = null)
     {
         $tmp = (array)$dsn;
         unset($tmp['password']);
@@ -199,14 +190,12 @@ class FLEA_Db_Driver_Abstract
      *
      * @return boolean
      */
-    function connect($dsn = false)
-    {
-    }
+    abstract public function connect($dsn = false): bool;
 
     /**
      * 关闭数据库连接
      */
-    function close()
+    public function close(): void
     {
         $this->conn = null;
         $this->lasterr = null;
@@ -223,9 +212,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return boolean
      */
-    function selectDb($database)
-    {
-    }
+    abstract public function selectDb(string $database): bool;
 
     /**
      * 执行一个查询，返回一个 resource 或者 boolean 值
@@ -236,9 +223,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return resource|boolean
      */
-    function execute($sql, $inputarr = null, $throw = true)
-    {
-    }
+    abstract public function execute(string $sql, ?array $inputarr = null, bool $throw = true);
 
     /**
      * 转义字符串
@@ -247,9 +232,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return mixed
      */
-    function qstr($value)
-    {
-    }
+    abstract public function qstr($value): string;
 
     /**
      * 按照指定的类型，返回值
@@ -259,7 +242,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return mixed
      */
-    function setValueByType($value, $type)
+    public function setValueByType($value, string $type): string
     {
         /**
          *  C CHAR 或 VARCHAR 类型字段
@@ -292,9 +275,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return string
      */
-    function qtable($tableName, $schema = null)
-    {
-    }
+    abstract public function qtable(string $tableName, ?string $schema = null): string;
 
     /**
      * 将字段名转换为完全限定名，避免因为字段名和数据库关键词相同导致的错误
@@ -305,9 +286,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return string
      */
-    function qfield($fieldName, $tableName = null, $schema = null)
-    {
-    }
+    abstract public function qfield(string $fieldName, ?string $tableName = null, ?string $schema = null): string;
 
     /**
      * 一次性将多个字段名转换为完全限定名
@@ -319,13 +298,13 @@ class FLEA_Db_Driver_Abstract
      *
      * @return string
      */
-    function qfields($fields, $tableName = null, $schema = null, $returnArray = false)
+    public function qfields($fields, ?string $tableName = null, ?string $schema = null, bool $returnArray = false)
     {
         if (!is_array($fields)) {
             $fields = explode(',', $fields);
             $fields = array_map('trim', $fields);
         }
-        $return = array();
+        $return = [];
         foreach ($fields as $fieldName) {
             $return[] = $this->qfield($fieldName, $tableName, $schema);
         }
@@ -340,7 +319,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return int
      */
-    function nextId($seqName = 'sdbo_seq', $startValue = 1)
+    public function nextId(string $seqName = 'sdbo_seq', int $startValue = 1)
     {
         $getNextIdSql = sprintf($this->NEXT_ID_SQL, $seqName);
         $result = $this->execute($getNextIdSql, null, false);
@@ -369,7 +348,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return boolean
      */
-    function createSeq($seqName = 'sdbo_seq', $startValue = 1)
+    public function createSeq(string $seqName = 'sdbo_seq', int $startValue = 1): bool
     {
         if ($this->execute(sprintf($this->CREATE_SEQ_SQL, $seqName))) {
             return $this->execute(sprintf($this->INIT_SEQ_SQL, $seqName, $startValue - 1));
@@ -385,7 +364,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @param string $seqName
      */
-    function dropSeq($seqName = 'sdbo_seq')
+    public function dropSeq(string $seqName = 'sdbo_seq'): bool
     {
         return $this->execute(sprintf($this->DROP_SEQ_SQL, $seqName));
     }
@@ -395,7 +374,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return mixed
      */
-    function insertId()
+    public function insertId()
     {
         return $this->HAS_INSERT_ID ? $this->_insertId() : $this->_insertId;
     }
@@ -405,7 +384,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return int
      */
-    function affectedRows()
+    public function affectedRows(): int
     {
         return $this->HAS_AFFECTED_ROWS ? $this->_affectedRows() : false;
     }
@@ -417,9 +396,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function fetchRow($res)
-    {
-    }
+    abstract public function fetchRow($res): ?array;
 
     /**
      * 从记录集中返回一行数据，字段名作为键名
@@ -428,9 +405,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function fetchAssoc($res)
-    {
-    }
+    abstract public function fetchAssoc($res): ?array;
 
     /**
      * 释放查询句柄
@@ -439,9 +414,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return boolean
      */
-    function freeRes($res)
-    {
-    }
+    abstract public function freeRes($res): bool;
 
     /**
      * 进行限定记录集的查询
@@ -452,9 +425,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return resource
      */
-    function selectLimit($sql, $length = null, $offset = null)
-    {
-    }
+    abstract public function selectLimit(string $sql, ?int $length = null, ?int $offset = null);
 
     /**
      * 执行一个查询，返回查询结果记录集、指定字段的值集合以及以该字段值分组后的记录集
@@ -466,13 +437,13 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function getAllWithFieldRefs($sql, $field, & $fieldValues, & $reference)
+    public function getAllWithFieldRefs($sql, string $field, array &$fieldValues, array &$reference): ?array
     {
         $res = is_resource($sql) ? $sql : $this->execute($sql);
-        $fieldValues = array();
-        $reference = array();
+        $fieldValues = [];
+        $reference = [];
         $offset = 0;
-        $data = array();
+        $data = [];
 
         while ($row = $this->fetchAssoc($res)) {
             $fieldValue = $row[$field];
@@ -496,7 +467,7 @@ class FLEA_Db_Driver_Abstract
      * @param string $refKeyName
      * @param mixed $limit
      */
-    function assemble($sql, & $assocRowset, $mappingName, $oneToOne, $refKeyName, $limit = null)
+    public function assemble(string $sql, array &$assocRowset, string $mappingName, bool $oneToOne, string $refKeyName, $limit = null): void
     {
         if (is_resource($sql)) {
             $res = $sql;
@@ -539,10 +510,10 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function & getAll($sql)
+    public function getAll($sql): ?array
     {
         $res = is_resource($sql) ? $sql : $this->execute($sql);
-        $rowset = array();
+        $rowset = [];
         while ($row = $this->fetchAssoc($res)) {
             $rowset[] = $row;
         }
@@ -557,7 +528,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return mixed
      */
-    function getOne($sql)
+    public function getOne(string $sql)
     {
         $res = is_resource($sql) ? $sql : $this->execute($sql);
         $row = $this->fetchRow($res);
@@ -572,7 +543,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return mixed
      */
-    function & getRow($sql)
+    public function getRow(string $sql): ?array
     {
         $res = is_resource($sql) ? $sql : $this->execute($sql);
         $row = $this->fetchAssoc($res);
@@ -588,10 +559,10 @@ class FLEA_Db_Driver_Abstract
      *
      * @return mixed
      */
-    function & getCol($sql, $col = 0)
+    public function getCol(string $sql, int $col = 0): array
     {
         $res = is_resource($sql) ? $sql : $this->execute($sql);
-        $data = array();
+        $data = [];
         while ($row = $this->fetchRow($res)) {
             $data[] = $row[$col];
         }
@@ -610,14 +581,14 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function & getAllGroupBy($sql, & $groupBy)
+    public function getAllGroupBy(string $sql, array &$groupBy): array
     {
         if (is_resource($sql)) {
             $res = $sql;
         } else {
             $res = $this->execute($sql);
         }
-        $data = array();
+        $data = [];
         $row = $this->fetchAssoc($res);
         if ($row != false) {
             if ($groupBy === true) {
@@ -657,9 +628,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function & metaColumns($table)
-    {
-    }
+    abstract public function metaColumns(string $table);
 
     /**
      * 获得所有数据表的名称
@@ -669,16 +638,14 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function metaTables($pattern = null, $schema = null)
-    {
-    }
+    abstract public function metaTables(?string $pattern = null, ?string $schema = null): array;
 
     /**
      * 返回数据库可以接受的日期格式
      *
      * @param int $timestamp
      */
-    function dbTimeStamp($timestamp)
+    public function dbTimeStamp(?int $timestamp = null): string
     {
         return date('Y-m-d H:i:s', $timestamp);
     }
@@ -686,7 +653,7 @@ class FLEA_Db_Driver_Abstract
     /**
      * 启动事务
      */
-    function startTrans()
+    public function startTrans(): bool
     {
         if (!$this->HAS_TRANSACTION) { return false; }
         if ($this->_transCount == 0) {
@@ -707,12 +674,12 @@ class FLEA_Db_Driver_Abstract
      * 如果 $commitOnNoErrors 参数为 true，当事务中所有查询都成功完成时，则提交事务，否则回滚事务
      * 如果 $commitOnNoErrors 参数为 false，则强制回滚事务
      *
-     * @param $commitOnNoErrors 指示在没有错误时是否提交事务
+     * @param bool $commitOnNoErrors 指示在没有错误时是否提交事务
      */
-    function completeTrans($commitOnNoErrors = true)
+    public function completeTrans(bool $commitOnNoErrors = true): bool
     {
         if (!$this->HAS_TRANSACTION) { return false; }
-        if ($this->_transCount == 0) { return; }
+        if ($this->_transCount == 0) { return true; }
         $this->_transCount--;
         if ($this->_transCount > 0 && $this->HAS_SAVEPOINT) {
             $savepoint = array_pop($this->_savepointStack);
@@ -727,7 +694,7 @@ class FLEA_Db_Driver_Abstract
     /**
      * 强制指示在调用 completeTrans() 时回滚事务
      */
-    function failTrans()
+    public function failTrans(): void
     {
         $this->_hasFailedQuery = true;
     }
@@ -735,7 +702,7 @@ class FLEA_Db_Driver_Abstract
     /**
      * 返回事务是否失败的状态
      */
-    function hasFailedTrans()
+    public function hasFailedTrans(): bool
     {
         return $this->HAS_TRANSACTION ? $this->_hasFailedQuery : false;
     }
@@ -748,7 +715,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return string
      */
-    function bind($sql, & $inputarr)
+    public function bind(string $sql, array &$inputarr): string
     {
         $arr = explode('?', $sql);
         $sql = array_shift($arr);
@@ -769,7 +736,7 @@ class FLEA_Db_Driver_Abstract
      *
      * @return string
      */
-    function getInsertSQL(& $row, $table, $schema = null)
+    public function getInsertSQL(array &$row, string $table, ?string $schema = null): string
     {
         list($holders, $values) = $this->getPlaceholder($row);
         $holders = implode(',', $holders);
@@ -779,11 +746,11 @@ class FLEA_Db_Driver_Abstract
         return $sql;
     }
 
-    function getUpdateSQL(& $row, $pk, $table, $schema = null)
+    public function getUpdateSQL(array &$row, $pk, string $table, ?string $schema = null): string
     {
         $pkv = $row[$pk];
         unset($row[$pk]);
-        list($pairs, $values) = $this->getPlaceholderPair($row);
+        [$pairs, ] = $this->getPlaceholderPair($row);
         $row[$pk] = $pkv;
         $pairs = implode(',', $pairs);
         $table = $this->qtable($table, $schema);
@@ -796,14 +763,14 @@ class FLEA_Db_Driver_Abstract
      * 根据驱动的参数占位符样式，返回包含参数占位符及有效数据的数组
      *
      * @param array $inputarr
-     * @param array $fields
+     * @param array|null $fields
      *
      * @return array
      */
-    function getPlaceholder(& $inputarr, $fields = null)
+    public function getPlaceholder(array &$inputarr, $fields = null): string
     {
-        $holders = array();
-        $values = array();
+        $holders = [];
+        $values = [];
         if (is_array($fields)) {
             $fields = array_change_key_case(array_flip($fields), CASE_LOWER);
             foreach (array_keys($inputarr) as $key) {
@@ -836,10 +803,10 @@ class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    function getPlaceholderPair(& $inputarr, $fields = null)
+    public function getPlaceholderPair(array &$inputarr, $fields = null): string
     {
-        $pairs = array();
-        $values = array();
+        $pairs = [];
+        $values = [];
         if (is_array($fields)) {
             $fields = array_change_key_case(array_flip($fields), CASE_LOWER);
             foreach (array_keys($inputarr) as $key) {

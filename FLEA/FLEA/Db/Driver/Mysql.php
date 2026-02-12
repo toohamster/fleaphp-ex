@@ -1,56 +1,68 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * 定义 FLEA_Db_Driver_Mysql 驱动
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Mysql.php 1077 2008-05-14 17:44:19Z dualface $
+ * Updated: Converted to PDO for PHP 7.4 compatibility
  */
 
-// {{{ includes
-FLEA::loadClass('FLEA_Db_Driver_Abstract');
-// }}}
 
 /**
- * 用于 mysql 扩展的数据库驱动程序
+ * 用于 PDO MySQL 的数据库驱动程序
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
- * @version 1.1
+ * @author toohamster
+ * @version 2.0
  */
 class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
 {
-    var $NEXT_ID_SQL    = 'UPDATE %s SET id = LAST_INSERT_ID(id + 1)';
-    var $CREATE_SEQ_SQL = 'CREATE TABLE %s (id INT NOT NULL)';
-    var $INIT_SEQ_SQL   = 'INSERT INTO %s VALUES (%s)';
-    var $DROP_SEQ_SQL   = 'DROP TABLE %s';
-    var $META_COLUMNS_SQL = 'SHOW FULL COLUMNS FROM %s';
-    var $PARAM_STYLE = DBO_PARAM_QM;
-    var $HAS_INSERT_ID  = true;
-    var $HAS_AFFECTED_ROWS = true;
-    var $_mysqlVersion = null;
+    /**
+     * @var string
+     */
+    public $NEXT_ID_SQL    = 'UPDATE %s SET id = LAST_INSERT_ID(id + 1)';
+    public $CREATE_SEQ_SQL = 'CREATE TABLE %s (id INT NOT NULL)';
+    public $INIT_SEQ_SQL   = 'INSERT INTO %s VALUES (%s)';
+    public $DROP_SEQ_SQL   = 'DROP TABLE %s';
+    public $META_COLUMNS_SQL = 'SHOW FULL COLUMNS FROM %s';
+    public $PARAM_STYLE = DBO_PARAM_QM;
+    public $HAS_INSERT_ID  = true;
+    public $HAS_AFFECTED_ROWS = true;
+    /**
+     * @var PDO|null
+     */
+    protected $pdo = null;
+    /**
+     * @var PDOStatement|null
+     */
+    protected $lastStmt = null;
+    /**
+     * @var string|null
+     */
+    protected $_mysqlVersion = null;
 
-    function connect($dsn = false)
+    /**
+     * Connect to database using PDO
+     *
+     * @param array|false $dsn
+     * @return bool
+     * @throws FLEA_Db_Exception_SqlQuery
+     */
+    public function connect($dsn = false): bool
     {
         $this->lasterr = null;
         $this->lasterrcode = null;
 
-        if ($this->conn && $dsn == false) { return true; }
+        if ($this->pdo && $dsn == false) { return true; }
         if (!$dsn) {
             $dsn = $this->dsn;
         } else {
             $this->dsn = $dsn;
         }
+
         if (isset($dsn['port']) && $dsn['port'] != '') {
             $host = $dsn['host'] . ':' . $dsn['port'];
         } else {
@@ -58,121 +70,236 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
         }
         if (!isset($dsn['login'])) { $dsn['login'] = ''; }
         if (!isset($dsn['password'])) { $dsn['password'] = ''; }
-        if (!empty($dsn['options'])) {
-            $this->conn = mysql_connect($host, $dsn['login'], $dsn['password'], false, $dsn['options']);
-        } else {
-            $this->conn = mysql_connect($host, $dsn['login'], $dsn['password']);
-        }
 
-        if (!$this->conn) {
-            FLEA::loadClass('FLEA_Db_Exception_SqlQuery');
-            return __THROW(new FLEA_Db_Exception_SqlQuery("mysql_connect('{$host}', '{$dsn['login']}') failed!", mysql_error(), mysql_errno()));
-        }
+        try {
+            $charset = isset($dsn['charset']) && $dsn['charset'] != '' ? $dsn['charset'] : FLEA::getAppInf('databaseCharset');
 
-        if (!empty($dsn['database'])) {
-            if (!$this->selectDb($dsn['database'])) { return false; }
-        }
+            $dsnString = "mysql:host={$host}";
+            if (!empty($dsn['database'])) {
+                $dsnString .= ";dbname={$dsn['database']}";
+            }
+            if (!empty($charset)) {
+                $dsnString .= ";charset={$charset}";
+            }
 
-        $this->_mysqlVersion = $this->getOne('SELECT VERSION()');
-        if (isset($dsn['charset']) && $dsn['charset'] != '') {
-            $charset = $dsn['charset'];
-        } else {
-            $charset = FLEA::getAppInf('databaseCharset');
-        }
-        if ($this->_mysqlVersion >= '4.1' && $charset != '') {
-            if (!$this->execute("SET NAMES '" . $charset . "'")) { return false; }
+            $options = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+            ];
+
+            if (!empty($dsn['options'])) {
+                $options = array_merge($options, $dsn['options']);
+            }
+
+            $this->pdo = new PDO($dsnString, $dsn['login'], $dsn['password'], $options);
+
+            // Set charset explicitly for older MySQL versions
+            if (!empty($charset)) {
+                $this->pdo->exec("SET NAMES '{$charset}'");
+            }
+
+            // Store connection in conn for compatibility
+            $this->conn = $this->pdo;
+
+            $this->_mysqlVersion = $this->getOne('SELECT VERSION()');
+
+        } catch (PDOException $e) {
+            $this->lasterr = $e->getMessage();
+            $this->lasterrcode = $e->getCode();
+            throw new FLEA_Db_Exception_SqlQuery(
+                "PDO Connection failed for host '{$host}'!",
+                $this->lasterr,
+                $this->lasterrcode
+            );
         }
 
         return true;
     }
 
-    function close()
+    /**
+     * Close database connection
+     *
+     * @return void
+     */
+    public function close(): void
     {
-        if ($this->conn) { mysql_close($this->conn); }
+        $this->pdo = null;
+        $this->conn = null;
+        $this->lastStmt = null;
         parent::close();
     }
 
-    function selectDb($database)
+    /**
+     * Select database
+     *
+     * @param string $database
+     * @return bool
+     * @throws FLEA_Db_Exception_SqlQuery
+     */
+    public function selectDb(string $database): bool
     {
-        if (!mysql_select_db($database, $this->conn)) {
-            FLEA::loadClass('FLEA_Db_Exception_SqlQuery');
-            return __THROW(new FLEA_Db_Exception_SqlQuery("SELECT DATABASE: '{$database}' FAILED!", mysql_error($this->conn), mysql_errno($this->conn)));
+        try {
+            $this->pdo->exec("USE `{$database}`");
+            return true;
+        } catch (PDOException $e) {
+            $this->lasterr = $e->getMessage();
+            $this->lasterrcode = $e->getCode();
+            throw new FLEA_Db_Exception_SqlQuery(
+                "SELECT DATABASE: '{$database}' FAILED!",
+                $this->lasterr,
+                $this->lasterrcode
+            );
         }
-        return true;
     }
 
-    function execute($sql, $inputarr = null, $throw = true)
+    /**
+     * Execute SQL query
+     *
+     * @param string $sql
+     * @param array|null $inputarr
+     * @param bool $throw
+     * @return PDOStatement|false
+     */
+    public function execute(string $sql, ?array $inputarr = null, bool $throw = true)
     {
         if (is_array($inputarr)) {
             $sql = $this->bind($sql, $inputarr);
         }
+
         if ($this->enableLog) {
             $this->log[] = $sql;
             log_message("sql: {$sql}", 'debug');
         }
 
         $this->querycount++;
-        $result = mysql_query($sql, $this->conn);
-        if ($result !== false) {
-            $this->lasterr = null;
-            $this->lasterrcode = null;
-            return $result;
-        }
-        $this->lasterr = mysql_error($this->conn);
-        $this->lasterrcode = mysql_errno($this->conn);
 
-        if ($throw) {
-            FLEA::loadClass('FLEA_Db_Exception_SqlQuery');
-            __THROW(new FLEA_Db_Exception_SqlQuery($sql, $this->lasterr, $this->lasterrcode));
+        try {
+            $stmt = $this->pdo->query($sql);
+            if ($stmt !== false) {
+                $this->lasterr = null;
+                $this->lasterrcode = null;
+                $this->lastStmt = $stmt;
+                return $stmt;
+            }
+        } catch (PDOException $e) {
+            $this->lasterr = $e->getMessage();
+            $this->lasterrcode = $e->getCode();
+
+            if ($throw) {
+                throw new FLEA_Db_Exception_SqlQuery($sql, $this->lasterr, $this->lasterrcode);
+            }
         }
+
         return false;
     }
 
-    function qstr($value)
+    /**
+     * Quote string for safe SQL usage
+     *
+     * @param mixed $value
+     * @return string|int|float
+     */
+    public function qstr($value)
     {
         if (is_int($value) || is_float($value)) { return $value; }
         if (is_bool($value)) { return $value ? $this->TRUE_VALUE : $this->FALSE_VALUE; }
         if (is_null($value)) { return $this->NULL_VALUE; }
-        return "'" . mysql_real_escape_string($value, $this->conn) . "'";
+        return $this->pdo->quote($value);
     }
 
-    function qtable($tableName, $schema = null)
+    /**
+     * Quote table name
+     *
+     * @param string $tableName
+     * @param string|null $schema
+     * @return string
+     */
+    public function qtable(string $tableName, ?string $schema = null): string
     {
         return $schema != '' ? "`{$schema}`.`{$tableName}`" : "`{$tableName}`";
     }
 
-    function qfield($fieldName, $tableName = null, $schema = null)
+    /**
+     * Quote field name
+     *
+     * @param string $fieldName
+     * @param string|null $tableName
+     * @param string|null $schema
+     * @return string
+     */
+    public function qfield(string $fieldName, ?string $tableName = null, ?string $schema = null): string
     {
         $fieldName = ($fieldName == '*') ? '*' : "`{$fieldName}`";
         return $tableName != '' ? $this->qtable($tableName, $schema) . '.' . $fieldName : $fieldName;
     }
 
-    function _insertId()
+    /**
+     * Get last insert ID
+     *
+     * @return string|int
+     */
+    protected function _insertId()
     {
-        return mysql_insert_id($this->conn);
+        return $this->pdo->lastInsertId();
     }
 
-    function _affectedRows()
+    /**
+     * Get affected rows count
+     *
+     * @return int
+     */
+    protected function _affectedRows(): int
     {
-        return mysql_affected_rows($this->conn);
+        if ($this->lastStmt) {
+            return $this->lastStmt->rowCount();
+        }
+        return 0;
     }
 
-    function fetchRow($res)
+    /**
+     * Fetch row as indexed array
+     *
+     * @param PDOStatement $res
+     * @return array|false
+     */
+    public function fetchRow(PDOStatement $res)
     {
-        return mysql_fetch_row($res);
+        return $res->fetch(PDO::FETCH_NUM);
     }
 
-    function fetchAssoc($res)
+    /**
+     * Fetch row as associative array
+     *
+     * @param PDOStatement $res
+     * @return array|false
+     */
+    public function fetchAssoc(PDOStatement $res)
     {
-        return mysql_fetch_assoc($res);
+        return $res->fetch(PDO::FETCH_ASSOC);
     }
 
-    function freeRes($res)
+    /**
+     * Free result
+     *
+     * @param PDOStatement $res
+     * @return bool
+     */
+    public function freeRes(PDOStatement $res): bool
     {
-        return mysql_free_result($res);
+        return true; // PDO statements are automatically freed
     }
 
-    function selectLimit($sql, $length = null, $offset = null)
+    /**
+     * Select with limit
+     *
+     * @param string $sql
+     * @param int|null $length
+     * @param int|null $offset
+     * @return PDOStatement|false
+     * @throws FLEA_Db_Exception_SqlQuery
+     */
+    public function selectLimit(string $sql, ?int $length = null, ?int $offset = null)
     {
         if (!is_null($offset)) {
             $sql .= " LIMIT " . (int)$offset;
@@ -187,7 +314,14 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
         return $this->execute($sql);
     }
 
-    function metaColumns($table)
+    /**
+     * Get column metadata
+     *
+     * @param string $table
+     * @return array|false
+     * @throws FLEA_Db_Exception_SqlQuery
+     */
+    public function metaColumns(string $table)
     {
         /**
          *  C CHAR 或 VARCHAR 类型字段
@@ -213,7 +347,6 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
             'FLOAT'         => 'N',
             'DOUBLE'        => 'N',
             'DOUBLEPRECISION' => 'N',
-            'FLOAT'         => 'N',
             'DECIMAL'       => 'N',
             'DEC'           => 'N',
 
@@ -243,9 +376,9 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
 
         $rs = $this->execute(sprintf($this->META_COLUMNS_SQL, $table));
         if (!$rs) { return false; }
-        $retarr = array();
-        while (($row = mysql_fetch_assoc($rs))) {
-            $field = array();
+        $retarr = [];
+        while (($row = $this->fetchAssoc($rs))) {
+            $field = [];
             $field['name'] = $row['Field'];
             $type = $row['Type'];
 
@@ -260,18 +393,16 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
                 $field['maxLength'] = is_numeric($queryArray[2]) ? $queryArray[2] : -1;
             } elseif (preg_match('/^(enum)\((.*)\)$/i', $type, $queryArray)) {
                 $field['type'] = $queryArray[1];
-                $arr = explode(",",$queryArray[2]);
+                $arr = explode(",", $queryArray[2]);
                 $field['enums'] = $arr;
-                $zlen = max(array_map("strlen",$arr)) - 2; // PHP >= 4.0.6
+                $zlen = max(array_map("strlen", $arr)) - 2;
                 $field['maxLength'] = ($zlen > 0) ? $zlen : 1;
             } else {
                 $field['type'] = $type;
                 $field['maxLength'] = -1;
             }
             $field['simpleType'] = $typeMap[strtoupper($field['type'])];
-            // if ($field['simpleType'] == 'C' && $field['maxLength'] > 250) {
-                // $field['simpleType'] = 'X';
-            // }
+
             $field['notNull'] = ($row['Null'] != 'YES');
             $field['primaryKey'] = ($row['Key'] == 'PRI');
             $field['autoIncrement'] = (strpos($row['Extra'], 'auto_increment') !== false);
@@ -297,62 +428,35 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
 
             $retarr[strtoupper($field['name'])] = $field;
         }
-        mysql_free_result($rs);
+        $this->freeRes($rs);
         return $retarr;
     }
 
-    function metaTables($pattern = null, $schema = null)
+    /**
+     * Get list of tables
+     *
+     * @param string|null $pattern
+     * @param string|null $schema
+     * @return array
+     * @@throws Exception
+     */
+    public function metaTables(?string $pattern = null, ?string $schema = null): array
     {
         $sql = 'SHOW TABLES';
-		if (!empty($schema)) {
-		    $sql .= " FROM {$schema}";
-		}
-		if (!empty($pattern)) {
-		    $sql .= ' LIKE ' . $this->qstr($schema);
-		}
-		$res = $this->execute($sql, null, false);
-		$tables = array();
-		while (($row = $this->fetchRow($res))) {
-		   $tables[] = reset($row);
-		}
-		$this->freeRes($res);
-		return $tables;
+        if (!empty($schema)) {
+            $sql .= " FROM {$schema}";
+        }
+        if (!empty($pattern)) {
+            $sql .= ' LIKE ' . $this->qstr($schema);
+        }
+        $res = $this->execute($sql, null, false);
+        $tables = [];
+        while (($row = $this->fetchRow($res))) {
+            $tables[] = reset($row);
+        }
+        $this->freeRes($res);
+        return $tables;
     }
-
 }
 
-/**
- * 与 FLEA_Db_Driver_Mysql 的唯一区别在于 FLEA_Db_Driver_Mysqlt 支持事务功能
- *
- * 要求表的存储引擎为 InnoDB 或者 BDB。
- *
- * @package Core
- * @author 起源科技 (www.qeeyuan.com)
- * @version 1.1
- */
-class FLEA_Db_Driver_Mysqlt extends FLEA_Db_Driver_Mysql
-{
-    var $HAS_TRANSACTION = true;
 
-    function connect($dsn = false)
-    {
-        parent::connect($dsn);
-        if ($this->_mysqlVersion >= '5.0') {
-            $this->HAS_SAVEPOINT = true;
-        }
-    }
-
-    function _startTrans()
-    {
-        $this->execute('START TRANSACTION');
-    }
-
-    function _completeTrans($commitOnNoErrors = true)
-    {
-        if ($this->_hasFailedQuery == false && $commitOnNoErrors) {
-            $this->execute('COMMIT');
-        } else {
-            $this->execute('ROLLBACK');
-        }
-    }
-}

@@ -1,18 +1,10 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * 定义 FLEA_Rbac_UsersManager 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: UsersManager.php 1037 2008-04-19 21:19:55Z qeeyuan $
  */
@@ -26,11 +18,7 @@ define('PWD_CRYPT',     2);
 define('PWD_CLEARTEXT', 3);
 define('PWD_SHA1',      4);
 define('PWD_SHA2',      5);
-// }}}
 
-// {{{ includes
-FLEA::loadClass('FLEA_Db_TableDataGateway');
-// }}}
 
 /**
  * UsersManager 派生自 FLEA_Db_TableDataGateway，用于访问保存用户信息的数据表
@@ -38,7 +26,7 @@ FLEA::loadClass('FLEA_Db_TableDataGateway');
  * 如果数据表的名字不同，应该从 FLEA_Rbac_UsersManager 派生类并使用自定义的数据表名字、主键字段名等。
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
@@ -48,63 +36,63 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @var string
      */
-    var $primaryKey = 'user_id';
+    public $primaryKey = 'user_id';
 
     /**
      * 数据表名字
      *
      * @var string
      */
-    var $tableName = 'users';
+    public $tableName = 'users';
 
     /**
      * 用户名字段的名字
      *
      * @var string
      */
-    var $usernameField = 'username';
+    public $usernameField = 'username';
 
     /**
      * 电子邮件字段的名字
      *
      * @var string
      */
-    var $emailField = 'email';
+    public $emailField = 'email';
 
     /**
      * 密码字段的名字
      *
      * @var string
      */
-    var $passwordField = 'password';
+    public $passwordField = 'password';
 
     /**
      * 角色字段的名字
      *
      * @var string
      */
-    var $rolesField = 'roles';
+    public $rolesField = 'roles';
 
     /**
      * 密码加密方式
      *
      * @var int
      */
-    var $encodeMethod = PWD_CRYPT;
+    public $encodeMethod = PWD_CRYPT;
 
     /**
      * 对数据进行自动验证
      *
      * @var boolean
      */
-    var $autoValidating = true;
+    public $autoValidating = true;
 
     /**
      * 指定其他具有特殊意义的字段
      *
      * @var array
      */
-    var $functionFields = array(
+    public $functionFields = array(
         'registerIpField' => null,
         'lastLoginField' => null,
         'lastLoginIpField' => null,
@@ -115,9 +103,9 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
     /**
      * 构造函数
      */
-    function FLEA_Rbac_UsersManager()
+    public function __construct()
     {
-        parent::FLEA_Db_TableDataGateway();
+        parent::__construct();
         $mn = strtoupper($this->emailField);
         if (isset($this->meta[$mn])) {
             $this->meta[$mn]['complexType'] = 'EMAIL';
@@ -132,7 +120,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function findByUserId($id, $fields = '*')
+    public function findByUserId($id, $fields = '*'): ?array
     {
         return $this->findByField($this->primaryKey, $id, null, $fields);
     }
@@ -145,7 +133,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function findByUsername($username, $fields = '*')
+    public function findByUsername(string $username, $fields = '*'): ?array
     {
         return $this->findByField($this->usernameField, $username, null, $fields);
     }
@@ -158,7 +146,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function findByEmail($email, $fields = '*')
+    public function findByEmail(string $email, $fields = '*'): ?array
     {
         return $this->findByField($this->emailField, $email, null, $fields);
     }
@@ -170,7 +158,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function existsUserId($id)
+    public function existsUserId($id): bool
     {
         return $this->findCount(array($this->primaryKey => $id)) > 0;
     }
@@ -182,7 +170,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function existsUsername($username)
+    public function existsUsername(string $username): bool
     {
         return $this->findCount(array($this->usernameField => $username)) > 0;
     }
@@ -194,7 +182,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function existsEmail($email)
+    public function existsEmail(string $email): bool
     {
         return $this->findCount(array($this->emailField => $email)) > 0;
     }
@@ -206,7 +194,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return mixed
      */
-    function create(& $row)
+    public function create(array &$row)
     {
         if (isset($this->functionFields['registerIpField'])
             && $this->functionFields['registerIpField'] != '')
@@ -227,7 +215,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @access public
      */
-    function validateUser($username, $password, $returnUserdata = false)
+    public function validateUser(string $username, string $password, bool $returnUserdata = false)
     {
         if ($returnUserdata) {
             $user = $this->findByField($this->usernameField, $username);
@@ -257,7 +245,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
             return false;
         }
 
-        $update = array();
+        $update = [];
 
         if (isset($this->functionFields['lastLoginField'])
             && $this->functionFields['lastLoginField'] != '')
@@ -297,7 +285,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @access public
      */
-    function changePassword($username, $oldPassword, $newPassword)
+    public function changePassword(string $username, string $oldPassword, string $newPassword): bool
     {
         $user = $this->findByField(
             $this->usernameField, $username, null,
@@ -320,7 +308,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function updatePassword($username, $newPassword)
+    public function updatePassword(string $username, string $newPassword): bool
     {
         $user = $this->findByField($this->usernameField, $username, null, $this->primaryKey);
         if (!$user) { return false; }
@@ -337,7 +325,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function updatePasswordById($userid, $newPassword)
+    public function updatePasswordById($userid, string $newPassword): bool
     {
         $user = $this->findByField($this->primaryKey, $userid, null, $this->primaryKey);
         if (!$user) { return false; }
@@ -356,7 +344,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @access public
      */
-    function checkPassword($cleartext, $cryptograph)
+    public function checkPassword(string $cleartext, string $cryptograph): bool
     {
         switch ($this->encodeMethod) {
         case PWD_MD5:
@@ -384,7 +372,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @access public
      */
-    function encodePassword($cleartext)
+    public function encodePassword(string $cleartext): ?string
     {
         switch ($this->encodeMethod) {
         case PWD_MD5:
@@ -410,7 +398,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function fetchRoles($user)
+    public function fetchRoles(array $user): array
     {
         if ($this->existsLink($this->rolesField)) {
             $link =& $this->getLink($this->rolesField);
@@ -423,7 +411,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
             !is_array($user[$this->rolesField])) {
             return array();
         }
-        $roles = array();
+        $roles = [];
         foreach ($user[$this->rolesField] as $role) {
             if (!is_array($role)) {
                 return array($user[$this->rolesField][$rolenameField]);
@@ -440,7 +428,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function update(& $row)
+    public function update(array &$row): bool
     {
         unset($row[$this->passwordField]);
         return parent::update($row);
@@ -449,7 +437,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
     /**
      * 在更新到数据库之前加密密码
      */
-    function _beforeUpdateDb(& $row)
+    protected function _beforeUpdateDb(array &$row): bool
     {
         $this->_encodeRecordPassword($row);
         return true;
@@ -458,7 +446,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
     /**
      * 在更新到数据库之前加密密码
      */
-    function _beforeCreateDb(& $row)
+    protected function _beforeCreateDb(array &$row): bool
     {
         $this->_encodeRecordPassword($row);
         return true;
@@ -469,7 +457,7 @@ class FLEA_Rbac_UsersManager extends FLEA_Db_TableDataGateway
      *
      * @param array $row
      */
-    function _encodeRecordPassword(& $row)
+    protected function _encodeRecordPassword(array &$row): void
     {
         if (isset($row[$this->passwordField])) {
             $row[$this->passwordField] =

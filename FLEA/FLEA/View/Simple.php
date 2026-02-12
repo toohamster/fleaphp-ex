@@ -1,18 +1,10 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * 定义 FLEA_View_Simple 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Simple.php 1304 2008-08-31 03:00:59Z dualface $
  */
@@ -22,7 +14,7 @@
  * 带有缓存功能的模版引擎
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_View_Simple
@@ -32,7 +24,7 @@ class FLEA_View_Simple
      *
      * @var string
      */
-    var $path;
+    public $path;
 
     /**
      * 缓存过期时间
@@ -40,7 +32,7 @@ class FLEA_View_Simple
      * @access public
      * @var int
      */
-    var $cacheLifetime;
+    public $cacheLifetime;
 
     /**
      * 指示是否使用 cache
@@ -48,7 +40,7 @@ class FLEA_View_Simple
      * @access public
      * @var boolean
      */
-    var $enableCache;
+    public $enableCache;
 
     /**
      * 缓存文件保存位置
@@ -56,7 +48,7 @@ class FLEA_View_Simple
      * @access public
      * @var string
      */
-    var $cacheDir;
+    public $cacheDir;
 
     /**
      * 模板变量
@@ -64,7 +56,7 @@ class FLEA_View_Simple
      * @access private
      * @var array
      */
-    var $vars = array();
+    public $vars = [];
 
     /**
      * 保存各个缓存内容的缓存状态
@@ -72,7 +64,7 @@ class FLEA_View_Simple
      * @access private
      * @var array
      */
-    var $cacheState = array();
+    public $cacheState = [];
 
     /**
      * 构造函数
@@ -81,7 +73,8 @@ class FLEA_View_Simple
      *
      * @return FLEA_View_Simple
      */
-    function FLEA_View_Simple($path = null) {
+    public function __construct(?string $path = null)
+    {
         log_message('Construction FLEA_View_Simple', 'debug');
 
         $this->path = $path;
@@ -89,7 +82,7 @@ class FLEA_View_Simple
         $this->enableCache = true;
         $this->cacheDir = './cache';
 
-		$viewConfig = (array)FLEA::getAppInf('viewConfig');
+        $viewConfig = (array)FLEA::getAppInf('viewConfig');
         $keys = array(
             'templateDir', 'cacheDir', 'cacheLifeTime', 'enableCache',
         );
@@ -108,7 +101,8 @@ class FLEA_View_Simple
      * @param mixed $name 模板变量名称
      * @param mixed $value 变量内容
      */
-    function assign($name, $value = null) {
+    public function assign($name, $value = null): void
+    {
         if (is_array($name) && is_null($value)) {
             $this->vars = array_merge($this->vars, $name);
         } else {
@@ -124,7 +118,8 @@ class FLEA_View_Simple
      *
      * @return string
      */
-    function fetch($file, $cacheId = null) {
+    public function fetch(string $file, ?string $cacheId = null): string
+    {
         if ($this->enableCache) {
             $cacheFile = $this->_getCacheFile($file, $cacheId);
             if ($this->isCached($file, $cacheId)) {
@@ -154,7 +149,8 @@ class FLEA_View_Simple
      * @param string $file 模板文件名
      * @param string $cacheId 缓存 ID，如果指定该值则会使用该内容的缓存输出
      */
-    function display($file, $cacheId = null) {
+    public function display(string $file, ?string $cacheId = null): void
+    {
         echo $this->fetch($file, $cacheId);
     }
 
@@ -166,7 +162,8 @@ class FLEA_View_Simple
      *
      * @return boolean
      */
-    function isCached($file, $cacheId = null) {
+    public function isCached(string $file, ?string $cacheId = null): bool
+    {
         // 如果禁用缓存则返回 false
         if (!$this->enableCache) { return false; }
 
@@ -198,14 +195,16 @@ class FLEA_View_Simple
      * @param string $file 模板资源名
      * @param string $cacheId 缓存 ID
      */
-    function cleanCache($file, $cacheId = null) {
+    public function cleanCache(string $file, ?string $cacheId = null): void
+    {
         @unlink($this->_getCacheFile($file, $cacheId));
     }
 
     /**
      * 清除所有缓存
      */
-    function cleanAllCache() {
+    public function cleanAllCache(): void
+    {
         foreach (glob($this->cacheDir . '/' . "*.php") as $filename) {
             @unlink($filename);
         }
@@ -219,7 +218,8 @@ class FLEA_View_Simple
      *
      * @return string
      */
-    function _getCacheFile($file, $cacheId) {
+    protected function _getCacheFile(string $file, ?string $cacheId = null): string
+    {
         return $this->cacheDir . DIRECTORY_SEPARATOR . rawurlencode($file . '-' . $cacheId) . '.php';
     }
 }

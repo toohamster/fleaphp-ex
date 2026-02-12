@@ -1,31 +1,20 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * 定义 FLEA_Acl_Table_UserGroups 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: UserGroups.php 1060 2008-05-04 05:02:59Z qeeyuan $
  */
 
-// {{{ includes
-FLEA::loadClass('FLEA_Db_TableDataGateway');
-// }}}
 
 /**
  * FLEA_Acl_Table_UserGroups 类提供了用户组数据的存储服务
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
@@ -35,21 +24,21 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @var string
      */
-    var $primaryKey = 'user_group_id';
+    public $primaryKey = 'user_group_id';
 
     /**
      * 数据表名称
      *
      * @var string
      */
-    var $tableName = 'user_groups';
+    public $tableName = 'user_groups';
 
     /**
      * 用户组关联多个角色和权限
      *
      * @var array
      */
-    var $manyToMany = array(
+    public $manyToMany = array(
         array(
             'tableClass' => 'FLEA_Acl_Table_Roles',
             'foreignKey' => 'user_group_id',
@@ -71,7 +60,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @var string
      */
-    var $_rootGroupName = '_#_ROOT_GROUP_#_';
+    public $_rootGroupName = '_#_ROOT_GROUP_#_';
 
     /**
      * 添加一个用户组，返回该用户组的 ID
@@ -81,15 +70,13 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return int
      */
-    function create($group, $parentId = 0) {
+    public function create($group, $parentId = 0) {
         $parentId = (int)$parentId;
         if ($parentId) {
             $parent = parent::find($parentId);
             if (!$parent) {
                 // 指定的父用户组不存在
-                FLEA::loadClass('FLEA_Acl_Exception_UserGroupNotFound');
-                __THROW(new FLEA_Acl_Exception_UserGroupNotFound($parentId));
-                return false;
+                throw new FLEA_Acl_Exception_UserGroupNotFound($parentId);
             }
         } else {
             // 如果未指定 $parentId 为 0 或 null，则创建一个顶级用户组
@@ -143,7 +130,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function update($group) {
+    public function update($group) {
         unset($group['left_value']);
         unset($group['right_value']);
         unset($group['parent_id']);
@@ -157,12 +144,10 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return boolean
      */
-    function removeByPkv($groupId) {
+    public function removeByPkv($groupId) {
         $group = parent::find((int)$groupId);
         if (!$group) {
-            FLEA::loadClass('FLEA_Acl_Exception_UserGroupNotFound');
-            __THROW(new FLEA_Acl_Exception_UserGroupNotFound($groupId));
-            return false;
+            throw new FLEA_Acl_Exception_UserGroupNotFound($groupId);
         }
 
         $this->dbo->startTrans();
@@ -215,7 +200,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function getPath($group) {
+    public function getPath($group) {
         $group['left_value'] = (int)$group['left_value'];
         $group['right_value'] = (int)$group['right_value'];
 
@@ -235,7 +220,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function getSubGroups($group) {
+    public function getSubGroups($group) {
         $conditions = "parent_id = {$group[$this->primaryKey]}";
         $sort = 'left_value ASC';
         return $this->findAll($conditions, $sort);
@@ -248,7 +233,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function getSubTree($group) {
+    public function getSubTree($group) {
         $group['left_value'] = (int)$group['left_value'];
         $group['right_value'] = (int)$group['right_value'];
 
@@ -264,7 +249,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function getCurrentLevelGroups($group) {
+    public function getCurrentLevelGroups($group) {
         $group['parent_id'] = (int)$group['parent_id'];
         $conditions = "parent_id = {$group['parent_id']}";
         $sort = 'left_value ASC';
@@ -276,7 +261,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function getAllGroups() {
+    public function getAllGroups() {
         return parent::findAll('left_value > 1', 'left_value ASC');
     }
 
@@ -285,7 +270,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return array
      */
-    function getAllTopGroups() {
+    public function getAllTopGroups() {
         $conditions = "parent_id = 0";
         $sort = 'left_value ASC';
         return $this->findAll($conditions, $sort);
@@ -298,7 +283,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      *
      * @return int
      */
-    function calcAllChildCount($group) {
+    public function calcAllChildCount($group) {
         return intval(($group['right_value'] - $group['left_value'] - 1) / 2);
     }
 

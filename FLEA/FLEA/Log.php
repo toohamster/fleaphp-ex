@@ -1,18 +1,10 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * 定义 FLEA_Log 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Log.php 999 2007-10-30 05:39:57Z qeeyuan $
  */
@@ -28,9 +20,9 @@ function log_message($msg, $level = 'log', $title = '')
     static $instance = null;
 
     if (is_null($instance)) {
-        $instance = array();
-        $obj =& FLEA::getSingleton('FLEA_Log');
-        $instance = array('obj' => & $obj);
+        $instance = [];
+        $obj = FLEA::getSingleton('FLEA_Log');
+        $instance = array('obj' => $obj);
     }
 
     return $instance['obj']->appendLog($msg, $level, $title);
@@ -40,7 +32,7 @@ function log_message($msg, $level = 'log', $title = '')
  * FLEA_Log 类提供基本的日志服务
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Log
@@ -50,49 +42,49 @@ class FLEA_Log
      *
      * @var string
      */
-    var $_log = '';
+    public $_log = '';
 
     /**
      * 日期格式
      *
      * @var string
      */
-    var $dateFormat = 'Y-m-d H:i:s';
+    public $dateFormat = 'Y-m-d H:i:s';
 
     /**
      * 保存日志文件的目录
      *
      * @var string
      */
-    var $_logFileDir;
+    public $_logFileDir;
 
     /**
      * 保存日志的文件名
      *
      * @var string
      */
-    var $_logFilename;
+    public $_logFilename;
 
     /**
      * 是否允许日志保存
      *
      * @var boolean
      */
-    var $_enabled = true;
+    public $_enabled = true;
 
     /**
      * 要写入日志文件的错误级别
      *
      * @var array
      */
-    var $_errorLevel;
+    public $_errorLevel;
 
     /**
      * 构造函数
      *
      * @return FLEA_Log
      */
-    function FLEA_Log()
+    public function __construct()
     {
         $dir = FLEA::getAppInf('logFileDir');
         if (empty($dir)) {
@@ -111,13 +103,12 @@ class FLEA_Log
             $errorLevel = explode(',', strtolower(FLEA::getAppInf('logErrorLevel')));
             $errorLevel = array_map('trim', $errorLevel);
             $errorLevel = array_filter($errorLevel, 'trim');
-            $this->_errorLevel = array();
+            $this->_errorLevel = [];
             foreach ($errorLevel as $e) {
                $this->_errorLevel[$e] = true;
             }
 
-            global $___fleaphp_loaded_time;
-            list($usec, $sec) = explode(" ", $___fleaphp_loaded_time);
+            list($usec, $sec) = explode(" ", FLEA_LOADED_TIME);
             $this->_log = sprintf("[%s %s] ======= FleaPHP Loaded =======\n",
                 date($this->dateFormat, $sec), $usec);
 
@@ -157,7 +148,7 @@ class FLEA_Log
      * @param string $msg
      * @param string $level
      */
-    function appendLog($msg, $level = 'log', $title = '')
+    public function appendLog($msg, $level = 'log', $title = '')
     {
         if (!$this->_enabled) { return; }
         $level = strtolower($level);
@@ -170,12 +161,10 @@ class FLEA_Log
     /**
      * 将日志信息写入缓存
      */
-    function __writeLog()
+    public function __writeLog()
     {
-        global $___fleaphp_loaded_time;
-
         // 计算应用程序执行时间（不包含入口文件）
-        list($usec, $sec) = explode(" ", $___fleaphp_loaded_time);
+        list($usec, $sec) = explode(" ", FLEA_LOADED_TIME);
         $beginTime = (float)$sec + (float)$usec;
         $endTime = microtime();
         list($usec, $sec) = explode(" ", $endTime);

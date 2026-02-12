@@ -1,18 +1,10 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * FleaPHP 中用于显示异常信息的公共文件
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Error
  * @version $Id: header.php 1005 2007-11-03 07:43:55Z qeeyuan $
  */
@@ -46,7 +38,7 @@ function __error_dump_trace($ex)
         $id = md5("{$file}({$line})");
         $function = isset($point['class']) ? "{$point['class']}::{$point['function']}" : $point['function'];
 
-        $args = array();
+        $args = [];
         if (is_array($point['args']) && count($point['args']) > 0) {
             foreach ($point['args'] as $arg) {
                 switch (gettype($arg)) {
@@ -177,12 +169,12 @@ EOT;
 ?>
 <meta http-equiv="Content-Type" content="text/html; charset=<?php echo RESPONSE_CHARSET; ?>" />
 <style>
-<?php readfile(dirname(__FILE__) . '/style.css'); ?>
+<?php readfile(__DIR__ . '/style.css'); ?>
 </style>
 <script language="javascript" type="text/javascript">
 function switch_filedesc(id)
 {
-    var el = document.getElementById(id);
+    public el = document.getElementById(id);
     if (el.style.display == 'none') {
         el.style.display = 'block';
     } else {

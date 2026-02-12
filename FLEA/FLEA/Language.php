@@ -1,12 +1,5 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * 定义 FLEA_Language 类
@@ -76,8 +69,7 @@
  *
  * 这样后续的 _T() 就不用指定第二个参数了。
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Language.php 1005 2007-11-03 07:43:55Z qeeyuan $
  */
@@ -96,13 +88,13 @@
  *
  * @return string
  */
-function _T($key, $language = '')
+function _T(string $key, string $language = ''): string
 {
     static $instance = null;
     if (!isset($instance['obj'])) {
-        $instance = array();
-        $obj =& FLEA::getSingleton('FLEA_Language');
-        $instance = array('obj' => & $obj);
+        $instance = [];
+        $obj = FLEA::getSingleton('FLEA_Language');
+        $instance = array('obj' => $obj);
     }
     return $instance['obj']->get($key, $language);
 }
@@ -116,13 +108,13 @@ function _T($key, $language = '')
  *
  * @return boolean
  */
-function load_language($dictname, $language = '', $noException = false)
+function load_language(string $dictname, string $language = '', bool $noException = false): bool
 {
     static $instance = null;
     if (!isset($instance['obj'])) {
-        $instance = array();
-        $obj =& FLEA::getSingleton('FLEA_Language');
-        $instance = array('obj' => & $obj);
+        $instance = [];
+        $obj = FLEA::getSingleton('FLEA_Language');
+        $instance = array('obj' => $obj);
     }
     return $instance['obj']->load($dictname, $language, $noException);
 }
@@ -131,7 +123,7 @@ function load_language($dictname, $language = '', $noException = false)
  * FLEA_Language 提供了语言转换功能
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Language
@@ -141,21 +133,21 @@ class FLEA_Language
      *
      * @var array
      */
-    var $_dict = array();
+    public $_dict = [];
 
     /**
      * 指示哪些语言文件已经被载入
      *
      * @var array
      */
-    var $_loadedFiles = array();
+    public $_loadedFiles = [];
 
     /**
      * 构造函数
      *
      * @return FLEA_Language
      */
-    function FLEA_Language()
+    public function __construct()
     {
         $autoload = FLEA::getAppInf('autoLoadLanguage');
         if (!is_array($autoload)) {
@@ -185,7 +177,7 @@ class FLEA_Language
      * @param string $language 指定为 '' 时表示将字典载入默认语言包中
      * @param boolena $noException
      */
-    function load($dictname, $language = '', $noException = false)
+    public function load(string $dictname, string $language = '', bool $noException = false): bool
     {
         $dictnames = explode(',', $dictname);
         foreach ($dictnames as $dictname) {
@@ -217,8 +209,7 @@ class FLEA_Language
                     $this->_dict[0] =& $this->_dict[$language];
                 }
             } else if (!$noException) {
-                FLEA::loadClass('FLEA_Exception_ExpectedFile');
-                return __THROW(new FLEA_Exception_ExpectedFile($filename));
+                throw new FLEA_Exception_ExpectedFile($filename);
             }
         }
     }
@@ -231,7 +222,7 @@ class FLEA_Language
      *
      * @return string
      */
-    function get($key, $language = '')
+    public function get($key, $language = '')
     {
         if ($language == '') { $language = 0; }
         return isset($this->_dict[$language][$key]) ?

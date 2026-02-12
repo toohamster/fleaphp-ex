@@ -1,18 +1,10 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * 定义 FLEA_Helper_Image 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Image.php 1405 2008-10-14 09:56:43Z dualface $
  */
@@ -26,7 +18,7 @@
  * 操作大图片时，请确保 php 能够分配足够的内存。
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Helper_Image
@@ -36,7 +28,7 @@ class FLEA_Helper_Image
      *
      * @var resource
      */
-    var $_handle = null;
+    public $_handle = null;
 
     /**
      * 构造函数
@@ -47,7 +39,7 @@ class FLEA_Helper_Image
      *
      * @return FLEA_Helper_Image
      */
-    function FLEA_Helper_Image($handle)
+    public function __construct($handle)
     {
         $this->_handle = $handle;
     }
@@ -67,7 +59,7 @@ class FLEA_Helper_Image
      *
      * @return FLEA_Helper_Image
      */
-    function & createFromFile($filename, $fileext = null)
+    static public function createFromFile(string $filename, ?string $fileext = null): FLEA_Helper_Image
     {
         if (is_null($fileext)) {
             $fileext = pathinfo($filename, PATHINFO_EXTENSION);
@@ -80,13 +72,11 @@ class FLEA_Helper_Image
             'gif' => 'imagecreatefromgif',
         );
         if (!isset($ext2functions[$fileext])) {
-            FLEA::loadClass('FLEA_Exception_NotImplemented');
-            __THROW(new FLEA_Exception_NotImplemented('imagecreatefrom' . $fileext));
-            return false;
+            throw new FLEA_Exception_NotImplemented('imagecreatefrom' . $fileext);
         }
 
         $handle = $ext2functions[$fileext]($filename);
-        $img =& new FLEA_Helper_Image($handle);
+        $img = new FLEA_Helper_Image($handle);
         return $img;
     }
 
@@ -96,7 +86,7 @@ class FLEA_Helper_Image
      * @param int $width
      * @param int $height
      */
-    function resize($width, $height)
+    public function resize(int $width, int $height): void
     {
         if (is_null($this->_handle)) { return; }
         $dest = imagecreatetruecolor($width, $height);
@@ -112,7 +102,7 @@ class FLEA_Helper_Image
      * @param int $width
      * @param int $height
      */
-    function resampled($width, $height)
+    public function resampled(int $width, int $height): void
     {
         if (is_null($this->_handle)) { return; }
         $dest = imagecreatetruecolor($width, $height);
@@ -130,7 +120,7 @@ class FLEA_Helper_Image
      * @param string $pos
      * @param string $bgcolor
      */
-    function resizeCanvas($width, $height, $pos = 'center', $bgcolor = '0xffffff')
+    public function resizeCanvas(int $width, int $height, string $pos = 'center', string $bgcolor = '0xffffff'): void
     {
         if (is_null($this->_handle)) { return; }
         $dest = imagecreatetruecolor($width, $height);
@@ -193,7 +183,7 @@ class FLEA_Helper_Image
      * @param boolean $highQuality
      * @param array $nocut
      */
-    function crop($width, $height, $highQuality = true, $nocut = null)
+    public function crop(int $width, int $height, bool $highQuality = true, ?bool $nocut = null): void
     {
         if (is_null($this->_handle)) { return; }
         $dest = imagecreatetruecolor($width, $height);
@@ -296,7 +286,7 @@ class FLEA_Helper_Image
      * @param string $filename
      * @param int $quality
      */
-    function saveAsJpeg($filename, $quality = 80)
+    public function saveAsJpeg(string $filename, int $quality = 80): bool
     {
         imagejpeg($this->_handle, $filename, $quality);
     }
@@ -306,7 +296,7 @@ class FLEA_Helper_Image
      *
      * @param string $filename
      */
-    function saveAsPng($filename)
+    public function saveAsPng(string $filename): bool
     {
         imagepng($this->_handle, $filename);
     }
@@ -316,7 +306,7 @@ class FLEA_Helper_Image
      *
      * @param string $filename
      */
-    function saveAsGif($filename)
+    public function saveAsGif(string $filename): bool
     {
         imagegif($this->_handle, $filename);
     }
@@ -324,7 +314,7 @@ class FLEA_Helper_Image
     /**
      * 销毁图像
      */
-    function destory()
+    public function destory(): void
     {
         imagedestroy($this->_handle);
         $this->_handle = null;
@@ -338,7 +328,7 @@ class FLEA_Helper_Image
      *
      * @return array
      */
-    function extractColor($color, $default = 'ffffff')
+    public function extractColor($color, string $default = 'ffffff'): array
     {
         $hex = trim($color, '#&Hh');
         $len = strlen($hex);

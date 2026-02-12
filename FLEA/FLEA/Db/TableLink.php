@@ -1,18 +1,10 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
- * 定义 FLEA_Db_TableLink 类及其继承类
+ * 定义 FLEA_Db_TableLink 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: TableLink.php 1449 2008-10-30 06:16:17Z dualface $
  */
@@ -24,7 +16,7 @@
  * 开发者不应该直接构造 FLEA_Db_TableLink 对象。
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.2
  */
 class FLEA_Db_TableLink
@@ -37,70 +29,70 @@ class FLEA_Db_TableLink
      *
      * @var string
      */
-    var $name;
+    public $name;
 
     /**
      * 该关联所使用的表数据入口对象名
      *
      * @var string
      */
-    var $tableClass;
+    public $tableClass;
 
     /**
      * 外键字段名
      *
      * @var string
      */
-    var $foreignKey;
+    public $foreignKey;
 
     /**
      * 关联数据表结果映射到主表结果中的字段名
      *
      * @var string
      */
-    var $mappingName;
+    public $mappingName;
 
     /**
      * 指示连接两个数据集的行时，是一对一连接还是一对多连接
      *
      * @var boolean
      */
-    var $oneToOne;
+    public $oneToOne;
 
     /**
      * 关联的类型
      *
      * @var enum
      */
-    var $type;
+    public $type;
 
     /**
      * 对关联表进行查询时使用的排序参数
      *
      * @var string
      */
-    var $sort;
+    public $sort;
 
     /**
      * 对关联表进行查询时使用的条件参数
      *
      * @var string
      */
-    var $conditions;
+    public $conditions;
 
     /**
      * 对关联表进行查询时要获取的关联表字段
      *
      * @var string|array
      */
-    var $fields = '*';
+    public $fields = '*';
 
     /**
      * 对关联表进行查询时限制查出的记录数
      *
      * @var int
      */
-    var $limit = null;
+    public $limit = null;
 
     /**
      * 当 enabled 为 false 时，表数据入口的任何操作都不会处理该关联
@@ -109,84 +101,84 @@ class FLEA_Db_TableLink
      *
      * @var boolean
      */
-    var $enabled = true;
+    public $enabled = true;
 
     /**
      * 指示在查询关联表时是否仅仅统计记录数，而不实际查询数据
      *
      * @var boolean
      */
-    var $countOnly = false;
+    public $countOnly = false;
 
     /**
      * 将关联记录总数缓存到指定的字段
      *
      * @var string
      */
-    var $counterCache = null;
+    public $counterCache = null;
 
     /**
      * 指示是否在主表读取记录时也读取该关联对应的关联表的记录
      *
      * @var boolean
      */
-    var $linkRead = true;
+    public $linkRead = true;
 
     /**
      * 指示是否在主表创建记录时也创建该关联对应的关联表的记录
      *
      * @var boolean
      */
-    var $linkCreate = true;
+    public $linkCreate = true;
 
     /**
      * 指示是否在主表更新记录时也更新该关联对应的关联表的记录
      *
      * @var boolean
      */
-    var $linkUpdate = true;
+    public $linkUpdate = true;
 
     /**
      * 指示是否在主表删除记录时也删除该关联对应的关联表的记录
      *
      * @var boolean
      */
-    var $linkRemove = true;
+    public $linkRemove = true;
 
     /**
      * 当删除主表记录而不删除关联表记录时，用什么值填充关联表记录的外键字段
      *
      * @var mixed
      */
-    var $linkRemoveFillValue = 0;
+    public $linkRemoveFillValue = 0;
 
     /**
      * 指示当保存关联数据时，采用何种方法，默认为 save，可以设置为 create、update 或 replace
      *
      * @var string
      */
-    var $saveAssocMethod = 'save';
+    public $saveAssocMethod = 'save';
 
     /**
      * 主表的表数据入口对象
      *
      * @var FLEA_Db_TableDataGateway
      */
-    var $mainTDG;
+    public $mainTDG;
 
     /**
      * 关联表的表数据入口对象
      *
      * @var FLEA_Db_TableDataGateway
      */
-    var $assocTDG = null;
+    public $assocTDG = null;
 
     /**
      * 必须设置的对象属性
      *
      * @var array
      */
-    var $_req = array(
+    public $_req = array(
         'name',             // 关联的名字
         'tableClass',       // 关联的表数据入口对象名
         'mappingName',      // 字段映射名
@@ -197,7 +189,7 @@ class FLEA_Db_TableLink
      *
      * @var array
      */
-    var $_optional = array(
+    public $_optional = array(
         'foreignKey',
         'sort',
         'conditions',
@@ -219,28 +211,28 @@ class FLEA_Db_TableLink
      *
      * @var string
      */
-    var $qforeignKey;
+    public $qforeignKey;
 
     /**
      * 数据访问对象
      *
      * @var FLEA_Db_Driver_Abstract
      */
-    var $dbo;
+    public $dbo;
 
     /**
      * 关联表数据入口的对象名
      *
      * @var string
      */
-    var $assocTDGObjectId;
+    public $assocTDGObjectId;
 
     /**
      * 指示关联的表数据入口是否已经初始化
      *
      * @var boolean
      */
-    var $init = false;
+    public $init = false;
 
     /**
      * 构造函数
@@ -254,15 +246,14 @@ class FLEA_Db_TableLink
      *
      * @return FLEA_Db_TableLink
      */
-    function FLEA_Db_TableLink($define, $type, & $mainTDG)
+    public function __construct($define, $type, & $mainTDG)
     {
         static $defaultDsnId = null;
 
         // 检查必须的属性是否都已经提供
         foreach ($this->_req as $key) {
             if (!isset($define[$key]) || $define[$key] == '') {
-                FLEA::loadClass('FLEA_Db_Exception_MissingLinkOption');
-                return __THROW(new FLEA_Db_Exception_MissingLinkOption($key));
+                throw new FLEA_Db_Exception_MissingLinkOption($key);
             } else {
                 $this->{$key} = $define[$key];
             }
@@ -274,8 +265,8 @@ class FLEA_Db_TableLink
             }
         }
         $this->type = $type;
-        $this->mainTDG =& $mainTDG;
-        $this->dbo =& $this->mainTDG->getDBO();
+        $this->mainTDG = $mainTDG;
+        $this->dbo = $this->mainTDG->getDBO();
         $dsnid = $this->dbo->dsn['id'];
 
         if (is_null($defaultDsnId)) {
@@ -303,7 +294,7 @@ class FLEA_Db_TableLink
      *
      * @return FLEA_Db_TableLink
      */
-    function & createLink($define, $type, & $mainTDG)
+    public static function createLink(array $define, int $type, FLEA_Db_TableDataGateway &$mainTDG): FLEA_Db_TableLink
     {
         static $typeMap = array(
             HAS_ONE         => 'FLEA_Db_HasOneLink',
@@ -311,18 +302,16 @@ class FLEA_Db_TableLink
             HAS_MANY        => 'FLEA_Db_HasManyLink',
             MANY_TO_MANY    => 'FLEA_Db_ManyToManyLink',
         );
-        static $instances = array();
+        static $instances = [];
 
         // 检查 $type 参数
         if (!isset($typeMap[$type])) {
-            FLEA::loadClass('FLEA_Db_Exception_InvalidLinkType');
-            return __THROW(new FLEA_Db_Exception_InvalidLinkType($type));
+            throw new FLEA_Db_Exception_InvalidLinkType($type);
         }
 
         // tableClass 属性是必须提供的
         if (!isset($define['tableClass'])) {
-            FLEA::loadClass('FLEA_Db_Exception_MissingLinkOption');
-            return __THROW(new FLEA_Db_Exception_MissingLinkOption('tableClass'));
+            throw new FLEA_Db_Exception_MissingLinkOption('tableClass');
         }
         // 如果没有提供 mappingName 属性，则使用 tableClass 作为 mappingName
         if (!isset($define['mappingName'])) {
@@ -337,12 +326,11 @@ class FLEA_Db_TableLink
         // 以及assocForeignKey 属性
         if ($type == MANY_TO_MANY) {
             if (!isset($define['joinTable']) && !isset($define['joinTableClass'])) {
-                FLEA::loadClass('FLEA_Db_Exception_MissingLinkOption');
-                return __THROW(new FLEA_Db_Exception_MissingLinkOption('joinTable'));
+                throw new FLEA_Db_Exception_MissingLinkOption('joinTable');
             }
         }
 
-        $instances[$define['name']] =& new $typeMap[$type]($define, $type, $mainTDG);
+        $instances[$define['name']] = new $typeMap[$type]($define, $type, $mainTDG);
         return $instances[$define['name']];
     }
 
@@ -354,7 +342,7 @@ class FLEA_Db_TableLink
      *
      * @return string
      */
-    function getMiddleTableName($table1, $table2)
+    public function getMiddleTableName(string $table1, string $table2): string
     {
         if (strcmp($table1, $table2) < 0) {
             return $this->dbo->dsn['prefix'] . "{$table1}_{$table2}";
@@ -371,27 +359,26 @@ class FLEA_Db_TableLink
      *
      * @return boolean
      */
-    function saveAssocData(& $row, $pkv)
+    function saveAssocData(array &$row, $pkv): bool
     {
-        FLEA::loadClass('FLEA_Exception_NotImplemented');
-        return __THROW(new FLEA_Exception_NotImplemented('saveAssocData()', 'FLEA_Db_TableLink'));
+        throw new FLEA_Exception_NotImplemented('saveAssocData()', 'FLEA_Db_TableLink');
     }
 
     /**
      * 初始化关联对象
      */
-    function init()
+    public function init(): void
     {
         if ($this->init) { return; }
         if (FLEA::isRegistered($this->assocTDGObjectId)) {
-            $this->assocTDG =& FLEA::registry($this->assocTDGObjectId);
+            $this->assocTDG = FLEA::registry($this->assocTDGObjectId);
         } else {
             if ($this->assocTDGObjectId) {
                 FLEA::loadClass($this->tableClass);
-                $this->assocTDG =& new $this->tableClass(array('dbo' => & $this->dbo));
+                $this->assocTDG = new $this->tableClass(array('dbo' => $this->dbo));
                 FLEA::register($this->assocTDG, $this->assocTDGObjectId);
             } else {
-                $this->assocTDG =& FLEA::getSingleton($this->tableClass);
+                $this->assocTDG = FLEA::getSingleton($this->tableClass);
             }
         }
         $this->init = true;
@@ -406,10 +393,9 @@ class FLEA_Db_TableLink
      *
      * @return int
      */
-    function calcCount(& $assocRowset, $mappingName, $in)
+    function calcCount(array &$assocRowset, string $mappingName, string $in): void
     {
-        FLEA::loadClass('FLEA_Exception_NotImplemented');
-        return __THROW(new FLEA_Exception_NotImplemented('calcCount()', 'FLEA_Db_TableLink'));
+        throw new FLEA_Exception_NotImplemented('calcCount()', 'FLEA_Db_TableLink');
     }
 
     /**
@@ -420,7 +406,7 @@ class FLEA_Db_TableLink
      *
      * @return string
      */
-    function _getFindSQLBase($sql, $in)
+    protected function _getFindSQLBase(string $sql, string $in): string
     {
         if ($in) {
             $sql .= " WHERE {$this->qforeignKey} {$in}";
@@ -452,7 +438,7 @@ class FLEA_Db_TableLink
      *
      * @return boolean
      */
-    function _saveAssocDataBase(& $row)
+    protected function _saveAssocDataBase(array &$row): bool
     {
         switch (strtolower($this->saveAssocMethod)) {
         case 'create':
@@ -467,126 +453,18 @@ class FLEA_Db_TableLink
     }
 }
 
-/**
- * FLEA_Db_HasOneLink 封装 has one 关系
- *
- * @package Core
- * @author 起源科技 (www.qeeyuan.com)
- * @version 1.0
- */
-class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
-{
-    var $oneToOne = true;
 
-    /**
-     * 构造函数
-     *
-     * @param array $define
-     * @param enum $type
-     * @param FLEA_Db_TableDataGateway $mainTDG
-     *
-     * @return FLEA_Db_TableLink
-     */
-    function FLEA_Db_HasOneLink($define, $type, & $mainTDG)
-    {
-        parent::FLEA_Db_TableLink($define, $type, $mainTDG);
-    }
-
-    /**
-     * 返回用于查询关联表数据的SQL语句
-     *
-     * @param string $in
-     *
-     * @return string
-     */
-    function getFindSQL($in)
-    {
-        if (!$this->init) { $this->init(); }
-        $fields = $this->qforeignKey . ' AS ' . $this->mainTDG->pka . ', ' . $this->dbo->qfields($this->fields, $this->assocTDG->fullTableName, $this->assocTDG->schema);
-        $sql = "SELECT {$fields} FROM {$this->assocTDG->qtableName} ";
-        return parent::_getFindSQLBase($sql, $in);
-    }
-
-    /**
-     * 创建或更新主表记录时，保存关联的数据
-     *
-     * @param array $row 要保存的关联数据
-     * @param mixed $pkv 主表的主键字段值
-     *
-     * @return boolean
-     */
-    function saveAssocData(& $row, $pkv)
-    {
-        if (empty($row)) { return true; }
-        if (!$this->init) { $this->init(); }
-        $row[$this->foreignKey] = $pkv;
-        return $this->_saveAssocDataBase($row);
-    }
-
-    /**
-     * 删除关联的数据
-     *
-     * @param mixed $qpkv
-     *
-     * @return boolean
-     */
-    function deleteByForeignKey($qpkv)
-    {
-        if (!$this->init) { $this->init(); }
-        $conditions = "{$this->qforeignKey} = {$qpkv}";
-        if ($this->linkRemove) {
-            return $this->assocTDG->removeByConditions($conditions);
-        } else {
-            return $this->assocTDG->updateField($conditions, $this->foreignKey, $this->linkRemoveFillValue);
-        }
-    }
-
-    /**
-     * 完全初始化关联对象
-     */
-    function init()
-    {
-        parent::init();
-        if (is_null($this->foreignKey)) {
-            $this->foreignKey = $this->mainTDG->primaryKey;
-        }
-        $this->qforeignKey = $this->dbo->qfield($this->foreignKey, $this->assocTDG->fullTableName, $this->assocTDG->schema);
-    }
-
-    /**
-     * 统计关联记录数
-     *
-     * @param array $assocRowset
-     * @param string $mappingName
-     * @param string $in
-     *
-     * @return int
-     */
-    function calcCount(& $assocRowset, $mappingName, $in)
-    {
-        if (!$this->init) { $this->init(); }
-        $sql = "SELECT {$this->qforeignKey} AS pid, COUNT({$this->qforeignKey}) AS c FROM {$this->assocTDG->qtableName} ";
-        $sql = parent::_getFindSQLBase($sql, $in);
-        $sql .= " GROUP BY {$this->qforeignKey}";
-
-        $r = $this->dbo->execute($sql);
-        while ($row = $this->dbo->fetchAssoc($r)) {
-            $assocRowset[$row['pid']][$mappingName] = (int)$row['c'];
-        }
-        $this->dbo->freeRes($r);
-    }
-}
 
 /**
  * FLEA_Db_BelongsToLink 封装 belongs to 关系
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
 {
-    var $oneToOne = true;
+    public $oneToOne = true;
 
     /**
      * 构造函数
@@ -597,10 +475,10 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
      *
      * @return FLEA_Db_TableLink
      */
-    function FLEA_Db_BelongsToLink($define, $type, & $mainTDG)
+    public function __construct($define, $type, & $mainTDG)
     {
         $this->linkUpdate = $this->linkCreate = $this->linkRemove = false;
-        parent::FLEA_Db_TableLink($define, $type, $mainTDG);
+        parent::__construct($define, $type, $mainTDG);
     }
 
     /**
@@ -610,7 +488,7 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
      *
      * @return string
      */
-    function getFindSQL($in)
+    public function getFindSQL($in)
     {
         if (!$this->init) { $this->init(); }
         $fields = $this->mainTDG->qpk . ' AS ' . $this->mainTDG->pka . ', ' . $this->dbo->qfields($this->fields, $this->assocTDG->fullTableName, $this->assocTDG->schema);
@@ -628,7 +506,7 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
      *
      * @return boolean
      */
-    function saveAssocData(& $row, $pkv)
+    function saveAssocData(array &$row, $pkv): bool
     {
         if (empty($row)) { return true; }
         if (!$this->init) { $this->init(); }
@@ -638,7 +516,7 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
     /**
      * 完全初始化关联对象
      */
-    function init()
+    public function init(): void
     {
         parent::init();
         if (is_null($this->foreignKey)) {
@@ -648,46 +526,13 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
     }
 }
 
-/**
- * FLEA_Db_HasManyLink 封装 has many 关系
- *
- * @package Core
- * @author 起源科技 (www.qeeyuan.com)
- * @version 1.0
- */
-class FLEA_Db_HasManyLink extends FLEA_Db_HasOneLink
-{
-    var $oneToOne = false;
 
-    /**
-     * 创建或更新主表记录时，保存关联的数据
-     *
-     * @param array $row 要保存的关联数据
-     * @param mixed $pkv 主表的主键字段值
-     *
-     * @return boolean
-     */
-    function saveAssocData(& $row, $pkv)
-    {
-        if (empty($row)) { return true; }
-        if (!$this->init) { $this->init(); }
-
-        foreach ($row as $arow) {
-            if (!is_array($arow)) { continue; }
-            $arow[$this->foreignKey] = $pkv;
-            if (!$this->_saveAssocDataBase($arow)) {
-                return false;
-            }
-        }
-        return true;
-    }
-}
 
 /**
  * FLEA_Db_ManyToManyLink 封装 many to many 关系
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
@@ -697,56 +542,56 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
      *
      * @var boolean
      */
-    var $oneToOne = false;
+    public $oneToOne = false;
 
     /**
      * 在处理中间表时，是否要将中间表当做实体
      *
      * @var boolean
      */
-    var $joinTableIsEntity = false;
+    public $joinTableIsEntity = false;
 
     /**
      * 中间表是实体时对应的表数据入口
      *
      * @var FLEA_Db_TableDataGateway
      */
-    var $joinTDG = null;
+    public $joinTDG = null;
 
     /**
      * 中间表的名字
      *
      * @var string
      */
-    var $joinTable = null;
+    public $joinTable = null;
 
     /**
      * 中间表的完全限定名
      *
      * @var string
      */
-    var $qjoinTable = null;
+    public $qjoinTable = null;
 
     /**
      * 中间表中保存关联表主键值的字段
      *
      * @var string
      */
-    var $assocForeignKey = null;
+    public $assocForeignKey = null;
 
     /**
      * 中间表中保存关联表主键值的字段的完全限定名
      *
      * @var string
      */
-    var $qassocForeignKey = null;
+    public $qassocForeignKey = null;
 
     /**
      * 中间表对应的表数据入口
      *
      * @var FLEA_Db_TableDataGateway
      */
-    var $joinTableClass = null;
+    public $joinTableClass = null;
 
     /**
      * 构造函数
@@ -757,12 +602,12 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
      *
      * @return FLEA_Db_TableLink
      */
-    function FLEA_Db_ManyToManyLink($define, $type, & $mainTDG)
+    function __construct($define, $type, & $mainTDG)
     {
         $this->_optional[] = 'joinTable';
         $this->_optional[] = 'joinTableClass';
         $this->_optional[] = 'assocForeignKey';
-        parent::FLEA_Db_TableLink($define, $type, $mainTDG);
+        parent::__construct($define, $type, $mainTDG);
 
         if ($this->joinTableClass != '') {
             $this->joinTableIsEntity = true;
@@ -778,7 +623,7 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
      */
     function getFindSQL($in)
     {
-        static $joinFields = array();
+        static $joinFields = [];
 
         if (!$this->init) { $this->init(); }
 
@@ -810,11 +655,11 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
      *
      * @return boolean
      */
-    function saveAssocData(& $row, $pkv)
+    function saveAssocData(array &$row, $pkv): bool
     {
         if (!$this->init) { $this->init(); }
-        $apkvs = array();
-        $entityRowset = array();
+        $apkvs = [];
+        $entityRowset = [];
 
         foreach ($row as $arow) {
             if (!is_array($arow)) {
@@ -847,12 +692,12 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
         $removeAssoc = array_diff($existsMiddle, $apkvs);
 
         if ($this->joinTableIsEntity) {
-            $insertEntityRowset = array();
+            $insertEntityRowset = [];
             foreach ($insertAssoc as $assocId) {
                 if (isset($entityRowset[$assocId])) {
                     $row = $entityRowset[$assocId];
                 } else {
-                    $row = array();
+                    $row = [];
                 }
                 $row[$this->foreignKey] = $pkv;
                 $row[$this->assocForeignKey] = $assocId;
@@ -928,11 +773,11 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
     /**
      * 完全初始化关联对象
      */
-    function init()
+    public function init(): void
     {
         parent::init();
         if ($this->joinTableClass) {
-            $this->joinTDG =& FLEA::getSingleton($this->joinTableClass);
+            $this->joinTDG = FLEA::getSingleton($this->joinTableClass);
             $this->joinTable = $this->joinTDG->tableName;
             $joinSchema = $this->joinTDG->schema;
         } else {
@@ -954,127 +799,4 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
     }
 }
 
-/**
- * FLEA_Db_SqlHelper 类提供了各种生成 SQL 语句的辅助方法
- *
- * @package Core
- * @author 起源科技 (www.qeeyuan.com)
- * @version 1.0
- */
-class FLEA_Db_SqlHelper
-{
-    /**
-     * 分析查询条件
-     *
-     * @param mixed $conditions
-     * @param FLEA_Db_TableDataGateway $table
-     *
-     * @return array
-     */
-    function parseConditions($conditions, & $table)
-    {
-        // 对于 NULL，直接返回 NULL
-        if (is_null($conditions)) { return null; }
 
-        // 如果是数字，则假定为主键字段值
-        if (is_numeric($conditions)) {
-            return "{$table->qpk} = {$conditions}";
-        }
-
-        // 如果是字符串，则假定为自定义条件
-        if (is_string($conditions)) {
-            return $conditions;
-        }
-
-        // 如果不是数组，说明提供的查询条件有误
-        if (!is_array($conditions)) {
-            return null;
-        }
-
-        $where = '';
-        $linksWhere = array();
-        $expr = '';
-
-        foreach ($conditions as $offset => $cond) {
-            $expr = 'AND';
-            /**
-             * 不过何种条件形式，一律转换为 (字段名, 值, 操作, 连接运算符, 值是否是SQL命令) 的形式
-             */
-            if (is_string($offset)) {
-                if (!is_array($cond)) {
-                    // 字段名 => 值
-                    $cond = array($offset, $cond);
-                } else {
-                    if (strtolower($offset) == 'in()') {
-                        if (count($cond) == 1 && is_array(reset($cond)) && is_string(key($cond))) {
-                            $tmp = $table->qfield(key($cond)) . ' IN (' . implode(',', array_map(array(& $table->dbo, 'qstr'), reset($cond))). ')';
-                        } else {
-                            $tmp = $table->qpk . ' IN (' . implode(',', array_map(array(& $table->dbo, 'qstr'), $cond)). ')';
-                        }
-                        $cond = array('', $tmp, '', $expr, true);
-                    } else {
-                        // 字段名 => 数组
-                        array_unshift($cond, $offset);
-                    }
-                }
-            } elseif (is_int($offset)) {
-                if (!is_array($cond)) {
-                    // 值
-                    $cond = array('', $cond, '', $expr, true);
-                }
-            } else {
-                continue;
-            }
-
-            if (!isset($cond[0])) { continue; }
-            if (!isset($cond[2])) { $cond[2] = '='; }
-            if (!isset($cond[3])) { $cond[3] = $expr; }
-            if (!isset($cond[4])) { $cond[4] = false; }
-
-            list($field, $value, $op, $expr, $isCommand) = $cond;
-
-            $str = '';
-            do {
-                if (strpos($field, '.') !== false) {
-                    list($scheme, $field) = explode('.', $field);
-                    $linkname = strtoupper($scheme);
-                    if (isset($table->links[$linkname])) {
-                        $linksWhere[$linkname][] = array($field, $value, $op, $expr, $isCommand);
-                        break;
-                    } else {
-                        $field = "{$scheme}.{$field}";
-                    }
-                }
-
-                if (!$isCommand) {
-                    $field = $table->qfield($field);
-                    $value = $table->dbo->qstr($value);
-                    $str = "{$field} {$op} {$value} {$expr} ";
-                } else {
-                    $str = "{$value} {$expr} ";
-                }
-            } while (false);
-
-            $where .= $str;
-        }
-
-        $where = substr($where, 0, - (strlen($expr) + 2));
-        if (empty($linksWhere)) {
-            return $where;
-        } else {
-            return array($where, $linksWhere);
-        }
-    }
-
-    /**
-     * 格式化输出 SQL 日志
-     *
-     * @param array $log
-     */
-    function dumpLog(& $log)
-    {
-        foreach ($log as $ix => $sql) {
-            dump($sql, 'SQL ' . ($ix + 1));
-        }
-    }
-}

@@ -1,18 +1,10 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * 定义 FLEA_Helper_Pager 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Pager.php 1016 2007-11-21 13:53:59Z qeeyuan $
  */
@@ -23,7 +15,7 @@
  * FLEA_Helper_Pager 使用很简单，只需要构造时传入 FLEA_Db_TableDataGateway 实例以及查询条件即可。
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Helper_Pager
@@ -36,7 +28,7 @@ class FLEA_Helper_Pager
      *
      * @var FLEA_Db_TableDataGateway|string
      */
-    var $source;
+    public $source;
 
     /**
      * 数据库访问对象，当 $this->source 参数为 SQL 语句时，必须调用
@@ -44,133 +36,133 @@ class FLEA_Helper_Pager
      *
      * @var SDBO
      */
-    var $dbo;
+    public $dbo;
 
     /**
      * 查询条件
      *
      * @var mixed
      */
-    var $_conditions;
+    public $_conditions;
 
     /**
      * 排序
      *
      * @var string
      */
-    var $_sortby;
+    public $_sortby;
 
     /**
      * 计算实际页码时的基数
      *
      * @var int
      */
-    var $_basePageIndex = 0;
+    public $_basePageIndex = 0;
 
     /**
      * 每页记录数
      *
      * @var int
      */
-    var $pageSize = -1;
+    public $pageSize = -1;
 
     /**
      * 数据表中符合查询条件的记录总数
      *
      * @var int
      */
-    var $totalCount = -1;
+    public $totalCount = -1;
 
     /**
      * 数据表中符合查询条件的记录总数
      *
      * @var int
      */
-    var $count = -1;
+    public $count = -1;
 
     /**
      * 符合条件的记录页数
      *
      * @var int
      */
-    var $pageCount = -1;
+    public $pageCount = -1;
 
     /**
      * 第一页的索引，从 0 开始
      *
      * @var int
      */
-    var $firstPage = -1;
+    public $firstPage = -1;
 
     /**
      * 第一页的页码
      *
      * @var int
      */
-    var $firstPageNumber = -1;
+    public $firstPageNumber = -1;
 
     /**
      * 最后一页的索引，从 0 开始
      *
      * @var int
      */
-    var $lastPage = -1;
+    public $lastPage = -1;
 
     /**
      * 最后一页的页码
      *
      * @var int
      */
-    var $lastPageNumber = -1;
+    public $lastPageNumber = -1;
 
     /**
      * 上一页的索引
      *
      * @var int
      */
-    var $prevPage = -1;
+    public $prevPage = -1;
 
     /**
      * 上一页的页码
      *
      * @var int
      */
-    var $prevPageNumber = -1;
+    public $prevPageNumber = -1;
 
     /**
      * 下一页的索引
      *
      * @var int
      */
-    var $nextPage = -1;
+    public $nextPage = -1;
 
     /**
      * 下一页的页码
      *
      * @var int
      */
-    var $nextPageNumber = -1;
+    public $nextPageNumber = -1;
 
     /**
      * 当前页的索引
      *
      * @var int
      */
-    var $currentPage = -1;
+    public $currentPage = -1;
 
     /**
      * 构造函数中提供的当前页索引，用于 setBasePageIndex() 后重新计算页码
      *
      * @var int
      */
-    var $_currentPage = -1;
+    public $_currentPage = -1;
 
     /**
      * 当前页的页码
      *
      * @var int
      */
-    var $currentPageNumber = -1;
+    public $currentPageNumber = -1;
 
     /**
      * 构造函数
@@ -195,7 +187,7 @@ class FLEA_Helper_Pager
      *
      * @return FLEA_Helper_Pager
      */
-    function FLEA_Helper_Pager(& $source, $currentPage, $pageSize = 20, $conditions = null, $sortby = null, $basePageIndex = 0)
+    public function __construct(& $source, $currentPage, $pageSize = 20, $conditions = null, $sortby = null, $basePageIndex = 0)
     {
         $this->_basePageIndex = $basePageIndex;
         $this->_currentPage = $this->currentPage = $currentPage;
@@ -221,7 +213,7 @@ class FLEA_Helper_Pager
      *
      * @param int $index
      */
-    function setBasePageIndex($index)
+    public function setBasePageIndex($index)
     {
         $this->_basePageIndex = $index;
         $this->currentPage = $this->_currentPage;
@@ -233,7 +225,7 @@ class FLEA_Helper_Pager
      *
      * @param int $page
      */
-    function setPage($page)
+    public function setPage($page)
     {
         $this->_currentPage = $page;
         $this->currentPage = $page;
@@ -245,7 +237,7 @@ class FLEA_Helper_Pager
      *
      * @param int $count
      */
-    function setCount($count)
+    public function setCount($count)
     {
         $this->count = $count;
         $this->computingPage();
@@ -256,7 +248,7 @@ class FLEA_Helper_Pager
      *
      * @param SDBO $dbo
      */
-    function setDBO(& $dbo)
+    public function setDBO(& $dbo)
     {
         $this->dbo =& $dbo;
     }
@@ -269,7 +261,7 @@ class FLEA_Helper_Pager
      *
      * @return array
      */
-    function & findAll($fields = '*', $queryLinks = true)
+    public function findAll($fields = '*', $queryLinks = true)
     {
         if ($this->count == -1) {
             $this->count = 20;
@@ -296,7 +288,7 @@ class FLEA_Helper_Pager
      *
      * @return array
      */
-    function getPagerData($returnPageNumbers = true)
+    public function getPagerData($returnPageNumbers = true)
     {
         $data = array(
             'pageSize' => $this->pageSize,
@@ -316,7 +308,7 @@ class FLEA_Helper_Pager
         );
 
         if ($returnPageNumbers) {
-            $data['pagesNumber'] = array();
+            $data['pagesNumber'] = [];
             for ($i = 0; $i < $this->pageCount; $i++) {
                 $data['pagesNumber'][$i] = $i + 1;
             }
@@ -333,7 +325,7 @@ class FLEA_Helper_Pager
      *
      * @return array
      */
-    function getNavbarIndexs($currentPage = 0, $navbarLen = 8)
+    public function getNavbarIndexs($currentPage = 0, $navbarLen = 8)
     {
         $mid = intval($navbarLen / 2);
         if ($currentPage < $this->firstPage) {
@@ -352,7 +344,7 @@ class FLEA_Helper_Pager
             if ($begin < $this->firstPage) { $begin = $this->firstPage; }
         }
 
-        $data = array();
+        $data = [];
         for ($i = $begin; $i <= $end; $i++) {
             $data[] = array('index' => $i, 'number' => ($i + 1 - $this->_basePageIndex));
         }
@@ -365,7 +357,7 @@ class FLEA_Helper_Pager
      * @param string $caption
      * @param string $jsfunc
      */
-    function renderPageJumper($caption = '%u', $jsfunc = 'fnOnPageChanged')
+    public function renderPageJumper($caption = '%u', $jsfunc = 'fnOnPageChanged')
     {
         $out = "<select name=\"PageJumper\" onchange=\"{$jsfunc}(this.value);\">\n";
         for ($i = $this->firstPage; $i <= $this->lastPage; $i++) {
@@ -384,7 +376,7 @@ class FLEA_Helper_Pager
     /**
      * 计算各项分页参数
      */
-    function computingPage()
+    protected function computingPage()
     {
         $this->pageCount = ceil($this->count / $this->pageSize);
         $this->firstPage = $this->_basePageIndex;

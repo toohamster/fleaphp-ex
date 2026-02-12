@@ -1,12 +1,5 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * 定义 FLEA 类和基础函数，并初始化 FleaPHP 运行环境
@@ -15,8 +8,7 @@
  * 在应用程序中只需要通过 require('FLEA.php') 载入该文件，
  * 即可完成 FleaPHP 运行环境的初始化工作。
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: FLEA.php 1525 2008-11-25 08:34:37Z dualface $
  */
@@ -24,8 +16,7 @@
 /**
  * 保存文件载入的时间
  */
-global $___fleaphp_loaded_time;
-$___fleaphp_loaded_time = microtime();
+define('FLEA_LOADED_TIME', microtime());
 
 /**
  * 定义一些有用的常量
@@ -35,13 +26,8 @@ $___fleaphp_loaded_time = microtime();
 define('FLEA_VERSION', '1.7.1524');
 
 // 定义指示 PHP4 或 PHP5 的常量
-if (substr(PHP_VERSION, 0, 1) == '5') {
-    define('PHP5', true);
-    define('PHP4', false);
-} else {
-    define('PHP5', false);
-    define('PHP4', true);
-}
+define('PHP5', true);
+define('PHP4', false);
 
 // 简写的 DIRECTORY_SEPARATOR
 define('DS', DIRECTORY_SEPARATOR);
@@ -77,25 +63,12 @@ define('ACTION_ALL',        'ACTION_ALL');
 /**
  * 初始化 FleaPHP 框架
  */
-define('G_FLEA_VAR', '__FLEA_CORE__');
-$GLOBALS[G_FLEA_VAR] = array(
-    'APP_INF'               => array(),
-    'OBJECTS'               => array(),
-    'DBO'                   => array(),
-    'CLASS_PATH'            => array(),
-    'FLEA_EXCEPTION_STACK'  => array(),
-    'FLEA_EXCEPTION_HANDLER'=> null,
-);
 
-// 定义 FleaPHP 文件所在位置，以及初始的 CLASS_PATH
-$GLOBALS[G_FLEA_VAR]['CLASS_PATH'][] = dirname(__FILE__);
-define('FLEA_DIR', $GLOBALS[G_FLEA_VAR]['CLASS_PATH'][0] . DS . 'FLEA');
-define('FLEA_3RD_DIR', $GLOBALS[G_FLEA_VAR]['CLASS_PATH'][0] . DS . '3rd');
-
-// 载入与早期 FleaPHP 保持兼容性的文件
-if (!defined('NO_LEGACY_FLEAPHP') || NO_LEGACY_FLEAPHP == false) {
-    require(FLEA_DIR . '/Compatibility.php');
-}
+// 初始化配置管理器
+$config = FLEA_Config::getInstance();
+$config->addClassPath(__DIR__);
+define('FLEA_DIR', $config->getClassPath()[0] . DS . 'FLEA');
+define('FLEA_3RD_DIR', $config->getClassPath()[0] . DS . '3rd');
 
 /**
  * 载入默认设置文件
@@ -103,18 +76,14 @@ if (!defined('NO_LEGACY_FLEAPHP') || NO_LEGACY_FLEAPHP == false) {
  * 如果没有定义 DEPLOY_MODE 常量为 true，则使用调试模式初始化 FleaPHP
  */
 if (!defined('DEPLOY_MODE') || DEPLOY_MODE != true) {
-    $GLOBALS[G_FLEA_VAR]['APP_INF'] = require(FLEA_DIR . '/Config/DEBUG_MODE_CONFIG.php');
+    $config->mergeAppInf(require(FLEA_DIR . '/Config/DEBUG_MODE_CONFIG.php'));
     define('DEBUG_MODE', true);
     if (!defined('DEPLOY_MODE')) { define('DEPLOY_MODE', false); }
 } else {
-    $GLOBALS[G_FLEA_VAR]['APP_INF'] = require(FLEA_DIR . '/Config/DEPLOY_MODE_CONFIG.php');
+    $config->mergeAppInf(require(FLEA_DIR . '/Config/DEPLOY_MODE_CONFIG.php'));
     define('DEBUG_MODE', false);
 }
 
-// 消除在 PHP5 中运行时产生的警告信息
-if (!defined('E_STRICT')) {
-    define('E_STRICT', 2048);
-}
 if (DEBUG_MODE) {
     error_reporting(error_reporting(0) & ~E_STRICT);
 } else {
@@ -124,13 +93,16 @@ if (DEBUG_MODE) {
 // 设置异常处理例程
 __SET_EXCEPTION_HANDLER('__FLEA_EXCEPTION_HANDLER');
 
+// 注册自动加载函数
+spl_autoload_register(array('FLEA', 'autoload'));
+
 /**
  * FLEA 类提供了 FleaPHP 框架的基本服务
  *
  * 该类的所有方法都是静态方法。
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA
@@ -143,21 +115,20 @@ class FLEA
      * FLEA::loadAppInf('./config/MyConfig.php');
      * </code>
      *
-     * @param mixed $__config 配置数组或配置文件名
+     * @param mixed $flea_internal_config 配置数组或配置文件名
      */
-    function loadAppInf($__flea_internal_config = null)
+    public static function loadAppInf($flea_internal_config = null): void
     {
-        if (!is_array($__flea_internal_config) && is_string($__flea_internal_config)) {
-            if (!is_readable($__flea_internal_config)) {
-                FLEA::loadClass('FLEA_Exception_ExpectedFile');
-                return __THROW(new FLEA_Exception_ExpectedFile($__flea_internal_config));
+        $config = FLEA_Config::getInstance();
+        if (!is_array($flea_internal_config) && is_string($flea_internal_config)) {
+            if (!is_readable($flea_internal_config)) {
+                throw new FLEA_Exception_ExpectedFile($flea_internal_config);
             }
-            $__flea_internal_config = require($__flea_internal_config);
+            $flea_internal_config = require($flea_internal_config);
         }
-        if (is_array($__flea_internal_config)) {
-            $GLOBALS[G_FLEA_VAR]['APP_INF'] = array_merge($GLOBALS[G_FLEA_VAR]['APP_INF'], $__flea_internal_config);
+        if (is_array($flea_internal_config)) {
+            $config->mergeAppInf($flea_internal_config);
         }
-        return null;
     }
 
     /**
@@ -175,9 +146,10 @@ class FLEA
      *
      * @return mixed
      */
-    function getAppInf($option, $default = null)
+    public static function getAppInf(string $option, $default = null)
     {
-        return isset($GLOBALS[G_FLEA_VAR]['APP_INF'][$option]) ? $GLOBALS[G_FLEA_VAR]['APP_INF'][$option] : $default;
+        $config = FLEA_Config::getInstance();
+        return $config->getAppInf($option, $default);
     }
 
     /**
@@ -197,17 +169,9 @@ class FLEA
      *
      * @return mixed
      */
-    function getAppInfValue($option, $keyname, $default = null)
+    public static function getAppInfValue(string $option, string $keyname, $default = null)
     {
-        if (!isset($GLOBALS[G_FLEA_VAR]['APP_INF'][$option])) {
-            $GLOBALS[G_FLEA_VAR]['APP_INF'][$option] = array();
-        }
-        if (array_key_exists($keyname, $GLOBALS[G_FLEA_VAR]['APP_INF'][$option])) {
-            return $GLOBALS[G_FLEA_VAR]['APP_INF'][$option][$keyname];
-        } else {
-            $GLOBALS[G_FLEA_VAR]['APP_INF'][$option][$keyname] = $default;
-            return $default;
-        }
+        return FLEA_Config::getInstance()->getAppInfValue($option, $keyname, $default);
     }
 
     /**
@@ -217,12 +181,9 @@ class FLEA
      * @param string $keyname
      * @param mixed $value
      */
-    function setAppInfValue($option, $keyname, $value)
+    public static function setAppInfValue(string $option, string $keyname, $value): void
     {
-        if (!isset($GLOBALS[G_FLEA_VAR]['APP_INF'][$option])) {
-            $GLOBALS[G_FLEA_VAR]['APP_INF'][$option] = array();
-        }
-        $GLOBALS[G_FLEA_VAR]['APP_INF'][$option][$keyname] = $value;
+        FLEA_Config::getInstance()->setAppInfValue($option, $keyname, $value);
     }
 
     /**
@@ -231,13 +192,9 @@ class FLEA
      * @param string $option
      * @param mixed $data
      */
-    function setAppInf($option, $data = null)
+    public static function setAppInf($option, $data = null): void
     {
-        if (is_array($option)) {
-            $GLOBALS[G_FLEA_VAR]['APP_INF'] = array_merge($GLOBALS[G_FLEA_VAR]['APP_INF'], $option);
-        } else {
-            $GLOBALS[G_FLEA_VAR]['APP_INF'][$option] = $data;
-        }
+        FLEA_Config::getInstance()->setAppInf($option, $data);
     }
 
     /**
@@ -257,15 +214,26 @@ class FLEA
      *
      * @param string $dir
      */
-    function import($dir)
+    public static function import(string $dir): void
     {
-        if (array_search($dir, $GLOBALS[G_FLEA_VAR]['CLASS_PATH'], true)) { return; }
-        if (DIRECTORY_SEPARATOR == '/') {
-            $dir = str_replace('\\', DIRECTORY_SEPARATOR, $dir);
-        } else {
-            $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
+        FLEA_Config::getInstance()->addClassPath($dir);
+    }
+
+    /**
+     * 自动加载类文件
+     *
+     * @param string $className 要加载的类名
+     * @return boolean 加载成功返回true，失败返回false
+     */
+    public static function autoload(string $className): bool
+    {
+        // 检查类是否已经加载
+        if (class_exists($className, false) || interface_exists($className, false)) { 
+            return true; 
         }
-        $GLOBALS[G_FLEA_VAR]['CLASS_PATH'][] = $dir;
+        
+        // 使用内部的 loadClass 方法来加载类
+        return self::loadClass($className, true);
     }
 
     /**
@@ -284,9 +252,9 @@ class FLEA
      *
      * @return boolean
      */
-    function loadFile($filename, $loadOnce = false)
+    public static function loadFile(string $filename, bool $loadOnce = false): bool
     {
-        static $is_loaded = array();
+        static $is_loaded = [];
 
         $path = FLEA::getFilePath($filename);
         if ($path != '') {
@@ -299,9 +267,7 @@ class FLEA
             }
         }
 
-        FLEA::loadClass('FLEA_Exception_ExpectedFile');
-        __THROW(new FLEA_Exception_ExpectedFile($filename));
-        return false;
+        throw new FLEA_Exception_ExpectedFile($filename);
     }
 
     /**
@@ -311,7 +277,6 @@ class FLEA
      *
      * example:
      * <code>
-     * FLEA::loadClass('Table_Posts');
      * // 首先将类名称 Table_Posts 转换为文件名 Table/Posts.php
      * // 然后从搜索路径中查找 Table/Posts.php 文件
      * </code>
@@ -321,32 +286,22 @@ class FLEA
      *
      * @return boolean
      */
-    function loadClass($className, $noException = false)
+    public static function loadClass(string $className, bool $noException = false): bool
     {
-        if (PHP5) {
-            if (class_exists($className, false) || interface_exists($className, false)) { return true; }
-        } else {
-            if (class_exists($className)) { return true; }
-        }
+        if (class_exists($className, false) || interface_exists($className, false)) { return true; }
 
         if (preg_match('/[^a-z0-9\-_.]/i', $className) === 0) {
             $filename = FLEA::getFilePath($className . '.php');
             if ($filename) {
                 require($filename);
-                if (PHP5) {
-                    if (class_exists($className, false) || interface_exists($className, false)) { return true; }
-                } else {
-                    if (class_exists($className)) { return true; }
-                }
+                if (class_exists($className, false) || interface_exists($className, false)) { return true; }
             }
         }
 
         if ($noException) { return false; }
 
         $filename = FLEA::getFilePath($className . '.php', true);
-        require_once(FLEA_DIR . '/Exception/ExpectedClass.php');
-        __THROW(new FLEA_Exception_ExpectedClass($className, $filename, file_exists($filename)));
-        return false;
+        throw new FLEA_Exception_ExpectedClass($className, $filename, file_exists($filename));
     }
 
     /**
@@ -359,7 +314,7 @@ class FLEA
      *
      * @return string
      */
-    function getFilePath($filename, $return = false)
+    public static function getFilePath(string $filename, bool $return = false): ?string
     {
         $filename = str_replace('_', DIRECTORY_SEPARATOR, $filename);
         if (DIRECTORY_SEPARATOR == '/') {
@@ -375,7 +330,8 @@ class FLEA
         // 首先搜索当前目录
         if (is_file($filename)) { return $filename; }
 
-        foreach ($GLOBALS[G_FLEA_VAR]['CLASS_PATH'] as $classdir) {
+        $config = FLEA_Config::getInstance();
+        foreach ($config->getClassPath() as $classdir) {
             $path = $classdir . DIRECTORY_SEPARATOR . $filename;
             if (is_file($path)) { return $path; }
         }
@@ -389,9 +345,9 @@ class FLEA
      *
      * example:
      * <code>
-     * $obj =& FLEA::getSingleton('Table_Posts);
+     * $obj = FLEA::getSingleton('Table_Posts);
      * ......
-     * $obj2 =& FLEA::getSingleton('Table_Posts);
+     * $obj2 = FLEA::getSingleton('Table_Posts);
      * // 检查调用两次获取的是否是同一个实例
      * echo $obj === $obj2 ? 'Equals' : 'Not equals';
      * </code>
@@ -400,18 +356,14 @@ class FLEA
      *
      * @return object
      */
-    function & getSingleton($className)
+    public static function getSingleton(string $className): object
     {
-        static $instances = array();
+        static $instances = [];
         if (FLEA::isRegistered($className)) {
             // 返回已经存在的对象实例
             return FLEA::registry($className);
         }
-        if (PHP5) {
-            $classExists = class_exists($className, false);
-        } else {
-            $classExists = class_exists($className);
-        }
+        $classExists = class_exists($className, false);
         if (!$classExists) {
             if (!FLEA::loadClass($className)) {
                 $return = false;
@@ -429,12 +381,12 @@ class FLEA
      *
      * example:
      * <code>
-     * $obj =& new MyClass();
+     * $obj = new MyClass();
      * // 将对象注册到容器
      * FLEA::register($obj, 'MyClass');
      * .....
      * // 从容器查找指定的对象
-     * $obj2 =&  FLEA::registry('MyClass');
+     * $obj2 = FLEA::registry('MyClass');
      * // 检查是否是同一个实例
      * echo $obj === $obj2 ? 'Equals' : 'Not equals';
      * </code>
@@ -444,24 +396,10 @@ class FLEA
      *
      * @return object
      */
-    function & register(& $obj, $name = null)
+    public static function register(object $obj, ?string $name = null): ?object
     {
-        if (!is_object($obj)) {
-            FLEA::loadClass('FLEA_Exception_TypeMismatch');
-            return __THROW(new FLEA_Exception_TypeMismatch($obj, 'object', gettype($obj)));
-        }
-
-        if (is_null($name)) {
-            $name = get_class($obj);
-        }
-
-        if (isset($GLOBALS[G_FLEA_VAR]['OBJECTS'][$name])) {
-            FLEA::loadClass('FLEA_Exception_ExistsKeyName');
-            return __THROW(new FLEA_Exception_ExistsKeyName($name));
-        } else {
-            $GLOBALS[G_FLEA_VAR]['OBJECTS'][$name] =& $obj;
-            return $obj;
-        }
+        $config = FLEA_Config::getInstance();
+        return $config->registerObject($obj, $name);
     }
 
     /**
@@ -473,16 +411,10 @@ class FLEA
      *
      * @return object
      */
-    function & registry($name = null)
+    public static function registry(?string $name = null)
     {
-        if (is_null($name)) {
-            return $GLOBALS[G_FLEA_VAR]['OBJECTS'];
-        }
-        if (isset($GLOBALS[G_FLEA_VAR]['OBJECTS'][$name]) && is_object($GLOBALS[G_FLEA_VAR]['OBJECTS'][$name])) {
-            return $GLOBALS[G_FLEA_VAR]['OBJECTS'][$name];
-        }
-        FLEA::loadClass('FLEA_Exception_NotExistsKeyName');
-        return __THROW(new FLEA_Exception_NotExistsKeyName($name));
+        $config = FLEA_Config::getInstance();
+        return $config->getRegistry($name);
     }
 
     /**
@@ -493,7 +425,7 @@ class FLEA
      * if (FLEA::isRegistered('MyClass')) {
      *      $obj =& FLEA::registry('MyClass');
      * } else {
-     *      $obj =& new MyClass();
+     *      $obj = new MyClass();
      * }
      * </code>
      *
@@ -501,9 +433,10 @@ class FLEA
      *
      * @return boolean
      */
-    function isRegistered($name)
+    public static function isRegistered(string $name): bool
     {
-        return isset($GLOBALS[G_FLEA_VAR]['OBJECTS'][$name]);
+        $config = FLEA_Config::getInstance();
+        return $config->isRegistered($name);
     }
 
 
@@ -534,13 +467,11 @@ class FLEA
      *
      * @return mixed 返回缓存的内容，缓存不存在或失效则返回 false
      */
-    function getCache($cacheId, $time = 900, $timeIsLifetime = true, $cacheIdIsFilename = false)
+    public static function getCache(string $cacheId, int $time = 900, bool $timeIsLifetime = true, bool $cacheIdIsFilename = false)
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
-            FLEA::loadClass('FLEA_Exception_CacheDisabled');
-            __THROW(new FLEA_Exception_CacheDisabled($cacheDir));
-            return false;
+            throw new FLEA_Exception_CacheDisabled($cacheDir);
         }
 
         if ($cacheIdIsFilename) {
@@ -592,13 +523,11 @@ class FLEA
      *
      * @return boolean
      */
-    function writeCache($cacheId, $data, $cacheIdIsFilename = false)
+    public static function writeCache(string $cacheId, $data, bool $cacheIdIsFilename = false): bool
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
-            FLEA::loadClass('FLEA_Exception_CacheDisabled');
-            __THROW(new FLEA_Exception_CacheDisabled($cacheDir));
-            return false;
+            throw new FLEA_Exception_CacheDisabled($cacheDir);
         }
 
         if ($cacheIdIsFilename) {
@@ -613,12 +542,10 @@ class FLEA
         $data = $prefix . $hash . $data;
 
         if (!safe_file_put_contents($cacheFile, $data)) {
-            FLEA::loadClass('FLEA_Exception_CacheDisabled');
-            __THROW(new FLEA_Exception_CacheDisabled($cacheDir));
-            return false;
-        } else {
-            return true;
+            throw new FLEA_Exception_CacheDisabled($cacheDir);
         }
+
+        return true;
     }
 
     /**
@@ -629,13 +556,11 @@ class FLEA
      *
      * @return boolean
      */
-    function purgeCache($cacheId, $cacheIdIsFilename = false)
+    public static function purgeCache(string $cacheId, bool $cacheIdIsFilename = false): bool
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
-            FLEA::loadClass('FLEA_Exception_CacheDisabled');
-            __THROW(new FLEA_Exception_CacheDisabled($cacheDir));
-            return false;
+            throw new FLEA_Exception_CacheDisabled($cacheDir);
         }
 
         if ($cacheIdIsFilename) {
@@ -658,7 +583,7 @@ class FLEA
      *
      * @return FLEA_WebControls
      */
-    function & initWebControls()
+    public static function initWebControls(): FLEA_WebControls
     {
         return FLEA::getSingleton(FLEA::getAppInf('webControlsClassName'));
     }
@@ -670,7 +595,7 @@ class FLEA
      *
      * @return FLEA_Ajax
      */
-    function & initAjax()
+    public static function initAjax(): FLEA_Ajax
     {
         return FLEA::getSingleton(FLEA::getAppInf('ajaxClassName'));
     }
@@ -683,15 +608,14 @@ class FLEA
      *
      * @param string $helperName
      */
-    function loadHelper($helperName)
+    public static function loadHelper(string $helperName): void
     {
         $settingName = 'helper.' . strtolower($helperName);
         $setting = FLEA::getAppInf($settingName);
         if ($setting) {
-            return FLEA::loadFile($setting, true);
+            FLEA::loadFile($setting, true);
         } else {
-            FLEA::loadClass('FLEA_Exception_NotExistsKeyName');
-            return __THROW(new FLEA_Exception_NotExistsKeyName('helper.' . $helperName));
+            throw new FLEA_Exception_NotExistsKeyName('helper.' . $helperName);
         }
     }
 
@@ -716,28 +640,28 @@ class FLEA
      *      'charset'  => 'utf8',
      * );
      *
-     * $dbo =& FLEA::getDBO($dsn);
+     * $dbo = FLEA::getDBO($dsn);
      * </code>
      *
      * @param array|string|int $dsn
      *
      * @return FLEA_Db_Driver_Abstract
      */
-    function & getDBO($dsn = 0)
+    public static function getDBO($dsn = 0): FLEA_Db_Driver_Abstract
     {
+        $config = FLEA_Config::getInstance();
         if ($dsn == 0) {
             $dsn = FLEA::getAppInf('dbDSN');
         }
         $dsn = FLEA::parseDSN($dsn);
 
         if (!is_array($dsn) || !isset($dsn['driver'])) {
-            FLEA::loadClass('FLEA_Db_Exception_InvalidDSN');
-            return __THROW(new FLEA_Db_Exception_InvalidDSN($dsn));
+            throw new FLEA_Db_Exception_InvalidDSN($dsn);
         }
 
         $dsnid = $dsn['id'];
-        if (isset($GLOBALS[G_FLEA_VAR]['DBO'][$dsnid])) {
-            return $GLOBALS[G_FLEA_VAR]['DBO'][$dsnid];
+        if ($config->hasDbo($dsnid)) {
+            return $config->getDbo($dsnid);
         }
 
         $driver = ucfirst(strtolower($dsn['driver']));
@@ -747,12 +671,12 @@ class FLEA
         } else {
             FLEA::loadClass($className);
         }
-        $dbo =& new $className($dsn);
+        $dbo = new $className($dsn);
         /* @var $dbo FLEA_Db_Driver_Abstract */
         $dbo->connect();
 
-        $GLOBALS[G_FLEA_VAR]['DBO'][$dsnid] =& $dbo;
-        return $GLOBALS[G_FLEA_VAR]['DBO'][$dsnid];
+        $config->registerDbo($dbo, $dsnid);
+        return $dbo;
     }
 
     /**
@@ -762,7 +686,7 @@ class FLEA
      *
      * @return array
      */
-    function parseDSN($dsn)
+    public static function parseDSN($dsn): ?array
     {
         if (is_array($dsn)) {
             $dsn['host'] = isset($dsn['host']) ? $dsn['host'] : '';
@@ -778,7 +702,7 @@ class FLEA
             $parse = parse_url($dsn);
             if (empty($parse['scheme'])) { return false; }
 
-            $dsn = array();
+            $dsn = [];
             $dsn['host']     = isset($parse['host']) ? $parse['host'] : 'localhost';
             $dsn['port']     = isset($parse['port']) ? $parse['port'] : '';
             $dsn['login']    = isset($parse['user']) ? $parse['user'] : '';
@@ -799,7 +723,7 @@ class FLEA
      *
      * 如果应用程序需要使用 FleaPHP 提供的 MVC 模式，则在载入 FLEA.php 和自定义的应用程序设置后，应该调用 FLEA::runMVC() 启动应用程序。
      */
-    function runMVC()
+    public static function runMVC(): void
     {
         $MVCPackageFilename = FLEA::getAppInf('MVCPackageFilename');
         if ($MVCPackageFilename != '') {
@@ -811,7 +735,7 @@ class FLEA
         $dispatcherClass = FLEA::getAppInf('dispatcher');
         FLEA::loadClass($dispatcherClass);
 
-        $dispatcher =& new $dispatcherClass($_GET);
+        $dispatcher = new $dispatcherClass($_GET);
         FLEA::register($dispatcher, $dispatcherClass);
         $dispatcher->dispatching();
     }
@@ -821,7 +745,7 @@ class FLEA
      *
      * @param boolean $loadMVC
      */
-    function init($loadMVC = false)
+    public static function init(bool $loadMVC = false): void
     {
         static $firstTime = true;
 
@@ -847,9 +771,7 @@ class FLEA
          * 安装应用程序指定的异常处理例程
          */
         __SET_EXCEPTION_HANDLER(FLEA::getAppInf('exceptionHandler'));
-        if (PHP5) {
-            set_exception_handler(FLEA::getAppInf('exceptionHandler'));
-        }
+        set_exception_handler(FLEA::getAppInf('exceptionHandler'));
 
         /**
          * 载入日志服务提供程序
@@ -867,24 +789,8 @@ class FLEA
          */
         $cachedir = FLEA::getAppInf('internalCacheDir');
         if (empty($cachedir)) {
-            FLEA::setAppInf('internalCacheDir', dirname(__FILE__) . DS . '_Cache');
+            FLEA::setAppInf('internalCacheDir', __DIR__ . DS . '_Cache');
         }
-
-        // 过滤 magic_quotes
-        if (get_magic_quotes_gpc()) {
-            $in = array(& $_GET, & $_POST, & $_COOKIE, & $_REQUEST);
-            while (list($k,$v) = each($in)) {
-                foreach ($v as $key => $val) {
-                    if (!is_array($val)) {
-                        $in[$k][$key] = stripslashes($val);
-                        continue;
-                    }
-                    $in[] =& $in[$k][$key];
-                }
-            }
-            unset($in);
-        }
-        set_magic_quotes_runtime(0);
 
         // 根据 URL 模式设置，决定是否要载入 URL 分析过滤器
         if (FLEA::getAppInf('urlMode') != URL_STANDARD) {
@@ -950,7 +856,7 @@ class FLEA
  * @param bool $jsWrapped 指示返回 JavaScript 代码时是否使用 <script> 标签进行包装
  * @param bool $return 指示是否返回生成的 JavaScript 代码
  */
-function redirect($url, $delay = 0, $js = false, $jsWrapped = true, $return = false)
+function redirect(string $url, int $delay = 0, bool $js = false, bool $jsWrapped = true, bool $return = false): ?string
 {
     $delay = (int)$delay;
     if (!$js) {
@@ -1029,7 +935,7 @@ EOT;
  *
  * @return string
  */
-function url($controllerName = null, $actionName = null, $params = null, $anchor = null, $options = null)
+function url(?string $controllerName = null, ?string $actionName = null, ?array $params = null, ?string $anchor = null, ?array $options = null): string
 {
     static $baseurl = null, $currentBootstrap = null;
 
@@ -1139,7 +1045,7 @@ function url($controllerName = null, $actionName = null, $params = null, $anchor
  *
  * @return string
  */
-function detect_uri_base()
+function detect_uri_base(): string
 {
     static $baseuri = null;
 
@@ -1227,7 +1133,7 @@ function detect_uri_base()
  *
  * @return string
  */
-function encode_url_args($args, $urlMode = URL_STANDARD, $parameterPairStyle = null)
+function encode_url_args(array $args, string $urlMode = URL_STANDARD, ?string $parameterPairStyle = null): string
 {
     $str = '';
     switch ($urlMode) {
@@ -1268,7 +1174,7 @@ function encode_url_args($args, $urlMode = URL_STANDARD, $parameterPairStyle = n
  *
  * @return string
  */
-function h($text)
+function h(string $text): string
 {
     return htmlspecialchars($text);
 }
@@ -1282,7 +1188,7 @@ function h($text)
  *
  * @return string
  */
-function t($text)
+function t(string $text): string
 {
     return nl2br(str_replace(' ', '&nbsp;', htmlspecialchars($text)));
 }
@@ -1301,7 +1207,7 @@ function t($text)
  * @param string $after_action 显示消息后要执行的动作
  * @param string $url 重定向位置
  */
-function js_alert($message = '', $after_action = '', $url = '')
+function js_alert(string $message = '', string $after_action = '', string $url = ''): void
 {
     $out = "<script language=\"javascript\" type=\"text/javascript\">\n";
     if (!empty($message)) {
@@ -1329,7 +1235,7 @@ function js_alert($message = '', $after_action = '', $url = '')
  *
  * @return string
  */
-function t2js($content)
+function t2js(string $content): string
 {
     return str_replace(array("\r", "\n"), array('', '\n'), addslashes($content));
 }
@@ -1343,7 +1249,7 @@ function t2js($content)
  *
  * @return boolean
  */
-function safe_file_put_contents($filename, & $content)
+function safe_file_put_contents(string $filename, string $content): bool
 {
     $fp = fopen($filename, 'wb');
     if ($fp) {
@@ -1364,7 +1270,7 @@ function safe_file_put_contents($filename, & $content)
  *
  * @return mixed
  */
-function safe_file_get_contents($filename)
+function safe_file_get_contents(string $filename): ?string
 {
     $fp = fopen($filename, 'rb');
     if ($fp) {
@@ -1386,7 +1292,7 @@ function safe_file_get_contents($filename)
 
 if (!function_exists('file_put_contents'))
 {
-    function file_put_contents($filename, & $content)
+    function file_put_contents(string $filename, string $content): bool
     {
         return safe_file_put_contents($filename, $content);
     }
@@ -1395,184 +1301,6 @@ if (!function_exists('file_put_contents'))
 /**
  * 调试和错误处理相关的全局函数
  */
-
-/**
- * 抛出一个异常
- *
- * FleaPHP 为了兼容 PHP4，模拟了一种异常机制。但这种模拟机制和真正的异常机制有本质区别。
- * FleaPHP 模拟的异常机制有下列特点：
- *   - 用 __TRY() 而不是 try 设置捕获点；
- *   - 用 __CATCH() 捕获异常，而不是 catch；
- *   - 用 __THROW() 抛出异常；
- *   - __TRY() 和 __CATCH() 并不能够捕获 PHP5 中用 throw 抛出的异常；
- *   - 程序在使用 __THROW() 抛出异常后，必须使用 return false 退出函数或类方法的执行；
- *   - __TRY() 和 __CATCH() 必须成对调用，并且 __CATCH() 只能捕获一个异常；
- *   - 用 __IS_EXCEPTION() 来判断 __CATCH() 的返回值是否是一个异常；
- *   - 如果 __TRY() 调用后没有用 __CATCH() 捕获异常，必须用 __CANCEL_TRY() 取消捕获。
- *
- * 虽然 __THROW() 并不强制要求抛出的异常必须是从 FLEA_Exception 继承的类，但应用程序
- * 应该抛出 FleaPHP 已经定义的异常。或者从 FLEA_Exception 派生应用程序自己的异常。
- * FLEA_Exception 提供了一些方法，可以让应用程序更好的处理异常。
- *
- * 下面的代码片段是模拟异常最常见的使用形式。
- * <code>
- * __TRY();
- * $ret = doSomething(); // 调用可能会发生异常的代码
- * $ex = __CATCH();
- * if (__IS_EXCEPTION($ex)) {
- *     // 处理异常
- * } else {
- *     echo $ret;
- * }
- *
- * function doSomething() {
- *     if (rand(0, 9) % 2) {
- *         __THROW(new MyException());
- *         return false;
- *     }
- *     return true;
- * }
- * </code>
- *
- * <strong>特别要注意的就是使用 __THROW() 抛出异常后，必须 return false</strong>
- *
- * 由于 doSomething() 中的 __THROW() 实际上并不中断程序执行，所以调用 doSomething() 的
- * 代码要负责检查返回值，或者在调用 doSomething() 以后理解捕获异常。
- *
- * 为此，__TRY() 和 __CATCH() 之间的代码要尽可能的少。
- *
- * <strong>对于 __TRY() 和 __CATCH() 的嵌套问题：</strong>
- *
- * FleaPHP 是允许 __TRY() 嵌套的。例如在上面代码中，doSomething() 函数调用了其他可能抛出
- * 异常的代码。则在 doSomething() 中也可以通过 __TRY() 和 __CATCH() 来捕获异常。
- *
- * <code>
- * function doSomething() {
- *     if (rand(0, 9) % 2) {
- *         __THROW(new MyException());
- *         return false;
- *     } else {
- *         __TRY();
- *         callAnotherFunc();
- *         $ex = __CATCH();
- *         if (__IS_EXCEPTION($ex)) {
- *             // 处理 callAnotherFunc() 函数抛出的异常
- *             ...
- *             // 根据处理结果，可以用 __THROW() 重新抛出这个异常，
- *             // 让调用 doSomething() 的代码去处理该异常
- *             __THROW($ex);
- *             return false;
- *         }
- *         return true;
- *     }
- * }
- * </code>
- *
- * 如果调用 __TRY() 之后不需要调用 __CATCH() 捕获异常，则必须用 __CANCEL_TRY()
- * 撤销用 __TRY() 设置的捕获点。
- *
- * @package Core
- *
- * @param FLEA_Exception $exception
- *
- * @return boolean
- */
-function __THROW($exception)
-{
-    // 写入日志
-    if (function_exists('log_message')) {
-        log_message(get_class($exception) . ': ' . $exception->getMessage(), 'exception');
-    }
-
-    // 确定是否将异常保存在栈中
-    if (isset($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK']) && is_array($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK']))
-    {
-        $point = array_pop($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK']);
-        if ($point != null) {
-            array_push($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK'], $exception);
-            $ret = false;
-            return $ret;
-        }
-    }
-
-    if (isset($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_HANDLER'])) {
-        call_user_func_array($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_HANDLER'], array(& $exception));
-    } else {
-        __FLEA_EXCEPTION_HANDLER($exception);
-    }
-    exit;
-}
-
-/**
- * 设置异常拦截点
- *
- * @package Core
- */
-function __TRY()
-{
-    static $point = 0;
-    if (!isset($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK']) ||
-        !is_array($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK']))
-    {
-        $GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK'] = array();
-    }
-
-    $point++;
-    array_push($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK'], $point);
-}
-
-/**
- * 返回抛出的异常，如果没有异常抛出，返回 false
- *
- * @package Core
- *
- * @return FLEA_Exception
- */
-function __CATCH()
-{
-    if (!is_array($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK'])) {
-        return false;
-    }
-    $exception = array_pop($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK']);
-    if (!is_object($exception)) {
-        $exception = false;
-    }
-    return $exception;
-}
-
-/**
- * 清除最后一个 __TRY() 异常捕获设置
- *
- * @package Core
- */
-function __CANCEL_TRY()
-{
-    if (is_array($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK'])) {
-        array_pop($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK']);
-    }
-}
-
-/**
- * 判断是否是一个异常
- *
- * $type 参数用于判断异常是否是指定的类型。
- *
- * @package Core
- *
- * @param FLEA_Exception $exception
- * @param string $type
- */
-function __IS_EXCEPTION($exception, $type = null)
-{
-    if (!is_object($exception) || !is_a($exception, 'FLEA_Exception')) {
-        return false;
-    }
-    if (is_null($type)) {
-        return true;
-    } else {
-        return strtoupper($type) == strtoupper(get_class($exception));
-    }
-}
 
 /**
  * 设置新的异常处理例程，返回当前使用的异常处理例程
@@ -1612,12 +1340,9 @@ function __IS_EXCEPTION($exception, $type = null)
  */
 function __SET_EXCEPTION_HANDLER($callback)
 {
-    if (isset($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_HANDLER'])) {
-        $current = $GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_HANDLER'];
-    } else {
-        $current = null;
-    }
-    $GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_HANDLER'] = $callback;
+    $config = FLEA_Config::getInstance();
+    $current = $config->getExceptionHandler();
+    $config->setExceptionHandler($callback);
     return $current;
 }
 
@@ -1628,7 +1353,7 @@ function __SET_EXCEPTION_HANDLER($callback)
  *
  * @param FLEA_Exception $ex
  */
-function __FLEA_EXCEPTION_HANDLER($ex)
+function __FLEA_EXCEPTION_HANDLER(FLEA_Exception $ex): void
 {
     if (!FLEA::getAppInf('displayErrors')) { exit; }
     if (FLEA::getAppInf('friendlyErrorsMessage')) {
@@ -1658,7 +1383,7 @@ function __FLEA_EXCEPTION_HANDLER($ex)
  * @param FLEA_Exception $ex
  * @param boolean $return 为 true 时返回输出信息，而不是直接显示
  */
-function print_ex($ex, $return = false)
+function print_ex(FLEA_Exception $ex, bool $return = false): ?string
 {
     $out = "exception '" . get_class($ex) . "'";
     if ($ex->getMessage() != '') {
@@ -1691,7 +1416,7 @@ function print_ex($ex, $return = false)
  * @param string $label
  * @param boolean $return
  */
-function dump($vars, $label = '', $return = false)
+function dump($vars, string $label = '', bool $return = false): ?string
 {
     if (ini_get('html_errors')) {
         $content = "<pre>\n";
@@ -1715,7 +1440,7 @@ function dump($vars, $label = '', $return = false)
  *
  * @return string
  */
-function dump_trace()
+function dump_trace(): void
 {
     $debug = debug_backtrace();
     $lines = '';
@@ -1759,7 +1484,7 @@ function dump_trace()
  *
  * @return float
  */
-function microtime_float($time = null)
+function microtime_float(?string $time = null): float
 {
     list($usec, $sec) = explode(' ', $time ? $time : microtime());
     return ((float)$usec + (float)$sec);
@@ -1783,9 +1508,9 @@ function microtime_float($time = null)
  *
  * @return string
  */
-function _ET($errorCode, $appError = false)
+function _ET(int $errorCode, bool $appError = false): string
 {
-    static $message = array();
+    static $message = [];
 
     $language = FLEA::getAppInf('defaultLanguage');
     $language = preg_replace('/[^a-z0-9\-_]+/i', '', $language);
@@ -1807,240 +1532,4 @@ function _ET($errorCode, $appError = false)
     return isset($message[$language][$errorCode]) ?
         $message[$language][$errorCode] :
         '';
-}
-
-/**
- * PHP4 和 PHP5 使用不同的类定义
- */
-if (PHP5) {
-
-    class FLEA_Exception extends Exception
-    {
-        function FLEA_Exception($message = '', $code = 0)
-        {
-            parent::__construct($message, $code);
-        }
-    }
-
-} else {
-
-    /**
-     * FLEA_Exception 类封装了一个异常
-     *
-     * 在 PHP5 中，FLEA_Exception 继承自 PHP 内置的 Exception 类。
-     * 在 PHP4 中，则模拟了异常机制。
-     *
-     * @package Exception
-     * @author 起源科技 (www.qeeyuan.com)
-     * @version 1.0
-     */
-    class FLEA_Exception
-    {
-        /**
-         * 异常消息
-         *
-         * @var string
-         */
-        var $message = 'Unknown exception';
-
-        /**
-         * 错误代码
-         */
-        var $code = 0;
-
-        /**
-         * 抛出异常的文件
-         *
-         * @var string
-         */
-        var $file;
-
-        /**
-         * 抛出异常代码的行号
-         *
-         * @var int
-         */
-        var $line;
-
-        /**
-         * 调用堆栈
-         *
-         * @var array
-         */
-        var $trac;
-
-        /**
-         * 构造函数
-         *
-         * @param string $message
-         * @param int $code
-         *
-         * @return FLEA_Exception
-         */
-        function FLEA_Exception($message = null, $code = 0)
-        {
-            $this->message = $message;
-            $this->code = $code;
-            $this->trac = debug_backtrace();
-
-            // 取得抛出异常的文件和代码行号
-            $last = array_shift($this->trac);
-            $this->file = $last['file'];
-            $this->line = $last['line'];
-        }
-
-        /**
-         * 获得异常错误信息
-         *
-         * @return string
-         */
-        function getMessage()
-        {
-            return $this->message;
-        }
-
-        /**
-         * 获得异常错误代码
-         *
-         * @return int
-         */
-        function getCode()
-        {
-            return $this->code;
-        }
-
-        /**
-         * 获得抛出异常的文件名
-         *
-         * @return string
-         */
-        function getFile()
-        {
-            return $this->file;
-        }
-
-        /**
-         * 获得抛出异常的代码行号
-         *
-         * @return int
-         */
-        function getLine()
-        {
-            return $this->line;
-        }
-
-        /**
-         * 返回调用堆栈
-         *
-         * @return array
-         */
-        function getTrace()
-        {
-            return $this->trac;
-        }
-
-        /**
-         * 返回字符串表示的调用堆栈
-         */
-        function getTraceAsString()
-        {
-            $out = '';
-            $ix = 0;
-            foreach ($this->trac as $point) {
-                $out .= "#{$ix} {$point['file']}({$point['line']}): {$point['function']}(";
-                if (is_array($point['args']) && count($point['args']) > 0) {
-                    foreach ($point['args'] as $arg) {
-                        switch (gettype($arg)) {
-                        case 'array':
-                        case 'resource':
-                            $out .= gettype($arg);
-                            break;
-                        case 'object':
-                            $out .= get_class($arg);
-                            break;
-                        case 'string':
-                            if (strlen($arg) > 30) {
-                                $arg = substr($arg, 0, 27) . ' ...';
-                            }
-                            $out .= "'{$arg}'";
-                            break;
-                        default:
-                            $out .= $arg;
-                        }
-                        $out .= ', ';
-                    }
-                    $out = substr($out, 0, -2);
-                }
-                $out .= ")\n";
-                $ix++;
-            }
-            $out .= "#{$ix} {main}\n";
-
-            return $out;
-        }
-
-        /**
-         * 返回异常的字符串形式
-         *
-         * @return string
-         */
-        function __toString()
-        {
-            $out = "exception '" . get_class($this) . "'";
-            if ($this->message != '') {
-                $out .= " with message '{$this->message}'";
-            }
-            $out .= " in {$this->file}:{$this->line}\n\n";
-            $out .= $this->getTraceAsString();
-            return $out;
-        }
-    }
-
-}
-
-/**
- * Ajax 相关的函数
- */
- /**
- * 当没有找到 PHP 内置的 JSON 扩展时，使用 PEAR::Service_JSON 来处理 JSON 的构造和解析
- *
- * 强烈推荐所有 PHP 用户安装 JSON 扩展，获得最好的性能表现。
- */
-
-if (!function_exists('json_encode')) {
-    /**
-     * 将变量转换为 JSON 字符串
-     *
-     * @param mixed $value
-     *
-     * @return string
-     */
-    function json_encode($value)
-    {
-        static $instance = array();
-        if (!isset($instance[0])) {
-            require_once(FLEA_DIR . '/Ajax/JSON.php');
-            $instance[0] =& new Services_JSON(SERVICES_JSON_LOOSE_TYPE);
-        }
-        return $instance[0]->encode($value);
-    }
-}
-
-if (!function_exists('json_decode')) {
-    /**
-     * 将 JSON 字符串转换为变量
-     *
-     * @param string $jsonString
-     *
-     * @return mixed
-     */
-    function json_decode($jsonString)
-    {
-        static $instance = array();
-        if (!isset($instance[0])) {
-            require_once(FLEA_DIR . '/Ajax/JSON.php');
-            $instance[0] =& new Services_JSON(SERVICES_JSON_LOOSE_TYPE);
-        }
-        return $instance[0]->decode($jsonString);
-    }
 }

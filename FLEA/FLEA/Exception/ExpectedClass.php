@@ -1,18 +1,10 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * 定义 FLEA_Exception_ExpectedClass 异常
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Exception
  * @version $Id: ExpectedClass.php 972 2007-10-09 20:56:54Z qeeyuan $
  */
@@ -21,7 +13,7 @@
  * FLEA_Exception_ExpectedClass 异常指示需要的类没有找到
  *
  * @package Exception
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Exception_ExpectedClass extends FLEA_Exception
@@ -31,21 +23,21 @@ class FLEA_Exception_ExpectedClass extends FLEA_Exception
      *
      * @var string
      */
-    var $className;
+    public $className;
 
     /**
      * 类定义文件
      *
      * @var string
      */
-    var $classFile;
+    public $classFile;
 
     /**
      * 指示文件是否存在
      *
      * @var boolean
      */
-    var $fileExists;
+    public $fileExists;
 
     /**
      * 构造函数
@@ -56,7 +48,7 @@ class FLEA_Exception_ExpectedClass extends FLEA_Exception
      *
      * @return FLEA_Exception_ExpectedClass
      */
-    function FLEA_Exception_ExpectedClass($className, $file = null, $fileExists = false)
+    public function __construct(string $className, ?string $file = null, bool $fileExists = false)
     {
         $this->className = $className;
         $this->classFile = $file;
@@ -68,6 +60,6 @@ class FLEA_Exception_ExpectedClass extends FLEA_Exception
             $code = 0x0102003;
             $msg = sprintf(_ET($code), $className);
         }
-        parent::FLEA_Exception($msg, $code);
+        parent::__construct($msg, $code);
     }
 }

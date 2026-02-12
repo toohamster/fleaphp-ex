@@ -1,18 +1,10 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * 定义 FLEA_WebControls 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: WebControls.php 1039 2008-04-25 19:29:53Z qeeyuan $
  */
@@ -23,7 +15,7 @@
  * 开发者不应该自行加载该文件，而是调用 init_webcontrols() 来进行 WebControls 的初始化。
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_WebControls
@@ -33,14 +25,14 @@ class FLEA_WebControls
      *
      * @var array
      */
-    var $_extends = array();
+    public $_extends = [];
 
     /**
      * 保存扩展控件的目录
      *
      * @var array
      */
-    var $_extendsDir = array();
+    public $_extendsDir = [];
 
     /**
      * 构造函数
@@ -49,7 +41,7 @@ class FLEA_WebControls
      *
      * @return FLEA_WebControls
      */
-    function FLEA_WebControls($extendsDir = null)
+    public function __construct($extendsDir = null)
     {
         if (is_array($extendsDir)) {
             $this->_extendsDir = array_merge($this->_extendsDir, $extendsDir);
@@ -74,7 +66,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function control($type, $name, $attribs = null, $return = false)
+    public function control(string $type, string $name, ?array $attribs = null, bool $return = false): ?string
     {
         $type = strtolower($type);
         $render = '_ctl' . ucfirst($type);
@@ -117,7 +109,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function attribsToString($attribs)
+    public function attribsToString(array $attribs): string
     {
         $__ctl_out = '';
         foreach ($attribs as $attrib => $value) {
@@ -134,9 +126,9 @@ class FLEA_WebControls
      *
      * @return array
      */
-    function extractAttribs(& $attribs, $req)
+    public function extractAttribs(array &$attribs, array $req): array
     {
-        $extract = array();
+        $extract = [];
         foreach ($req as $attrib) {
             if (array_key_exists($attrib, $attribs)) {
                 $extract[$attrib] = $attribs[$attrib];
@@ -153,9 +145,9 @@ class FLEA_WebControls
      *
      * @param array $attribs
      */
-    function mergeAttribs(& $attribs)
+    public function mergeAttribs(array &$attribs): void
     {
-        $args = array();
+        $args = [];
         foreach ($attribs as $key => $arg) {
             if (is_array($arg)) {
                 $args = array_merge($args, $arg);
@@ -171,7 +163,7 @@ class FLEA_WebControls
      *
      * @return object
      */
-    function & _getView()
+    protected function _getView()
     {
         $viewClass = FLEA::getAppInf('view');
         if ($viewClass != 'PHP') {
@@ -190,7 +182,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function _ctlTextbox($name, $attribs)
+    public function _ctlTextbox(string $name, ?array $attribs = null): string
     {
         return $this->__baseCtlInput($name, $attribs, 'text');
     }
@@ -203,7 +195,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function _ctlPassword($name, $attribs)
+    public function _ctlPassword(string $name, ?array $attribs = null): string
     {
         return $this->__baseCtlInput($name, $attribs, 'password');
     }
@@ -216,7 +208,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function _ctlMemo($name, $attribs)
+    public function _ctlMemo(string $name, ?array $attribs = null): string
     {
         extract($this->extractAttribs($attribs, array('id', 'value', 'disabled')));
         if (empty($id)) { $id = $name; }
@@ -244,7 +236,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function _ctlCheckbox($name, $attribs)
+    public function _ctlCheckbox(string $name, ?array $attribs = null): string
     {
         return $this->__baseCtlCheckboxOrRadio($name, $attribs, 'checkbox');
     }
@@ -257,7 +249,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function _ctlCheckBoxGroup($name, $attribs)
+    public function _ctlCheckBoxGroup(string $name, ?array $attribs = null): string
     {
         return $this->__baseCtlCheckboxOrRadioGroup($name, $attribs, 'checkbox', '[]');
     }
@@ -270,7 +262,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function _ctlRadio($name, $attribs)
+    public function _ctlRadio(string $name, ?array $attribs = null): string
     {
         return $this->__baseCtlCheckboxOrRadio($name, $attribs, 'radio');
     }
@@ -283,7 +275,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function _ctlRadioGroup($name, $attribs)
+    public function _ctlRadioGroup(string $name, ?array $attribs = null): string
     {
         return $this->__baseCtlCheckboxOrRadioGroup($name, $attribs, 'radio', '');
     }
@@ -296,7 +288,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function _ctlListBox($name, $attribs)
+    public function _ctlListBox(string $name, ?array $attribs = null): string
     {
         extract($this->extractAttribs($attribs,
                 array('id', 'size', 'items', 'selected', 'multiple', 'disabled', 'key', 'caption')));
@@ -375,7 +367,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function _ctlDropdownList($name, $attribs)
+    public function _ctlDropdownList(string $name, ?array $attribs = null): string
     {
         extract($this->extractAttribs($attribs,
                 array('id', 'items', 'selected', 'disabled', 'key', 'caption')));
@@ -438,7 +430,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function _ctlFileUpload($name, $attribs)
+    public function _ctlFileUpload(string $name, ?array $attribs = null): string
     {
         return $this->__baseCtlInput($name, $attribs, 'file');
     }
@@ -452,7 +444,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function _ctlButton($name, $attribs, $buttonType = 'button')
+    public function _ctlButton(string $name, ?array $attribs = null, string $buttonType = 'button'): string
     {
         extract($this->extractAttribs($attribs, array('caption')));
         if ($caption != '') { $attribs['value'] = $caption; }
@@ -467,7 +459,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function _ctlSubmit($name, $attribs)
+    public function _ctlSubmit(string $name, ?array $attribs = null): string
     {
         return $this->_ctlButton($name, $attribs, 'submit');
     }
@@ -480,7 +472,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function _ctlReset($name, $attribs)
+    public function _ctlReset(string $name, ?array $attribs = null): string
     {
         return $this->_ctlButton($name, $attribs, 'reset');
     }
@@ -493,7 +485,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function _ctlLabel($name, $attribs)
+    public function _ctlLabel(string $name, ?array $attribs = null): string
     {
         extract($this->extractAttribs($attribs, array('id', 'caption')));
         if (empty($id)) { $id = $name; }
@@ -519,7 +511,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function _ctlStatic($name, $attribs)
+    public function _ctlStatic(string $name, ?array $attribs = null): string
     {
         extract($this->extractAttribs($attribs, array('id', 'value')));
         if (empty($id)) { $id = $name; }
@@ -544,7 +536,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function _ctlHidden($name, $attribs)
+    public function _ctlHidden(string $name, ?array $attribs = null): string
     {
         return $this->__baseCtlInput($name, $attribs, 'hidden');
     }
@@ -558,7 +550,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function __baseCtlInput($name, $attribs, $type)
+    protected function __baseCtlInput($name, $attribs, $type)
     {
         extract($this->extractAttribs($attribs, array('id', 'value', 'disabled')));
         if (empty($id)) { $id = $name; }
@@ -586,7 +578,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function __baseCtlCheckboxOrRadio($name, $attribs, $type)
+    protected function __baseCtlCheckboxOrRadio($name, $attribs, $type)
     {
         extract($this->extractAttribs($attribs,
                 array('id', 'value', 'checked', 'disabled', 'caption')));
@@ -634,7 +626,7 @@ class FLEA_WebControls
      *
      * @return string
      */
-    function __baseCtlCheckboxOrRadioGroup($name, $attribs, $type, $suffix)
+    protected function __baseCtlCheckboxOrRadioGroup($name, $attribs, $type, $suffix)
     {
         static $idSuffix = 1;
 
@@ -659,7 +651,7 @@ class FLEA_WebControls
                 return 'INVALID ITEMS';
             }
         } else if ($key2caption) {
-            $tmp = array();
+            $tmp = [];
             foreach ($items as $caption => $key) {
                 $tmp[$key] = $caption;
             }
@@ -758,7 +750,7 @@ class FLEA_WebControls
      *
      * @return boolean
      */
-    function __processMultiDimArray(& $items, & $key, & $caption, $key2caption = false)
+    protected function __processMultiDimArray(& $items, & $key, & $caption, $key2caption = false)
     {
         if ($caption == '') {
             $first = reset($items);
@@ -768,7 +760,7 @@ class FLEA_WebControls
         }
 
         // 传入的 items 是一个多维数组
-        $new = array();
+        $new = [];
         if ($key2caption) {
             foreach ($items as $item) {
                 $new[$item[$key]] = $item[$caption];

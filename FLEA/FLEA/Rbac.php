@@ -11,8 +11,7 @@
 /**
  * 定义 FLEA_Rbac 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Rbac.php 999 2007-10-30 05:39:57Z qeeyuan $
  */
@@ -24,7 +23,7 @@
  * 这些服务由 FLEA_Rbac_UsersManager 和 FLEA_Rbac_RolesManager 提供。
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Rbac
@@ -34,21 +33,21 @@ class FLEA_Rbac
      *
      * @var string
      */
-    var $_sessionKey = 'RBAC_USERDATA';
+    public $_sessionKey = 'RBAC_USERDATA';
 
     /**
      * 指示用户数据中，以什么键保存角色信息
      *
      * @var string
      */
-    var $_rolesKey = 'RBAC_ROLES';
+    public $_rolesKey = 'RBAC_ROLES';
 
     /**
      * 构造函数
      *
      * @return FLEA_Rbac
      */
-    function FLEA_Rbac()
+    public function __construct()
     {
         $this->_sessionKey = FLEA::getAppInf('RBACSessionKey');
         if ($this->_sessionKey == 'RBAC_USERDATA') {
@@ -62,7 +61,7 @@ class FLEA_Rbac
      * @param array $userData
      * @param mixed $rolesData
      */
-    function setUser($userData, $rolesData = null)
+    public function setUser(array $userData, $rolesData = null): void
     {
         if ($rolesData) {
             $userData[$this->_rolesKey] = $rolesData;
@@ -75,7 +74,7 @@ class FLEA_Rbac
      *
      * @return array
      */
-    function getUser()
+    public function getUser(): ?array
     {
         return isset($_SESSION[$this->_sessionKey]) ?
                 $_SESSION[$this->_sessionKey] :
@@ -85,7 +84,7 @@ class FLEA_Rbac
     /**
      * 从 session 中清除用户数据
      */
-    function clearUser()
+    public function clearUser(): void
     {
         unset($_SESSION[$this->_sessionKey]);
     }
@@ -95,7 +94,7 @@ class FLEA_Rbac
      *
      * @return mixed
      */
-    function getRoles()
+    public function getRoles()
     {
         $user = $this->getUser();
         return isset($user[$this->_rolesKey]) ?
@@ -108,7 +107,7 @@ class FLEA_Rbac
      *
      * @return array
      */
-    function getRolesArray()
+    public function getRolesArray(): array
     {
         $roles = $this->getRoles();
         if (is_array($roles)) { return $roles; }
@@ -124,7 +123,7 @@ class FLEA_Rbac
      *
      * @return boolean
      */
-    function check(& $roles, & $ACT)
+    public function check(array &$roles, array &$ACT): bool
     {
         $roles = array_map('strtoupper', $roles);
         if ($ACT['allow'] == RBAC_EVERYONE) {
@@ -142,9 +141,7 @@ class FLEA_Rbac
             }
             // 如果 deny 也为 RBAC_EVERYONE，则表示 ACT 出现了冲突
             if ($ACT['deny'] == RBAC_EVERYONE) {
-                FLEA::loadClass('FLEA_Rbac_Exception_InvalidACT');
-                __THROW(new FLEA_Rbac_Exception_InvalidACT($ACT));
-                return false;
+                throw new FLEA_Rbac_Exception_InvalidACT($ACT);
             }
 
             // 只有 deny 中没有用户的角色信息，则检查通过
@@ -211,9 +208,9 @@ class FLEA_Rbac
      *
      * @return array
      */
-    function prepareACT($ACT)
+    public function prepareACT(array $ACT): array
     {
-        $ret = array();
+        $ret = [];
         $arr = array('allow', 'deny');
         foreach ($arr as $key) {
             do {

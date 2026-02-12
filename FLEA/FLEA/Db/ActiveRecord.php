@@ -1,17 +1,9 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * 定义 FLEA_Db_ActiveRecord 类
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
  * @author 起源科技(www.qeeyuan.com)
  * @package Core
  * @version $Id: ActiveRecord.php 972 2007-10-09 20:56:54Z qeeyuan $
@@ -20,7 +12,6 @@
 /**
  * FLEA_Db_ActiveRecord 类实现了 ActiveRecord 模式
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
  * @author 起源科技(www.qeeyuan.com)
  * @package Core
  * @version $Id: ActiveRecord.php 972 2007-10-09 20:56:54Z qeeyuan $
@@ -32,35 +23,35 @@ class FLEA_Db_ActiveRecord
      *
      * @var array
      */
-    var $_aggregation = array();
+    public $_aggregation = [];
 
     /**
      * 用于完成数据库操作的 TableDataGateway 继承类
      *
      * @var FLEA_Db_TableDataGateway
      */
-    var $_table;
+    public $_table;
 
     /**
      * 该对象的主键属性名
      *
      * @var string
      */
-    var $_idname;
+    public $_idname;
 
     /**
      * 指示该对象是否已经初始化
      *
      * @var boolean
      */
-    var $init = false;
+    public $init = false;
 
     /**
      * 字段和对象属性之间的映射关系
      *
      * @var array
      */
-    var $_mapping = false;
+    public $_mapping = false;
 
     /**
      * 继承类必须覆盖此静态函数
@@ -69,7 +60,7 @@ class FLEA_Db_ActiveRecord
      *
      * @return array
      */
-    function define()
+    static function define(): array
     {
     }
 
@@ -82,7 +73,7 @@ class FLEA_Db_ActiveRecord
      *
      * @return FLEA_Db_ActiveRecord
      */
-    function FLEA_Db_ActiveRecord($conditions = null)
+    public function __construct($conditions = null)
     {
         $this->init();
         $this->load($conditions);
@@ -93,7 +84,7 @@ class FLEA_Db_ActiveRecord
      *
      * @param array $options
      */
-    function init()
+    public function init(): void
     {
         if ($this->init) { return; }
         $this->init = true;
@@ -104,10 +95,10 @@ class FLEA_Db_ActiveRecord
 
         $objid = "{$myclass}_tdg";
         if (FLEA::isRegistered($objid)) {
-            $this->_table =& FLEA::registry($objid);
+            $this->_table = FLEA::registry($objid);
         } else {
             FLEA::loadClass($tableClass);
-            $this->_table =& new $tableClass(array('skipCreateLinks' => true));
+            $this->_table = new $tableClass(array('skipCreateLinks' => true));
             FLEA::register($this->_table, $objid);
         }
 
@@ -127,14 +118,14 @@ class FLEA_Db_ActiveRecord
         }
 
         if (!isset($options['aggregation']) || !is_array($options['aggregation'])) {
-            $options['aggregation'] = array();
+            $options['aggregation'] = [];
         }
         foreach ($options['aggregation'] as $offset => $define) {
             if (!isset($define['mappingName'])) {
                 $define['mappingName'] = substr(strtolower($define['tableClass']), 0, 1) . substr($define['tableClass'], 1);
             }
             if ($define['mappingType'] == HAS_MANY || $define['mappingType'] == MANY_TO_MANY) {
-                $this->{$define['mappingName']} = array();
+                $this->{$define['mappingName']} = [];
             } else {
                 $this->{$define['mappingName']} = null;
             }
@@ -167,7 +158,7 @@ class FLEA_Db_ActiveRecord
      *
      * @param mixed $conditions
      */
-    function load($conditions)
+    public function load($conditions): void
     {
         $row = $this->_table->find($conditions);
         if (is_array($row)) { $this->attach($row); }
@@ -176,7 +167,7 @@ class FLEA_Db_ActiveRecord
     /**
      * 保存对象到数据库
      */
-    function save()
+    public function save(): void
     {
         $row =& $this->toArray();
         $this->_table->save($row);
@@ -185,7 +176,7 @@ class FLEA_Db_ActiveRecord
     /**
      * 从数据库删除对象
      */
-    function delete()
+    public function delete(): void
     {
         $this->_table->removeByPkv($this->getId());
     }
@@ -195,7 +186,7 @@ class FLEA_Db_ActiveRecord
      *
      * @param mixed $id
      */
-    function setId($id)
+    public function setId($id): void
     {
         $this->{$this->_idname} = $id;
     }
@@ -205,7 +196,7 @@ class FLEA_Db_ActiveRecord
      *
      * @return mixed
      */
-    function getId()
+    public function getId()
     {
         return $this->{$this->_idname};
     }
@@ -215,9 +206,9 @@ class FLEA_Db_ActiveRecord
      *
      * @return array
      */
-    function toArray()
+    public function toArray(): array
     {
-        $arr = array();
+        $arr = [];
         foreach ($this->_mapping['p2f'] as $prop => $field) {
             $arr[$field] = $this->{$prop};
         }
@@ -229,7 +220,7 @@ class FLEA_Db_ActiveRecord
      *
      * @param array $row
      */
-    function attach(& $row)
+    public function attach(array &$row): void
     {
         foreach ($this->_mapping['f2p'] as $field => $prop) {
             if (isset($row[$field])) {
@@ -241,9 +232,9 @@ class FLEA_Db_ActiveRecord
             $mn = $define['link']->mappingName;
             if (!isset($row[$mn])) { continue; }
             if ($define['link']->oneToOne) {
-                $this->{$mn} =& new $define['class']($row[$mn]);
+                $this->{$mn} = new $define['class']($row[$mn]);
             } else {
-                $this->{$mn}[] =& new $define['class']($row[$mn]);
+                $this->{$mn}[] = new $define['class']($row[$mn]);
             }
         }
     }

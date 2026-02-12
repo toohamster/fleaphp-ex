@@ -1,18 +1,10 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * 定义了一系列用于简化数组操作的函数
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Array.php 972 2007-10-09 20:56:54Z qeeyuan $
  */
@@ -23,7 +15,7 @@
  * @param array $arr
  * @param boolean $trim
  */
-function array_remove_empty(& $arr, $trim = true)
+function array_remove_empty(array &$arr, bool $trim = true): void
 {
     foreach ($arr as $key => $value) {
         if (is_array($value)) {
@@ -47,9 +39,9 @@ function array_remove_empty(& $arr, $trim = true)
  *
  * @return array
  */
-function array_col_values(& $arr, $col)
+function array_col_values(array &$arr, string $col): array
 {
-    $ret = array();
+    $ret = [];
     foreach ($arr as $row) {
         if (isset($row[$col])) { $ret[] = $row[$col]; }
     }
@@ -67,9 +59,9 @@ function array_col_values(& $arr, $col)
  *
  * @return array
  */
-function array_to_hashmap(& $arr, $keyField, $valueField = null)
+function array_to_hashmap(array &$arr, string $keyField, ?string $valueField = null): array
 {
-    $ret = array();
+    $ret = [];
     if ($valueField) {
         foreach ($arr as $row) {
             $ret[$row[$keyField]] = $row[$valueField];
@@ -90,9 +82,9 @@ function array_to_hashmap(& $arr, $keyField, $valueField = null)
  *
  * @return array
  */
-function array_group_by(& $arr, $keyField)
+function array_group_by(array &$arr, string $keyField): array
 {
-    $ret = array();
+    $ret = [];
     foreach ($arr as $row) {
         $key = $row[$keyField];
         $ret[$key][] = $row;
@@ -114,15 +106,14 @@ function array_group_by(& $arr, $keyField)
  *
  * return array
  */
-function array_to_tree($arr, $fid, $fparent = 'parent_id',
-    $fchildrens = 'childrens', $returnReferences = false)
+function array_to_tree(array $arr, string $fid, string $fparent = 'parent_id', string $fchildrens = 'childrens', bool $returnReferences = false): array
 {
-    $pkvRefs = array();
+    $pkvRefs = [];
     foreach ($arr as $offset => $row) {
         $pkvRefs[$row[$fid]] =& $arr[$offset];
     }
 
-    $tree = array();
+    $tree = [];
     foreach ($arr as $offset => $row) {
         $parentId = $row[$fparent];
         if ($parentId) {
@@ -148,9 +139,9 @@ function array_to_tree($arr, $fid, $fparent = 'parent_id',
  *
  * @return array
  */
-function tree_to_array(& $node, $fchildrens = 'childrens')
+function tree_to_array(array &$node, string $fchildrens = 'childrens'): array
 {
-    $ret = array();
+    $ret = [];
     if (isset($node[$fchildrens]) && is_array($node[$fchildrens])) {
         foreach ($node[$fchildrens] as $child) {
             $ret = array_merge($ret, tree_to_array($child, $fchildrens));
@@ -172,7 +163,7 @@ function tree_to_array(& $node, $fchildrens = 'childrens')
  *
  * @return array
  */
-function array_column_sort($array, $keyname, $sortDirection = SORT_ASC)
+function array_column_sort(array $array, string $keyname, int $sortDirection = SORT_ASC): array
 {
     return array_sortby_multifields($array, array($keyname => $sortDirection));
 }
@@ -183,9 +174,9 @@ function array_column_sort($array, $keyname, $sortDirection = SORT_ASC)
  * @param array $rowset
  * @param array $args
  */
-function array_sortby_multifields($rowset, $args)
+function array_sortby_multifields(array $rowset, array $args): array
 {
-    $sortArray = array();
+    $sortArray = [];
     $sortRule = '';
     foreach ($args as $sortField => $sortDir) {
         foreach ($rowset as $offset => $row) {

@@ -1,12 +1,5 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * FleaPHP 用简单、具有一致性的模型来实现 Ajax 操作。
@@ -34,8 +27,7 @@
  *
  * 此处的 $ajax 对象是 FLEA_Ajax 类的一个实例。通过 FLEA::initAjax() 获得。
  *
- * @copyright Copyright (c) 2005 - 2008 QeeYuan China Inc. (http://www.qeeyuan.com)
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @package Core
  * @version $Id: Ajax.php 1005 2007-11-03 07:43:55Z qeeyuan $
  */
@@ -44,7 +36,7 @@
  * Ajax 类提供了大部分 Ajax 操作
  *
  * @package Core
- * @author 起源科技 (www.qeeyuan.com)
+ * @author toohamster
  * @version 1.0
  */
 class FLEA_Ajax
@@ -54,14 +46,14 @@ class FLEA_Ajax
      *
      * @var array
      */
-    var $events;
+    public $events;
 
     /**
      * 所有 FLEA_Ajax 支持的参数的类型
      *
      * @var array
      */
-    var $paramsType = array(
+    public $paramsType = array(
         'async'         => 'boolean',
         'beforeSend'    => 'function',
         'complete'      => 'function',
@@ -93,9 +85,9 @@ class FLEA_Ajax
      *
      * @return FLEA_Ajax
      */
-    function FLEA_Ajax()
+    public function __construct()
     {
-        $this->_events = array();
+        $this->_events = [];
     }
 
     /**
@@ -111,7 +103,7 @@ class FLEA_Ajax
      *
      * @return string
      */
-    function dumpJs($return = false, $wrapper = true)
+    public function dumpJs(bool $return = false, bool $wrapper = true): ?string
     {
         $out = '';
         if ($wrapper) {
@@ -171,7 +163,7 @@ class FLEA_Ajax
      *
      * @return string
      */
-    function registerEvent($control, $event, $url, $attribs = null)
+    public function registerEvent(string $control, string $event, string $url, ?array $attribs = null): string
     {
         $control2 = preg_replace('/[^a-z0-9_]+/i', '', $control);
         $functionName = "ajax_{$control2}_on{$event}";
@@ -184,7 +176,7 @@ class FLEA_Ajax
      *
      * @return string
      */
-    function returnCheckJs()
+    public function returnCheckJs(): string
     {
         $version = FLEA_VERSION;
         return <<<EOT
@@ -204,9 +196,9 @@ EOT;
      *
      * @return string
      */
-    function returnEventJs(& $eventList)
+    public function returnEventJs(array &$eventList): string
     {
-        $bindEvents = array();
+        $bindEvents = [];
         $out = '';
         foreach ($eventList as $event) {
             $out .= $this->_insertAjaxRequest($event, $bindEvents) . "\n";
@@ -223,7 +215,7 @@ EOT;
      *
      * @return string
      */
-    function _insertAjaxRequest($eventArr, & $bindEvents)
+    protected function _insertAjaxRequest(array $eventArr, array &$bindEvents): string
     {
         list($control, $event, $url, $attribs, $functionName) = $eventArr;
         $this->_formatAttribs($attribs);
@@ -232,14 +224,14 @@ EOT;
         /**
          * 构造 ajax 请求函数
          */
-        $beforeRequest = array();
+        $beforeRequest = [];
         $call = $event == 'submit' ? "$(\"{$control}\").ajaxSubmit" : "$.ajax";
 
         /**
          * 处理 params 属性
          */
         if (isset($attribs['params'])) {
-            $params = array();
+            $params = [];
             parse_str($attribs['params'], $params);
             $params = (array)$params;
             if (!empty($params)) {
@@ -328,7 +320,7 @@ EOT;
      *
      * @param array $attribs
      */
-    function _formatAttribs(& $attribs)
+    protected function _formatAttribs(& $attribs)
     {
         // 格式化参数
         foreach ($attribs as $option => $value) {
