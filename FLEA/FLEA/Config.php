@@ -168,7 +168,8 @@ class FLEA_Config
      * @param object $obj 对象实例
      * @param string|null $name 对象名称，默认使用类名
      * @return object
-     * @throws Exception 如果参数不是对象
+     * @throws FLEA_Exception_ExistsKeyName 如果对象名称已存在
+     * @throws FLEA_Exception_TypeMismatch 如果参数不是对象
      */
     public function registerObject(object $obj, ?string $name = null): object
     {
@@ -181,7 +182,7 @@ class FLEA_Config
         }
 
         if (isset($this->objects[$name])) {
-            throw new FLEA_Exception_ExistsKeyName("Object with name '{$name}' already exists");
+            throw new FLEA_Exception_ExistsKeyName($name);
         }
 
         $this->objects[$name] = $obj;
@@ -193,6 +194,7 @@ class FLEA_Config
      *
      * @param string|null $name 对象名称，为 null 时返回所有对象
      * @return object|array|null
+     * @throws FLEA_Exception_NotExistsKeyName 当对象不存在时
      */
     public function getRegistry(?string $name = null)
     {
@@ -202,7 +204,7 @@ class FLEA_Config
         if (isset($this->objects[$name]) && is_object($this->objects[$name])) {
             return $this->objects[$name];
         }
-        return null;
+        throw new FLEA_Exception_ExistsKeyName("Object with name '{$name}' already exists");
     }
 
     /**
@@ -355,21 +357,5 @@ class FLEA_Config
     private function __clone()
     {
         // 私有方法，防止克隆
-    }
-
-    /**
-     * 防止序列化
-     */
-    public function __sleep()
-    {
-        throw new Exception('Cannot serialize singleton');
-    }
-
-    /**
-     * 防止反序列化
-     */
-    public function __wakeup()
-    {
-        throw new Exception('Cannot unserialize singleton');
     }
 }

@@ -64,7 +64,6 @@ define('ACTION_ALL',        'ACTION_ALL');
 /**
  * 初始化 FleaPHP 框架
  */
-define('G_FLEA_VAR', '__FLEA_CORE__');
 
 // 初始化配置管理器
 $config = FLEA_Config::getInstance();
@@ -121,6 +120,7 @@ class FLEA
      */
     public static function loadAppInf($flea_internal_config = null): void
     {
+        $config = FLEA_Config::getInstance();
         if (!is_array($flea_internal_config) && is_string($flea_internal_config)) {
             if (!is_readable($flea_internal_config)) {
                 throw new FLEA_Exception_ExpectedFile($flea_internal_config);
@@ -128,7 +128,7 @@ class FLEA
             $flea_internal_config = require($flea_internal_config);
         }
         if (is_array($flea_internal_config)) {
-            $GLOBALS[G_FLEA_VAR]['APP_INF'] = array_merge($GLOBALS[G_FLEA_VAR]['APP_INF'], $flea_internal_config);
+            $config->mergeAppInf($flea_internal_config);
         }
     }
 
@@ -149,7 +149,8 @@ class FLEA
      */
     public static function getAppInf(string $option, $default = null)
     {
-        return isset($GLOBALS[G_FLEA_VAR]['APP_INF'][$option]) ? $GLOBALS[G_FLEA_VAR]['APP_INF'][$option] : $default;
+        $config = FLEA_Config::getInstance();
+        return $config->getAppInf($option, $default);
     }
 
     /**
@@ -171,15 +172,8 @@ class FLEA
      */
     public static function getAppInfValue(string $option, string $keyname, $default = null)
     {
-        if (!isset($GLOBALS[G_FLEA_VAR]['APP_INF'][$option])) {
-            $GLOBALS[G_FLEA_VAR]['APP_INF'][$option] = [];
-        }
-        if (array_key_exists($keyname, $GLOBALS[G_FLEA_VAR]['APP_INF'][$option])) {
-            return $GLOBALS[G_FLEA_VAR]['APP_INF'][$option][$keyname];
-        } else {
-            $GLOBALS[G_FLEA_VAR]['APP_INF'][$option][$keyname] = $default;
-            return $default;
-        }
+        $config = FLEA_Config::getInstance();
+        return $config->getAppInfValue($option, $keyname, $default);
     }
 
     /**
@@ -191,10 +185,8 @@ class FLEA
      */
     public static function setAppInfValue(string $option, string $keyname, $value): void
     {
-        if (!isset($GLOBALS[G_FLEA_VAR]['APP_INF'][$option])) {
-            $GLOBALS[G_FLEA_VAR]['APP_INF'][$option] = [];
-        }
-        $GLOBALS[G_FLEA_VAR]['APP_INF'][$option][$keyname] = $value;
+        $config = FLEA_Config::getInstance();
+        $config->setAppInfValue($option, $keyname, $value);
     }
 
     /**
@@ -205,11 +197,8 @@ class FLEA
      */
     public static function setAppInf($option, $data = null): void
     {
-        if (is_array($option)) {
-            $GLOBALS[G_FLEA_VAR]['APP_INF'] = array_merge($GLOBALS[G_FLEA_VAR]['APP_INF'], $option);
-        } else {
-            $GLOBALS[G_FLEA_VAR]['APP_INF'][$option] = $data;
-        }
+        $config = FLEA_Config::getInstance();
+        $config->setAppInf($option, $data);
     }
 
     /**
@@ -231,13 +220,8 @@ class FLEA
      */
     public static function import(string $dir): void
     {
-        if (array_search($dir, $GLOBALS[G_FLEA_VAR]['CLASS_PATH'], true)) { return; }
-        if (DIRECTORY_SEPARATOR == '/') {
-            $dir = str_replace('\\', DIRECTORY_SEPARATOR, $dir);
-        } else {
-            $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
-        }
-        $GLOBALS[G_FLEA_VAR]['CLASS_PATH'][] = $dir;
+        $config = FLEA_Config::getInstance();
+        $config->addClassPath($dir);
     }
 
     /**
@@ -351,7 +335,8 @@ class FLEA
         // 首先搜索当前目录
         if (is_file($filename)) { return $filename; }
 
-        foreach ($GLOBALS[G_FLEA_VAR]['CLASS_PATH'] as $classdir) {
+        $config = FLEA_Config::getInstance();
+        foreach ($config->getClassPath() as $classdir) {
             $path = $classdir . DIRECTORY_SEPARATOR . $filename;
             if (is_file($path)) { return $path; }
         }
@@ -418,20 +403,8 @@ class FLEA
      */
     public static function register(object $obj, ?string $name = null): ?object
     {
-        if (!is_object($obj)) {
-            throw new FLEA_Exception_TypeMismatch($obj, 'object', gettype($obj));
-        }
-
-        if (is_null($name)) {
-            $name = get_class($obj);
-        }
-
-        if (isset($GLOBALS[G_FLEA_VAR]['OBJECTS'][$name])) {
-            throw new FLEA_Exception_ExistsKeyName($name);
-        }
-
-        $GLOBALS[G_FLEA_VAR]['OBJECTS'][$name] = $obj;
-        return $obj;
+        $config = FLEA_Config::getInstance();
+        return $config->registerObject($obj, $name);
     }
 
     /**
@@ -445,13 +418,8 @@ class FLEA
      */
     public static function registry(?string $name = null)
     {
-        if (is_null($name)) {
-            return $GLOBALS[G_FLEA_VAR]['OBJECTS'];
-        }
-        if (isset($GLOBALS[G_FLEA_VAR]['OBJECTS'][$name]) && is_object($GLOBALS[G_FLEA_VAR]['OBJECTS'][$name])) {
-            return $GLOBALS[G_FLEA_VAR]['OBJECTS'][$name];
-        }
-        throw new FLEA_Exception_NotExistsKeyName($name);
+        $config = FLEA_Config::getInstance();
+        return $config->getRegistry($name);
     }
 
     /**
@@ -472,7 +440,8 @@ class FLEA
      */
     public static function isRegistered(string $name): bool
     {
-        return isset($GLOBALS[G_FLEA_VAR]['OBJECTS'][$name]);
+        $config = FLEA_Config::getInstance();
+        return $config->isRegistered($name);
     }
 
 
@@ -685,6 +654,7 @@ class FLEA
      */
     public static function getDBO($dsn = 0): FLEA_Db_Driver_Abstract
     {
+        $config = FLEA_Config::getInstance();
         if ($dsn == 0) {
             $dsn = FLEA::getAppInf('dbDSN');
         }
@@ -695,8 +665,8 @@ class FLEA
         }
 
         $dsnid = $dsn['id'];
-        if (isset($GLOBALS[G_FLEA_VAR]['DBO'][$dsnid])) {
-            return $GLOBALS[G_FLEA_VAR]['DBO'][$dsnid];
+        if ($config->hasDbo($dsnid)) {
+            return $config->getDbo($dsnid);
         }
 
         $driver = ucfirst(strtolower($dsn['driver']));
@@ -710,8 +680,8 @@ class FLEA
         /* @var $dbo FLEA_Db_Driver_Abstract */
         $dbo->connect();
 
-        $GLOBALS[G_FLEA_VAR]['DBO'][$dsnid] =& $dbo;
-        return $GLOBALS[G_FLEA_VAR]['DBO'][$dsnid];
+        $config->registerDbo($dbo, $dsnid);
+        return $dbo;
     }
 
     /**
@@ -1345,14 +1315,13 @@ if (!function_exists('file_put_contents'))
 function __TRY(): void
 {
     static $point = 0;
-    if (!isset($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK']) ||
-        !is_array($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK']))
-    {
-        $GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK'] = [];
+    $config = FLEA_Config::getInstance();
+    if (!$config->hasExceptionStack()) {
+        $config->exceptionStack = [];
     }
 
     $point++;
-    array_push($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK'], $point);
+    $config->pushException($point);
 }
 
 /**
@@ -1364,10 +1333,11 @@ function __TRY(): void
  */
 function __CATCH()
 {
-    if (!is_array($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK'])) {
+    $config = FLEA_Config::getInstance();
+    if (!$config->hasExceptionStack()) {
         return false;
     }
-    $exception = array_pop($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK']);
+    $exception = $config->popException();
     if (!is_object($exception)) {
         $exception = false;
     }
@@ -1381,8 +1351,9 @@ function __CATCH()
  */
 function __CANCEL_TRY(): void
 {
-    if (is_array($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK'])) {
-        array_pop($GLOBALS[G_FLEA_VAR]['FLEA_EXCEPTION_STACK']);
+    $config = FLEA_Config::getInstance();
+    if ($config->hasExceptionStack()) {
+        $config->popException();
     }
 }
 
