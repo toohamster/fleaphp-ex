@@ -33,11 +33,12 @@
             "FLEA\\Helper\\FileUploader\\": "FLEA/FLEA/Helper/FileUploader/",
             "FLEA\\View\\": "FLEA/FLEA/View/",
             "FLEA\\Session\\": "FLEA/FLEA/Session/",
-            "FLEA\\Rbac\\": "FLEA/FLEA/Rbac/",
-            "FLEA\\Acl\\": "FLEA/FLEA/Acl/"
+            "FLEA\\Rbac\\": "FLEA/Rbac/",
+            "FLEA\\Acl\\": "FLEA/Acl/"
         },
         "files": [
-            "FLEA/FLEA.php"
+            "FLEA/FLEA.php",
+            "FLEA/Functions.php"
         ]
     },
     "autoload-dev": {

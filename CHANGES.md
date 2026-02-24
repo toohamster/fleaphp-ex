@@ -4,6 +4,128 @@
 
 ---
 
+## 2026-02-24 - 集中管理全局函数到 Functions.php
+
+### 修改文件
+- **新增**: `FLEA/Functions.php` - 包含所有40个全局函数
+- **修改**: `composer.json` - 添加 Functions.php 到自动加载配置
+- **修改**: `vendor/composer/autoload_files.php` - 添加 Functions.php 映射
+- **删除**: `FLEA/FLEA/Helper/FileSystem.php`
+- **删除**: `FLEA/FLEA/Helper/Array.php`
+- **删除**: `FLEA/FLEA/Helper/Html.php`
+- **删除**: `FLEA/FLEA/Helper/Yaml.php`
+- **删除**: `FLEA/FLEA/Filter/Uri.php`
+
+### 修改目的
+将所有分散在 Helper 目录和 Filter 目录中的全局函数集中到统一的 Functions.php 文件中，便于管理和维护。通过 Composer 自动加载机制进行加载。
+
+### 详细修改内容
+
+#### 新增 FLEA/Functions.php
+
+**集中管理的全局函数（40个）：**
+
+1. **框架核心函数（17个）**
+   - `redirect()` - 重定向浏览器
+   - `url()` - 生成 URL 地址
+   - `detect_uri_base()` - 检测基础 URI
+   - `encode_url_args()` - 编码 URL 参数
+   - `h()` - HTML 转义
+   - `t()` - 文本转换
+   - `js_alert()` - JavaScript 警告
+   - `t2js()` - 文本转 JavaScript
+   - `safe_file_put_contents()` - 安全写入文件
+   - `safe_file_get_contents()` - 安全读取文件
+   - `__SET_EXCEPTION_HANDLER()` - 设置异常处理器
+   - `__FLEA_EXCEPTION_HANDLER()` - FLEA 异常处理器
+   - `print_ex()` - 打印异常
+   - `dump()` - 调试输出变量
+   - `dump_trace()` - 输出调用堆栈
+   - `microtime_float()` - 获取浮点时间
+   - `_ET()` - 获取错误消息
+
+2. **文件系统函数（2个）**
+   - `mkdirs()` - 创建目录
+   - `rmdirs()` - 递归删除目录
+
+3. **数组操作函数（8个）**
+   - `array_remove_empty()` - 移除空值
+   - `array_col_values()` - 获取列值
+   - `array_to_hashmap()` - 数组转哈希
+   - `array_group_by()` - 按字段分组
+   - `array_to_tree()` - 数组转树形
+   - `tree_to_array()` - 树形转数组
+   - `array_column_sort()` - 按列排序
+   - `array_sortby_multifields()` - 多字段排序
+
+4. **HTML 生成函数（11个）**
+   - `html_dropdown_list()` - 下拉列表
+   - `html_radio_group()` - 单选按钮组
+   - `html_checkbox_group()` - 复选框组
+   - `html_checkbox()` - 复选框
+   - `html_textbox()` - 文本框
+   - `html_password()` - 密码框
+   - `html_textarea()` - 文本域
+   - `html_hidden()` - 隐藏字段
+   - `html_filefield()` - 文件上传字段
+   - `html_form()` - 表单开始
+   - `html_form_close()` - 表单结束
+
+5. **配置函数（1个）**
+   - `load_yaml()` - 加载 YAML 配置
+
+6. **过滤器函数（1个）**
+   - `___uri_filter()` - URI 过滤器
+
+**所有函数特性：**
+- 添加了完整的类型声明（参数类型和返回类型）
+- 保持了原有的函数签名，确保向后兼容
+- 集中在单一文件中，便于查找和维护
+
+#### 更新 composer.json
+
+```json
+"autoload": {
+    "psr-4": { ... },
+    "files": [
+        "FLEA/FLEA.php",
+        "FLEA/Functions.php"
+    ]
+}
+```
+
+#### 更新 vendor/composer/autoload_files.php
+
+添加 Functions.php 自动加载映射：
+```php
+return array(
+    '93834b923f549c6fdab62e1c83ed0398' => $baseDir . '/FLEA/FLEA.php',
+    'flea_functions' => $baseDir . '/FLEA/Functions.php',
+);
+```
+
+#### 删除的文件
+
+删除了以下只包含全局函数的文件：
+- `FLEA/FLEA/Helper/FileSystem.php` - 只包含 `mkdirs()` 和 `rmdirs()` 函数
+- `FLEA/FLEA/Helper/Array.php` - 只包含数组操作函数
+- `FLEA/FLEA/Helper/Html.php` - 只包含 HTML 生成函数
+- `FLEA/FLEA/Helper/Yaml.php` - 只包含 `load_yaml()` 函数
+- `FLEA/FLEA/Filter/Uri.php` - 只包含 `___uri_filter()` 函数
+
+### 影响范围
+- **向后兼容性**: 所有全局函数保持原有签名，使用方式不变
+- **自动加载**: 通过 Composer 自动加载 Functions.php
+- **代码组织**: 全局函数集中管理，Helper 目录只保留真正的类文件
+- **维护性**: 便于查找和修改全局函数
+
+### 相关文件
+- `FLEA/FLEA.php` - 包含一些框架核心函数
+- `composer.json` - 自动加载配置
+- `vendor/composer/autoload_files.php` - 自动加载映射
+
+---
+
 ## 2026-02-12 - 重构配置管理，消除 $GLOBALS 使用
 
 ### 修改文件
