@@ -4,7 +4,7 @@ namespace FLEA\Helper;
 
 
 /**
- * 定义 FLEA_Helper_Image 类
+ * 定义 \FLEA\Helper\Image 类
  *
  * @author toohamster
  * @package Core
@@ -12,10 +12,10 @@ namespace FLEA\Helper;
  */
 
 /**
- * FLEA_Helper_Image 类封装了针对图像的操作
+ * \FLEA\Helper\Image 类封装了针对图像的操作
  *
- * 开发者不能直接构造该类的实例，而是应该用 FLEA_Helper_Image::createFromFile()
- * 静态方法创建一个 FLEA_Helper_Image 类的实例。
+ * 开发者不能直接构造该类的实例，而是应该用 \FLEA\Helper\Image::createFromFile()
+ * 静态方法创建一个 \FLEA\Helper\Image 类的实例。
  *
  * 操作大图片时，请确保 php 能够分配足够的内存。
  *
@@ -34,12 +34,12 @@ class Image
 
     /**
      * 构造函数
-     * 开发者不能直接构造该类的实例，而是应该用 FLEA_Helper_Image::createFromFile()
-     * 静态方法创建一个 FLEA_Helper_Image 类的实例。
+     * 开发者不能直接构造该类的实例，而是应该用 \FLEA\Helper\Image::createFromFile()
+     * 静态方法创建一个 \FLEA\Helper\Image 类的实例。
      *
      * @param resource $handle
      *
-     * @return FLEA_Helper_Image
+     * @return \FLEA\Helper\Image
      */
     public function __construct($handle)
     {
@@ -53,15 +53,15 @@ class Image
      *
      * <code>
      * $ext = pathinfo($_FILES['postfile']['name'], PATHINFO_EXTENSION);
-     * $image =& FLEA_Helper_Image::createFromFile($_FILES['postfile']['tmp_name'], $ext);
+     * $image =& \FLEA\Helper\Image::createFromFile($_FILES['postfile']['tmp_name'], $ext);
      * </code>
      *
      * @param string $filename
      * @param string $fileext
      *
-     * @return FLEA_Helper_Image
+     * @return \FLEA\Helper\Image
      */
-    static public function createFromFile(string $filename, ?string $fileext = null): FLEA_Helper_Image
+    static public function createFromFile(string $filename, ?string $fileext = null): \FLEA\Helper\Image
     {
         if (is_null($fileext)) {
             $fileext = pathinfo($filename, PATHINFO_EXTENSION);
@@ -78,7 +78,7 @@ class Image
         }
 
         $handle = $ext2functions[$fileext]($filename);
-        $img = new FLEA_Helper_Image($handle);
+        $img = new \FLEA\Helper\Image($handle);
         return $img;
     }
 

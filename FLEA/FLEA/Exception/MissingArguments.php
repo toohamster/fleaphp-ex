@@ -4,7 +4,7 @@
 
 namespace FLEA\Exception;
 /**
- * 定义 FLEA_Exception_MissingArguments 异常
+ * 定义 \FLEA\Exception_MissingArguments 异常
  *
  * @author toohamster
  * @package Exception
@@ -12,7 +12,7 @@ namespace FLEA\Exception;
  */
 
 /**
- * FLEA_Exception_MissingArguments 异常指示缺少必须的参数
+ * \FLEA\Exception_MissingArguments 异常指示缺少必须的参数
  *
  * @package Exception
  * @author toohamster
@@ -32,7 +32,7 @@ class MissingArguments extends \FLEA\Exception
      *
      * @param mixed $args
      *
-     * @return FLEA_Exception_MissingArguments
+     * @return \FLEA\Exception_MissingArguments
      */
     public function __construct($args)
     {

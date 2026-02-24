@@ -4,7 +4,7 @@
 
 namespace FLEA\Helper;
 /**
- * 定义 FLEA_Helper_Verifier 类
+ * 定义 \FLEA\Helper\Verifier 类
  *
  * @author toohamster
  * @package Core
@@ -12,7 +12,7 @@ namespace FLEA\Helper;
  */
 
 /**
- * FLEA_Helper_Verifier 对象根据一系列验证规则对指定的数据进行验证
+ * \FLEA\Helper\Verifier 对象根据一系列验证规则对指定的数据进行验证
  *
  * 验证规则由多个规则组成，每个规则用于验证一个字段。
  *
@@ -41,7 +41,7 @@ namespace FLEA\Helper;
  *  I        - 整数
  *  R        - 自动增量或计数器
  *
- * 基本属性和利用 SDBO::metaColumns() 方法取得的字段信息完全一致。
+ * 基本属性和利用 \FLEA\Db\TableDataGateway::metaColumns() 方法取得的字段信息完全一致。
  * 因此可以直接将 metaColumns() 的返回结果作为验证规则。
  *
  * 为了获得更强的验证能力，还可以使用下列扩展属性：
@@ -200,7 +200,7 @@ class Verifier
         if (isset($rule['complexType'])) {
             $func = 'is' . $rule['complexType'];
             if (!method_exists($this, $func)) {
-                throw new FLEA_Exception_InvalidArguments('$rule[\'complexType\']',
+                throw new \FLEA\Exception_InvalidArguments('$rule[\'complexType\']',
                         $rule['complexType']);
                 return null;
             }

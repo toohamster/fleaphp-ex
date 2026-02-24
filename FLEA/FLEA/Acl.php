@@ -4,7 +4,7 @@ namespace FLEA;
 
 
 /**
- * 定义 FLEA_Acl 类
+ * 定义 \FLEA\Acl 类
  *
  * @author toohamster
  * @package Core
@@ -12,7 +12,7 @@ namespace FLEA;
  */
 
 /**
- * FLEA_Acl 提供了 ACL 组件的使用接口
+ * \FLEA\Acl 提供了 ACL 组件的使用接口
  *
  * @package Core
  * @author toohamster

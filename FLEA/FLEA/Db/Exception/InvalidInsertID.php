@@ -4,7 +4,7 @@ namespace FLEA\Db\Exception;
 
 
 /**
- * 定义 FLEA_Db_Exception_InvalidInsertID 异常
+ * 定义 \FLEA\Db\Exception\InvalidInsertID 异常
  *
  * @author toohamster
  * @package Exception
@@ -12,7 +12,7 @@ namespace FLEA\Db\Exception;
  */
 
 /**
- * FLEA_Db_Exception_InvalidInsertID 异常指示无法获取刚刚插入的记录的主键值
+ * \FLEA\Db\Exception\InvalidInsertID 异常指示无法获取刚刚插入的记录的主键值
  *
  * @package Exception
  * @author toohamster
@@ -23,7 +23,7 @@ class InvalidInsertID extends \FLEA\Exception
     /**
      * 构造函数
      *
-     * @return FLEA_Db_Exception_InvalidInsertID
+     * @return \FLEA\Db\Exception\InvalidInsertID
      */
     function __construct()
     {

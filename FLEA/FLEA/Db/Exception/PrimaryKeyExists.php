@@ -4,7 +4,7 @@ namespace FLEA\Db\Exception;
 
 
 /**
- * 定义 FLEA_Db_Exception_PrimaryKeyExists 异常
+ * 定义 \FLEA\Db\Exception\PrimaryKeyExists 异常
  *
  * @author toohamster
  * @package Exception
@@ -12,7 +12,7 @@ namespace FLEA\Db\Exception;
  */
 
 /**
- * FLEA_Db_Exception_PrimaryKeyExists 异常指示在不需要主键值的时候却提供了主键值
+ * \FLEA\Db\Exception\PrimaryKeyExists 异常指示在不需要主键值的时候却提供了主键值
  *
  * @package Exception
  * @author toohamster
@@ -40,7 +40,7 @@ class PrimaryKeyExists extends \FLEA\Exception
      * @param string $pk
      * @param mixed $pkValue
      *
-     * @return FLEA_Db_Exception_PrimaryKeyExists
+     * @return \FLEA\Db\Exception\PrimaryKeyExists
      */
     public function __construct($pk, $pkValue = null)
     {

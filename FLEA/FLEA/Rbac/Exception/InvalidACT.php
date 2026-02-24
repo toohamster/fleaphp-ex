@@ -4,7 +4,7 @@
 
 namespace FLEA\Rbac\Exception;
 /**
- * 定义 FLEA_Rbac_Exception_InvalidACT 异常
+ * 定义 \FLEA\Rbac\Exception\InvalidACT 异常
  *
  * @author toohamster
  * @package Exception
@@ -12,7 +12,7 @@ namespace FLEA\Rbac\Exception;
  */
 
 /**
- * FLEA_Rbac_Exception_InvalidACT 异常指示一个无效的 ACT
+ * \FLEA\Rbac\Exception\InvalidACT 异常指示一个无效的 ACT
  *
  * @package Exception
  * @author toohamster
@@ -32,7 +32,7 @@ class InvalidACT extends \FLEA\Exception
      *
      * @param mixed $act
      *
-     * @return FLEA_Rbac_Exception_InvalidACT
+     * @return \FLEA\Rbac\Exception\InvalidACT
      */
     function __construct($act)
     {

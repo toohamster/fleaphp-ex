@@ -4,7 +4,7 @@
 
 namespace FLEA\Exception;
 /**
- * 定义 FLEA_Exception_MissingController 异常
+ * 定义 \FLEA\Exception_MissingController 异常
  *
  * @author toohamster
  * @package Exception
@@ -12,7 +12,7 @@ namespace FLEA\Exception;
  */
 
 /**
- * FLEA_Exception_MissingController 指示请求的控制器没有找到
+ * \FLEA\Exception_MissingController 指示请求的控制器没有找到
  *
  * @package Exception
  * @author toohamster
@@ -71,7 +71,7 @@ class MissingController extends \FLEA\Exception
      * @param string $controllerClass
      * @param string $actionMethod
      *
-     * @return FLEA_Exception_MissingController
+     * @return \FLEA\Exception_MissingController
      */
     public function __construct(string $controllerName, string $actionName, $arguments = null, ?string $controllerClass = null, ?string $actionMethod = null, ?string $controllerClassFilename = null)
     {

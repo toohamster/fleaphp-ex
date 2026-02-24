@@ -4,7 +4,7 @@
 
 namespace FLEA\Exception;
 /**
- * 定义 FLEA_Exception_ValidationFailed 异常
+ * 定义 \FLEA\Exception_ValidationFailed 异常
  *
  * @author toohamster
  * @package Exception
@@ -12,7 +12,7 @@ namespace FLEA\Exception;
  */
 
 /**
- * FLEA_Exception_ValidationFailed 异常指示数据验证失败
+ * \FLEA\Exception_ValidationFailed 异常指示数据验证失败
  *
  * @package Exception
  * @author toohamster
@@ -40,7 +40,7 @@ class ValidationFailed extends \FLEA\Exception
      * @param array $result
      * @param mixed $data
      *
-     * @return FLEA_Exception_ValidationFailed
+     * @return \FLEA\Exception_ValidationFailed
      */
     public function __construct(array $result, $data = null)
     {

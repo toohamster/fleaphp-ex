@@ -4,7 +4,7 @@ namespace FLEA\Db;
 
 
 /**
- * 定义 FLEA_Db_TableDataGateway 类
+ * 定义 \FLEA\Db\TableDataGateway 类
  *
  * @author toohamster
  * @package Core
@@ -35,9 +35,9 @@ define('HAS_MANY',      3);
 define('MANY_TO_MANY',  4);
 
 /**
- * FLEA_Db_TableDataGateway 类（表数据入口）封装了数据表的 CRUD 操作
+ * \FLEA\Db\TableDataGateway 类（表数据入口）封装了数据表的 CRUD 操作
  *
- * 开发者应该从 FLEA_Db_TableDataGateway 派生自己的类，
+ * 开发者应该从 \FLEA\Db\TableDataGateway 派生自己的类，
  * 并通过添加方法来封装针对该数据表的更复杂的数据库操作。
  *
  * 对于每一个表数据入口对象，都必须在类定义中通过 $tableName 和 $primaryKey
@@ -134,7 +134,7 @@ class TableDataGateway
     /**
      * 用于数据验证的对象
      *
-     * @var FLEA_Helper_Verifier
+     * @var \FLEA\Helper\Verifier
      */
     public $verifier = null;
 
@@ -233,7 +233,7 @@ class TableDataGateway
     public $lastValidationResult;
 
     /**
-     * 构造 FLEA_Db_TableDataGateway 实例
+     * 构造 \FLEA\Db\TableDataGateway 实例
      *
      * $params 参数允许有下列选项：
      *   - schema: 指定数据表的 schema
@@ -249,7 +249,7 @@ class TableDataGateway
      *
      * @param array $params
      *
-     * @return FLEA_Db_TableDataGateway
+     * @return \FLEA\Db\TableDataGateway
      */
     public function __construct(?array $params = null)
     {
@@ -844,7 +844,7 @@ class TableDataGateway
         if ($this->autoValidating && !is_null($this->verifier)) {
             if (!$this->checkRowData($row, true)) {
                 // 验证失败抛出异常
-                throw new FLEA_Exception_ValidationFailed($this->getLastValidation(), $row);
+                throw new \FLEA\Exception_ValidationFailed($this->getLastValidation(), $row);
             }
         }
 
@@ -1067,7 +1067,7 @@ class TableDataGateway
         // 自动验证数据
         if ($this->autoValidating && !is_null($this->verifier)) {
             if (!$this->checkRowData($row)) {
-                throw new FLEA_Exception_ValidationFailed($this->getLastValidation(), $row);
+                throw new \FLEA\Exception_ValidationFailed($this->getLastValidation(), $row);
             }
         }
 
@@ -1215,7 +1215,7 @@ class TableDataGateway
                 if (!$link->enabled) { continue; }
                 switch ($link->type) {
                 case MANY_TO_MANY:
-                    /* @var $link FLEA_Db_ManyToManyLink */
+                    /* @var $link \FLEA\Db\TableLink\ManyToManyLink */
                     if (!$link->deleteMiddleTableDataByMainForeignKey($qpkv)) {
                         $this->dbo->completeTrans(false);
                         return false;
@@ -1229,7 +1229,7 @@ class TableDataGateway
                      * 当 $link->linkRemove 为 true 时，直接删除关联表中的关联数据
                      * 否则更新关联数据的外键值为 $link->linkRemoveFillValue
                      */
-                    /* @var $link FLEA_Db_HasOneLink */
+                    /* @var $link \FLEA\Db\TableLink\HasOneLink */
                     if ($link->deleteByForeignKey($qpkv) === false) {
                         $this->dbo->completeTrans(false);
                         return false;
@@ -1338,7 +1338,7 @@ class TableDataGateway
                 /* @var $link \FLEA\Db\TableLink */
                 switch ($link->type) {
                 case MANY_TO_MANY:
-                    /* @var $link FLEA_Db_ManyToManyLink */
+                    /* @var $link \FLEA\Db\TableLink\ManyToManyLink */
                     $link->init();
                     $sql = "DELETE FROM {$link->qjoinTable}";
                     break;
@@ -1487,7 +1487,7 @@ class TableDataGateway
      *
      * @param string $linkName
      *
-     * @return FLEA_Db_TableDataGateway
+     * @return \FLEA\Db\TableDataGateway
      */
     public function getLinkTable(string $linkName): ?string
     {
@@ -1618,7 +1618,7 @@ class TableDataGateway
     public function qinto(string $sql, ?array $params = null): string
     {
         if (!is_array($params)) {
-            throw new FLEA_Exception_TypeMismatch('$params', 'array', gettype($params));
+            throw new \FLEA\Exception_TypeMismatch('$params', 'array', gettype($params));
         }
         $arr = explode('?', $sql);
         $sql = array_shift($arr);
@@ -1851,15 +1851,15 @@ class TableDataGateway
                 switch ($link->type) {
                 case HAS_ONE:
                 case HAS_MANY:
-                    /* @var $link FLEA_Db_HasOneLink */
+                    /* @var $link \FLEA\Db\TableLink\HasOneLink */
                     $sqljoin .= "LEFT JOIN {$link->assocTDG->qtableName} ON {$link->mainTDG->qpk} = {$link->qforeignKey} ";
                     break;
                 case BELONGS_TO:
-                    /* @var $link FLEA_Db_BelongsToLink */
+                    /* @var $link \FLEA\Db\TableLink\BelongsToLink */
                     $sqljoin .= "LEFT JOIN {$link->assocTDG->qtableName} ON {$link->assocTDG->qpk} = {$link->qforeignKey} ";
                     break;
                 case MANY_TO_MANY:
-                    /* @var $link FLEA_Db_ManyToManyLink */
+                    /* @var $link \FLEA\Db\TableLink\ManyToManyLink */
                     $sqljoin .= "INNER JOIN {$link->qjoinTable} ON {$link->qforeignKey} = {$this->qpk} INNER JOIN {$link->assocTDG->qtableName} ON {$link->assocTDG->qpk} = {$link->qassocForeignKey} ";
                     break;
                 }

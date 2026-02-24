@@ -4,7 +4,7 @@ namespace FLEA\Helper;
 
 
 /**
- * 定义 FLEA_Helper_SendFile 类
+ * 定义 \FLEA\Helper\SendFile 类
  *
  * @author toohamster
  * @package Core
@@ -17,9 +17,9 @@ define('SENDFILE_INLINE', 'inline');
 // }}}
 
 /**
- * FLEA_Helper_SendFile 类用于向浏览器发送文件
+ * \FLEA\Helper\SendFile 类用于向浏览器发送文件
  *
- * 利用 FLEA_Helper_SendFile，应用程序可以将重要的文件保存在
+ * 利用 \FLEA\Helper\SendFile，应用程序可以将重要的文件保存在
  * 浏览器无法访问的位置。然后通过程序将文件内容发送给浏览器。
  *
  * @package Core

@@ -4,7 +4,7 @@ namespace FLEA\Db;
 
 
 /**
- * 定义 FLEA_Db_ActiveRecord 类
+ * 定义 \FLEA\Db\ActiveRecord 类
  *
  * @author 起源科技(www.qeeyuan.com)
  * @package Core
@@ -12,7 +12,7 @@ namespace FLEA\Db;
  */
 
 /**
- * FLEA_Db_ActiveRecord 类实现了 ActiveRecord 模式
+ * \FLEA\Db\ActiveRecord 类实现了 ActiveRecord 模式
  *
  * @author 起源科技(www.qeeyuan.com)
  * @package Core
@@ -73,7 +73,7 @@ class ActiveRecord
      *
      * @param mixed $conditions
      *
-     * @return FLEA_Db_ActiveRecord
+     * @return \FLEA\Db\ActiveRecord
      */
     public function __construct($conditions = null)
     {

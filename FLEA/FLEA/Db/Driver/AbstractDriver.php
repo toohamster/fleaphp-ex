@@ -3,7 +3,7 @@
 namespace FLEA\Db\Driver;
 
 /**
- * 定义 FLEA_Db_Driver_Abstract 类
+ * 定义 \FLEA\Db\Driver\AbstractDriver 类
  *
  * @author toohamster
  * @package Core
@@ -29,7 +29,7 @@ define('DBO_PARAM_DL_SEQUENCE', '$');
 define('DBO_PARAM_AT_NAMED',    '@');
 
 /**
- * FLEA_Db_Driver_Abstract 是所有数据库驱动的抽象基础类
+ * \FLEA\Db\Driver\AbstractDriver 是所有数据库驱动的抽象基础类
  *
  * @package Core
  * @author toohamster

@@ -4,7 +4,7 @@
 
 namespace FLEA\Acl\Exception;
 /**
- * 定义 FLEA_Acl_Exception_UserGroupNotFound 异常
+ * 定义 \FLEA\Acl_Exception_UserGroupNotFound 异常
  *
  * @author toohamster
  * @package Core
@@ -12,7 +12,7 @@ namespace FLEA\Acl\Exception;
  */
 
 /**
- * FLEA_Acl_Exception_UserGroupNotFound 指示指定的用户组没有找到
+ * \FLEA\Acl_Exception_UserGroupNotFound 指示指定的用户组没有找到
  *
  * @package Core
  * @author toohamster

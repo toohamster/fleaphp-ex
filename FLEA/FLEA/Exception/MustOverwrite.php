@@ -4,7 +4,7 @@
 
 namespace FLEA\Exception;
 /**
- * 定义 FLEA_Exception_MustOverwrite 异常
+ * 定义 \FLEA\Exception_MustOverwrite 异常
  *
  * @author toohamster
  * @package Exception
@@ -12,7 +12,7 @@ namespace FLEA\Exception;
  */
 
 /**
- * FLEA_Exception_MustOverwrite 异常指示某个方法必须在派生类中重写
+ * \FLEA\Exception_MustOverwrite 异常指示某个方法必须在派生类中重写
  *
  * @package Exception
  * @author toohamster
@@ -27,7 +27,7 @@ class MustOverwrite extends \FLEA\Exception
      *
      * @param string $prototypeMethod
      *
-     * @return FLEA_Exception_MustOverwrite
+     * @return \FLEA\Exception_MustOverwrite
      */
     public function __construct($prototypeMethod)
     {

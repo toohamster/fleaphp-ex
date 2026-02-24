@@ -3,7 +3,7 @@
 namespace FLEA\Db\Driver;
 
 /**
- * 定义 FLEA_Db_Driver_Sqlite 驱动，用PDO实现访问sqlite3数据库
+ * 定义 \FLEA\Db\Driver\Sqlitepdo 驱动，用PDO实现访问sqlite3数据库
  * Editor by lonestone 2007 10 13
  * Email:wangyong.yichang@gmail.com
  * Version 0.1

@@ -4,7 +4,7 @@ namespace FLEA\Db\Exception;
 
 
 /**
- * 定义 FLEA_Db_Exception_MissingPrimaryKey 异常
+ * 定义 \FLEA\Db\Exception\MissingPrimaryKey 异常
  *
  * @author toohamster
  * @package Exception
@@ -12,7 +12,7 @@ namespace FLEA\Db\Exception;
  */
 
 /**
- * FLEA_Db_Exception_MissingPrimaryKey 异常指示没有提供主键字段值
+ * \FLEA\Db\Exception\MissingPrimaryKey 异常指示没有提供主键字段值
  *
  * @package Exception
  * @author toohamster
@@ -32,7 +32,7 @@ class MissingPrimaryKey extends \FLEA\Exception
      *
      * @param string $pk
      *
-     * @return FLEA_Db_Exception_MissingPrimaryKey
+     * @return \FLEA\Db\Exception\MissingPrimaryKey
      */
     public function __construct($pk)
     {

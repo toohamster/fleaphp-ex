@@ -4,7 +4,7 @@ namespace FLEA\Rbac;
 
 
 /**
- * 定义 FLEA_Rbac_UsersManager 类
+ * 定义 \FLEA\Rbac_UsersManager 类
  *
  * @author toohamster
  * @package Core
@@ -25,7 +25,7 @@ define('PWD_SHA2',      5);
 /**
  * UsersManager 派生自 \FLEA\Db\TableDataGateway，用于访问保存用户信息的数据表
  *
- * 如果数据表的名字不同，应该从 FLEA_Rbac_UsersManager 派生类并使用自定义的数据表名字、主键字段名等。
+ * 如果数据表的名字不同，应该从 \FLEA\Rbac_UsersManager 派生类并使用自定义的数据表名字、主键字段名等。
  *
  * @package Core
  * @author toohamster

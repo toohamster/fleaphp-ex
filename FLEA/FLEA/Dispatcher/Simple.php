@@ -12,7 +12,7 @@ namespace FLEA\Dispatcher;
 /////////////////////////////////////////////////////////////////////////////
 
 /**
- * 定义 FLEA_Dispatcher_Simple 类
+ * 定义 \FLEA\Dispatcher\Simple 类
  *
  * @author toohamster
  * @package Core
@@ -20,7 +20,7 @@ namespace FLEA\Dispatcher;
  */
 
 /**
- * FLEA_Dispatcher_Simple 分析 HTTP 请求，并转发到合适的 Controller 对象处理
+ * \FLEA\Dispatcher\Simple 分析 HTTP 请求，并转发到合适的 Controller 对象处理
  *
  * @package Core
  * @author toohamster
@@ -47,7 +47,7 @@ class Simple
      *
      * @param array $request
      *
-     * @return FLEA_Dispatcher_Simple
+     * @return \FLEA\Dispatcher\Simple
      */
     public function __construct(array &$request)
     {

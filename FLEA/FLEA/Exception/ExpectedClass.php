@@ -4,7 +4,7 @@
 
 namespace FLEA\Exception;
 /**
- * 定义 FLEA_Exception_ExpectedClass 异常
+ * 定义 \FLEA\Exception_ExpectedClass 异常
  *
  * @author toohamster
  * @package Exception
@@ -12,7 +12,7 @@ namespace FLEA\Exception;
  */
 
 /**
- * FLEA_Exception_ExpectedClass 异常指示需要的类没有找到
+ * \FLEA\Exception_ExpectedClass 异常指示需要的类没有找到
  *
  * @package Exception
  * @author toohamster
@@ -48,7 +48,7 @@ class ExpectedClass extends \FLEA\Exception
      * @param string $file
      * @param boolean $fileExists
      *
-     * @return FLEA_Exception_ExpectedClass
+     * @return \FLEA\Exception_ExpectedClass
      */
     public function __construct(string $className, ?string $file = null, bool $fileExists = false)
     {

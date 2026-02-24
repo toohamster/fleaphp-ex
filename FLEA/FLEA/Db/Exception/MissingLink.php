@@ -4,7 +4,7 @@ namespace FLEA\Db\Exception;
 
 
 /**
- * 定义 FLEA_Db_Exception_MissingLink 异常
+ * 定义 \FLEA\Db\Exception\MissingLink 异常
  *
  * @author toohamster
  * @package Exception
@@ -12,7 +12,7 @@ namespace FLEA\Db\Exception;
  */
 
 /**
- * FLEA_Db_Exception_MissingLink 异常指示尝试访问的关联不存在
+ * \FLEA\Db\Exception\MissingLink 异常指示尝试访问的关联不存在
  *
  * @package Exception
  * @author toohamster
@@ -27,7 +27,7 @@ class MissingLink extends \FLEA\Exception
      *
      * @param $name
      *
-     * @return FLEA_Db_Exception_MissingLink
+     * @return \FLEA\Db\Exception\MissingLink
      */
     public function __construct($name)
     {

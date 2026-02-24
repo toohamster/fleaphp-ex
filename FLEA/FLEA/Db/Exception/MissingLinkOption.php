@@ -4,7 +4,7 @@ namespace FLEA\Db\Exception;
 
 
 /**
- * 定义 FLEA_Db_Exception_MissingLinkOption 异常
+ * 定义 \FLEA\Db\Exception\MissingLinkOption 异常
  *
  * @author toohamster
  * @package Exception
@@ -12,7 +12,7 @@ namespace FLEA\Db\Exception;
  */
 
 /**
- * FLEA_Db_Exception_MissingLinkOption 异常指示创建 TableLink 对象时没有提供必须的选项
+ * \FLEA\Db\Exception\MissingLinkOption 异常指示创建 TableLink 对象时没有提供必须的选项
  *
  * @package Exception
  * @author toohamster
@@ -32,7 +32,7 @@ class MissingLinkOption extends \FLEA\Exception
      *
      * @param string $option
      *
-     * @return FLEA_Db_Exception_MissingLinkOption
+     * @return \FLEA\Db\Exception\MissingLinkOption
      */
     public function __construct($option)
     {

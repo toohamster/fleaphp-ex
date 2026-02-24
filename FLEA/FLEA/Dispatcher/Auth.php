@@ -12,7 +12,7 @@ namespace FLEA\Dispatcher;
 /////////////////////////////////////////////////////////////////////////////
 
 /**
- * 定义 FLEA_Dispatcher_Auth 类
+ * 定义 \FLEA\Dispatcher\Auth 类
  *
  * @author toohamster
  * @package Core
@@ -21,7 +21,7 @@ namespace FLEA\Dispatcher;
 
 
 /**
- * FLEA_Dispatcher_Auth 分析 HTTP 请求，并转发到合适的 Controller 对象处理
+ * \FLEA\Dispatcher\Auth 分析 HTTP 请求，并转发到合适的 Controller 对象处理
  *
  * @package Core
  * @author toohamster
@@ -32,7 +32,7 @@ class Auth extends \FLEA\Dispatcher\Simple
     /**
      * 用于提供验证服务的对象实例
      *
-     * @var FLEA_Rbac
+     * @var \FLEA\Rbac
      */
     public $_auth;
 
@@ -41,7 +41,7 @@ class Auth extends \FLEA\Dispatcher\Simple
      *
      * @param array $request
      *
-     * @return FLEA_Dispatcher_Auth
+     * @return \FLEA\Dispatcher\Auth
      */
     public function __construct(& $request)
     {
@@ -52,7 +52,7 @@ class Auth extends \FLEA\Dispatcher\Simple
     /**
      * 返回当前使用的验证服务对象
      *
-     * @return FLEA_Rbac
+     * @return \FLEA\Rbac
      */
     public function getAuthProvider()
     {
@@ -62,7 +62,7 @@ class Auth extends \FLEA\Dispatcher\Simple
     /**
      * 设置要使用的验证服务对象
      *
-     * @param FLEA_Rbac $auth
+     * @param \FLEA\Rbac $auth
      */
     public function setAuthProvider(& $auth)
     {
@@ -147,7 +147,7 @@ class Auth extends \FLEA\Dispatcher\Simple
             if ($callback) {
                 return call_user_func_array($callback, $args);
             } else {
-                throw new FLEA_Dispatcher_Exception_CheckFailed($controllerName, $actionName, $rawACT, $roles);
+                throw new \FLEA\Dispatcher\Exception\CheckFailed($controllerName, $actionName, $rawACT, $roles);
             }
         }
     }
@@ -282,6 +282,6 @@ class Auth extends \FLEA\Dispatcher\Simple
         }
 
         // 当控制器的 ACT 文件没有返回 ACT 时抛出异常
-        throw new FLEA_Rbac_Exception_InvalidACTFile($actFilename, $ACT);
+        throw new \FLEA\Rbac\Exception\InvalidACTFile($actFilename, $ACT);
     }
 }

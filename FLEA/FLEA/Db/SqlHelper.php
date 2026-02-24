@@ -4,7 +4,7 @@ namespace FLEA\Db;
 
 
 /**
- * 定义 FLEA_Db_SqlHelper 类
+ * 定义 \FLEA\Db\SqlHelper 类
  *
  * @author toohamster
  * @package Core
@@ -12,7 +12,7 @@ namespace FLEA\Db;
  */
 
 /**
- * FLEA_Db_SqlHelper 类提供了各种生成 SQL 语句的辅助方法
+ * \FLEA\Db\SqlHelper 类提供了各种生成 SQL 语句的辅助方法
  *
  * @package Core
  * @author toohamster

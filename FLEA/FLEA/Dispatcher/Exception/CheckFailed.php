@@ -4,7 +4,7 @@
 
 namespace FLEA\Dispatcher\Exception;
 /**
- * 定义 FLEA_Dispatcher_Exception_CheckFailed 异常
+ * 定义 \FLEA\Dispatcher\Exception\CheckFailed 异常
  *
  * @author toohamster
  * @package Exception
@@ -12,7 +12,7 @@ namespace FLEA\Dispatcher\Exception;
  */
 
 /**
- * FLEA_Dispatcher_Exception_CheckFailed 异常指示用户试图访问的控制器方法不允许该用户访问
+ * \FLEA\Dispatcher\Exception\CheckFailed 异常指示用户试图访问的控制器方法不允许该用户访问
  *
  * @package Exception
  * @author toohamster
@@ -33,7 +33,7 @@ class CheckFailed extends \FLEA\Exception
      * @param array $act
      * @param array $roles
      *
-     * @return FLEA_Dispatcher_Exception_CheckFailed
+     * @return \FLEA\Dispatcher\Exception\CheckFailed
      */
     function __construct($controllerName, $actionName,
             $act = null, $roles = null)

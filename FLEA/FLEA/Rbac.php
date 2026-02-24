@@ -12,7 +12,7 @@ namespace FLEA;
 /////////////////////////////////////////////////////////////////////////////
 
 /**
- * 定义 FLEA_Rbac 类
+ * 定义 \FLEA\Rbac 类
  *
  * @author toohamster
  * @package Core
@@ -20,10 +20,10 @@ namespace FLEA;
  */
 
 /**
- * FLEA_Rbac 提供基于角色的权限检查服务
+ * \FLEA\Rbac 提供基于角色的权限检查服务
  *
- * FLEA_Rbac 并不提供用户管理和角色管理服务，
- * 这些服务由 FLEA_Rbac_UsersManager 和 FLEA_Rbac_RolesManager 提供。
+ * \FLEA\Rbac 并不提供用户管理和角色管理服务，
+ * 这些服务由 \FLEA\Rbac_UsersManager 和 \FLEA\Rbac_RolesManager 提供。
  *
  * @package Core
  * @author toohamster
@@ -48,7 +48,7 @@ class Rbac
     /**
      * 构造函数
      *
-     * @return FLEA_Rbac
+     * @return \FLEA\Rbac
      */
     public function __construct()
     {
@@ -144,7 +144,7 @@ class Rbac
             }
             // 如果 deny 也为 RBAC_EVERYONE，则表示 ACT 出现了冲突
             if ($ACT['deny'] == RBAC_EVERYONE) {
-                throw new FLEA_Rbac_Exception_InvalidACT($ACT);
+                throw new \FLEA\Rbac\Exception\InvalidACT($ACT);
             }
 
             // 只有 deny 中没有用户的角色信息，则检查通过

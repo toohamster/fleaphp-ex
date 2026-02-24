@@ -4,7 +4,7 @@ namespace FLEA\Helper\FileUploader;
 
 
 /**
- * 定义 FLEA_Helper_FileUploader_File 类
+ * 定义 \FLEA\Helper\FileUploader_File 类
  *
  * @author toohamster
  * @package Core
@@ -41,7 +41,7 @@ class File
      * @param string $name
      * @param int $ix
      *
-     * @return FLEA_Helper_FileUploader_File
+     * @return \FLEA\Helper\FileUploader_File
      */
     public function __construct($struct, $name, $ix = false)
     {

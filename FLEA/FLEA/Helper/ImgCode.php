@@ -4,7 +4,7 @@ namespace FLEA\Helper;
 
 
 /**
- * 定义 FLEA_Helper_ImgCode 类
+ * 定义 \FLEA\Helper\ImgCode 类
  *
  * @author toohamster
  * @package Core
@@ -12,7 +12,7 @@ namespace FLEA\Helper;
  */
 
 /**
- * FLEA_Helper_ImgCode 类实现了一个简单的图像验证码生成器，并带有检查验证方法
+ * \FLEA\Helper\ImgCode 类实现了一个简单的图像验证码生成器，并带有检查验证方法
  *
  * 当启用了 session 时，验证码会保存在 session 中。用法：
  *
@@ -24,7 +24,7 @@ namespace FLEA\Helper;
  * 接下来为显示验证码的控制器编写 imgcode 方法：
  * <code>
  * function actionImgcode() {
- *     $imgcode = FLEA::getSingleton('FLEA_Helper_ImgCode');
+ *     $imgcode = FLEA::getSingleton('\FLEA\Helper\ImgCode');
  *     $imgcode->image();
  * }
  * </code>
@@ -32,7 +32,7 @@ namespace FLEA\Helper;
  * 最后，对于用户提交的表单做如下验证：
  * <code>
  * function actionSubmit() {
- *     $imgcode = FLEA::getSingleton('FLEA_Helper_ImgCode');
+ *     $imgcode = FLEA::getSingleton('\FLEA\Helper\ImgCode');
  *     // 假定验证码在表单中的字段名是 imgcode
  *     if ($imgcode->check($_POST['imgcode'])) {
  *         // 验证通过

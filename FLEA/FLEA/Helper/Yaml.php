@@ -46,7 +46,7 @@ function load_yaml($filename, $cacheEnabled = true, $replace = null)
     static $objects = [];
 
     if (!file_exists($filename)) {
-        throw new FLEA_Exception_ExpectedFile($filename);
+        throw new \FLEA\Exception_ExpectedFile($filename);
     }
     
     if ($cacheEnabled) {

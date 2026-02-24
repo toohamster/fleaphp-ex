@@ -4,7 +4,7 @@ namespace FLEA\Db\Exception;
 
 
 /**
- * 定义 FLEA_Db_Exception_SqlQuery 异常
+ * 定义 \FLEA\Db\Exception\SqlQuery 异常
  *
  * @author toohamster
  * @package Exception
@@ -12,7 +12,7 @@ namespace FLEA\Db\Exception;
  */
 
 /**
- * FLEA_Db_Exception_SqlQuery 异常指示一个 SQL 语句执行错误
+ * \FLEA\Db\Exception\SqlQuery 异常指示一个 SQL 语句执行错误
  *
  * @package Exception
  * @author toohamster
@@ -34,7 +34,7 @@ class SqlQuery extends \FLEA\Exception
      * @param string $msg
      * @param int $code
      *
-     * @return FLEA_Db_Exception_SqlQuery
+     * @return \FLEA\Db\Exception\SqlQuery
      */
     public function __construct($sql, $msg = 0, $code = 0)
     {

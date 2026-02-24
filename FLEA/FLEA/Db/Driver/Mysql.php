@@ -4,7 +4,7 @@ namespace FLEA\Db\Driver;
 
 
 /**
- * 定义 FLEA_Db_Driver_Mysql 驱动
+ * 定义 \FLEA\Db\Driver\Mysql 驱动
  *
  * @author toohamster
  * @package Core

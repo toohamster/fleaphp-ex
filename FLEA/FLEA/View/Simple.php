@@ -4,7 +4,7 @@ namespace FLEA\View;
 
 
 /**
- * 定义 FLEA_View_Simple 类
+ * 定义 \FLEA\View\Simple 类
  *
  * @author toohamster
  * @package Core
@@ -12,7 +12,7 @@ namespace FLEA\View;
  */
 
 /**
- * FLEA_View_Simple 实现了一个简单的、使用 PHP 自身作为模版语言，
+ * \FLEA\View\Simple 实现了一个简单的、使用 PHP 自身作为模版语言，
  * 带有缓存功能的模版引擎
  *
  * @package Core
@@ -73,11 +73,11 @@ class Simple
      *
      * @param string $path 模板文件所在路径
      *
-     * @return FLEA_View_Simple
+     * @return \FLEA\View\Simple
      */
     public function __construct(?string $path = null)
     {
-        log_message('Construction FLEA_View_Simple', 'debug');
+        log_message('Construction \FLEA\View\Simple', 'debug');
 
         $this->path = $path;
         $this->cacheLifetime = 900;

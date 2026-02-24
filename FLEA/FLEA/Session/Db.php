@@ -4,7 +4,7 @@ namespace FLEA\Session;
 
 
 /**
- * 定义 FLEA_Session_Db 类
+ * 定义 \FLEA\Session\Db 类
  *
  * @author toohamster
  * @package Core
@@ -12,9 +12,9 @@ namespace FLEA\Session;
  */
 
 /**
- * FLEA_Session_Db 类提供将 session 保存到数据库的能力
+ * \FLEA\Session\Db 类提供将 session 保存到数据库的能力
  *
- * 要使用 FLEA_Session_Db，必须完成下列准备工作：
+ * 要使用 \FLEA\Session\Db，必须完成下列准备工作：
  *
  * - 创建需要的数据表
  *
@@ -23,7 +23,7 @@ namespace FLEA\Session;
  *     sess_data   text            存储 session 数据
  *     activity    int(11)         该 session 最后一次读取/写入时间
  *
- * - 修改应用程序设置 sessionProvider 为 FLEA_Session_Db
+ * - 修改应用程序设置 sessionProvider 为 \FLEA\Session\Db
  *
  * @package Core
  * @author toohamster
@@ -34,7 +34,7 @@ class Db
     /**
      * 数据库访问对象
      *
-     * @var FLEA_Db_Driver_Abstract
+     * @var \FLEA\Db\Driver\AbstractDriver
      */
     public $dbo = null;
 
@@ -78,7 +78,7 @@ class Db
     /**
      * 构造函数
      *
-     * @return FLEA_Session_Db
+     * @return \FLEA\Session\Db
      */
     public function __construct()
     {

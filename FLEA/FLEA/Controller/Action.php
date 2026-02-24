@@ -3,7 +3,7 @@
 namespace FLEA\Controller;
 
 /**
- * 定义 FLEA_Controller_Action 类
+ * 定义 \FLEA\Controller\Action 类
  *
  * @author toohamster
  * @package Core
@@ -11,7 +11,7 @@ namespace FLEA\Controller;
  */
 
 /**
- * FLEA_Controller_Action 实现了一个其它控制器的超类，
+ * \FLEA\Controller\Action 实现了一个其它控制器的超类，
  * 为开发者自己的控制器提供了一些方便的成员变量和方法
  *
  * 开发者不一定需要从这个类继承来构造自己的控制器。
@@ -63,7 +63,7 @@ class Action
      *
      * @param string $controllerName
      *
-     * @return FLEA_Controller_Action
+     * @return \FLEA\Controller\Action
      */
     public function __construct(string $controllerName)
     {

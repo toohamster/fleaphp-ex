@@ -4,7 +4,7 @@ namespace FLEA\Db\Exception;
 
 
 /**
- * 定义 FLEA_Db_Exception_InvalidLinkType 异常
+ * 定义 \FLEA\Db\Exception\InvalidLinkType 异常
  *
  * @author toohamster
  * @package Exception
@@ -12,7 +12,7 @@ namespace FLEA\Db\Exception;
  */
 
 /**
- * FLEA_Db_Exception_InvalidLinkType 异常指示无效的数据表关联类型
+ * \FLEA\Db\Exception\InvalidLinkType 异常指示无效的数据表关联类型
  *
  * @package Exception
  * @author toohamster
@@ -27,7 +27,7 @@ class InvalidLinkType extends \FLEA\Exception
      *
      * @param $type
      *
-     * @return FLEA_Db_Exception_InvalidDSN
+     * @return \FLEA\Db\Exception\InvalidDSN
      */
     function __construct($type)
     {

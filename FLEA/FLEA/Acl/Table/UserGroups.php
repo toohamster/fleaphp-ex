@@ -4,7 +4,7 @@ namespace FLEA\Acl\Table;
 
 
 /**
- * 定义 FLEA_Acl_Table_UserGroups 类
+ * 定义 \FLEA\Acl_Table_UserGroups 类
  *
  * @author toohamster
  * @package Core
@@ -13,7 +13,7 @@ namespace FLEA\Acl\Table;
 
 
 /**
- * FLEA_Acl_Table_UserGroups 类提供了用户组数据的存储服务
+ * \FLEA\Acl_Table_UserGroups 类提供了用户组数据的存储服务
  *
  * @package Core
  * @author toohamster
@@ -42,17 +42,17 @@ class UserGroups extends \FLEA\Db\TableDataGateway
      */
     public $manyToMany = array(
         array(
-            'tableClass' => 'FLEA_Acl_Table_Roles',
+            'tableClass' => '\FLEA\Acl_Table_Roles',
             'foreignKey' => 'user_group_id',
             'assocForeignKey' => 'role_id',
-            'joinTableClass' => 'FLEA_Acl_Table_UserGroupsHasRoles',
+            'joinTableClass' => '\FLEA\Acl_Table_UserGroupsHasRoles',
             'mappingName' => 'roles',
         ),
         array(
-            'tableClass' => 'FLEA_Acl_Table_Permissions',
+            'tableClass' => '\FLEA\Acl_Table_Permissions',
             'foreignKey' => 'user_group_id',
             'assocForeignKey' => 'permission_id',
-            'joinTableClass' => 'FLEA_Acl_Table_UserGroupsHasPermissions',
+            'joinTableClass' => '\FLEA\Acl_Table_UserGroupsHasPermissions',
             'mappingName' => 'permissions',
         ),
     );
@@ -78,7 +78,7 @@ class UserGroups extends \FLEA\Db\TableDataGateway
             $parent = parent::find($parentId);
             if (!$parent) {
                 // 指定的父用户组不存在
-                throw new FLEA_Acl_Exception_UserGroupNotFound($parentId);
+                throw new \FLEA\Acl_Exception_UserGroupNotFound($parentId);
             }
         } else {
             // 如果未指定 $parentId 为 0 或 null，则创建一个顶级用户组
@@ -149,7 +149,7 @@ class UserGroups extends \FLEA\Db\TableDataGateway
     public function removeByPkv($groupId) {
         $group = parent::find((int)$groupId);
         if (!$group) {
-            throw new FLEA_Acl_Exception_UserGroupNotFound($groupId);
+            throw new \FLEA\Acl_Exception_UserGroupNotFound($groupId);
         }
 
         $this->dbo->startTrans();
