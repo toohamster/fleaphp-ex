@@ -24,12 +24,14 @@
 
 FleaPHP 是一个轻量级的 PHP 框架，提供了完整的 MVC 开发支持、数据库抽象层、缓存管理等功能。本手册将帮助开发者快速上手并充分利用 FleaPHP 的功能。
 
+**重要说明**：FleaPHP 现已全面迁移到 PSR-4 命名空间标准和 Composer 自动加载。所有框架类都使用命名空间（例如 `\FLEA\Controller\Action`），并通过 Composer 的 PSR-4 自动加载器加载。本手册中的所有示例均已更新以反映这些变化。
+
 ### 特性
 
 - **轻量级**：核心代码精简，性能高效
 - **MVC 架构**：支持模型-视图-控制器模式
 - **数据库抽象层**：支持多种数据库，统一的操作接口
-- **自动加载**：基于命名约定的类文件自动加载
+- **PSR-4 自动加载**：基于 Composer 的 PSR-4 标准自动加载
 - **对象容器**：单例模式管理对象实例
 - **缓存系统**：内置文件缓存支持
 - **灵活配置**：支持调试和生产两种模式
@@ -37,6 +39,7 @@ FleaPHP 是一个轻量级的 PHP 框架，提供了完整的 MVC 开发支持�
 ### 系统要求
 
 - PHP 7.0 或更高版本
+- Composer（用于依赖管理和自动加载）
 - 支持的数据库：MySQL, PostgreSQL, SQLite 等
 
 ---
@@ -54,8 +57,15 @@ your-project/
 │   └── FLEA/
 │       ├── Config.php
 │       └── ...
+├── composer.json
 ├── index.php
 └── ...
+```
+
+确保你的项目包含 `composer.json` 文件，并已运行 `composer install` 生成 `vendor/autoload.php`：
+
+```bash
+composer install
 ```
 
 ### 基础配置
@@ -98,7 +108,7 @@ return [
 
 ```php
 <?php
-require('FLEA/FLEA.php');
+require('vendor/autoload.php');
 
 // 加载应用程序配置
 FLEA::loadAppInf('config.php');
@@ -107,13 +117,15 @@ FLEA::loadAppInf('config.php');
 FLEA::runMVC();
 ```
 
+**注意**：使用 Composer 后，框架会通过 `vendor/autoload.php` 自动加载，无需手动 `require('FLEA/FLEA.php')`。
+
 ---
 
 ## 核心概念
 
 ### 配置管理
 
-FleaPHP 使用 `FLEA_Config` 单例类管理所有配置。框架在加载时会自动初始化配置管理器。
+FleaPHP 使用 `\FLEA\Config` 单例类管理所有配置。框架在加载时会自动初始化配置管理器。
 
 ### 对象容器
 
@@ -121,7 +133,24 @@ FleaPHP 使用 `FLEA_Config` 单例类管理所有配置。框架在加载时会
 
 ### 类文件搜索路径
 
-框架维护一组目录作为类文件的搜索路径，自动加载器会按照这些路径查找类文件。
+框架完全使用 Composer PSR-4 自动加载器来加载类文件，无需手动配置类搜索路径。所有类通过命名空间自动定位到对应的文件。
+
+**PSR-4 命名空间映射：**
+
+```json
+{
+    "autoload": {
+        "psr-4": {
+            "FLEA\\": "FLEA/FLEA/"
+        }
+    }
+}
+```
+
+类名与文件路径的对应关系：
+- `\FLEA\Config` → `FLEA/FLEA/Config.php`
+- `\FLEA\Db\TableDataGateway` → `FLEA/FLEA/Db/TableDataGateway.php`
+- `\FLEA\Controller\Action` → `FLEA/FLEA/Controller/Action.php`
 
 ### 数据库连接池
 
@@ -218,82 +247,81 @@ URL 模式常量：
 
 ## 类加载与自动加载
 
-### 自动加载
+### Composer PSR-4 自动加载
 
-框架使用 SPL 自动加载功能，自动根据类名加载对应的类文件。
+FleaPHP 现在使用 Composer 的 PSR-4 自动加载器来加载所有类文件。这是现代 PHP 开发的标准做法，提供了更好的性能和可维护性。
 
-类名中的下划线（`_`）会被转换为目录分隔符：
+#### 类命名空间
+
+所有框架类都使用 PSR-4 命名空间规范：
 
 ```php
-// 自动加载 Table_Posts 类
-// 查找文件：Table/Posts.php
-$obj = new Table_Posts();
+// 使用完整的命名空间
+$config = new \FLEA\Config();
+$userTable = new \FLEA\Db\TableDataGateway();
+$dispatcher = new \FLEA\Dispatcher\Auth();
 ```
 
-### 手动加载类
+#### 自动加载机制
 
-使用 `FLEA::loadClass()` 手动加载类：
+Composer 会根据命名空间自动加载类文件，无需手动 include/require：
 
 ```php
-// 加载类文件
-FLEA::loadClass('Helper_String');
+// 使用类时，Composer 会自动加载对应的文件
+$userTable = FLEA::getSingleton(\FLEA\Db\TableDataGateway::class);
 
-// 第二个参数为 true 时，类文件不存在不抛出异常
-FLEA::loadClass('Helper_String', true);
+// 等价于
+use FLEA\Db\TableDataGateway;
+$userTable = FLEA::getSingleton(TableDataGateway::class);
 ```
 
-### 加载文件
+#### 类名与文件路径对应关系
 
-使用 `FLEA::loadFile()` 加载任意文件：
+| 类名 | 文件路径 |
+|------|----------|
+| `\FLEA\Config` | `FLEA/FLEA/Config.php` |
+| `\FLEA\Db\TableDataGateway` | `FLEA/FLEA/Db/TableDataGateway.php` |
+| `\FLEA\Db\ActiveRecord` | `FLEA/FLEA/Db/ActiveRecord.php` |
+| `\FLEA\Controller\Action` | `FLEA/FLEA/Controller/Action.php` |
+| `\FLEA\Dispatcher\Auth` | `FLEA/FLEA/Dispatcher/Auth.php` |
+| `\FLEA\Exception\MissingController` | `FLEA/FLEA/Exception/MissingController.php` |
+
+### 加载非类文件
+
+对于不包含类定义的文件（如函数库、配置文件），使用 `require_once()` 手动加载：
 
 ```php
-// 加载文件
-FLEA::loadFile('config/routes.php');
+// 加载函数库
+require_once dirname(__FILE__) . '/lib/functions.php';
 
-// 第二个参数为 true 时，使用 require_once
-FLEA::loadFile('lib/functions.php', true);
+// 加载配置文件
+require_once dirname(__FILE__) . '/config/routes.php';
 ```
 
-文件名中的下划线（`_`）也会被转换为目录分隔符：
+### 自动加载配置文件
 
-```php
-FLEA::loadFile('Helper_Array_Utils');
-// 加载 Helper/Array/Utils.php
-```
+通过 `composer.json` 的 `files` 配置自动加载文件：
 
-### 添加类搜索路径
-
-使用 `FLEA::import()` 添加类文件搜索路径：
-
-```php
-// 添加搜索路径
-FLEA::import(dirname(__FILE__) . '/APP');
-
-// 现在可以在 APP 目录下查找类文件
-FLEA::loadClass('Model_User'); // 查找 APP/Model/User.php
-```
-
-注意：应该添加类文件所在目录的父目录，而不是类文件所在目录本身。
-
-例如，如果类文件位于 `./APP/Model/User.php`，则应该添加 `./APP` 目录：
-
-```php
-FLEA::import('./APP');
-FLEA::loadClass('Model_User'); // 正确
-```
-
-### 搜索文件
-
-使用 `FLEA::getFilePath()` 搜索文件：
-
-```php
-// 搜索文件，返回完整路径
-$path = FLEA::getFilePath('Helper_String');
-
-// 如果文件不存在，返回 false
-if ($path) {
-    require($path);
+```json
+{
+    "autoload": {
+        "psr-4": {
+            "FLEA\\": "FLEA/FLEA/"
+        },
+        "files": [
+            "FLEA/FLEA.php",
+            "FLEA/Functions.php"
+        ]
+    }
 }
+```
+
+### 重新生成自动加载文件
+
+修改 `composer.json` 后，需要重新生成自动加载文件：
+
+```bash
+composer dump-autoload
 ```
 
 ---
@@ -433,10 +461,10 @@ FleaPHP 提供了 `FLEA_Db_TableDataGateway` 类（表数据入口），用于�
 
 ### 定义数据表入口类
 
-创建数据表入口类，继承自 `FLEA_Db_TableDataGateway`：
+创建数据表入口类，继承自 `\FLEA\Db\TableDataGateway`：
 
 ```php
-class Table_Users extends FLEA_Db_TableDataGateway
+class Table_Users extends \FLEA\Db\TableDataGateway
 {
     /**
      * 数据表名（不包含前缀）
@@ -453,7 +481,11 @@ class Table_Users extends FLEA_Db_TableDataGateway
 使用该类：
 
 ```php
-$userTable = FLEA::getSingleton('Table_Users');
+$userTable = FLEA::getSingleton(\FLEA\Db\TableDataGateway::class);
+
+// 或者
+use FLEA\Db\TableDataGateway;
+$userTable = FLEA::getSingleton(TableDataGateway::class);
 ```
 
 ### 表关系定义
@@ -472,7 +504,7 @@ FleaPHP 支持四种表关系类型：
 一个用户对应一个详细资料：
 
 ```php
-class Table_Users extends FLEA_Db_TableDataGateway
+class Table_Users extends \FLEA\Db\TableDataGateway
 {
     public $tableName = 'users';
     public $primaryKey = 'user_id';
@@ -505,7 +537,7 @@ $profile = $user['profile'];
 一个部门拥有多个员工：
 
 ```php
-class Table_Departments extends FLEA_Db_TableDataGateway
+class Table_Departments extends \FLEA\Db\TableDataGateway
 {
     public $tableName = 'departments';
     public $primaryKey = 'dept_id';
@@ -539,7 +571,7 @@ $employees = $dept['employees'];
 一个用户属于一个角色：
 
 ```php
-class Table_Users extends FLEA_Db_TableDataGateway
+class Table_Users extends \FLEA\Db\TableDataGateway
 {
     public $tableName = 'users';
     public $primaryKey = 'user_id';
@@ -572,7 +604,7 @@ $role = $user['role'];
 学生与课程是多对多关系，通过中间表关联：
 
 ```php
-class Table_Students extends FLEA_Db_TableDataGateway
+class Table_Students extends \FLEA\Db\TableDataGateway
 {
     public $tableName = 'students';
     public $primaryKey = 'student_id';
@@ -977,7 +1009,7 @@ $userTable->removeLink('profile');
 #### 启用自动验证
 
 ```php
-class Table_Users extends FLEA_Db_TableDataGateway
+class Table_Users extends \FLEA\Db\TableDataGateway
 {
     public $tableName = 'users';
     public $primaryKey = 'user_id';
@@ -1026,7 +1058,7 @@ if (!$result) {
 如果数据表包含以下字段，会自动填充当前时间：
 
 ```php
-class Table_Users extends FLEA_Db_TableDataGateway
+class Table_Users extends \FLEA\Db\TableDataGateway
 {
     public $tableName = 'users';
     public $primaryKey = 'user_id';
@@ -1064,7 +1096,7 @@ $userTable->update($row);
 使用 `FLEA::runMVC()` 启动 MVC 应用：
 
 ```php
-require('FLEA/FLEA.php');
+require('vendor/autoload.php');
 FLEA::loadAppInf('config.php');
 
 // 运行 MVC 应用
@@ -1073,10 +1105,10 @@ FLEA::runMVC();
 
 ### 控制器
 
-控制器类应该继承自 `FLEA_Controller_Action`：
+控制器类应该继承自 `\FLEA\Controller\Action`：
 
 ```php
-class Controller_Index extends FLEA_Controller_Action
+class Controller_Index extends \FLEA\Controller\Action
 {
     public function actionIndex()
     {
@@ -1224,13 +1256,13 @@ FleaPHP 提供了完整的 RBAC（基于角色的访问控制）支持，通过 
 创建 RBAC 实例：
 
 ```php
-$rbac = new FLEA_Rbac();
+$rbac = new \FLEA\Rbac\Rbac();
 ```
 
 或者在控制器中使用：
 
 ```php
-$rbac = FLEA::getSingleton('FLEA_Rbac');
+$rbac = FLEA::getSingleton(\FLEA\Rbac\Rbac::class);
 ```
 
 ### 配置 RBAC
@@ -1251,7 +1283,7 @@ return [
 使用 `setUser()` 方法将用户信息保存到 session 中：
 
 ```php
-$rbac = new FLEA_Rbac();
+$rbac = new \FLEA\Rbac\Rbac();
 
 // 设置用户信息
 $userData = [
@@ -1362,7 +1394,7 @@ $ACT = [
 使用 `check()` 方法检查访问权限：
 
 ```php
-$rbac = new FLEA_Rbac();
+$rbac = new \FLEA\Rbac\Rbac();
 
 // 设置用户及其角色
 $userData = ['user_id' => 1, 'username' => 'john'];
@@ -1485,7 +1517,7 @@ if ($rbac->check($roles, $ACT)) {
 #### 登录时设置用户和角色
 
 ```php
-class Controller_Login extends FLEA_Controller_Action
+class Controller_Login extends \FLEA\Controller\Action
 {
     public function actionLogin()
     {
@@ -1502,7 +1534,7 @@ class Controller_Login extends FLEA_Controller_Action
             $roles = $roleTable->getUserRoles($user['user_id']);
 
             // 设置用户和角色
-            $rbac = new FLEA_Rbac();
+            $rbac = new \FLEA\Rbac\Rbac();
             $rbac->setUser($user, $roles);
 
             // 跳转到首页
@@ -1514,7 +1546,7 @@ class Controller_Login extends FLEA_Controller_Action
 
     public function actionLogout()
     {
-        $rbac = new FLEA_Rbac();
+        $rbac = new \FLEA\Rbac\Rbac();
         $rbac->clearUser();
 
         redirect(url('Login', 'index'));
@@ -1525,11 +1557,11 @@ class Controller_Login extends FLEA_Controller_Action
 #### 在控制器中检查权限
 
 ```php
-class Controller_Admin extends FLEA_Controller_Action
+class Controller_Admin extends \FLEA\Controller\Action
 {
     public function actionIndex()
     {
-        $rbac = new FLEA_Rbac();
+        $rbac = new \FLEA\Rbac\Rbac();
         $roles = $rbac->getRolesArray();
 
         // 定义访问控制表
@@ -1557,7 +1589,7 @@ class Controller_Admin extends FLEA_Controller_Action
 ```php
 function checkPermission($requiredRoles)
 {
-    $rbac = new FLEA_Rbac();
+    $rbac = new \FLEA\Rbac\Rbac();
     $roles = $rbac->getRolesArray();
 
     $ACT = [
@@ -1575,7 +1607,7 @@ function checkPermission($requiredRoles)
 在控制器中使用中间件：
 
 ```php
-class Controller_Admin extends FLEA_Controller_Action
+class Controller_Admin extends \FLEA\Controller\Action
 {
     public function actionIndex()
     {
@@ -1634,15 +1666,30 @@ if (!$rbac->check($roles, $ACT)) {
 
 ### 框架异常
 
-FleaPHP 提供了多个异常类，都继承自 `FLEA_Exception`：
+FleaPHP 提供了多个异常类，都继承自 `\FLEA\Exception`：
 
-- `FLEA_Exception_ExpectedFile` - 文件不存在
-- `FLEA_Exception_ExpectedClass` - 类不存在
-- `FLEA_Exception_TypeMismatch` - 类型不匹配
-- `FLEA_Exception_ExistsKeyName` - 对象名称已存在
-- `FLEA_Exception_NotExistsKeyName` - 对象名称不存在
-- `FLEA_Exception_CacheDisabled` - 缓存功能未启用
-- `FLEA_Db_Exception_InvalidDSN` - 无效的 DSN
+- `\FLEA\Exception\ExpectedFile` - 文件不存在
+- `\FLEA\Exception\ExpectedClass` - 类不存在
+- `\FLEA\Exception\TypeMismatch` - 类型不匹配
+- `\FLEA\Exception\ExistsKeyName` - 对象名称已存在
+- `\FLEA\Exception\NotExistsKeyName` - 对象名称不存在
+- `\FLEA\Exception\CacheDisabled` - 缓存功能未启用
+- `\FLEA\Exception\MissingController` - 控制器不存在
+- `\FLEA\Exception\MissingAction` - 动作不存在
+- `\FLEA\Db\Exception\InvalidDSN` - 无效的 DSN
+
+#### 使用异常
+
+```php
+try {
+    $userTable = FLEA::getSingleton(\FLEA\Db\TableDataGateway::class);
+    $user = $userTable->find(1);
+} catch (\FLEA\Exception\ExpectedClass $e) {
+    echo '类不存在: ' . $e->getMessage();
+} catch (\FLEA\Db\Exception\InvalidDSN $e) {
+    echo '数据库连接失败: ' . $e->getMessage();
+}
+```
 
 ### 设置异常处理器
 
@@ -1672,19 +1719,22 @@ function myExceptionHandler($ex)
 FLEA::loadHelper('array');
 FLEA::loadHelper('image');
 
-// 使用助手
-$arrayHelper = new FLEA_Helper_Array();
+// 使用助手类（通过 Composer 自动加载）
+use FLEA\Helper\Array;
+$arrayHelper = new Array();
 ```
 
 助手配置在应用程序配置中，以 `helper.` 开头：
 
 ```php
 return [
-    'helper.array' => 'FLEA_Helper_Array',
-    'helper.image' => 'FLEA_Helper_Image',
+    'helper.array' => 'FLEA\Helper\Array',
+    'helper.image' => 'FLEA\Helper\Image',
     // ...
 ];
 ```
+
+**注意**：FleaPHP 的全局辅助函数（如 `dump()`, `redirect()`, `url()` 等）已集中到 `FLEA/Functions.php` 文件中，通过 Composer 自动加载，无需手动加载。
 
 ### 初始化 WebControls
 
@@ -1698,7 +1748,7 @@ $webControls = FLEA::initWebControls();
 
 ```php
 return [
-    'webControlsClassName' => 'MyApp_WebControls',
+    'webControlsClassName' => 'MyApp\Controls\WebControls',
 ];
 ```
 
@@ -1714,7 +1764,7 @@ $ajax = FLEA::initAjax();
 
 ```php
 return [
-    'ajaxClassName' => 'MyApp_Ajax',
+    'ajaxClassName' => 'MyApp\Ajax\Ajax',
 ];
 ```
 
@@ -1806,15 +1856,53 @@ return [
 
 ### 2. 类文件组织
 
-- 遵循命名约定：类名中的下划线对应目录层级
-- 将类文件放在合理的目录结构中
-- 使用 `FLEA::import()` 添加搜索路径时，添加目录的父目录
+- 使用 PSR-4 命名空间规范组织类文件
+- 命名空间与目录结构对应
+- 在 `composer.json` 中配置 PSR-4 自动加载规则
+- 所有类通过 Composer 自动加载，无需手动管理搜索路径
+
+**示例目录结构：**
+```
+your-project/
+├── vendor/
+│   └── composer/
+│       └── autoload_*.php
+├── src/
+│   ├── Controller/
+│   │   └── Index.php
+│   ├── Model/
+│   │   └── User.php
+│   └── View/
+├── composer.json
+└── index.php
+```
+
+**composer.json 配置：**
+```json
+{
+    "autoload": {
+        "psr-4": {
+            "MyApp\\": "src/"
+        }
+    }
+}
+```
 
 ### 3. 对象管理
 
 - 对于需要多次使用的对象，使用 `FLEA::getSingleton()` 获取单例
 - 对于服务类，在应用启动时注册到对象容器
 - 避免在循环中创建不必要的对象
+- 使用完整的命名空间或 `use` 语句引用类
+
+```php
+// 使用完整命名空间
+$userTable = FLEA::getSingleton(\FLEA\Db\TableDataGateway::class);
+
+// 或者使用 use 语句
+use FLEA\Db\TableDataGateway;
+$userTable = FLEA::getSingleton(TableDataGateway::class);
+```
 
 ### 4. 数据库操作
 
@@ -1856,16 +1944,27 @@ A: 定义 `DEPLOY_MODE` 常量为 true 即可启用生产模式：
 
 ```php
 define('DEPLOY_MODE', true);
-require('FLEA/FLEA.php');
+require('vendor/autoload.php');
 ```
 
 ### Q: 如何自定义类文件搜索路径？
 
-A: 使用 `FLEA::import()` 添加搜索路径：
+A: 使用 Composer 的 PSR-4 自动加载配置，无需手动配置搜索路径：
 
-```php
-FLEA::import(dirname(__FILE__) . '/APP');
-FLEA::import(dirname(__FILE__) . '/LIB');
+```json
+{
+    "autoload": {
+        "psr-4": {
+            "MyApp\\": "src/",
+            "MyApp\\Lib\\": "lib/"
+        }
+    }
+}
+```
+
+然后运行：
+```bash
+composer dump-autoload
 ```
 
 ### Q: 如何处理数据库连接失败？
@@ -1875,7 +1974,7 @@ A: 使用 try-catch 捕获异常：
 ```php
 try {
     $dbo = FLEA::getDBO();
-} catch (FLEA_Db_Exception_InvalidDSN $e) {
+} catch (\FLEA\Db\Exception\InvalidDSN $e) {
     echo '数据库连接失败: ' . $e->getMessage();
 }
 ```
@@ -1936,17 +2035,19 @@ A: 无法直接重置，需要重新加载框架。
 | `requestFilters` | 请求过滤器数组 | [] |
 | `MVCPackageFilename` | MVC 包文件名 | '' |
 | `defaultTimezone` | 默认时区 | Asia/Shanghai |
-| `dispatcher` | 调度器类名 | FLEA_Dispatcher_Auth |
+| `dispatcher` | 调度器类名 | \FLEA\Dispatcher\Auth |
 | `urlCallback` | URL 生成回调函数 | null |
 
 ### 内置助手
 
 | 助手名称 | 类名 |
 |----------|------|
-| array | FLEA_Helper_Array |
-| pager | FLEA_Helper_Pager |
-| image | FLEA_Helper_Image |
-| uploader | FLEA_Helper_Uploader |
+| array | \FLEA\Helper\Array |
+| pager | \FLEA\Helper\Pager |
+| image | \FLEA\Helper\Image |
+| uploader | \FLEA\Helper\Uploader |
+
+**注意**：这些助手类已重构为使用命名空间，请使用新的类名。
 
 ### 相关资源
 

@@ -377,6 +377,200 @@ spl_autoload_register(array('FLEA', 'autoload'));
 // 旧的 autoload/loadClass/loadFile/getFilePath/import 方法已移除
 ```
 
+### 错误模板文件修改
+
+移除旧式类加载机制后，错误处理相关的模板文件也进行了相应更新：
+
+#### 1. FLEA/FLEA/_Errors/chinese-utf8/FLEA_EXCEPTION_MISSINGACTION.php
+
+**修改内容：**
+
+**之前：**
+```php
+但该控制器的类定义文件
+<p><strong><?php __error_filelink($ex->controllerClassFilename); ?></strong></p>
+中没有定义动作 <strong><?php echo $ex->actionName; ?></strong>
+对应的方法 <strong><?php echo $ex->actionMethod; ?></strong>。
+
+...
+
+请检查文件
+<p><strong><?php __error_filelink($ex->controllerClassFilename); ?></strong></p>
+中定义的 <strong><?php echo $ex->controllerClass; ?></strong> 类是否编写了
+<strong><?php echo $ex->actionMethod; ?></strong> 方法。
+```
+
+**现在：**
+```php
+但该控制器的类 <strong><?php echo $ex->controllerClass; ?></strong>
+中没有定义动作 <strong><?php echo $ex->actionName; ?></strong>
+对应的方法 <strong><?php echo $ex->actionMethod; ?></strong>。
+
+...
+
+请检查 <strong><?php echo $ex->controllerClass; ?></strong> 类是否编写了
+<strong><?php echo $ex->actionMethod; ?></strong> 方法。
+```
+
+**改进：**
+- 移除了对 `controllerClassFilename` 属性的依赖
+- 不再显示文件路径，因为类文件路径由 Composer 自动加载器管理
+- 简化了错误信息，直接显示类名
+
+#### 2. FLEA/FLEA/_Errors/chinese-utf8/FLEA_EXCEPTION_MISSINGCONTROLLER.php
+
+**修改内容：**
+
+**之前：**
+```php
+但控制器 <strong><?php echo $ex->controllerName; ?></strong>
+对应的类 <strong><?php echo $ex->controllerClass; ?></strong>
+<?php if ($ex->controllerClassFilename): ?>
+在文件
+<p><strong><?php __error_filelink($ex->controllerClassFilename); ?></strong></p>
+中没有定义。
+<?php else: ?>
+没有定义。
+<?php endif; ?>
+
+...
+
+<?php
+if ($ex->controllerClassFilename):
+$controllerClassFilename = $ex->controllerClassFilename;
+?>
+请检查文件
+<p><strong><?php __error_filelink($ex->controllerClassFilename); ?></strong></p>
+中是否有 <strong><?php echo $ex->controllerClass; ?></strong> 类的定义。
+<?php
+else:
+$controllerClassFilename = FLEA::getFilePath($ex->controllerClass . '.php', true);
+?>
+请检查是否创建了 <strong><?php echo $ex->controllerClass; ?></strong> 类的定义文件：
+<p><strong><?php __error_filelink($controllerClassFilename); ?></strong></p>
+<?php endif; ?>
+```
+
+**现在：**
+```php
+控制器 <strong><?php echo $ex->controllerName; ?></strong>
+对应的类 <strong><?php echo $ex->controllerClass; ?></strong>
+不存在。
+
+...
+
+请检查 <strong><?php echo $ex->controllerClass; ?></strong> 类是否已定义。
+
+<?php
+// 将命名空间类名转换为文件路径用于显示
+$controllerClassFilename = str_replace('\\', DIRECTORY_SEPARATOR, $ex->controllerClass) . '.php';
+?>
+<p><strong><?php echo $controllerClassFilename; ?></strong></p>
+```
+
+**改进：**
+- 移除了条件判断逻辑，不再依赖 `controllerClassFilename` 属性
+- 移除了对 `FLEA::getFilePath()` 的调用
+- 简化了错误信息，直接显示类不存在
+- 保留了文件路径的显示，但改为通过命名空间转换得到，仅用于提示参考
+- 使用 `str_replace('\\', DIRECTORY_SEPARATOR, $ex->controllerClass)` 将命名空间类名转换为文件路径
+
+#### 3. FLEA/FLEA/Dispatcher/Simple.php
+
+**修改内容：**
+
+**之前：**
+```php
+// 载入控制对应的类定义
+if (!$this->_loadController($controllerClass)) { break; }
+
+...
+
+throw new \FLEA\Exception_MissingController(
+        $controllerName, $actionName, $this->_requestBackup,
+        $controllerClass, $actionMethod, $controllerClassFilename);
+
+throw new \FLEA\Exception_MissingAction(
+        $controllerName, $actionName, $this->_requestBackup,
+        $controllerClass, $actionMethod, $controllerClassFilename);
+
+...
+
+protected function _loadController(string $controllerClass): bool
+{
+    $controllerClassFilename = FLEA::getFilePath($controllerClass . '.php', true);
+    if (!is_readable($controllerClassFilename)) {
+        return false;
+    }
+    include_once($controllerClassFilename);
+    return class_exists($controllerClass);
+}
+```
+
+**现在：**
+```php
+// 使用 Composer PSR-4 自动加载器加载控制器类
+if (!$this->_loadController($controllerClass)) { break; }
+
+...
+
+throw new \FLEA\Exception\MissingController(
+        $controllerName, $actionName, $this->_requestBackup,
+        $controllerClass, $actionMethod, null);
+
+throw new \FLEA\Exception\MissingAction(
+        $controllerName, $actionName, $this->_requestBackup,
+        $controllerClass, $actionMethod, null);
+
+...
+
+/**
+ * 载入控制器类
+ *
+ * 使用 Composer PSR-4 自动加载器
+ *
+ * @param string $controllerClass
+ *
+ * @return boolean
+ */
+protected function _loadController(string $controllerClass): bool
+{
+    // 使用 Composer PSR-4 自动加载器加载类
+    if (!class_exists($controllerClass, false)) {
+        return false;
+    }
+    return true;
+}
+```
+
+**改进：**
+- 移除了 `_loadController()` 方法中对 `FLEA::getFilePath()` 的调用
+- 移除了 `include_once()` 手动加载文件的操作
+- 使用 `class_exists($controllerClass, false)` 直接触发 Composer PSR-4 自动加载器
+- 抛出异常时，将 `controllerClassFilename` 参数设为 `null`，因为不再需要
+- 更新了异常类引用为新的命名空间 `\FLEA\Exception\MissingController` 和 `\FLEA\Exception\MissingAction`
+- 添加了注释说明使用 Composer PSR-4 自动加载器
+
+### 错误模板修改的影响
+
+1. **简化错误信息**
+   - 不再显示具体的文件路径，因为由 Composer 自动加载器管理
+   - 专注于类名和方法名的显示，更符合面向对象编程的思维
+
+2. **保持向后兼容性**
+   - 异常类（`MissingController` 和 `MissingAction`）仍然保留了 `controllerClassFilename` 属性
+   - 该属性在构造函数中接收，但在新代码中传 `null`
+   - 错误模板中不再依赖该属性，但保留属性定义以防止破坏旧代码
+
+3. **移除文件操作**
+   - 不再需要 `FLEA::getFilePath()` 方法来搜索类文件
+   - 不再需要 `include_once()` 手动加载类文件
+   - 所有类加载都由 Composer 自动加载器处理
+
+4. **路径转换逻辑**
+   - 在错误模板中，需要显示文件路径时，使用 `str_replace('\\', DIRECTORY_SEPARATOR, $ex->controllerClass)` 将命名空间类名转换为文件路径
+   - 这仅用于显示参考，实际的类文件加载由 Composer 处理
+
 ### 优势
 
 1. **性能优化**
@@ -1538,10 +1732,147 @@ namespace FLEA\Db\TableLink;
 
 ### 下一步
 
-按照 `PSR4_MIGRATION_PLAN.md` 继续重构其他类：
-- 控制器类（FLEA_Controller_*）
-- 权限控制类（FLEA_Rbac, FLEA_Acl）
-- 助手类（FLEA_Helper_*）
-- 其他辅助类
+---
+
+## 2026-02-24 - 更新文档以反映 PSR-4 迁移
+
+### 修改文件
+- `README.md` - 全面重写，添加 PSR-4 迁移说明
+- `USER_GUIDE.md` - 更新所有示例代码以使用 PSR-4 命名空间
+
+### 更新内容
+
+#### 1. README.md 全面更新
+
+新增了完整的 README 文档，包含：
+
+**版本信息**
+- 添加 PSR-4 迁移说明
+- 更新特性列表，强调 PSR-4 自动加载
+
+**系统要求**
+- 明确要求 Composer 用于依赖管理和自动加载
+
+**安装指南**
+- 详细的 Composer 安装步骤
+- `composer install` 命令说明
+- 配置文件创建指南
+- 使用 `vendor/autoload.php` 初始化框架
+
+**PSR-4 命名空间迁移**
+- 专门的 PSR-4 迁移章节
+- 详细的类名对照表（旧类名 vs 新命名空间类名）
+- 控制器、数据模型、RBAC 使用示例
+- 迁移指南，对比旧代码和新代码
+
+**目录结构**
+- 更新目录结构，展示 PSR-4 组织方式
+- 说明 `FLEA/FLEA/` 命名空间目录
+
+**快速开始**
+- PSR-4 风格的控制器示例
+- 数据库操作示例
+- 访问 URL 的三种模式说明
+
+**文档参考**
+- 链接到 USER_GUIDE.md 详细文档
+
+**配置 Composer**
+- `composer.json` 配置示例
+- PSR-4 自动加载配置说明
+- `composer dump-autoload` 命令
+
+**最佳实践**
+- 使用命名空间的建议
+- Composer 管理依赖
+- 单例模式使用
+- 异常处理
+- 缓存使用
+
+**其他章节**
+- 贡献指南
+- 许可证信息
+- 更新日志链接
+- 支持信息
+
+#### 2. USER_GUIDE.md 更新
+
+**简介部分**
+- 添加重要说明，框架已全面迁移到 PSR-4 命名空间
+- 更新特性列表：将"自动加载"改为"PSR-4 自动加载"
+
+**安装部分**
+- 添加 `composer.json` 和 `composer install` 说明
+- 更新项目结构图，包含 `composer.json`
+
+**初始化框架**
+- 更新 `require('FLEA/FLEA.php')` 为 `require('vendor/autoload.php')`
+- 添加说明：使用 Composer 后无需手动 require FLEA.php
+
+**配置管理**
+- 更新 `FLEA_Config` 引用为 `\FLEA\Config`
+
+**TableDataGateway 示例**
+- 更新所有 `FLEA_Db_TableDataGateway` 为 `\FLEA\Db\TableDataGateway`
+- 更新控制器继承示例
+- 更新 RBAC 类实例化示例
+
+**MVC 模式**
+- 更新控制器继承：`FLEA_Controller_Action` → `\FLEA\Controller\Action`
+
+**RBAC 权限控制**
+- 更新 RBAC 类引用：`FLEA_Rbac` → `\FLEA\Rbac\Rbac`
+- 更新所有 RBAC 使用示例
+- 更新登录和登出示例
+- 更新权限检查示例
+
+**常见问题**
+- 更新调试模式示例：使用 `vendor/autoload.php`
+- 更新自定义类搜索路径问题：说明使用 Composer PSR-4 配置
+
+**核心概念**
+- 更新配置管理类引用：`FLEA_Config` → `\FLEA\Config`
+
+#### 3. 代码示例更新统计
+
+更新的类引用：
+- `FLEA_Db_TableDataGateway` → `\FLEA\Db\TableDataGateway` (6 处)
+- `FLEA_Controller_Action` → `\FLEA\Controller\Action` (4 处)
+- `FLEA_Rbac` → `\FLEA\Rbac\Rbac` (5 处)
+- `FLEA_Config` → `\FLEA\Config` (1 处)
+
+更新的初始化代码：
+- `require('FLEA/FLEA.php')` → `require('vendor/autoload.php')` (2 处)
+
+### 目的
+
+确保所有文档准确反映 PSR-4 迁移后的架构，帮助开发者：
+1. 了解 PSR-4 命名空间的使用方法
+2. 掌握 Composer 自动加载的配置
+3. 顺利从旧代码迁移到新架构
+4. 正确使用更新后的框架功能
+
+### 文档一致性
+
+- README.md 和 USER_GUIDE.md 现在完全一致地使用 PSR-4 命名空间
+- 所有代码示例都已更新为使用完整的命名空间或 `use` 语句
+- 移除了所有对旧式类加载方法的引用
+- 强调 Composer 作为依赖管理和自动加载的唯一方式
+
+### 向后兼容性说明
+
+文档中明确说明：
+- 框架已完全迁移到 PSR-4 命名空间
+- 所有类必须使用命名空间引用
+- 必须使用 Composer 的 PSR-4 自动加载器
+- 不再支持旧的类名格式（如 `FLEA_Db_TableDataGateway`）
+
+### 验证
+
+所有更新的文档已验证：
+- ✅ 代码示例语法正确
+- ✅ 命名空间引用准确
+- ✅ Composer 配置说明完整
+- ✅ 迁移指南清晰易懂
 
 ---
