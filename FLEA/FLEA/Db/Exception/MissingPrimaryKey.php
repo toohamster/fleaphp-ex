@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Db\Exception;
+
 
 /**
  * 定义 FLEA_Db_Exception_MissingPrimaryKey 异常
@@ -16,7 +18,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Db_Exception_MissingPrimaryKey extends FLEA_Exception
+class MissingPrimaryKey extends \FLEA\Exception
 {
     /**
      * 主键字段名

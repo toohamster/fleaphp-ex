@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Db\Exception;
+
 
 /**
  * 定义 FLEA_Db_Exception_SqlQuery 异常
@@ -16,7 +18,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Db_Exception_SqlQuery extends FLEA_Exception
+class SqlQuery extends \FLEA\Exception
 {
     /**
      * 发生错误的 SQL 语句

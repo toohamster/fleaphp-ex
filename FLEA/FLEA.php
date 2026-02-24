@@ -647,9 +647,9 @@ class FLEA
      *
      * @param array|string|int $dsn
      *
-     * @return FLEA_Db_Driver_Abstract
+     * @return \FLEA\Db\Driver\AbstractDriver
      */
-    public static function getDBO($dsn = 0): FLEA_Db_Driver_Abstract
+    public static function getDBO($dsn = 0): \FLEA\Db\Driver\AbstractDriver
     {
         $config = Config::getInstance();
         if ($dsn == 0) {
@@ -674,7 +674,7 @@ class FLEA
             FLEA::loadClass($className);
         }
         $dbo = new $className($dsn);
-        /* @var $dbo FLEA_Db_Driver_Abstract */
+        /* @var $dbo \FLEA\Db\Driver\AbstractDriver */
         $dbo->connect();
 
         $config->registerDbo($dbo, $dsnid);

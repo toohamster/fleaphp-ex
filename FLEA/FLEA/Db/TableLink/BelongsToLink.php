@@ -1,22 +1,24 @@
 <?php
-
-
 /**
- * 定义 FLEA_Db_BelongsToLink 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: BelongsToLink.php 1449 2008-10-30 06:16:17Z dualface $
- */
-
-/**
- * FLEA_Db_BelongsToLink 封装 belongs to 关系
+ * FLEA\Db\TableLink\BelongsToLink 封装 belongs to 关系
  *
  * @package Core
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
+
+namespace FLEA\Db\TableLink;
+
+use FLEA\Db\TableLink;
+
+/**
+ * FLEA\Db\TableLink\BelongsToLink 封装 belongs to 关系
+ *
+ * @package Core
+ * @author toohamster
+ * @version 1.0
+ */
+class BelongsToLink extends TableLink
 {
     public $oneToOne = true;
 
@@ -25,11 +27,11 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
      *
      * @param array $define
      * @param enum $type
-     * @param FLEA_Db_TableDataGateway $mainTDG
+     * @param \FLEA\Db\TableDataGateway $mainTDG
      *
-     * @return FLEA_Db_TableLink
+     * @return \FLEA\Db\TableLink
      */
-    public function __construct(array $define, int $type, FLEA_Db_TableDataGateway $mainTDG)
+    public function __construct($define, $type, & $mainTDG)
     {
         $this->linkUpdate = $this->linkCreate = $this->linkRemove = false;
         parent::__construct($define, $type, $mainTDG);
@@ -42,7 +44,7 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
      *
      * @return string
      */
-    public function getFindSQL(string $in): string
+    public function getFindSQL($in)
     {
         if (!$this->init) { $this->init(); }
         $fields = $this->mainTDG->qpk . ' AS ' . $this->mainTDG->pka . ', ' . $this->dbo->qfields($this->fields, $this->assocTDG->fullTableName, $this->assocTDG->schema);
@@ -60,7 +62,7 @@ class FLEA_Db_BelongsToLink extends FLEA_Db_TableLink
      *
      * @return boolean
      */
-    function saveAssocData(array $row, $pkv): bool
+    function saveAssocData(array &$row, $pkv): bool
     {
         if (empty($row)) { return true; }
         if (!$this->init) { $this->init(); }

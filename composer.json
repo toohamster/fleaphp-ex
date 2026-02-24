@@ -22,7 +22,11 @@
     },
     "autoload": {
         "psr-4": {
-            "FLEA\\": "FLEA/FLEA/"
+            "FLEA\\": "FLEA/FLEA/",
+            "FLEA\\Db\\": "FLEA/FLEA/Db/",
+            "FLEA\\Db\\Driver\\": "FLEA/FLEA/Db/Driver/",
+            "FLEA\\Db\\TableLink\\": "FLEA/FLEA/Db/TableLink/",
+            "FLEA\\Db\\Exception\\": "FLEA/FLEA/Db/Exception/"
         },
         "files": [
             "FLEA/FLEA.php"

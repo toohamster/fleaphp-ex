@@ -1,22 +1,17 @@
 <?php
 
+namespace FLEA\Db\Exception;
+
 
 /**
- * 定义 FLEA_Db_Exception_InvalidDSN 异常
+ * 定义 InvalidDSN 异常
  *
- * @author toohamster
- * @package Exception
- * @version $Id: InvalidDSN.php 972 2007-10-09 20:56:54Z qeeyuan $
- */
-
-/**
- * FLEA_Db_Exception_InvalidDSN 异常指示没有提供有效的 DSN 设置
+ * InvalidDSN 异常指示没有提供有效的 DSN 设置
  *
  * @package Exception
- * @author toohamster
  * @version 1.0
  */
-class FLEA_Db_Exception_InvalidDSN extends FLEA_Exception
+class InvalidDSN extends \FLEA\Exception
 {
     public $dsn;
 
@@ -25,7 +20,7 @@ class FLEA_Db_Exception_InvalidDSN extends FLEA_Exception
      *
      * @param $dsn
      *
-     * @return FLEA_Db_Exception_InvalidDSN
+     * @return InvalidDSN
      */
     function __construct($dsn)
     {

@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Db\Driver;
+
 
 /**
  * 定义 FLEA_Db_Driver_Mysql 驱动
@@ -18,7 +20,7 @@
  * @author toohamster
  * @version 2.0
  */
-class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
+class Mysql extends \FLEA\Db\Driver\AbstractDriver
 {
     /**
      * @var string
@@ -49,7 +51,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
      *
      * @param array|false $dsn
      * @return bool
-     * @throws FLEA_Db_Exception_SqlQuery
+     * @throws \FLEA\Db\Exception\SqlQuery
      */
     public function connect($dsn = false): bool
     {
@@ -107,7 +109,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
         } catch (PDOException $e) {
             $this->lasterr = $e->getMessage();
             $this->lasterrcode = $e->getCode();
-            throw new FLEA_Db_Exception_SqlQuery(
+            throw new \FLEA\Db\Exception\SqlQuery(
                 "PDO Connection failed for host '{$host}'!",
                 $this->lasterr,
                 $this->lasterrcode
@@ -135,7 +137,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
      *
      * @param string $database
      * @return bool
-     * @throws FLEA_Db_Exception_SqlQuery
+     * @throws \FLEA\Db\Exception\SqlQuery
      */
     public function selectDb(string $database): bool
     {
@@ -145,7 +147,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
         } catch (PDOException $e) {
             $this->lasterr = $e->getMessage();
             $this->lasterrcode = $e->getCode();
-            throw new FLEA_Db_Exception_SqlQuery(
+            throw new \FLEA\Db\Exception\SqlQuery(
                 "SELECT DATABASE: '{$database}' FAILED!",
                 $this->lasterr,
                 $this->lasterrcode
@@ -187,7 +189,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
             $this->lasterrcode = $e->getCode();
 
             if ($throw) {
-                throw new FLEA_Db_Exception_SqlQuery($sql, $this->lasterr, $this->lasterrcode);
+                throw new \FLEA\Db\Exception\SqlQuery($sql, $this->lasterr, $this->lasterrcode);
             }
         }
 
@@ -198,9 +200,9 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
      * Quote string for safe SQL usage
      *
      * @param mixed $value
-     * @return string|int|float
+     * @return string
      */
-    public function qstr($value)
+    public function qstr($value): string
     {
         if (is_int($value) || is_float($value)) { return $value; }
         if (is_bool($value)) { return $value ? $this->TRUE_VALUE : $this->FALSE_VALUE; }
@@ -297,7 +299,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
      * @param int|null $length
      * @param int|null $offset
      * @return PDOStatement|false
-     * @throws FLEA_Db_Exception_SqlQuery
+     * @throws \FLEA\Db\Exception\SqlQuery
      */
     public function selectLimit(string $sql, ?int $length = null, ?int $offset = null)
     {
@@ -319,7 +321,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
      *
      * @param string $table
      * @return array|false
-     * @throws FLEA_Db_Exception_SqlQuery
+     * @throws \FLEA\Db\Exception\SqlQuery
      */
     public function metaColumns(string $table)
     {

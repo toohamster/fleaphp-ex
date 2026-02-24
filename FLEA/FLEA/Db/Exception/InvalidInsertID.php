@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Db\Exception;
+
 
 /**
  * 定义 FLEA_Db_Exception_InvalidInsertID 异常
@@ -16,7 +18,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Db_Exception_InvalidInsertID extends FLEA_Exception
+class InvalidInsertID extends \FLEA\Exception
 {
     /**
      * 构造函数

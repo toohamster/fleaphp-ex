@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Db;
+
 
 /**
  * 定义 FLEA_Db_ActiveRecord 类
@@ -16,7 +18,7 @@
  * @package Core
  * @version $Id: ActiveRecord.php 972 2007-10-09 20:56:54Z qeeyuan $
  */
-class FLEA_Db_ActiveRecord
+class ActiveRecord
 {
     /**
      * 定义该对象要聚合的其他对象
@@ -28,7 +30,7 @@ class FLEA_Db_ActiveRecord
     /**
      * 用于完成数据库操作的 TableDataGateway 继承类
      *
-     * @var FLEA_Db_TableDataGateway
+     * @var \FLEA\Db\TableDataGateway
      */
     public $_table;
 

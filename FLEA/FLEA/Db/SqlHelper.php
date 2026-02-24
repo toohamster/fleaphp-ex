@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Db;
+
 
 /**
  * 定义 FLEA_Db_SqlHelper 类
@@ -16,13 +18,13 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Db_SqlHelper
+class SqlHelper
 {
     /**
      * 分析查询条件
      *
      * @param mixed $conditions
-     * @param FLEA_Db_TableDataGateway $table
+     * @param \FLEA\Db\TableDataGateway $table
      *
      * @return array
      */

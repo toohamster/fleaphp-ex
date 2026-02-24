@@ -749,3 +749,206 @@ public function registerObject($obj, ?string $name = null)
 试点实施已准备好作为后续大规模重构的参考。
 
 ---
+
+试点实施现在完全符合 Composer 标准，可以作为后续大规模重构的参考。
+
+---
+
+## 2026-02-13 - 数据库类 PSR-4 重构（第一批：异常类）
+
+### 新增文件
+- `DB_PSR4_REFACTORING_PLAN.md` - 数据库类详细重构计划
+- `refactor_db.sh` - 数据库类重构辅助脚本
+
+### 修改文件
+- `FLEA/FLEA/Db/Exception/InvalidDSN.php`
+- `FLEA/FLEA/Db/Exception/InvalidInsertID.php`
+- `FLEA/FLEA/Db/Exception/InvalidLinkType.php`
+- `FLEA/FLEA/Db/Exception/MetaColumnsFailed.php`
+- `FLEA/FLEA/Db/Exception/MissingDSN.php`
+- `FLEA/FLEA/Db/Exception/MissingLink.php`
+- `FLEA/FLEA/Db/Exception/MissingLinkOption.php`
+- `FLEA/FLEA/Db/Exception/MissingPrimaryKey.php`
+- `FLEA/FLEA/Db/Exception/PrimaryKeyExists.php`
+- `FLEA/FLEA/Db/Exception/SqlQuery.php`
+
+### 重构内容
+
+#### 重构的数据库异常类（10 个类）
+
+所有数据库异常类已从 PSR-0 风格重构为 PSR-4 命名空间：
+
+| 旧类名 | 新命名空间和类名 |
+|--------|------------------|
+| `FLEA_Db_Exception_InvalidDSN` | `FLEA\Db\Exception\InvalidDSN` |
+| `FLEA_Db_Exception_InvalidInsertID` | `FLEA\Db\Exception\InvalidInsertID` |
+| `FLEA_Db_Exception_InvalidLinkType` | `FLEA\Db\Exception\InvalidLinkType` |
+| `FLEA_Db_Exception_MetaColumnsFailed` | `FLEA\Db\Exception\MetaColumnsFailed` |
+| `FLEA_Db_Exception_MissingDSN` | `FLEA\Db\Exception\MissingDSN` |
+| `FLEA_Db_Exception_MissingLink` | `FLEA\Db\Exception\MissingLink` |
+| `FLEA_Db_Exception_MissingLinkOption` | `FLEA\Db\Exception\MissingLinkOption` |
+| `FLEA_Db_Exception_MissingPrimaryKey` | `FLEA\Db\Exception\MissingPrimaryKey` |
+| `FLEA_Db_Exception_PrimaryKeyExists` | `FLEA\Db\Exception\PrimaryKeyExists` |
+| `FLEA_Db_Exception_SqlQuery` | `FLEA\Db\Exception\SqlQuery` |
+
+#### 主要更改
+
+1. **添加命名空间声明**
+```php
+namespace FLEA\Db\Exception;
+
+class InvalidDSN { }
+```
+
+2. **更新类名**
+```php
+// 旧代码
+class FLEA_Db_Exception_InvalidDSN
+
+// 新代码
+class InvalidDSN
+```
+
+3. **更新父类引用**
+```php
+// 旧代码
+extends FLEA_Exception
+
+// 新代码
+extends \FLEA\Exception
+```
+
+### 验证
+
+所有重构的数据库异常类通过语法检查 ✅
+
+### 下一步
+
+按照 `DB_PSR4_REFACTORING_PLAN.md` 的计划继续：
+1. ✅ **数据库异常类**（已完成）
+2. ⏳ **表链接类**（下一步）
+3. ⏳ **数据库驱动类**
+4. ⏳ **核心数据库类**（TableDataGateway, ActiveRecord）
+
+### 重构计划文档
+
+详细的数据库类重构计划已记录在 `DB_PSR4_REFACTORING_PLAN.md` 中。
+
+---
+
+## 2026-02-24 - 数据库类 PSR-4 重构（完成）
+
+### 修改文件
+- `composer.json` - 更新 PSR-4 自动加载配置
+- `FLEA/FLEA.php` - 更新所有数据库类引用
+
+### 重构内容
+
+#### 1. 核心数据库类（4 个类）
+
+| 旧类名 | 新命名空间和类名 |
+|--------|------------------|
+| `FLEA_Db_ActiveRecord` | `FLEA\Db\ActiveRecord` |
+| `FLEA_Db_SqlHelper` | `FLEA\Db\SqlHelper` |
+| `FLEA_Db_TableLink` | `FLEA\Db\TableLink` |
+| `FLEA_Db_TableDataGateway` | `FLEA\Db\TableDataGateway` |
+
+#### 2. 数据库驱动类（4 个类）
+
+| 旧类名 | 新命名空间和类名 |
+|--------|------------------|
+| `FLEA_Db_Driver_Abstract` | `FLEA\Db\Driver\AbstractDriver` |
+| `FLEA_Db_Driver_Mysql` | `FLEA\Db\Driver\Mysql` |
+| `FLEA_Db_Driver_Mysqlt` | `FLEA\Db\Driver\Mysqlt` |
+| `FLEA_Db_Driver_Sqlitepdo` | `FLEA\Db\Driver\Sqlitepdo` |
+
+#### 3. 表链接类（4 个类）
+
+| 旧类名 | 新命名空间和类名 |
+|--------|------------------|
+| `FLEA_Db_TableLink_HasOneLink` | `FLEA\Db\TableLink\HasOneLink` |
+| `FLEA_Db_TableLink_BelongsToLink` | `FLEA\Db\TableLink\BelongsToLink` |
+| `FLEA_Db_TableLink_HasManyLink` | `FLEA\Db\TableLink\HasManyLink` |
+| `FLEA_Db_TableLink_ManyToManyLink` | `FLEA\Db\TableLink\ManyToManyLink` |
+
+#### 4. 数据库异常类（10 个类）- 已于 2026-02-13 完成
+
+### 主要更改
+
+1. **composer.json 更新**
+```json
+{
+    "autoload": {
+        "psr-4": {
+            "FLEA\\": "FLEA/FLEA/",
+            "FLEA\\Db\\": "FLEA/FLEA/Db/",
+            "FLEA\\Db\\Driver\\": "FLEA/FLEA/Db/Driver/",
+            "FLEA\\Db\\TableLink\\": "FLEA/FLEA/Db/TableLink/",
+            "FLEA\\Db\\Exception\\": "FLEA/FLEA/Db/Exception/"
+        }
+    }
+}
+```
+
+2. **添加命名空间声明**
+```php
+namespace FLEA\Db;
+namespace FLEA\Db\Driver;
+namespace FLEA\Db\TableLink;
+```
+
+3. **更新类引用**
+   - `FLEA_Config` → `\FLEA\Config`
+   - `FLEA_Exception*` → `\FLEA\Exception\*`
+   - `FLEA_Db_*` → `\FLEA\Db\*`
+   - `FLEA_Db_Driver_Abstract` → `\FLEA\Db\Driver\AbstractDriver`（避免 PHP 保留关键字）
+
+4. **文件名修正**
+   - `Abstract.php` → `AbstractDriver.php`（符合 PSR-4 标准，文件名与类名一致）
+
+5. **创建表链接子类文件**
+   - 在 `FLEA/FLEA/Db/TableLink/` 目录下创建独立的类文件
+   - 从 `TableLink.php` 中移除子类定义
+
+6. **更新 FLEA.php 引用**
+   - 所有 `FLEA_Db_*` 类引用更新为使用新的命名空间
+
+7. **PHP 7.4 兼容性**
+   - 子类重写父类方法时，保持与父类一致的返回类型声明
+   - 不使用 PHP 8.0+ 的联合类型语法（如 `PDOStatement|false`）
+   - 所有代码通过 PHP 7.4.32 语法检查
+
+### 验证
+
+使用 php74 命令对所有重构的类进行语法检查 ✅
+
+创建验证脚本 `verify_db_refactoring.sh` 用于自动化验证
+
+### 使用的重构脚本
+
+- `refactor_core_db.php` - 核心数据库类重构脚本
+- `refactor_tabledatagateway.php` - TableDataGateway 专用重构脚本
+- `refactor_drivers.php` - 数据库驱动类重构脚本
+- `update_flea_php.php` - FLEA.php 引用更新脚本
+- `verify_db_refactoring.sh` - 验证脚本（使用 php74）
+
+### PHP 7.4 特性支持
+
+框架支持 PHP 7.4，代码兼容以下 PHP 7.4 特性：
+- 类型属性（Typed Properties）
+- 箭头函数（Arrow Functions）
+- Null 合并赋值操作符（Null Coalescing Assignment Operator）
+- 数组展开运算符（Array Spread Operator）用于数字键数组
+- 数值字面量分隔符（Numeric Literal Separator）
+
+**注意**：不使用 PHP 8.0+ 的特性，如联合类型（Union Types）。
+
+### 下一步
+
+按照 `PSR4_MIGRATION_PLAN.md` 继续重构其他类：
+- 控制器类（FLEA_Controller_*）
+- 权限控制类（FLEA_Rbac, FLEA_Acl）
+- 助手类（FLEA_Helper_*）
+- 其他辅助类
+
+---

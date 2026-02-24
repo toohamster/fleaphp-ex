@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Db\Exception;
+
 
 /**
  * 定义 FLEA_Db_Exception_MetaColumnsFailed 异常
@@ -16,7 +18,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Db_Exception_MetaColumnsFailed extends FLEA_Exception
+class MetaColumnsFailed extends \FLEA\Exception
 {
     public $tableName;
 

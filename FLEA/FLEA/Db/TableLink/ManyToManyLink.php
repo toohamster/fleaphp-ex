@@ -1,22 +1,25 @@
 <?php
-
-
 /**
- * 定义 FLEA_Db_ManyToManyLink 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: ManyToManyLink.php 1449 2008-10-30 06:16:17Z dualface $
- */
-
-/**
- * FLEA_Db_ManyToManyLink 封装 many to many 关系
+ * FLEA\Db\TableLink\ManyToManyLink 封装 many to many 关系
  *
  * @package Core
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
+
+namespace FLEA\Db\TableLink;
+
+use FLEA\Db\TableLink;
+use FLEA\Db\TableDataGateway;
+
+/**
+ * FLEA\Db\TableLink\ManyToManyLink 封装 many to many 关系
+ *
+ * @package Core
+ * @author toohamster
+ * @version 1.0
+ */
+class ManyToManyLink extends TableLink
 {
     /**
      * 组合关联数据时是否是一对一
@@ -35,7 +38,7 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
     /**
      * 中间表是实体时对应的表数据入口
      *
-     * @var FLEA_Db_TableDataGateway
+     * @var TableDataGateway
      */
     public $joinTDG = null;
 
@@ -70,7 +73,7 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
     /**
      * 中间表对应的表数据入口
      *
-     * @var FLEA_Db_TableDataGateway
+     * @var TableDataGateway
      */
     public $joinTableClass = null;
 
@@ -79,11 +82,11 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
      *
      * @param array $define
      * @param enum $type
-     * @param FLEA_Db_TableDataGateway $mainTDG
+     * @param TableDataGateway $mainTDG
      *
-     * @return FLEA_Db_TableLink
+     * @return TableLink
      */
-    function __construct(array $define, int $type, FLEA_Db_TableDataGateway $mainTDG)
+    function __construct($define, $type, & $mainTDG)
     {
         $this->_optional[] = 'joinTable';
         $this->_optional[] = 'joinTableClass';
@@ -102,7 +105,7 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
      *
      * @return string
      */
-    function getFindSQL(string $in): string
+    function getFindSQL($in)
     {
         static $joinFields = [];
 
@@ -136,7 +139,7 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
      *
      * @return boolean
      */
-    function saveAssocData(array $row, $pkv): bool
+    function saveAssocData(array &$row, $pkv): bool
     {
         if (!$this->init) { $this->init(); }
         $apkvs = [];
@@ -229,7 +232,7 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
      *
      * @return boolean
      */
-    function deleteMiddleTableDataByMainForeignKey($qpkv): bool
+    function deleteMiddleTableDataByMainForeignKey($qpkv)
     {
         if (!$this->init) { $this->init(); }
         $sql = "DELETE FROM {$this->qjoinTable} WHERE {$this->qforeignKey} = {$qpkv} ";
@@ -243,7 +246,7 @@ class FLEA_Db_ManyToManyLink extends FLEA_Db_TableLink
      *
      * @return boolean
      */
-    function deleteMiddleTableDataByAssocForeignKey($pkv): bool
+    function deleteMiddleTableDataByAssocForeignKey($pkv)
     {
         if (!$this->init) { $this->init(); }
         $qpkv = $this->dbo->qstr($pkv);

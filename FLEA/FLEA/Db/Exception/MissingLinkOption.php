@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Db\Exception;
+
 
 /**
  * 定义 FLEA_Db_Exception_MissingLinkOption 异常
@@ -16,7 +18,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Db_Exception_MissingLinkOption extends FLEA_Exception
+class MissingLinkOption extends \FLEA\Exception
 {
     /**
      * 缺少的选项名

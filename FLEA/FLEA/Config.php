@@ -49,13 +49,6 @@ class Config
     public $classPath = [];
 
     /**
-     * 异常堆栈
-     *
-     * @var array
-     */
-    public $exceptionStack = [];
-
-    /**
      * 异常处理器
      *
      * @var callable|null
@@ -71,7 +64,6 @@ class Config
         $this->appInf = [];
         $this->objects = [];
         $this->dbo = [];
-        $this->exceptionStack = [];
         $this->exceptionHandler = null;
     }
 
@@ -304,53 +296,6 @@ class Config
         $current = $this->exceptionHandler;
         $this->exceptionHandler = $callback;
         return $current;
-    }
-
-    /**
-     * 推入异常到堆栈
-     *
-     * @param mixed $exception 异常对象或点标记
-     * @return void
-     */
-    public function pushException($exception): void
-    {
-        if (!is_array($this->exceptionStack)) {
-            $this->exceptionStack = [];
-        }
-        array_push($this->exceptionStack, $exception);
-    }
-
-    /**
-     * 从堆栈弹出异常
-     *
-     * @return mixed
-     */
-    public function popException()
-    {
-        if (!is_array($this->exceptionStack)) {
-            return null;
-        }
-        return array_pop($this->exceptionStack);
-    }
-
-    /**
-     * 获取异常堆栈
-     *
-     * @return array
-     */
-    public function getExceptionStack(): array
-    {
-        return $this->exceptionStack;
-    }
-
-    /**
-     * 检查异常堆栈是否为空
-     *
-     * @return bool
-     */
-    public function hasExceptionStack(): bool
-    {
-        return is_array($this->exceptionStack);
     }
 
     /**

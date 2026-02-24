@@ -1,38 +1,31 @@
 <?php
-
-
 /**
- * 定义 FLEA_Db_HasOneLink 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: HasOneLink.php 1449 2008-10-30 06:16:17Z dualface $
- */
-
-/**
- * FLEA_Db_HasOneLink 封装 has one 关系
+ * FLEA\Db\TableLink\HasOneLink 封装 has one 关系
  *
  * @package Core
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
-{
-    public $oneToOne = true;
 
+namespace FLEA\Db\TableLink;
+
+use FLEA\Db\TableLink;
+
+/**
+ * FLEA\Db\TableLink\HasOneLink 封装 has one 关系
+ *
+ * @package Core
+ * @author toohamster
+ * @version 1.0
+ */
+class HasOneLink extends TableLink
+{
     /**
-     * 构造函数
+     * 组合关联数据时是否是一对一
      *
-     * @param array $define
-     * @param enum $type
-     * @param FLEA_Db_TableDataGateway $mainTDG
-     *
-     * @return FLEA_Db_TableLink
+     * @var boolean
      */
-    public function __construct(array $define, int $type, FLEA_Db_TableDataGateway $mainTDG)
-    {
-        parent::__construct($define, $type, $mainTDG);
-    }
+    public $oneToOne = true;
 
     /**
      * 返回用于查询关联表数据的SQL语句
@@ -41,11 +34,13 @@ class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
      *
      * @return string
      */
-    public function getFindSQL(string $in): string
+    public function getFindSQL($in)
     {
         if (!$this->init) { $this->init(); }
-        $fields = $this->qforeignKey . ' AS ' . $this->mainTDG->pka . ', ' . $this->dbo->qfields($this->fields, $this->assocTDG->fullTableName, $this->assocTDG->schema);
+        $fields = $this->qforeignKey . ' AS ' . $this->mainTDG->pka . ', ' . $this->assocTDG->qfields($this->fields);
+
         $sql = "SELECT {$fields} FROM {$this->assocTDG->qtableName} ";
+
         return parent::_getFindSQLBase($sql, $in);
     }
 
@@ -57,30 +52,12 @@ class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
      *
      * @return boolean
      */
-    public function saveAssocData(array $row, $pkv): bool
+    function saveAssocData(array &$row, $pkv): bool
     {
-        if (empty($row)) { return true; }
         if (!$this->init) { $this->init(); }
+
         $row[$this->foreignKey] = $pkv;
         return $this->_saveAssocDataBase($row);
-    }
-
-    /**
-     * 删除关联的数据
-     *
-     * @param mixed $qpkv
-     *
-     * @return boolean
-     */
-    public function deleteByForeignKey($qpkv): bool
-    {
-        if (!$this->init) { $this->init(); }
-        $conditions = "{$this->qforeignKey} = {$qpkv}";
-        if ($this->linkRemove) {
-            return $this->assocTDG->removeByConditions($conditions);
-        } else {
-            return $this->assocTDG->updateField($conditions, $this->foreignKey, $this->linkRemoveFillValue);
-        }
     }
 
     /**
@@ -93,28 +70,5 @@ class FLEA_Db_HasOneLink extends FLEA_Db_TableLink
             $this->foreignKey = $this->mainTDG->primaryKey;
         }
         $this->qforeignKey = $this->dbo->qfield($this->foreignKey, $this->assocTDG->fullTableName, $this->assocTDG->schema);
-    }
-
-    /**
-     * 统计关联记录数
-     *
-     * @param array $assocRowset
-     * @param string $mappingName
-     * @param string $in
-     *
-     * @return int
-     */
-    function calcCount(array $assocRowset, string $mappingName, string $in): void
-    {
-        if (!$this->init) { $this->init(); }
-        $sql = "SELECT {$this->qforeignKey} AS pid, COUNT({$this->qforeignKey}) AS c FROM {$this->assocTDG->qtableName} ";
-        $sql = parent::_getFindSQLBase($sql, $in);
-        $sql .= " GROUP BY {$this->qforeignKey}";
-
-        $r = $this->dbo->execute($sql);
-        while ($row = $this->dbo->fetchAssoc($r)) {
-            $assocRowset[$row['pid']][$mappingName] = (int)$row['c'];
-        }
-        $this->dbo->freeRes($r);
     }
 }

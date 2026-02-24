@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Db;
+
 
 /**
  * 定义 FLEA_Db_TableDataGateway 类
@@ -45,7 +47,7 @@ define('MANY_TO_MANY',  4);
  * @author toohamster
  * @version 1.2
  */
-class FLEA_Db_TableDataGateway
+class TableDataGateway
 {
     /**
      * 数据库 schema
@@ -178,7 +180,7 @@ class FLEA_Db_TableDataGateway
      * 开发者不应该直接访问该成员变量，而是通过 setDBO() 和 getDBO() 方法
      * 来访问表数据入口使用数据访问对象。
      *
-     * @var FLEA_Db_Driver_Abstract
+     * @var \FLEA\Db\Driver\AbstractDriver
      */
     public $dbo = null;
 
@@ -303,11 +305,11 @@ class FLEA_Db_TableDataGateway
     /**
      * 设置数据库访问对象
      *
-     * @param FLEA_Db_Driver_Abstract $dbo
+     * @param \FLEA\Db\Driver\AbstractDriver $dbo
      *
      * @return boolean
      */
-    public function setDBO(FLEA_Db_Driver_Abstract $dbo): bool
+    public function setDBO(\FLEA\Db\Driver\AbstractDriver $dbo): bool
     {
         $this->dbo = $dbo;
 
@@ -367,9 +369,9 @@ class FLEA_Db_TableDataGateway
     /**
      * 返回该表数据入口对象使用的数据访问对象
      *
-     * @return FLEA_Db_Driver_Abstract
+     * @return \FLEA\Db\Driver\AbstractDriver
      */
-    public function getDBO(): FLEA_Db_Driver_Abstract
+    public function getDBO(): \FLEA\Db\Driver\AbstractDriver
     {
         return $this->dbo;
     }
@@ -463,7 +465,7 @@ class FLEA_Db_TableDataGateway
          */
         $callback = function (&$r, $o, $m) { $r[$m] = null; };
         foreach ($this->links as $link) {
-            /* @var $link FLEA_Db_TableLink */
+            /* @var $link \FLEA\Db\TableLink */
             $mn = $link->mappingName;
             if (!$link->enabled || !$link->linkRead) { continue; }
             if (!$link->countOnly) {
@@ -508,7 +510,7 @@ class FLEA_Db_TableDataGateway
         $this->enableLinks(array_keys($enabledLinks));
 
         foreach ($tdg->links as $link) {
-            /* @var $link FLEA_Db_TableLink */
+            /* @var $link \FLEA\Db\TableLink */
             if (!$link->enabled || !$link->linkRead || !isset($enabledLinks[$link->mappingName])) { continue; }
 
             $in = [];
@@ -576,7 +578,7 @@ class FLEA_Db_TableDataGateway
         $this->enableLinks(array_keys($enabledLinks));
 
         foreach ($tdg->links as $link) {
-            /* @var $link FLEA_Db_TableLink */
+            /* @var $link \FLEA\Db\TableLink */
             if (!$link->enabled || !$link->linkRead || !isset($enabledLinks[$link->mappingName])) { continue; }
 
             $in = [];
@@ -832,7 +834,7 @@ class FLEA_Db_TableDataGateway
 
         // 检查是否提供了主键值
         if (!isset($row[$this->primaryKey])) {
-            throw new FLEA_Db_Exception_MissingPrimaryKey($this->primaryKey);
+            throw new \FLEA\Db\Exception\MissingPrimaryKey($this->primaryKey);
         }
 
         // 自动填写记录的最后更新时间字段
@@ -876,7 +878,7 @@ class FLEA_Db_TableDataGateway
         if ($this->autoLink && $saveLinks) {
             foreach (array_keys($this->links) as $linkKey) {
                 $link =& $this->links[$linkKey];
-                /* @var $link FLEA_Db_TableLink */
+                /* @var $link \FLEA\Db\TableLink */
                 // 跳过不需要处理的关联
                 if (!$link->enabled || !$link->linkUpdate || !isset($row[$link->mappingName]) || !is_array($row[$link->mappingName])) {
                     continue;
@@ -1097,7 +1099,7 @@ class FLEA_Db_TableDataGateway
             if (!$insertId) {
                 if ($unsetpk) { unset($row[$this->primaryKey]); }
                 $this->dbo->completeTrans(false);
-                throw new FLEA_Db_Exception_InvalidInsertID();
+                throw new \FLEA\Db\Exception\InvalidInsertID();
             }
         }
 
@@ -1105,7 +1107,7 @@ class FLEA_Db_TableDataGateway
         if ($this->autoLink && $saveLinks) {
             foreach (array_keys($this->links) as $linkKey) {
                 $link =& $this->links[$linkKey];
-                /* @var $link FLEA_Db_TableLink */
+                /* @var $link \FLEA\Db\TableLink */
                 if (!$link->enabled || !$link->linkCreate || !isset($row[$link->mappingName]) || !is_array($row[$link->mappingName])) {
                     // 跳过没有关联数据的关联和不需要处理的关联
                     continue;
@@ -1171,7 +1173,7 @@ class FLEA_Db_TableDataGateway
         }
 
         if (!isset($row[$this->primaryKey])) {
-            throw new FLEA_Db_Exception_MissingPrimaryKey($this->primaryKey);
+            throw new \FLEA\Db\Exception\MissingPrimaryKey($this->primaryKey);
         }
         $ret = $this->removeByPkv($row[$this->primaryKey], $removeLink);
         if ($ret) {
@@ -1209,7 +1211,7 @@ class FLEA_Db_TableDataGateway
         if ($this->autoLink && $removeLink) {
             foreach (array_keys($this->links) as $linkKey) {
                 $link =& $this->links[$linkKey];
-                /* @var $link FLEA_Db_TableLink */
+                /* @var $link \FLEA\Db\TableLink */
                 if (!$link->enabled) { continue; }
                 switch ($link->type) {
                 case MANY_TO_MANY:
@@ -1333,7 +1335,7 @@ class FLEA_Db_TableDataGateway
         if ($this->autoLink) {
             foreach (array_keys($this->links) as $linkKey) {
                 $link =& $this->links[$linkKey];
-                /* @var $link FLEA_Db_TableLink */
+                /* @var $link \FLEA\Db\TableLink */
                 switch ($link->type) {
                 case MANY_TO_MANY:
                     /* @var $link FLEA_Db_ManyToManyLink */
@@ -1395,10 +1397,10 @@ class FLEA_Db_TableDataGateway
      *
      * @param string $linkName
      *
-     * @return FLEA_Db_TableLink
+     * @return \FLEA\Db\TableLink
      *
      */
-    public function enableLink(string $linkName): ?FLEA_Db_TableLink
+    public function enableLink(string $linkName): ?\FLEA\Db\TableLink
     {
         $link = $this->getLink($linkName);
         if ($link) { $link->enabled = true; }
@@ -1434,9 +1436,9 @@ class FLEA_Db_TableDataGateway
      *
      * @param string $linkName
      *
-     * @return FLEA_Db_TableLink
+     * @return \FLEA\Db\TableLink
      */
-    public function disableLink(string $linkName): ?FLEA_Db_TableLink
+    public function disableLink(string $linkName): ?\FLEA\Db\TableLink
     {
         $link = $this->getLink($linkName);
         if ($link) { $link->enabled = false; }
@@ -1468,7 +1470,7 @@ class FLEA_Db_TableDataGateway
      *
      * @param string $linkName
      *
-     * @return FLEA_Db_TableLink
+     * @return \FLEA\Db\TableLink
      */
     public function getLink(string $linkName)
     {
@@ -1477,7 +1479,7 @@ class FLEA_Db_TableDataGateway
             return $this->links[$linkName];
         }
 
-        throw new FLEA_Db_Exception_MissingLink($linkName);
+        throw new \FLEA\Db\Exception\MissingLink($linkName);
     }
 
     /**
@@ -1512,7 +1514,7 @@ class FLEA_Db_TableDataGateway
      * @param array $defines
      * @param enum $type
      *
-     * @return FLEA_Db_TableLink
+     * @return \FLEA\Db\TableLink
      */
     public function createLink($defines, int $type)
     {
@@ -1525,7 +1527,7 @@ class FLEA_Db_TableDataGateway
         foreach ($defines as $define) {
             if (!is_array($define)) { continue; }
             // 构造连接对象实例
-            $link = FLEA_Db_TableLink::createLink($define, $type, $this);
+            $link = \FLEA\Db\TableLink::createLink($define, $type, $this);
             $this->links[strtoupper($link->name)] =& $link;
         }
     }
@@ -1817,7 +1819,7 @@ class FLEA_Db_TableDataGateway
     protected function getWhere($conditions, bool $queryLinks = true): array
     {
         // 处理查询条件
-        $where = FLEA_Db_SqlHelper::parseConditions($conditions, $this);
+        $where = \FLEA\Db\SqlHelper::parseConditions($conditions, $this);
         $sqljoin = '';
         $distinct = '';
 
@@ -1842,7 +1844,7 @@ class FLEA_Db_TableDataGateway
                 }
 
                 $link =& $this->links[$linkid];
-                /* @var $link FLEA_Db_TableLink */
+                /* @var $link \FLEA\Db\TableLink */
                 if (!$link->init) { $link->init(); }
                 $distinct = 'DISTINCT ';
 
@@ -1981,8 +1983,8 @@ class FLEA_Db_TableDataGateway
          */
         $this->meta = $this->dbo->metaColumns($this->qtableName);
         if (!is_array($this->meta) || empty($this->meta)) {
-            FLEA::loadClass('FLEA_Db_Exception_MetaColumnsFailed');
-            throw new FLEA_Db_Exception_MetaColumnsFailed($this->qtableName);
+            FLEA::loadClass('\FLEA\Db\Exception\MetaColumnsFailed');
+            throw new \FLEA\Db\Exception\MetaColumnsFailed($this->qtableName);
         }
 
         if ($cached) {
@@ -2125,7 +2127,7 @@ class FLEA_Db_TableDataGateway
     {
         foreach (array_keys($this->links) as $linkKey) {
             $link =& $this->links[$linkKey];
-            /* @var $link FLEA_Db_TableLink */
+            /* @var $link \FLEA\Db\TableLink */
             if ($link->type != BELONGS_TO || !$link->enabled || !$link->counterCache) { continue; }
             $link->init();
             $f = $link->assocTDG->qfield($link->counterCache);
@@ -2140,7 +2142,7 @@ class FLEA_Db_TableDataGateway
             $conditions = "{$link->qforeignKey} = {$fkv}";
             if ($link->conditions) {
                 if (is_array($link->conditions)) {
-                    $conditions = FLEA_Db_SqlHelper::parseConditions($link->conditions, $link->assocTDG);
+                    $conditions = \FLEA\Db\SqlHelper::parseConditions($link->conditions, $link->assocTDG);
                     if (is_array($conditions)) {
                         $conditions = $conditions[0];
                     }

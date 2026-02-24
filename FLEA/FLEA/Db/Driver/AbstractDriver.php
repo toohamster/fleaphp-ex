@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Db\Driver;
+
 /**
  * 定义 FLEA_Db_Driver_Abstract 类
  *
@@ -33,7 +35,7 @@ define('DBO_PARAM_AT_NAMED',    '@');
  * @author toohamster
  * @version 1.1
  */
-abstract class FLEA_Db_Driver_Abstract
+abstract class AbstractDriver
 {
     /**
      * 用于描绘 true、false 和 null 的数据库值

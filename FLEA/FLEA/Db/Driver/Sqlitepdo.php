@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Db\Driver;
+
 /**
  * 定义 FLEA_Db_Driver_Sqlite 驱动，用PDO实现访问sqlite3数据库
  * Editor by lonestone 2007 10 13
@@ -136,7 +138,7 @@ class FLEA_Db_Driver_Sqlite
 			}
 		}
 
-		throw new FLEA_Db_Exception_SqlQuery( "connect('{$dsn['db']}') failed!");
+		throw new \FLEA\Db\Exception\SqlQuery( "connect('{$dsn['db']}') failed!");
 	}
 
 	/**
@@ -202,7 +204,7 @@ class FLEA_Db_Driver_Sqlite
 			return false;
 		}
 
-		throw new FLEA_Db_Exception_SqlQuery( $sql, $this->lasterr[2], $this->lasterrcode );
+		throw new \FLEA\Db\Exception\SqlQuery( $sql, $this->lasterr[2], $this->lasterrcode );
 	}
 
 	/**
