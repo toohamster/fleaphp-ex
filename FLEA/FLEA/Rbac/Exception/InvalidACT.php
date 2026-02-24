@@ -1,6 +1,8 @@
 <?php
 
 
+
+namespace FLEA\Rbac\Exception;
 /**
  * 定义 FLEA_Rbac_Exception_InvalidACT 异常
  *
@@ -16,7 +18,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Rbac_Exception_InvalidACT extends FLEA_Exception
+class InvalidACT extends \FLEA\Exception
 {
     /**
      * 无效的 ACT 内容

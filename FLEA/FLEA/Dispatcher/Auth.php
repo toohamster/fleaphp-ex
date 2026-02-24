@@ -1,4 +1,7 @@
 <?php
+
+namespace FLEA\Dispatcher;
+
 /////////////////////////////////////////////////////////////////////////////
 // FleaPHP Framework
 //
@@ -24,7 +27,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Dispatcher_Auth extends FLEA_Dispatcher_Simple
+class Auth extends \FLEA\Dispatcher\Simple
 {
     /**
      * 用于提供验证服务的对象实例

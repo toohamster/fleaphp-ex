@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Helper;
+
 
 /**
  * 定义 FLEA_Helper_Image 类
@@ -21,7 +23,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Helper_Image
+class Image
 {
     /**
      * GD 资源句柄
@@ -72,7 +74,7 @@ class FLEA_Helper_Image
             'gif' => 'imagecreatefromgif',
         );
         if (!isset($ext2functions[$fileext])) {
-            throw new FLEA_Exception_NotImplemented('imagecreatefrom' . $fileext);
+            throw new \FLEA\Exception_NotImplemented('imagecreatefrom' . $fileext);
         }
 
         $handle = $ext2functions[$fileext]($filename);

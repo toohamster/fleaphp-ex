@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Helper;
+
 
 /**
  * 定义 FLEA_Helper_ImgCode 类
@@ -42,7 +44,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Helper_ImgCode
+class ImgCode
 {
     /**
      * 生成的验证码

@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Controller;
+
 /**
  * 定义 FLEA_Controller_Action 类
  *
@@ -19,7 +21,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Controller_Action
+class Action
 {
     /**
      * 当前控制的名字，用于 $this->url() 方法
@@ -38,7 +40,7 @@ class FLEA_Controller_Action
     /**
      * 当前使用的调度器的名字
      *
-     * @var FLEA_Dispatcher_Auth
+     * @var \FLEA\Dispatcher\Auth
      */
     public $_dispatcher = null;
 
@@ -106,9 +108,9 @@ class FLEA_Controller_Action
     /**
      * 设置当前控制器使用的调度器对象
      *
-     * @param FLEA_Dispatcher_Simple $dispatcher
+     * @param \FLEA\Dispatcher\Simple $dispatcher
      */
-    public function __setDispatcher(FLEA_Dispatcher_Simple &$dispatcher): void
+    public function __setDispatcher(\FLEA\Dispatcher\Simple &$dispatcher): void
     {
         $this->_dispatcher =& $dispatcher;
     }
@@ -116,9 +118,9 @@ class FLEA_Controller_Action
     /**
      * 获得当前使用的 Dispatcher
      *
-     * @return FLEA_Dispatcher_Auth
+     * @return \FLEA\Dispatcher\Auth
      */
-    protected function _getDispatcher(): FLEA_Dispatcher_Auth
+    protected function _getDispatcher(): \FLEA\Dispatcher\Auth
     {
         if (!is_object($this->_dispatcher)) {
             $this->_dispatcher = FLEA::getSingleton(FLEA::getAppInf('dispatcher'));

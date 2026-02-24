@@ -1,6 +1,8 @@
 <?php
 
 
+
+namespace FLEA\Exception;
 /**
  * 定义 FLEA_Exception_NotImplemented 异常
  *
@@ -16,7 +18,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Exception_NotImplemented extends FLEA_Exception
+class NotImplemented extends \FLEA\Exception
 {
     public $className;
     public $methodName;

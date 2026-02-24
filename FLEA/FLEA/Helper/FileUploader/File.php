@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Helper\FileUploader;
+
 
 /**
  * 定义 FLEA_Helper_FileUploader_File 类
@@ -16,7 +18,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Helper_FileUploader_File
+class File
 {
     /**
      * 上传文件信息

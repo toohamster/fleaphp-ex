@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA;
+
 
 /**
  * 定义 FLEA_Language 类
@@ -126,7 +128,7 @@ function load_language(string $dictname, string $language = '', bool $noExceptio
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Language
+class Language
 {
     /**
      * 保存当前载入的字典
@@ -209,7 +211,7 @@ class FLEA_Language
                     $this->_dict[0] =& $this->_dict[$language];
                 }
             } else if (!$noException) {
-                throw new FLEA_Exception_ExpectedFile($filename);
+                throw new \FLEA\Exception_ExpectedFile($filename);
             }
         }
     }

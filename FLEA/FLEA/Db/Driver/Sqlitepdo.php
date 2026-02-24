@@ -12,7 +12,7 @@ namespace FLEA\Db\Driver;
 /**
  * 用于 sqlite 使用pdo扩展的数据库驱动程序
  */
-class FLEA_Db_Driver_Sqlite
+class Sqlitepdo
 {
 	/**
 	 * 用于 genSeq()、dropSeq() 和 nextId() 的 SQL 查询语句

@@ -1,4 +1,7 @@
 <?php
+
+namespace FLEA\Dispatcher;
+
 /////////////////////////////////////////////////////////////////////////////
 // FleaPHP Framework
 //
@@ -23,7 +26,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Dispatcher_Simple
+class Simple
 {
     /**
      * 保存了请求信息的数组
@@ -131,12 +134,12 @@ class FLEA_Dispatcher_Simple
         }
 
         if (is_null($controller)) {
-            throw new FLEA_Exception_MissingController(
+            throw new \FLEA\Exception_MissingController(
                     $controllerName, $actionName, $this->_requestBackup,
                     $controllerClass, $actionMethod, $controllerClassFilename);
         }
 
-        throw new FLEA_Exception_MissingAction(
+        throw new \FLEA\Exception_MissingAction(
                 $controllerName, $actionName, $this->_requestBackup,
                 $controllerClass, $actionMethod, $controllerClassFilename);
     }

@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Acl\Table;
+
 
 /**
  * 定义 FLEA_Acl_Table_UserGroups 类
@@ -17,7 +19,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
+class UserGroups extends \FLEA\Db\TableDataGateway
 {
     /**
      * 主键字段名

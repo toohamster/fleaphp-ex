@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA;
+
 
 /**
  * 定义 FLEA_WebControls 类
@@ -18,7 +20,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_WebControls
+class WebControls
 {
     /**
      * 扩展的控件

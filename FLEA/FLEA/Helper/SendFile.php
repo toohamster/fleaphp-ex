@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Helper;
+
 
 /**
  * 定义 FLEA_Helper_SendFile 类
@@ -24,7 +26,7 @@ define('SENDFILE_INLINE', 'inline');
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Helper_SendFile
+class SendFile
 {
     /**
      * 向浏览器发送文件内容

@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Acl;
+
 
 /**
  * 定义 FLEA_Acl_Manager 类
@@ -16,7 +18,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Acl_Manager
+class Manager
 {
     /**
      * 所有使用到的表数据对象类名称

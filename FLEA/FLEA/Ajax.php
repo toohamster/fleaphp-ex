@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA;
+
 
 /**
  * FleaPHP 用简单、具有一致性的模型来实现 Ajax 操作。
@@ -39,7 +41,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Ajax
+class Ajax
 {
     /**
      * 已经注册的事件

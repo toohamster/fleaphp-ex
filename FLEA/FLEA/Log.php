@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA;
+
 
 /**
  * 定义 FLEA_Log 类
@@ -35,7 +37,7 @@ function log_message($msg, $level = 'log', $title = '')
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Log
+class Log
 {
     /**
      * 保存运行期间的日志，在教本结束时将日志内容写入到文件

@@ -1,6 +1,8 @@
 <?php
 
 
+
+namespace FLEA\Dispatcher\Exception;
 /**
  * 定义 FLEA_Dispatcher_Exception_CheckFailed 异常
  *
@@ -16,7 +18,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Dispatcher_Exception_CheckFailed extends FLEA_Exception
+class CheckFailed extends \FLEA\Exception
 {
     public $controllerName;
     public $actionName;

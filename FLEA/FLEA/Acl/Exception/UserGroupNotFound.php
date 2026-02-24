@@ -1,6 +1,8 @@
 <?php
 
 
+
+namespace FLEA\Acl\Exception;
 /**
  * 定义 FLEA_Acl_Exception_UserGroupNotFound 异常
  *
@@ -16,7 +18,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Acl_Exception_UserGroupNotFound extends FLEA_Exception
+class UserGroupNotFound extends \FLEA\Exception
 {
     public $userGroupId;
 

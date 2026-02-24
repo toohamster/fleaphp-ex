@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Session;
+
 
 /**
  * 定义 FLEA_Session_Db 类
@@ -27,7 +29,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Session_Db
+class Db
 {
     /**
      * 数据库访问对象

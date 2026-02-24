@@ -606,7 +606,7 @@ class FLEA
      * 载入一个助手
      *
      * 所有的助手都定义在应用程序设置中，并且以 helper. 开头。
-     * 例如 helper.array 指定为 FLEA_Helper_Array、helper.image 指定为 FLEA_Helper_Image。
+     * 例如 helper.array 指定为 \FLEA\Helper\Array、helper.image 指定为 \FLEA\Helper\Image。
      *
      * @param string $helperName
      */

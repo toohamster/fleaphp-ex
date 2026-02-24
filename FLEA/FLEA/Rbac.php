@@ -1,4 +1,7 @@
 <?php
+
+namespace FLEA;
+
 /////////////////////////////////////////////////////////////////////////////
 // FleaPHP Framework
 //
@@ -26,7 +29,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Rbac
+class Rbac
 {
     /**
      * 指示在 session 中用什么名字保存用户的信息

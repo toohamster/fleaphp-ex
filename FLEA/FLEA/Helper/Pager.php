@@ -1,6 +1,8 @@
 <?php
 
 
+
+namespace FLEA\Helper;
 /**
  * 定义 FLEA_Helper_Pager 类
  *
@@ -18,7 +20,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Helper_Pager
+class Pager
 {
     /**
      * 如果 $this->source 是一个 FLEA_Db_TableDataGateway 对象，则调用

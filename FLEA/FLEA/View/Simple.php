@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\View;
+
 
 /**
  * 定义 FLEA_View_Simple 类
@@ -17,7 +19,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_View_Simple
+class Simple
 {
     /**
      * 模板文件所在路径

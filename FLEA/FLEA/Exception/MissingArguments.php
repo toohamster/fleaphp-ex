@@ -1,6 +1,8 @@
 <?php
 
 
+
+namespace FLEA\Exception;
 /**
  * 定义 FLEA_Exception_MissingArguments 异常
  *
@@ -16,7 +18,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Exception_MissingArguments extends FLEA_Exception
+class MissingArguments extends \FLEA\Exception
 {
     /**
      * 缺少的参数

@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Helper;
+
 
 /**
  * 定义 FLEA_Helper_FileUploader 和 FLEA_Helper_FileUploader_File 对象
@@ -37,7 +39,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Helper_FileUploader
+class FileUploader
 {
     /**
      * 所有的 UploadFile 对象实例
@@ -131,7 +133,7 @@ class FLEA_Helper_FileUploader
     public function getFile($name)
     {
         if (!isset($this->_files[$name])) {
-            throw new FLEA_Exception_ExpectedFile('$_FILES[' . $name . ']');
+            throw new \FLEA\Exception_ExpectedFile('$_FILES[' . $name . ']');
         }
         return $this->_files[$name];
     }

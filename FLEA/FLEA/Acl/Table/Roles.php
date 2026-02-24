@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Acl\Table;
+
 
 /**
  * 定义 FLEA_Acl_Table_Roles 类
@@ -15,7 +17,7 @@
  *
  * @package Core
  */
-class FLEA_Acl_Table_Roles extends FLEA_Db_TableDataGateway
+class Roles extends \FLEA\Db\TableDataGateway
 {
     /**
      * 主键字段名

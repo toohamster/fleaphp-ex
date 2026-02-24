@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Acl\Table;
+
 
 /**
  * 定义 FLEA_Acl_Table_Users 类
@@ -17,7 +19,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Acl_Table_Users extends FLEA_Rbac_UsersManager
+class Users extends \FLEA\Rbac\UsersManager
 {
     public $belongsTo = array(
         array(

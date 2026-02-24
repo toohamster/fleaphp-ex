@@ -1,6 +1,8 @@
 <?php
 
 
+
+namespace FLEA\Exception;
 /**
  * 定义 FLEA_Exception_MissingAction 异常
  *
@@ -16,7 +18,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Exception_MissingAction extends FLEA_Exception
+class MissingAction extends \FLEA\Exception
 {
     /**
      * 控制器的名字

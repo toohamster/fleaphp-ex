@@ -1,6 +1,8 @@
 <?php
 
 
+
+namespace FLEA\Exception;
 /**
  * 定义 FLEA_Exception_FileOperation 异常
  *
@@ -16,7 +18,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Exception_FileOperation extends FLEA_Exception
+class FileOperation extends \FLEA\Exception
 {
     /**
      * 正在进行的文件操作
