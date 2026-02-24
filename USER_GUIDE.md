@@ -1659,42 +1659,6 @@ function myExceptionHandler($ex)
 }
 ```
 
-### 异常捕获点
-
-使用 `__TRY()`, `__CATCH()`, `__CANCEL_TRY()` 实现异常捕获：
-
-```php
-// 设置异常捕获点
-__TRY();
-
-try {
-    // 可能抛出异常的代码
-    FLEA::loadClass('NonExistentClass');
-} catch (Exception $e) {
-    // 将异常压入堆栈
-    throw $e;
-}
-
-// 检查是否有异常
-$ex = __CATCH();
-if (__IS_EXCEPTION($ex)) {
-    echo '捕获到异常: ' . $ex->getMessage();
-}
-
-// 或取消异常捕获点
-__CANCEL_TRY();
-```
-
-### 检查异常类型
-
-使用 `__IS_EXCEPTION()` 检查异常类型：
-
-```php
-if (__IS_EXCEPTION($ex, 'FLEA_Exception_ExpectedFile')) {
-    echo '文件不存在异常';
-}
-```
-
 ---
 
 ## 助手函数

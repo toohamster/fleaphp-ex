@@ -11,6 +11,7 @@
  */
 
 use FLEA\FLEA;
+use FLEA\Config;
 
 /**
  * 重定向浏览器到指定的 URL
@@ -117,58 +118,132 @@ function url(?string $controllerName = null, ?string $actionName = null, ?array 
 }
 
 /**
- * 检测并返回基础 URI
+ * 获得当前请求的 URL 地址
+ *
+ * 参考 QeePHP 和 Zend Framework 实现。
  *
  * @return string
  */
 function detect_uri_base(): string
 {
-    $filename = $_SERVER['SCRIPT_FILENAME'] ?? '';
-    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-    $phpSelf = $_SERVER['PHP_SELF'] ?? '';
+    static $baseuri = null;
 
-    if ($scriptName !== '' && basename($scriptName) == $filename) {
-        $baseUrl = dirname($scriptName);
-    } elseif ($phpSelf !== '' && basename($phpSelf) == $filename) {
-        $baseUrl = dirname($phpSelf);
+    if ($baseuri) { return $baseuri; }
+    $filename = basename($_SERVER['SCRIPT_FILENAME']);
+
+    if (basename($_SERVER['SCRIPT_NAME']) === $filename) {
+        $url = $_SERVER['SCRIPT_NAME'];
+    } elseif (basename($_SERVER['PHP_SELF']) === $filename) {
+        $url = $_SERVER['PHP_SELF'];
+    } elseif (isset($_SERVER['ORIG_SCRIPT_NAME']) && basename($_SERVER['ORIG_SCRIPT_NAME']) === $filename) {
+        $url = $_SERVER['ORIG_SCRIPT_NAME']; // 1and1 shared hosting compatibility
     } else {
-        $baseUrl = '';
+        // Backtrack up the script_filename to find the portion matching
+        // php_self
+        $path    = $_SERVER['PHP_SELF'];
+        $segs    = explode('/', trim($_SERVER['SCRIPT_FILENAME'], '/'));
+        $segs    = array_reverse($segs);
+        $index   = 0;
+        $last    = count($segs);
+        $url = '';
+        do {
+            $seg     = $segs[$index];
+            $url = '/' . $seg . $url;
+            ++$index;
+        } while (($last > $index) && (false !== ($pos = strpos($path, $url))) && (0 != $pos));
     }
 
-    if ($baseUrl === '.' || $baseUrl === '') {
-        $baseUrl = '/';
+    // Does the baseUrl have anything in common with the request_uri?
+    if (isset($_SERVER['HTTP_X_REWRITE_URL'])) { // check this first so IIS will catch
+        $request_uri = $_SERVER['HTTP_X_REWRITE_URL'];
+    } elseif (isset($_SERVER['REQUEST_URI'])) {
+        $request_uri = $_SERVER['REQUEST_URI'];
+    } elseif (isset($_SERVER['ORIG_PATH_INFO'])) { // IIS 5.0, PHP as CGI
+        $request_uri = $_SERVER['ORIG_PATH_INFO'];
+        if (!empty($_SERVER['QUERY_STRING'])) {
+            $request_uri .= '?' . $_SERVER['QUERY_STRING'];
+        }
     } else {
-        $baseUrl = str_replace('\\', '/', $baseUrl);
-        $baseUrl = rtrim($baseUrl, '/');
+        $request_uri = '';
     }
 
-    if (!empty($_SERVER['HTTP_HOST'])) {
-        $protocol = ($_SERVER['HTTPS'] ?? '') === 'on' ? 'https' : 'http';
-        $baseUrl = $protocol . '://' . $_SERVER['HTTP_HOST'] . $baseUrl;
+    if (0 === strpos($request_uri, $url)) {
+        // full $url matches
+        $baseuri = $url;
+        return $baseuri;
     }
 
-    return $baseUrl;
+    if (0 === strpos($request_uri, dirname($url))) {
+        // directory portion of $url matches
+        $baseuri = rtrim(dirname($url), '/') . '/';
+        return $baseuri;
+    }
+
+    if (!strpos($request_uri, basename($url))) {
+        // no match whatsoever; set it blank
+        return '';
+    }
+
+    // If using mod_rewrite or ISAPI_Rewrite strip the script filename
+    // out of baseUrl. $pos !== 0 makes sure it is not matching a value
+    // from PATH_INFO or QUERY_STRING
+    if ((strlen($request_uri) >= strlen($url))
+        && ((false !== ($pos = strpos($request_uri, $url))) && ($pos !== 0)))
+    {
+        $url = substr($request_uri, 0, $pos + strlen($url));
+    }
+
+    $baseuri = rtrim($url, '/') . '/';
+    return $baseuri;
 }
 
 /**
- * 将数组转换为 URL 查询字符串
+ * 将数组转换为可通过 url 传递的字符串连接
  *
- * @param array $args 要转换的数组
- * @param string $urlMode URL 模式
- * @param ?string $parameterPairStyle 参数对样式
+ * 用法：
+ * <code>
+ * $string = encode_url_args(array('username' => 'dualface', 'mode' => 'md5'));
+ * // $string 现在为 username=dualface&mode=md5
+ * </code>
+ *
+ * @param array $args
+ * @param enum $urlMode
+ * @param string $parameterPairStyle
+ *
  * @return string
  */
 function encode_url_args(array $args, string $urlMode = URL_STANDARD, ?string $parameterPairStyle = null): string
 {
-    if ($urlMode == URL_PATHINFO && $parameterPairStyle != null && $parameterPairStyle != '/') {
-        $pairs = [];
-        foreach ($args as $key => $value) {
-            $pairs[] = urlencode($key) . $parameterPairStyle . urlencode($value);
-        }
-        return implode('/', $pairs);
+    $str = '';
+    switch ($urlMode) {
+        case URL_STANDARD:
+            if (is_null($parameterPairStyle)) {
+                $parameterPairStyle = '=';
+            }
+            $sc = '&';
+            break;
+        case URL_PATHINFO:
+        case URL_REWRITE:
+            if (is_null($parameterPairStyle)) {
+                $parameterPairStyle = FLEA::getAppInf('urlParameterPairStyle');
+            }
+            $sc = '/';
+            break;
     }
 
-    return http_build_query($args);
+    foreach ($args as $key => $value) {
+        if (is_null($value) || $value === '') { continue; }
+        if (is_array($value)) {
+            $append = encode_url_args($value, $urlMode);
+        } else {
+            $append = rawurlencode($key) . $parameterPairStyle . rawurlencode($value);
+        }
+        if (substr($str, -1) != $sc) {
+            $str .= $sc;
+        }
+        $str .= $append;
+    }
+    return substr($str, 1);
 }
 
 /**
@@ -203,7 +278,7 @@ function t(string $text): string
  */
 function js_alert(string $message = '', string $after_action = '', string $url = ''): void
 {
-    echo '<script language="JavaScript" type="text/javascript">';
+    echo '<script type="text/javascript">';
     if ($message != '') {
         echo "alert(\"" . addslashes($message) . "\");";
     }
@@ -262,57 +337,114 @@ function safe_file_get_contents(string $filename): ?string
     return $content === false ? null : $content;
 }
 
+
 /**
- * 设置异常处理器
+ * 调试和错误处理相关的全局函数
+ */
+
+/**
+ * 设置新的异常处理例程，返回当前使用的异常处理例程
  *
- * @param $callback 回调函数
- * @return void
+ * 当抛出的异常没有任何 __TRY() 捕获时，将调用异常处理例程。FleaPHP 默认的
+ * 异常处理例程会显示异常的详细信息，已经程序运行路径，帮助开发者定位错误。
+ *
+ * 用法：
+ * <code>
+ * // 保存现在使用的异常处理例程
+ * global $prevExceptionHandler;
+ * $prevExceptionHandler = __SET_EXCEPTION_HANDLER('app_exception_handler');
+ *
+ * function app_exception_handler(& $ex) {
+ *     global $prevExceptionHandler;
+ *
+ *     if (is_a($ex, 'APP_Exception')) {
+ *        // 处理该异常
+ *        ...
+ *     } else {
+ *        // 调用原有的异常处理例程
+ *        if ($prevExceptionHandler) {
+ *            call_user_func_array($prevExceptionHandler, array(& $exception));
+ *        }
+ *     }
+ * }
+ * </code>
+ *
+ * 上面的代码设置了一个新的异常处理例程，同时可以在必要时调用原有的异常处理例程。
+ * 虽然不强制要求开发者这样做，但参照上面的代码片段可以形成一个异常处理例程调用链。
+ *
+ * @package Core
+ *
+ * @param callback $callback
+ *
+ * @return mixed
  */
 function __SET_EXCEPTION_HANDLER($callback)
 {
-    set_exception_handler($callback);
+    $config = Config::getInstance();
+    $current = $config->getExceptionHandler();
+    $config->setExceptionHandler($callback);
+    return $current;
 }
 
 /**
- * FLEA 框架异常处理器
+ * FleaPHP 默认的异常处理例程
  *
- * @param FLEA_Exception $ex 异常对象
- * @return void
+ * @package Core
+ *
+ * @param \Throwable $ex
  */
-function __FLEA_EXCEPTION_HANDLER(FLEA_Exception $ex): void
+function __FLEA_EXCEPTION_HANDLER(\Throwable $ex): void
 {
-    if (FLEA::getAppInf('displayErrors')) {
+    if (!FLEA::getAppInf('displayErrors')) { exit; }
+    if (FLEA::getAppInf('friendlyErrorsMessage')) {
+        $language = FLEA::getAppInf('defaultLanguage');
+        $language = preg_replace('/[^a-z0-9\-_]+/i', '', $language);
+
+        $exclass = strtoupper(get_class($ex));
+        $template = FLEA_DIR . "/_Errors/{$language}/{$exclass}.php";
+        if (!file_exists($template)) {
+            $template = FLEA_DIR . "/_Errors/{$language}/FLEA_EXCEPTION.php";
+            if (!file_exists($template)) {
+                $template = FLEA_DIR . "/_Errors/default/FLEA_EXCEPTION.php";
+            }
+        }
+        include($template);
+    } else {
         print_ex($ex);
-    } else {
-        log_message($ex->toString(), 'error');
     }
+    exit;
 }
 
 /**
- * 输出异常信息
+ * 打印异常的详细信息
  *
- * @param FLEA_Exception $ex 异常对象
- * @param bool $return 是否返回字符串
- * @return ?string
+ * @package Core
+ *
+ * @param \Throwable $ex
+ * @param boolean $return 为 true 时返回输出信息，而不是直接显示
  */
-function print_ex(FLEA_Exception $ex, bool $return = false): ?string
+function print_ex(\Throwable $ex, bool $return = false): ?string
 {
-    $output = '<pre style="text-align: left; background: #fff; border: 1px solid #ccc; margin: 1em; padding: 1em;">';
-    $output .= '<strong>' . h(get_class($ex)) . '</strong>';
-    $output .= '<br />Error Code: ' . h($ex->getCode());
-    $output .= '<br />Error Message: ' . h($ex->getMessage());
-    $output .= '<br />File: ' . h($ex->getFile());
-    $output .= '<br />Line: ' . h($ex->getLine());
-    $output .= '<hr />';
-    $output .= h($ex->getTraceAsString());
-    $output .= '</pre>';
-
-    if ($return) {
-        return $output;
-    } else {
-        echo $output;
-        return null;
+    $out = "exception '" . get_class($ex) . "'";
+    if ($ex->getMessage() != '') {
+        $out .= " with message '" . $ex->getMessage() . "'";
     }
+    if (defined('DEPLOY_MODE') && DEPLOY_MODE != false) {
+        $out .= ' in ' . basename($ex->getFile()) . ':' . $ex->getLine() . "\n\n";
+    } else {
+        $out .= ' in ' . $ex->getFile() . ':' . $ex->getLine() . "\n\n";
+        $out .= $ex->getTraceAsString();
+    }
+
+    if ($return) { return $out; }
+
+    if (ini_get('html_errors')) {
+        echo nl2br(htmlspecialchars($out));
+    } else {
+        echo $out;
+    }
+
+    return '';
 }
 
 /**
