@@ -1,22 +1,16 @@
 <?php
 
+namespace FLEA\Exception;
 
 /**
- * 定义 FLEA_Exception_ExpectedFile 异常
+ * 定义 ExpectedFile 异常
  *
- * @author toohamster
- * @package Exception
- * @version $Id: ExpectedFile.php 972 2007-10-09 20:56:54Z qeeyuan $
- */
-
-/**
- * FLEA_Exception_ExpectedFile 异常指示需要的文件没有找到
+ * ExpectedFile 异常指示需要的文件没有找到
  *
  * @package Exception
- * @author toohamster
  * @version 1.0
  */
-class FLEA_Exception_ExpectedFile extends FLEA_Exception
+class ExpectedFile extends \FLEA\Exception
 {
     public $filename;
 
@@ -25,7 +19,7 @@ class FLEA_Exception_ExpectedFile extends FLEA_Exception
      *
      * @param string $filename
      *
-     * @return FLEA_Exception_ExpectedFile
+     * @return ExpectedFile
      */
     public function __construct(string $filename)
     {

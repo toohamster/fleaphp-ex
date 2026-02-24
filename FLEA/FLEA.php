@@ -64,9 +64,11 @@ define('ACTION_ALL',        'ACTION_ALL');
  * 初始化 FleaPHP 框架
  */
 
-// 初始化配置管理器
-$config = FLEA_Config::getInstance();
-$config->addClassPath(__DIR__);
+// 初始化配置管理器（Composer 的 PSR-4 自动加载器会自动加载类）
+use FLEA\Config;
+
+$config = Config::getInstance();
+$config->addClassPath(dirname(__FILE__));
 define('FLEA_DIR', $config->getClassPath()[0] . DS . 'FLEA');
 define('FLEA_3RD_DIR', $config->getClassPath()[0] . DS . '3rd');
 
@@ -119,10 +121,10 @@ class FLEA
      */
     public static function loadAppInf($flea_internal_config = null): void
     {
-        $config = FLEA_Config::getInstance();
+        $config = Config::getInstance();
         if (!is_array($flea_internal_config) && is_string($flea_internal_config)) {
             if (!is_readable($flea_internal_config)) {
-                throw new FLEA_Exception_ExpectedFile($flea_internal_config);
+                throw new Exception\ExpectedFile($flea_internal_config);
             }
             $flea_internal_config = require($flea_internal_config);
         }
@@ -148,7 +150,7 @@ class FLEA
      */
     public static function getAppInf(string $option, $default = null)
     {
-        $config = FLEA_Config::getInstance();
+        $config = Config::getInstance();
         return $config->getAppInf($option, $default);
     }
 
@@ -171,7 +173,7 @@ class FLEA
      */
     public static function getAppInfValue(string $option, string $keyname, $default = null)
     {
-        return FLEA_Config::getInstance()->getAppInfValue($option, $keyname, $default);
+        return Config::getInstance()->getAppInfValue($option, $keyname, $default);
     }
 
     /**
@@ -183,7 +185,7 @@ class FLEA
      */
     public static function setAppInfValue(string $option, string $keyname, $value): void
     {
-        FLEA_Config::getInstance()->setAppInfValue($option, $keyname, $value);
+        Config::getInstance()->setAppInfValue($option, $keyname, $value);
     }
 
     /**
@@ -194,7 +196,7 @@ class FLEA
      */
     public static function setAppInf($option, $data = null): void
     {
-        FLEA_Config::getInstance()->setAppInf($option, $data);
+        Config::getInstance()->setAppInf($option, $data);
     }
 
     /**
@@ -216,7 +218,7 @@ class FLEA
      */
     public static function import(string $dir): void
     {
-        FLEA_Config::getInstance()->addClassPath($dir);
+        Config::getInstance()->addClassPath($dir);
     }
 
     /**
@@ -267,7 +269,7 @@ class FLEA
             }
         }
 
-        throw new FLEA_Exception_ExpectedFile($filename);
+        throw new Exception\ExpectedFile($filename);
     }
 
     /**
@@ -301,7 +303,7 @@ class FLEA
         if ($noException) { return false; }
 
         $filename = FLEA::getFilePath($className . '.php', true);
-        throw new FLEA_Exception_ExpectedClass($className, $filename, file_exists($filename));
+        throw new Exception\ExpectedClass($className, $filename, file_exists($filename));
     }
 
     /**
@@ -330,7 +332,7 @@ class FLEA
         // 首先搜索当前目录
         if (is_file($filename)) { return $filename; }
 
-        $config = FLEA_Config::getInstance();
+        $config = Config::getInstance();
         foreach ($config->getClassPath() as $classdir) {
             $path = $classdir . DIRECTORY_SEPARATOR . $filename;
             if (is_file($path)) { return $path; }
@@ -398,7 +400,7 @@ class FLEA
      */
     public static function register(object $obj, ?string $name = null): ?object
     {
-        $config = FLEA_Config::getInstance();
+        $config = Config::getInstance();
         return $config->registerObject($obj, $name);
     }
 
@@ -413,7 +415,7 @@ class FLEA
      */
     public static function registry(?string $name = null)
     {
-        $config = FLEA_Config::getInstance();
+        $config = Config::getInstance();
         return $config->getRegistry($name);
     }
 
@@ -435,7 +437,7 @@ class FLEA
      */
     public static function isRegistered(string $name): bool
     {
-        $config = FLEA_Config::getInstance();
+        $config = Config::getInstance();
         return $config->isRegistered($name);
     }
 
@@ -471,7 +473,7 @@ class FLEA
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
-            throw new FLEA_Exception_CacheDisabled($cacheDir);
+            throw new Exception\CacheDisabled($cacheDir);
         }
 
         if ($cacheIdIsFilename) {
@@ -527,7 +529,7 @@ class FLEA
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
-            throw new FLEA_Exception_CacheDisabled($cacheDir);
+            throw new Exception\CacheDisabled($cacheDir);
         }
 
         if ($cacheIdIsFilename) {
@@ -542,7 +544,7 @@ class FLEA
         $data = $prefix . $hash . $data;
 
         if (!safe_file_put_contents($cacheFile, $data)) {
-            throw new FLEA_Exception_CacheDisabled($cacheDir);
+            throw new Exception\CacheDisabled($cacheDir);
         }
 
         return true;
@@ -560,7 +562,7 @@ class FLEA
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
-            throw new FLEA_Exception_CacheDisabled($cacheDir);
+            throw new Exception\CacheDisabled($cacheDir);
         }
 
         if ($cacheIdIsFilename) {
@@ -615,7 +617,7 @@ class FLEA
         if ($setting) {
             FLEA::loadFile($setting, true);
         } else {
-            throw new FLEA_Exception_NotExistsKeyName('helper.' . $helperName);
+            throw new Exception\NotExistsKeyName('helper.' . $helperName);
         }
     }
 
@@ -649,7 +651,7 @@ class FLEA
      */
     public static function getDBO($dsn = 0): FLEA_Db_Driver_Abstract
     {
-        $config = FLEA_Config::getInstance();
+        $config = Config::getInstance();
         if ($dsn == 0) {
             $dsn = FLEA::getAppInf('dbDSN');
         }
@@ -1340,7 +1342,7 @@ if (!function_exists('file_put_contents'))
  */
 function __SET_EXCEPTION_HANDLER($callback)
 {
-    $config = FLEA_Config::getInstance();
+    $config = Config::getInstance();
     $current = $config->getExceptionHandler();
     $config->setExceptionHandler($callback);
     return $current;

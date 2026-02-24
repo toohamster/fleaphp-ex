@@ -9,12 +9,14 @@
  * @package Core
  * @version 1.0
  */
-class FLEA_Config
+namespace FLEA;
+
+class Config
 {
     /**
      * 单例实例
      *
-     * @var FLEA_Config
+     * @var Config
      */
     private static $_instance = null;
 
@@ -76,9 +78,9 @@ class FLEA_Config
     /**
      * 获取单例实例
      *
-     * @return FLEA_Config
+     * @return Config
      */
-    public static function getInstance()
+    public static function getInstance(): self
     {
         if (self::$_instance === null) {
             self::$_instance = new self();
@@ -168,13 +170,13 @@ class FLEA_Config
      * @param object $obj 对象实例
      * @param string|null $name 对象名称，默认使用类名
      * @return object
-     * @throws FLEA_Exception_ExistsKeyName 如果对象名称已存在
-     * @throws FLEA_Exception_TypeMismatch 如果参数不是对象
+     * @throws \FLEA\Exception\ExistsKeyName 如果对象名称已存在
+     * @throws \FLEA\Exception\TypeMismatch 如果参数不是对象
      */
-    public function registerObject(object $obj, ?string $name = null): object
+    public function registerObject($obj, ?string $name = null)
     {
         if (!is_object($obj)) {
-            throw new FLEA_Exception_TypeMismatch($obj, 'object', gettype($obj));
+            throw new \FLEA\Exception\TypeMismatch($obj, 'object', gettype($obj));
         }
 
         if (is_null($name)) {
@@ -182,7 +184,7 @@ class FLEA_Config
         }
 
         if (isset($this->objects[$name])) {
-            throw new FLEA_Exception_ExistsKeyName($name);
+            throw new \FLEA\Exception\ExistsKeyName($name);
         }
 
         $this->objects[$name] = $obj;
@@ -194,7 +196,7 @@ class FLEA_Config
      *
      * @param string|null $name 对象名称，为 null 时返回所有对象
      * @return object|array|null
-     * @throws FLEA_Exception_NotExistsKeyName 当对象不存在时
+     * @throws Exception\NotExistsKeyName 当对象不存在时
      */
     public function getRegistry(?string $name = null)
     {
@@ -204,7 +206,7 @@ class FLEA_Config
         if (isset($this->objects[$name]) && is_object($this->objects[$name])) {
             return $this->objects[$name];
         }
-        throw new FLEA_Exception_ExistsKeyName("Object with name '{$name}' already exists");
+        throw new \FLEA\Exception\NotExistsKeyName($name);
     }
 
     /**

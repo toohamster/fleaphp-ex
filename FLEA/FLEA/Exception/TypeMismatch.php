@@ -1,22 +1,16 @@
 <?php
 
+namespace FLEA\Exception;
 
 /**
- * 定义 FLEA_Exception_TypeMismatch 异常
+ * 定义 TypeMismatch 异常
  *
- * @author toohamster
- * @package Exception
- * @version $Id: TypeMismatch.php 972 2007-10-09 20:56:54Z qeeyuan $
- */
-
-/**
- * FLEA_Exception_TypeMismatch 异常指示一个类型不匹配错误
+ * TypeMismatch 异常指示一个类型不匹配错误
  *
  * @package Exception
- * @author toohamster
  * @version 1.0
  */
-class FLEA_Exception_TypeMismatch extends FLEA_Exception
+class TypeMismatch extends \FLEA\Exception
 {
     public $arg;
     public $expected;
@@ -29,7 +23,7 @@ class FLEA_Exception_TypeMismatch extends FLEA_Exception
      * @param string $expected
      * @param string $actual
      *
-     * @return FLEA_Exception_TypeMismatch
+     * @return TypeMismatch
      */
     public function __construct(string $arg, string $expected, string $actual)
     {
