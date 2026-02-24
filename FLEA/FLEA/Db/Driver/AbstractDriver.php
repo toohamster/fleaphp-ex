@@ -394,29 +394,29 @@ abstract class AbstractDriver
     /**
      * 从记录集中返回一行数据
      *
-     * @param resouce $res
+     * @param PDOStatement $res
      *
      * @return array
      */
-    abstract public function fetchRow($res): ?array;
+    abstract public function fetchRow(PDOStatement $res): ?array;
 
     /**
      * 从记录集中返回一行数据，字段名作为键名
      *
-     * @param resouce $res
+     * @param PDOStatement $res
      *
      * @return array
      */
-    abstract public function fetchAssoc($res): ?array;
+    abstract public function fetchAssoc(PDOStatement $res): ?array;
 
     /**
      * 释放查询句柄
      *
-     * @param resource $res
+     * @param PDOStatement $res
      *
      * @return boolean
      */
-    abstract public function freeRes($res): bool;
+    abstract public function freeRes(PDOStatement $res): bool;
 
     /**
      * 进行限定记录集的查询

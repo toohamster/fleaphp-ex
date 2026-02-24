@@ -413,10 +413,10 @@ class Sqlitepdo
 	/**
 	 * 从记录集中返回一行数据
 	 *
-	 * @param resouce $res
+	 * @param PDOStatement $res
 	 * @return array
 	 */
-	public function fetchRow( $res )
+	public function fetchRow(PDOStatement $res): ?array
 	{
 		$row = $res->fetch();
 		$temp = [];
@@ -431,10 +431,10 @@ class Sqlitepdo
 	/**
 	 * 从记录集中返回一行数据，字段名作为键名
 	 *
-	 * @param resouce $res
+	 * @param PDOStatement $res
 	 * @return array
 	 */
-	public function fetchAssoc( $res )
+	public function fetchAssoc(PDOStatement $res): ?array
 	{
 		$row = $res->fetch( PDO::FETCH_ASSOC );
 		$temp = [];
@@ -449,10 +449,10 @@ class Sqlitepdo
 	/**
 	 * 释放查询句柄
 	 *
-	 * @param resource $res
+	 * @param PDOStatement $res
 	 * @return boolean
 	 */
-	public function freeRes( $res )
+	public function freeRes(PDOStatement $res): bool
 	{
 		// return sqlite_free_result($res);
 		return true; //sqlite 没有这样的函数
