@@ -3,6 +3,8 @@
 namespace FLEA\Db;
 
 
+use FLEA;
+
 /**
  * 定义 \FLEA\Db\TableDataGateway 类
  *
@@ -1934,7 +1936,7 @@ class TableDataGateway
     protected function _setCreatedTimeFields(array &$row): void
     {
         $currentTime = time();
-        $currentTimeStamp = $this->dbo->dbTimeStamp(time());
+        $currentTimeStamp = $this->dbo->dbTimeStamp($currentTime);
         foreach (array_merge($this->createdTimeFields, $this->updatedTimeFields) as $af) {
             $af = strtoupper($af);
             if (!isset($this->meta[$af])) { continue; }
@@ -1983,7 +1985,6 @@ class TableDataGateway
          */
         $this->meta = $this->dbo->metaColumns($this->qtableName);
         if (!is_array($this->meta) || empty($this->meta)) {
-            FLEA::loadClass('\FLEA\Db\Exception\MetaColumnsFailed');
             throw new \FLEA\Db\Exception\MetaColumnsFailed($this->qtableName);
         }
 

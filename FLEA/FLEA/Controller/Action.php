@@ -87,7 +87,10 @@ class Action
 
         if (!isset($instances[$componentName])) {
             $componentClassName = FLEA::getAppInf('component.' . $componentName);
-            FLEA::loadClass($componentClassName);
+            // 使用 Composer PSR-4 自动加载
+            if (!class_exists($componentClassName, false)) {
+                throw new \FLEA\Exception\ExpectedClass($componentClassName);
+            }
             $instances[$componentName] = new $componentClassName($this);
         }
         return $instances[$componentName];

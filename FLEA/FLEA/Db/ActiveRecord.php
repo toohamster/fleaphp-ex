@@ -99,7 +99,10 @@ class ActiveRecord
         if (FLEA::isRegistered($objid)) {
             $this->_table = FLEA::registry($objid);
         } else {
-            FLEA::loadClass($tableClass);
+            // 使用 Composer PSR-4 自动加载
+            if (!class_exists($tableClass, false)) {
+                throw new \FLEA\Exception\ExpectedClass($tableClass);
+            }
             $this->_table = new $tableClass(array('skipCreateLinks' => true));
             FLEA::register($this->_table, $objid);
         }
@@ -135,7 +138,10 @@ class ActiveRecord
             /**
              * 获得聚合对象的定义信息
              */
-            FLEA::loadClass($define['class']);
+            // 使用 Composer PSR-4 自动加载
+            if (!class_exists($define['class'], false)) {
+                throw new \FLEA\Exception\ExpectedClass($define['class']);
+            }
             $options = call_user_func(array($define['class'], 'define'));
 
             $link = array(

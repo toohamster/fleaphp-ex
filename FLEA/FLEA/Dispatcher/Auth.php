@@ -219,8 +219,10 @@ class Auth extends \FLEA\Dispatcher\Simple
         $ACT = FLEA::getAppInfValue('globalACT', $controllerName);
         if ($ACT) { return $ACT; }
 
-        $actFilename = FLEA::getFilePath($controllerClass . '.act.php');
-        if (!$actFilename) {
+        // 将控制器类名转换为文件路径
+        $actFilename = str_replace('\\', DIRECTORY_SEPARATOR, $controllerClass) . '.act.php';
+        
+        if (!file_exists($actFilename)) {
             if (FLEA::getAppInf('autoQueryDefaultACTFile')) {
                 $ACT = $this->getControllerACTFromDefaultFile($controllerName);
                 if ($ACT) { return $ACT; }

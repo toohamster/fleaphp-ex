@@ -9,15 +9,9 @@ require(__DIR__ . '/../_common/header.php');
 <h2>详细错误原因：</h2>
 您请求访问控制器 <strong><?php echo $ex->controllerName; ?></strong>
 的动作 <strong><?php echo $ex->actionName; ?></strong>。<br />
-但控制器 <strong><?php echo $ex->controllerName; ?></strong>
+控制器 <strong><?php echo $ex->controllerName; ?></strong>
 对应的类 <strong><?php echo $ex->controllerClass; ?></strong>
-<?php if ($ex->controllerClassFilename): ?>
-在文件
-<p><strong><?php __error_filelink($ex->controllerClassFilename); ?></strong></p>
-中没有定义。
-<?php else: ?>
-没有定义。
-<?php endif; ?>
+不存在。
 </div>
 
 <p>
@@ -26,20 +20,13 @@ require(__DIR__ . '/../_common/header.php');
 
 <div class="tip">
 <h2>解决：</h2>
+请检查 <strong><?php echo $ex->controllerClass; ?></strong> 类是否已定义。
+
 <?php
-if ($ex->controllerClassFilename): 
-$controllerClassFilename = $ex->controllerClassFilename;
+// 将命名空间类名转换为文件路径用于显示
+$controllerClassFilename = str_replace('\\', DIRECTORY_SEPARATOR, $ex->controllerClass) . '.php';
 ?>
-请检查文件
-<p><strong><?php __error_filelink($ex->controllerClassFilename); ?></strong></p>
-中是否有 <strong><?php echo $ex->controllerClass; ?></strong> 类的定义。
-<?php
-else:
-$controllerClassFilename = FLEA::getFilePath($ex->controllerClass . '.php', true);
-?>
-请检查是否创建了 <strong><?php echo $ex->controllerClass; ?></strong> 类的定义文件：
-<p><strong><?php __error_filelink($controllerClassFilename); ?></strong></p>
-<?php endif; ?>
+<p><strong><?php echo $controllerClassFilename; ?></strong></p>
 </div>
 
 <?php

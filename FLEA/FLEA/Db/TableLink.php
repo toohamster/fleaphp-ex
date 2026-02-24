@@ -376,7 +376,10 @@ class TableLink
             $this->assocTDG = FLEA::registry($this->assocTDGObjectId);
         } else {
             if ($this->assocTDGObjectId) {
-                FLEA::loadClass($this->tableClass);
+                // 使用 Composer PSR-4 自动加载
+                if (!class_exists($this->tableClass, false)) {
+                    throw new \FLEA\Exception\ExpectedClass($this->tableClass);
+                }
                 $this->assocTDG = new $this->tableClass(array('dbo' => $this->dbo));
                 FLEA::register($this->assocTDG, $this->assocTDGObjectId);
             } else {

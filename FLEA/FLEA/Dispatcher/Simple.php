@@ -97,9 +97,8 @@ class Simple
         $actionMethod = $actionPrefix . $actionName . FLEA::getAppInf('actionMethodSuffix');
 
         $controller = null;
-        $controllerClassFilename = null;
         do {
-            // 载入控制对应的类定义
+            // 使用 Composer PSR-4 自动加载器加载控制器类
             if (!$this->_loadController($controllerClass)) { break; }
 
             // 构造控制器对象
@@ -134,14 +133,14 @@ class Simple
         }
 
         if (is_null($controller)) {
-            throw new \FLEA\Exception_MissingController(
+            throw new \FLEA\Exception\MissingController(
                     $controllerName, $actionName, $this->_requestBackup,
-                    $controllerClass, $actionMethod, $controllerClassFilename);
+                    $controllerClass, $actionMethod, null);
         }
 
-        throw new \FLEA\Exception_MissingAction(
+        throw new \FLEA\Exception\MissingAction(
                 $controllerName, $actionName, $this->_requestBackup,
-                $controllerClass, $actionMethod, $controllerClassFilename);
+                $controllerClass, $actionMethod, null);
     }
 
     /**
@@ -246,17 +245,18 @@ class Simple
     /**
      * 载入控制器类
      *
+     * 使用 Composer PSR-4 自动加载器
+     *
      * @param string $controllerClass
      *
      * @return boolean
      */
     protected function _loadController(string $controllerClass): bool
     {
-        $controllerClassFilename = FLEA::getFilePath($controllerClass . '.php', true);
-        if (!is_readable($controllerClassFilename)) {
+        // 使用 Composer PSR-4 自动加载器加载类
+        if (!class_exists($controllerClass, false)) {
             return false;
         }
-        include_once($controllerClassFilename);
-        return class_exists($controllerClass);
+        return true;
     }
 }

@@ -91,8 +91,9 @@ if (DEBUG_MODE) {
 // 设置异常处理例程
 __SET_EXCEPTION_HANDLER('__FLEA_EXCEPTION_HANDLER');
 
-// 注册自动加载函数
-spl_autoload_register(array('FLEA', 'autoload'));
+// 注意：FLEA 框架现在使用 Composer PSR-4 自动加载器
+// 不再注册 spl_autoload_register(array('FLEA', 'autoload'))
+// 旧的 autoload/loadClass/loadFile/getFilePath/import 方法已移除
 
 /**
  * FLEA 类提供了 FleaPHP 框架的基本服务
@@ -196,162 +197,20 @@ class FLEA
     }
 
     /**
-     * 导入文件搜索路径
-     *
-     * FLEA::loadClass()、FLEA::getSingleton() 会在搜索路径中查找指定名字的类定义文件。
-     * 因此需要调用 FLEA::import() 将存放类定义文件的目录添加到搜索路径中。
-     * 但是，不应该将类文件所在目录直接添加到搜索路径中，而是根据类的命名来决定要添加哪一个目录。
-     *
-     * 例如类名称是 Table_Posts，而实际的文件是 ./APP/Table/Posts.php。
-     * 那么应该添加的目录就是 ./APP，而不是 ./APP/Table 。
-     *
-     * example:
-     * <code>
-     * FLEA::import(APP_DIR . '/LIBS');
-     * </code>
-     *
-     * @param string $dir
-     */
-    public static function import(string $dir): void
-    {
-        Config::getInstance()->addClassPath($dir);
-    }
-
-    /**
-     * 自动加载类文件
-     *
-     * @param string $className 要加载的类名
-     * @return boolean 加载成功返回true，失败返回false
-     */
-    public static function autoload(string $className): bool
-    {
-        // 检查类是否已经加载
-        if (class_exists($className, false) || interface_exists($className, false)) {
-            return true;
-        }
-
-        // 使用内部的 loadClass 方法来加载类
-        return self::loadClass($className, true);
-    }
-
-    /**
-     * 载入指定的文件
-     *
-     * FLEA::loadFile() 会 $filename 参数中的 “_” 替换为目录，例如：
-     *
-     * example:
-     * <code>
-     * FLEA::loadFile('Table_Posts.php');
-     * // 等同于 include 'Table/Posts.php';
-     * </code>
-     *
-     * @param string $className
-     * @param boolean $loadOnce 指定为 true 时，FLEA::loadFile() 等同于 require_once
-     *
-     * @return boolean
-     */
-    public static function loadFile(string $filename, bool $loadOnce = false): bool
-    {
-        static $is_loaded = [];
-
-        $path = FLEA::getFilePath($filename);
-        if ($path != '') {
-            if (isset($is_loaded[$path]) && $loadOnce) { return true; }
-            $is_loaded[$path] = true;
-            if ($loadOnce) {
-                return require_once($path);
-            } else {
-                return require($path);
-            }
-        }
-
-        throw new Exception\ExpectedFile($filename);
-    }
-
-    /**
-     * 载入指定类的定义文件
-     *
-     * 类名称中的 “_” 会被替换为目录，然后从搜索路径中查找该类的定义文件。
-     *
-     * example:
-     * <code>
-     * // 首先将类名称 Table_Posts 转换为文件名 Table/Posts.php
-     * // 然后从搜索路径中查找 Table/Posts.php 文件
-     * </code>
-     *
-     * @param string $filename
-     * @param boolean $noException 如果为 true，则类定义文件没找到时不抛出异常
-     *
-     * @return boolean
-     */
-    public static function loadClass(string $className, bool $noException = false): bool
-    {
-        if (class_exists($className, false) || interface_exists($className, false)) { return true; }
-
-        if (preg_match('/[^a-z0-9\-_.]/i', $className) === 0) {
-            $filename = FLEA::getFilePath($className . '.php');
-            if ($filename) {
-                require($filename);
-                if (class_exists($className, false) || interface_exists($className, false)) { return true; }
-            }
-        }
-
-        if ($noException) { return false; }
-
-        $filename = FLEA::getFilePath($className . '.php', true);
-        throw new Exception\ExpectedClass($className, $filename, file_exists($filename));
-    }
-
-    /**
-     * 按照 FleaPHP 中命名规则，搜索文件
-     *
-     * FleaPHP 的命名规则就是文件名中的“_”替换为目录分隔符。
-     *
-     * @param string $filename
-     * @param boolean $return 指示是否直接返回处理后的文件名，而不判断文件是否存在
-     *
-     * @return string
-     */
-    public static function getFilePath(string $filename, bool $return = false): ?string
-    {
-        $filename = str_replace('_', DIRECTORY_SEPARATOR, $filename);
-        if (DIRECTORY_SEPARATOR == '/') {
-            $filename = str_replace('\\', DIRECTORY_SEPARATOR, $filename);
-        } else {
-            $filename = str_replace('/', DIRECTORY_SEPARATOR, $filename);
-        }
-
-        if (strtolower(substr($filename, -4)) != '.php') {
-            $filename .= '.php';
-        }
-
-        // 首先搜索当前目录
-        if (is_file($filename)) { return $filename; }
-
-        $config = Config::getInstance();
-        foreach ($config->getClassPath() as $classdir) {
-            $path = $classdir . DIRECTORY_SEPARATOR . $filename;
-            if (is_file($path)) { return $path; }
-        }
-
-        if ($return) { return $filename; }
-        return false;
-    }
-
-    /**
      * 返回指定类的唯一一个实例
      *
+     * 该方法使用 Composer PSR-4 自动加载器加载类，并返回单例实例。
+     * 如果类不存在，会抛出异常。
+     *
      * example:
      * <code>
-     * $obj = FLEA::getSingleton('Table_Posts);
-     * ......
-     * $obj2 = FLEA::getSingleton('Table_Posts);
+     * $obj = FLEA::getSingleton(\FLEA\Db\TableDataGateway::class);
+     * $obj2 = FLEA::getSingleton(\FLEA\Db\TableDataGateway::class);
      * // 检查调用两次获取的是否是同一个实例
      * echo $obj === $obj2 ? 'Equals' : 'Not equals';
      * </code>
      *
-     * @param string $className
-     *
+     * @param string $className 完整的类名（包含命名空间）
      * @return object
      */
     public static function getSingleton(string $className): object
@@ -361,17 +220,15 @@ class FLEA
             // 返回已经存在的对象实例
             return FLEA::registry($className);
         }
-        $classExists = class_exists($className, false);
-        if (!$classExists) {
-            if (!FLEA::loadClass($className)) {
-                $return = false;
-                return $return;
-            }
+        
+        // 使用 Composer PSR-4 自动加载器加载类
+        if (!class_exists($className, false)) {
+            throw new Exception\ExpectedClass($className);
         }
-
-        $instances[$className] = new $className();
-        FLEA::register($instances[$className], $className);
-        return $instances[$className];
+        
+        $obj = new $className();
+        FLEA::register($obj, $className);
+        return $obj;
     }
 
     /**
@@ -611,7 +468,10 @@ class FLEA
         $settingName = 'helper.' . strtolower($helperName);
         $setting = FLEA::getAppInf($settingName);
         if ($setting) {
-            FLEA::loadFile($setting, true);
+            // 使用 Composer PSR-4 自动加载
+            if (!class_exists($setting, false)) {
+                throw new Exception\ExpectedClass($setting);
+            }
         } else {
             throw new Exception\NotExistsKeyName('helper.' . $helperName);
         }
@@ -775,7 +635,11 @@ class FLEA
          * 载入日志服务提供程序
          */
         if (FLEA::getAppInf('logEnabled') && FLEA::getAppInf('logProvider')) {
-            FLEA::loadClass(FLEA::getAppInf('logProvider'));
+            // 使用 Composer PSR-4 自动加载
+            $logProviderClass = FLEA::getAppInf('logProvider');
+            if (!class_exists($logProviderClass, false)) {
+                throw new Exception\ExpectedClass($logProviderClass);
+            }
         }
 
         /**
@@ -796,7 +660,10 @@ class FLEA
 
         // 处理 requestFilters
         foreach ((array)FLEA::getAppInf('requestFilters') as $file) {
-            FLEA::loadFile($file);
+            // 直接 require 文件，不使用 loadFile
+            if (file_exists($file)) {
+                require_once($file);
+            }
         }
 
         // 处理 $loadMVC
@@ -809,7 +676,10 @@ class FLEA
 
         // 处理 autoLoad
         foreach ((array)FLEA::getAppInf('autoLoad') as $file) {
-            FLEA::loadFile($file);
+            // 直接 require 文件，不使用 loadFile
+            if (file_exists($file)) {
+                require_once($file);
+            }
         }
 
         // 载入指定的 session 服务提供程序
@@ -827,7 +697,11 @@ class FLEA
 
         // 检查是否启用多语言支持
         if (FLEA::getAppInf('multiLanguageSupport')) {
-            FLEA::loadClass(FLEA::getAppInf('languageSupportProvider'));
+            // 使用 Composer PSR-4 自动加载
+            $languageProviderClass = FLEA::getAppInf('languageSupportProvider');
+            if (!class_exists($languageProviderClass, false)) {
+                throw new Exception\ExpectedClass($languageProviderClass);
+            }
         }
         if (!function_exists('_T')) {
             function _T() {};
