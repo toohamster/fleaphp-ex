@@ -109,7 +109,7 @@ class Ajax
     {
         $out = '';
         if ($wrapper) {
-            $out .= "<script language=\"JavaScript\" type=\"text/javascript\">\n";
+            $out .= "<script language=\"javascript\" type=\"text/javascript\">\n";
         }
 
         // 输出检查 JavaScript 库是否已经正确加载的 JavaScript 代码
@@ -322,7 +322,7 @@ EOT;
      *
      * @param array $attribs
      */
-    protected function _formatAttribs(& $attribs)
+    protected function _formatAttribs(array &$attribs)
     {
         // 格式化参数
         foreach ($attribs as $option => $value) {

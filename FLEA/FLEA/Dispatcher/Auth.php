@@ -43,7 +43,7 @@ class Auth extends \FLEA\Dispatcher\Simple
      *
      * @return \FLEA\Dispatcher\Auth
      */
-    public function __construct(& $request)
+    public function __construct(array $request)
     {
         parent::__construct($request);
         $this->_auth = FLEA::getSingleton(FLEA::getAppInf('dispatcherAuthProvider'));
@@ -54,7 +54,7 @@ class Auth extends \FLEA\Dispatcher\Simple
      *
      * @return \FLEA\Rbac
      */
-    public function getAuthProvider()
+    public function getAuthProvider(): \FLEA\Rbac
     {
         return $this->_auth;
     }
@@ -64,9 +64,9 @@ class Auth extends \FLEA\Dispatcher\Simple
      *
      * @param \FLEA\Rbac $auth
      */
-    public function setAuthProvider(& $auth)
+    public function setAuthProvider(\FLEA\Rbac $auth): void
     {
-        $this->_auth =& $auth;
+        $this->_auth = $auth;
     }
 
     /**
@@ -75,7 +75,7 @@ class Auth extends \FLEA\Dispatcher\Simple
      * @param array $userData
      * @param mixed $rolesData
      */
-    public function setUser($userData, $rolesData = null)
+    public function setUser(array $userData, $rolesData = null): void
     {
         $this->_auth->setUser($userData, $rolesData);
     }
@@ -85,7 +85,7 @@ class Auth extends \FLEA\Dispatcher\Simple
      *
      * @return array
      */
-    public function getUser()
+    public function getUser(): array
     {
         return $this->_auth->getUser();
     }
@@ -95,7 +95,7 @@ class Auth extends \FLEA\Dispatcher\Simple
      *
      * @return array
      */
-    public function getUserRoles()
+    public function getUserRoles(): array
     {
         return $this->_auth->getRolesArray();
     }

@@ -189,14 +189,14 @@ class Pager
      *
      * @return \FLEA\Helper\Pager
      */
-    public function __construct(& $source, $currentPage, $pageSize = 20, $conditions = null, $sortby = null, $basePageIndex = 0)
+    public function __construct($source, $currentPage, $pageSize = 20, $conditions = null, $sortby = null, $basePageIndex = 0)
     {
         $this->_basePageIndex = $basePageIndex;
         $this->_currentPage = $this->currentPage = $currentPage;
         $this->pageSize = $pageSize;
 
         if (is_object($source)) {
-            $this->source =& $source;
+            $this->source = $source;
             $this->_conditions = $conditions;
             $this->_sortby = $sortby;
             $this->totalCount = $this->count = (int)$this->source->findCount($conditions);
@@ -204,7 +204,7 @@ class Pager
         } elseif (!empty($source)) {
             $this->source = $source;
             $sql = "SELECT COUNT(*) FROM ( $source ) as _count_table";
-            $this->dbo =& FLEA::getDBO();
+            $this->dbo = FLEA::getDBO();
             $this->totalCount = $this->count = (int)$this->dbo->getOne($sql);
             $this->computingPage();
         }
@@ -250,9 +250,9 @@ class Pager
      *
      * @param \FLEA\Db\Driver\AbstractDriver|\FLEA\Db\Driver\Mysql|\FLEA\Db\Driver\Mysqlt|\FLEA\Db\Driver\Sqlitepdo $dbo
      */
-    public function setDBO(& $dbo)
+    public function setDBO($dbo)
     {
-        $this->dbo =& $dbo;
+        $this->dbo = $dbo;
     }
 
     /**

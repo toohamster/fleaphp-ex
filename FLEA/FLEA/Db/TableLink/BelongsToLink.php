@@ -31,7 +31,7 @@ class BelongsToLink extends TableLink
      *
      * @return \FLEA\Db\TableLink
      */
-    public function __construct($define, $type, & $mainTDG)
+    public function __construct($define, $type, $mainTDG)
     {
         $this->linkUpdate = $this->linkCreate = $this->linkRemove = false;
         parent::__construct($define, $type, $mainTDG);

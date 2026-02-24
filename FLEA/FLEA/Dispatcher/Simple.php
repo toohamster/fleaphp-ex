@@ -72,7 +72,7 @@ class Simple
      *
      * @return mixed
      */
-    public function dispatching()
+    public function dispatching(): mixed
     {
         $controllerName = $this->getControllerName();
         $actionName = $this->getActionName();

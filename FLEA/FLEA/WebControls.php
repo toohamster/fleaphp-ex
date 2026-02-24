@@ -752,7 +752,7 @@ class WebControls
      *
      * @return boolean
      */
-    protected function __processMultiDimArray(& $items, & $key, & $caption, $key2caption = false)
+    protected function __processMultiDimArray(& $items, $key, $caption, $key2caption = false)
     {
         if ($caption == '') {
             $first = reset($items);

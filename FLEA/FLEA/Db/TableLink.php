@@ -248,7 +248,7 @@ class TableLink
      *
      * @return \FLEA\Db\TableLink
      */
-    public function __construct($define, $type, & $mainTDG)
+    public function __construct($define, $type, $mainTDG)
     {
         static $defaultDsnId = null;
 

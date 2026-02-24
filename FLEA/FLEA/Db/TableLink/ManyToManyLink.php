@@ -86,7 +86,7 @@ class ManyToManyLink extends TableLink
      *
      * @return TableLink
      */
-    function __construct($define, $type, & $mainTDG)
+    function __construct($define, $type, $mainTDG)
     {
         $this->_optional[] = 'joinTable';
         $this->_optional[] = 'joinTableClass';
