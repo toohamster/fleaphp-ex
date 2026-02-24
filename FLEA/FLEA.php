@@ -326,7 +326,7 @@ class FLEA
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
-            throw new Exception\CacheDisabled($cacheDir);
+            throw new \FLEA\Exception\CacheDisabled($cacheDir);
         }
 
         if ($cacheIdIsFilename) {
@@ -382,7 +382,7 @@ class FLEA
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
-            throw new Exception\CacheDisabled($cacheDir);
+            throw new \FLEA\Exception\CacheDisabled($cacheDir);
         }
 
         if ($cacheIdIsFilename) {
@@ -397,7 +397,7 @@ class FLEA
         $data = $prefix . $hash . $data;
 
         if (!safe_file_put_contents($cacheFile, $data)) {
-            throw new Exception\CacheDisabled($cacheDir);
+            throw new \FLEA\Exception\CacheDisabled($cacheDir);
         }
 
         return true;
@@ -415,7 +415,7 @@ class FLEA
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
         if (is_null($cacheDir)) {
-            throw new Exception\CacheDisabled($cacheDir);
+            throw new \FLEA\Exception\CacheDisabled($cacheDir);
         }
 
         if ($cacheIdIsFilename) {

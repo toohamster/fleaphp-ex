@@ -262,10 +262,10 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
     /**
      * Fetch row as indexed array
      *
-     * @param PDOStatement $res
-     * @return array|false
+     * @param mixed $res
+     * @return array|null
      */
-    public function fetchRow(PDOStatement $res)
+    public function fetchRow($res): ?array
     {
         return $res->fetch(PDO::FETCH_NUM);
     }
@@ -273,10 +273,10 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
     /**
      * Fetch row as associative array
      *
-     * @param PDOStatement $res
-     * @return array|false
+     * @param mixed $res
+     * @return array|null
      */
-    public function fetchAssoc(PDOStatement $res)
+    public function fetchAssoc($res): ?array
     {
         return $res->fetch(PDO::FETCH_ASSOC);
     }
@@ -284,10 +284,10 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
     /**
      * Free result
      *
-     * @param PDOStatement $res
+     * @param mixed $res
      * @return bool
      */
-    public function freeRes(PDOStatement $res): bool
+    public function freeRes($res): bool
     {
         return true; // PDO statements are automatically freed
     }

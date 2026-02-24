@@ -37,8 +37,8 @@
             "FLEA\\Acl\\": "FLEA/Acl/"
         },
         "files": [
-            "FLEA/FLEA.php",
-            "FLEA/Functions.php"
+            "FLEA/Functions.php",
+            "FLEA/FLEA.php"
         ]
     },
     "autoload-dev": {

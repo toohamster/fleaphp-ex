@@ -10,7 +10,6 @@
  * @version 1.0
  */
 
-use FLEA\FLEA;
 use FLEA\Config;
 
 /**
@@ -526,7 +525,7 @@ function _ET(int $errorCode, bool $appError = false): string
         }
     }
 
-    $message = FLEA::loadCache('errorMessages.' . $errorCode);
+    $message = FLEA::getCache('errorMessages.' . $errorCode);
     if ($message) {
         return $message;
     }
