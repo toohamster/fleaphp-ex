@@ -206,3 +206,99 @@
 这些内容对于开发者充分利用 FleaPHP 框架的功能至关重要。
 
 ---
+
+## 2026-02-13 - 引入 Composer 支持
+
+### 新增文件
+- `composer.json`
+
+### 修改文件
+- `.gitignore`
+
+### 修改内容
+
+#### 1. 新增 composer.json
+
+创建了标准的 `composer.json` 文件，包含以下配置：
+
+- **基本信息**：
+  - 包名：`fleaphp/fleaphp`
+  - 描述：轻量级 PHP 框架，支持 MVC 架构、数据库抽象层和 RBAC
+  - 类型：library
+  - 许可证：LGPL-2.1-or-later
+  - PHP 版本要求：>= 7.0
+
+- **自动加载配置**：
+  - PSR-4 命名空间：`FLEA\` 映射到 `FLEA/FLEA/` 目录
+  - 文件自动加载：包含 `FLEA/FLEA.php` 以确保框架初始化
+  - 开发环境自动加载：`FLEA\Tests\` 映射到 `tests/` 目录
+
+#### 2. 更新 .gitignore
+
+在 `.gitignore` 文件中添加了 Composer 相关的忽略规则：
+
+- `vendor/` - Composer 依赖包目录
+- `composer.lock` - Composer 锁定文件
+- `composer.phar` - Composer PHAR 文件
+
+### 目的
+
+为 FleaPHP 框架引入 Composer 支持，带来以下优势：
+
+1. **依赖管理**：可以通过 Composer 管理框架依赖和第三方库
+2. **自动加载**：利用 Composer 的 PSR-4 自动加载机制，简化类文件加载
+3. **标准化**：遵循 PHP 社区的标准依赖管理方式
+4. **易于集成**：更容易集成到现有的 Composer 项目中
+5. **版本控制**：通过 Composer 管理框架和依赖的版本
+
+### 使用方法
+
+#### 安装依赖
+
+```bash
+composer install
+```
+
+#### 更新依赖
+
+```bash
+composer update
+```
+
+#### 在项目中使用
+
+在项目的 `composer.json` 中添加：
+
+```json
+{
+    "require": {
+        "fleaphp/fleaphp": "^1.0"
+    }
+}
+```
+
+然后运行：
+
+```bash
+composer install
+```
+
+在项目中引入 Composer 自动加载：
+
+```php
+<?php
+require 'vendor/autoload.php';
+
+// FleaPHP 已经通过 composer.json 的 files 配置自动加载
+// 可以直接使用框架功能
+FLEA::loadAppInf('config.php');
+FLEA::runMVC();
+```
+
+### 注意事项
+
+- `FLEA/FLEA.php` 已经配置为在自动加载时加载，无需手动 require
+- 框架的类名遵循 PSR-4 标准，类名中的下划线会被转换为命名空间
+- 开发者可以使用传统的类加载方式，也可以完全使用 Composer 自动加载
+
+---

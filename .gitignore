@@ -13,3 +13,8 @@ uploads/
 *.cache
 .phpstorm.meta.php
 .vscode/
+
+# Composer
+vendor/
+composer.lock
+composer.phar
