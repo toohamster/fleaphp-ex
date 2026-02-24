@@ -12,22 +12,6 @@
 
 use FLEA\FLEA;
 
-if (!defined('FLEA_VERSION')) {
-    define('FLEA_VERSION', '3.0.0');
-}
-
-if (!defined('URL_STANDARD')) {
-    define('URL_STANDARD', 1);
-}
-
-if (!defined('URL_REWRITE')) {
-    define('URL_REWRITE', 2);
-}
-
-if (!defined('URL_PATHINFO')) {
-    define('URL_PATHINFO', 3);
-}
-
 /**
  * 重定向浏览器到指定的 URL
  *
@@ -43,7 +27,7 @@ function redirect(string $url, int $delay = 0, bool $js = false, bool $jsWrapped
     if ($js) {
         $html = '';
         if ($jsWrapped) {
-            $html .= '<script language="JavaScript" type="text/javascript">';
+            $html .= '<script type="text/javascript">';
         }
         if ($delay > 0) {
             $html .= "window.setTimeout(\"location.href = '{$url}';\", {$delay} * 1000);";
@@ -139,19 +123,19 @@ function url(?string $controllerName = null, ?string $actionName = null, ?array 
  */
 function detect_uri_base(): string
 {
-    $filename = isset($_SERVER['SCRIPT_FILENAME']) ? basename($_SERVER['SCRIPT_FILENAME']) : '';
-    $scriptName = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '';
-    $phpSelf = isset($_SERVER['PHP_SELF']) ? $_SERVER['PHP_SELF'] : '';
+    $filename = $_SERVER['SCRIPT_FILENAME'] ?? '';
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+    $phpSelf = $_SERVER['PHP_SELF'] ?? '';
 
-    if ($scriptName != '' && basename($scriptName) == $filename) {
+    if ($scriptName !== '' && basename($scriptName) == $filename) {
         $baseUrl = dirname($scriptName);
-    } elseif ($phpSelf != '' && basename($phpSelf) == $filename) {
+    } elseif ($phpSelf !== '' && basename($phpSelf) == $filename) {
         $baseUrl = dirname($phpSelf);
     } else {
         $baseUrl = '';
     }
 
-    if ($baseUrl == '.' || $baseUrl == '') {
+    if ($baseUrl === '.' || $baseUrl === '') {
         $baseUrl = '/';
     } else {
         $baseUrl = str_replace('\\', '/', $baseUrl);
@@ -159,7 +143,7 @@ function detect_uri_base(): string
     }
 
     if (!empty($_SERVER['HTTP_HOST'])) {
-        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ? 'https' : 'http';
+        $protocol = ($_SERVER['HTTPS'] ?? '') === 'on' ? 'https' : 'http';
         $baseUrl = $protocol . '://' . $_SERVER['HTTP_HOST'] . $baseUrl;
     }
 
@@ -436,13 +420,7 @@ function _ET(int $errorCode, bool $appError = false): string
  */
 function mkdirs($dir, $mode = 0777)
 {
-    if (is_dir($dir)) {
-        return true;
-    }
-    if (!mkdirs(dirname($dir), $mode)) {
-        return false;
-    }
-    return @mkdir($dir, $mode);
+    return is_dir($dir) || (mkdirs(dirname($dir), $mode) && @mkdir($dir, $mode));
 }
 
 /**
@@ -475,27 +453,21 @@ function rmdirs($dir)
 }
 
 /**
- * 移除数组中的空值
+ * 从数组中删除空白的元素（包括只有空白字符的元素）
  *
- * @param array &$arr 数组引用
- * @param bool $trim 是否去除空白字符
- * @return void
+ * @param array $arr
+ * @param boolean $trim
  */
 function array_remove_empty(array &$arr, bool $trim = true): void
 {
     foreach ($arr as $key => $value) {
         if (is_array($value)) {
-            array_remove_empty($arr[$key], $trim);
-            if (empty($arr[$key])) {
-                unset($arr[$key]);
-            }
+            array_remove_empty($arr[$key]);
         } else {
-            if ($trim) {
-                $value = trim($value);
-            }
-            if ($value === '' || $value === null) {
+            $value = trim($value);
+            if ($value == '') {
                 unset($arr[$key]);
-            } else {
+            } elseif ($trim) {
                 $arr[$key] = $value;
             }
         }
@@ -503,169 +475,174 @@ function array_remove_empty(array &$arr, bool $trim = true): void
 }
 
 /**
- * 获取数组中指定列的所有值
+ * 从一个二维数组中返回指定键的所有值
  *
- * @param array &$arr 数组引用
- * @param string $col 列名
+ * @param array $arr
+ * @param string $col
+ *
  * @return array
  */
-function array_col_values(array &$arr, string $col): array
+function array_col_values(array $arr, string $col): array
 {
-    $result = [];
-    foreach ($arr as $row) {
-        if (isset($row[$col])) {
-            $result[] = $row[$col];
-        }
-    }
-    return $result;
+    return array_column($arr, $col);
 }
 
 /**
- * 将数组转换为哈希表
+ * 将一个二维数组转换为 hashmap
  *
- * @param array &$arr 数组引用
- * @param string $keyField 键字段
- * @param ?string $valueField 值字段
+ * 如果省略 $valueField 参数，则转换结果每一项为包含该项所有数据的数组。
+ *
+ * @param array $arr
+ * @param string $keyField
+ * @param string $valueField
+ *
  * @return array
  */
 function array_to_hashmap(array &$arr, string $keyField, ?string $valueField = null): array
 {
-    $result = [];
-    foreach ($arr as $row) {
-        $key = $row[$keyField];
-        if ($valueField === null) {
-            $result[$key] = $row;
-        } else {
-            $result[$key] = $row[$valueField];
+    $ret = [];
+    if ($valueField) {
+        foreach ($arr as $row) {
+            $ret[$row[$keyField]] = $row[$valueField];
+        }
+    } else {
+        foreach ($arr as $row) {
+            $ret[$row[$keyField]] = $row;
         }
     }
-    return $result;
+    return $ret;
 }
 
 /**
- * 按指定字段对数组进行分组
+ * 将一个二维数组按照指定字段的值分组
  *
- * @param array &$arr 数组引用
- * @param string $keyField 键字段
+ * @param array $arr
+ * @param string $keyField
+ *
  * @return array
  */
 function array_group_by(array &$arr, string $keyField): array
 {
-    $result = [];
+    $ret = [];
     foreach ($arr as $row) {
-        $key = $row[$keyField];
-        if (!isset($result[$key])) {
-            $result[$key] = [];
+        if (isset($row[$keyField])) {
+            $ret[$row[$keyField]][] = $row;
         }
-        $result[$key][] = $row;
     }
-    return $result;
+    return $ret;
 }
 
 /**
- * 将数组转换为树形结构
+ * 将一个平面的二维数组按照指定的字段转换为树状结构
  *
- * @param array $arr 数组
- * @param string $fid ID 字段名
- * @param string $fparent 父ID字段名
- * @param string $fchildrens 子节点字段名
- * @param bool $returnReferences 是否返回引用
- * @return array
+ * 当 $returnReferences 参数为 true 时，返回结果的 tree 字段为树，refs 字段则为节点引用。
+ * 利用返回的节点引用，可以很方便的获取包含以任意节点为根的子树。
+ *
+ * @param array $arr 原始数据
+ * @param string $fid 节点ID字段名
+ * @param string $fparent 节点父ID字段名
+ * @param string $fchildrens 保存子节点的字段名
+ * @param boolean $returnReferences 是否在返回结果中包含节点引用
+ *
+ * return array
  */
 function array_to_tree(array $arr, string $fid, string $fparent = 'parent_id', string $fchildrens = 'childrens', bool $returnReferences = false): array
 {
     $pkvRefs = [];
-    $result = [];
-
     foreach ($arr as $offset => $row) {
-        $pkv = $row[$fid];
-        $pkvRefs[$pkv] =& $arr[$offset];
+        $pkvRefs[$row[$fid]] =& $arr[$offset];
     }
 
-    foreach ($pkvRefs as $parentId => &$row) {
-        if ($parentId != '' && isset($pkvRefs[$row[$fparent]])) {
-            $parent =& $pkvRefs[$row[$fparent]];
-            $parent[$fchildrens][] =& $row;
+    $tree = [];
+    foreach ($arr as $offset => $row) {
+        $parentId = $row[$fparent];
+        if ($parentId) {
+            if (!isset($pkvRefs[$parentId])) { continue; }
+            $parent =& $pkvRefs[$parentId];
+            $parent[$fchildrens][] =& $arr[$offset];
         } else {
-            $result[] =& $row;
+            $tree[] =& $arr[$offset];
         }
     }
-
-    return $result;
+    if ($returnReferences) {
+        return array('tree' => $tree, 'refs' => $pkvRefs);
+    } else {
+        return $tree;
+    }
 }
 
 /**
- * 将树形结构转换为数组
+ * 将树转换为平面的数组
  *
- * @param array &$node 树节点
- * @param string $fchildrens 子节点字段名
+ * @param array $node
+ * @param string $fchildrens
+ *
  * @return array
  */
 function tree_to_array(array &$node, string $fchildrens = 'childrens'): array
 {
-    static $counter = 0;
-
-    if (empty($node[$fchildrens])) {
-        return [];
-    }
-
-    $arr = [];
-    foreach ($node[$fchildrens] as &$child) {
-        $arr[] =& $child;
-        if (isset($child[$fchildrens]) && !empty($child[$fchildrens])) {
-            $arr = array_merge($arr, tree_to_array($child, $fchildrens));
+    $ret = [];
+    if (isset($node[$fchildrens]) && is_array($node[$fchildrens])) {
+        foreach ($node[$fchildrens] as $child) {
+            $ret = array_merge($ret, tree_to_array($child, $fchildrens));
         }
+        unset($node[$fchildrens]);
+        $ret[] = $node;
+    } else {
+        $ret[] = $node;
     }
-
-    return $arr;
+    return $ret;
 }
 
 /**
- * 按指定列对数组进行排序
+ * 根据指定的键值对数组排序
  *
- * @param array $array 数组
- * @param string $keyname 键名
+ * @param array $array 要排序的数组
+ * @param string $keyname 键值名称
  * @param int $sortDirection 排序方向
+ *
  * @return array
  */
 function array_column_sort(array $array, string $keyname, int $sortDirection = SORT_ASC): array
 {
-    $sorted = [];
-    foreach ($array as $row) {
-        $sorted[$row[$keyname]] = $row;
-    }
-
-    if ($sortDirection == SORT_ASC) {
-        ksort($sorted);
-    } else {
-        krsort($sorted);
-    }
-
-    return array_values($sorted);
+    return array_sortby_multifields($array, array($keyname => $sortDirection));
 }
 
 /**
- * 按多个字段对数组进行排序
+ * 将一个二维数组按照指定列进行排序，类似 SQL 语句中的 ORDER BY
  *
- * @param array $rowset 行集合
- * @param array $args 参数
- * @return array
+ * @param array $rowset
+ * @param array $args
  */
 function array_sortby_multifields(array $rowset, array $args): array
 {
-    if (empty($args)) {
+    // 参数验证
+    if (empty($rowset) || empty($args)) {
         return $rowset;
     }
-
-    usort($rowset, function($a, $b) use ($args) {
-        foreach ($args as $key => $value) {
-            if ($a[$key] != $b[$key]) {
-                return ($a[$key] > $b[$key]) ? $value : -$value;
-            }
+    
+    // 构建排序参数数组
+    $sortParams = [];
+    $firstRow = reset($rowset);
+    
+    // 验证字段存在性并构建排序参数
+    foreach ($args as $field => $direction) {
+        if (!is_array($firstRow) || !array_key_exists($field, $firstRow)) {
+            return $rowset;
         }
-        return 0;
-    });
-
+        
+        // 提取该字段的所有值
+        $columnValues = array_column($rowset, $field);
+        $sortParams[] = $columnValues;
+        $sortParams[] = $direction;
+    }
+    
+    // 添加主数组引用
+    $sortParams[] = &$rowset;
+    
+    // 使用 array_multisort 进行排序
+    array_multisort(...$sortParams);
+    
     return $rowset;
 }
 
@@ -996,9 +973,4 @@ function ___uri_filter()
 
     // 将 $_GET 合并到 $_REQUEST
     $_REQUEST = array_merge($_REQUEST, $_GET);
-}
-
-// 调用 URI 过滤器
-if (defined('FLEA_VERSION')) {
-    ___uri_filter();
 }

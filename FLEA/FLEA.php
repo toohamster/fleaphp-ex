@@ -25,10 +25,6 @@ define('FLEA_LOADED_TIME', microtime());
 // 定义 FleaPHP 版本号常量
 define('FLEA_VERSION', '1.7.1524');
 
-// 定义指示 PHP4 或 PHP5 的常量
-define('PHP5', true);
-define('PHP4', false);
-
 // 简写的 DIRECTORY_SEPARATOR
 define('DS', DIRECTORY_SEPARATOR);
 
@@ -781,10 +777,6 @@ class FLEA
         if (FLEA::getAppInf('logEnabled') && FLEA::getAppInf('logProvider')) {
             FLEA::loadClass(FLEA::getAppInf('logProvider'));
         }
-        if (!function_exists('log_message')) {
-            // 如果没有指定日志服务提供程序，就定义一个空的 log_message() 函数
-            function log_message() {};
-        }
 
         /**
          * 如果没有指定缓存目录，则使用默认的缓存目录
@@ -796,7 +788,10 @@ class FLEA
 
         // 根据 URL 模式设置，决定是否要载入 URL 分析过滤器
         if (FLEA::getAppInf('urlMode') != URL_STANDARD) {
-            require(FLEA_DIR . '/Filter/Uri.php');
+            // 调用 URI 过滤器
+            if (defined('FLEA_VERSION')) {
+                ___uri_filter();
+            }
         }
 
         // 处理 requestFilters
@@ -1353,9 +1348,9 @@ function __SET_EXCEPTION_HANDLER($callback)
  *
  * @package Core
  *
- * @param FLEA_Exception $ex
+ * @param \Throwable $ex
  */
-function __FLEA_EXCEPTION_HANDLER(FLEA_Exception $ex): void
+function __FLEA_EXCEPTION_HANDLER(\Throwable $ex): void
 {
     if (!FLEA::getAppInf('displayErrors')) { exit; }
     if (FLEA::getAppInf('friendlyErrorsMessage')) {
@@ -1382,10 +1377,10 @@ function __FLEA_EXCEPTION_HANDLER(FLEA_Exception $ex): void
  *
  * @package Core
  *
- * @param FLEA_Exception $ex
+ * @param \Throwable $ex
  * @param boolean $return 为 true 时返回输出信息，而不是直接显示
  */
-function print_ex(FLEA_Exception $ex, bool $return = false): ?string
+function print_ex(\Throwable $ex, bool $return = false): ?string
 {
     $out = "exception '" . get_class($ex) . "'";
     if ($ex->getMessage() != '') {
