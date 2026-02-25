@@ -89,7 +89,7 @@ return array(
     /**
      * 应用程序要使用的 url 调度器
      */
-    'dispatcher'                => '\FLEA\Dispatcher\Simple',
+    'dispatcher'                => \FLEA\Dispatcher\Simple::class,
 
     /**
      * 调度器调度失败（例如控制器或控制器方法不存在）后，要调用的处理程序
@@ -169,12 +169,12 @@ return array(
     /**
      * 初始化 Ajax 时要载入的类
      */
-    'ajaxClassName'             => '\FLEA\Ajax',
+    'ajaxClassName'             => \FLEA\Ajax::class,
 
     /**
      * 初始化 WebControls 时要载入的类
      */
-    'webControlsClassName'      => '\FLEA\WebControls',
+    'webControlsClassName'      => \FLEA\WebControls::class,
 
     /**
      * WebControls 扩展控件的保存目录
@@ -208,7 +208,7 @@ return array(
     /**
      * 指定提供多语言支持的提供程序
      */
-    'languageSupportProvider'   => '\FLEA\Language',
+    'languageSupportProvider'   => \FLEA\Language::class,
 
     /**
      * 指示语言文件的保存位置
@@ -232,7 +232,7 @@ return array(
     /**
      * 调度器要使用的验证服务提供程序
      */
-    'dispatcherAuthProvider'    => '\FLEA\Rbac',
+    'dispatcherAuthProvider'    => \FLEA\Rbac::class,
 
     /**
      * 指示 RBAC 组件要使用的默认 ACT 文件
@@ -284,7 +284,7 @@ return array(
     /**
      * 指示日志服务的程序
      */
-    'logProvider'               => '\FLEA\Log',
+    'logProvider'               => \FLEA\Log::class,
 
     /**
      * 指示用什么目录保存日志文件
@@ -335,27 +335,27 @@ return array(
     /**
      * 数据验证服务助手
      */
-    'helper.verifier'           => '\FLEA\Helper\Verifier',
+    'helper.verifier'           => \FLEA\Helper\Verifier::class,
 
     /**
      * 文件系统操作助手
      */
-    'helper.file'               => '\FLEA\Helper\SendFile',
+    'helper.file'               => \FLEA\Helper\SendFile::class,
 
     /**
      * 图像处理助手
      */
-    'helper.image'              => '\FLEA\Helper\Image',
+    'helper.image'              => \FLEA\Helper\Image::class,
 
     /**
      * 分页助手
      */
-    'helper.pager'              => '\FLEA\Helper\Pager',
+    'helper.pager'              => \FLEA\Helper\Pager::class,
 
     /**
      * 文件上传助手
      */
-    'helper.uploader'           => '\FLEA\Helper\FileUploader',
+    'helper.uploader'           => \FLEA\Helper\FileUploader::class,
 
     // }}}}
 

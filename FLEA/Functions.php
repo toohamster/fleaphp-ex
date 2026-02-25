@@ -11,6 +11,23 @@
  */
 
 /**
+ * 返回类加载器对象
+ *
+ * @return \Composer\Autoload\ClassLoader
+ */
+function class_loader()
+{
+    static $loader = null;
+    if ( is_null($loader) )
+    {
+        $loader = new \Composer\Autoload\ClassLoader();
+        $loader->register();
+    }
+
+    return $loader;
+}
+
+/**
  * 重定向浏览器到指定的 URL
  *
  * @param string $url 要重定向的 URL

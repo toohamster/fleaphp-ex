@@ -81,11 +81,11 @@ if (!defined('DEPLOY_MODE') || DEPLOY_MODE != true) {
     define('DEBUG_MODE', false);
 }
 
-if (DEBUG_MODE) {
-    error_reporting(error_reporting(0) & ~E_STRICT);
-} else {
-    error_reporting(0);
-}
+// if (DEBUG_MODE) {
+//     error_reporting(error_reporting(0) & ~E_STRICT);
+// } else {
+//     error_reporting(0);
+// }
 
 // 注意：FLEA 框架现在使用 Composer PSR-4 自动加载器
 
