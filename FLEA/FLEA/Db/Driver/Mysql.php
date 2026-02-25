@@ -38,7 +38,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
      */
     protected $pdo = null;
     /**
-     * @var PDOStatement|null
+     * @var \PDOStatement|null
      */
     protected $lastStmt = null;
     /**
@@ -85,16 +85,16 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
             }
 
             $options = [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false,
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                \PDO::ATTR_EMULATE_PREPARES => false,
             ];
 
             if (!empty($dsn['options'])) {
                 $options = array_merge($options, $dsn['options']);
             }
 
-            $this->pdo = new PDO($dsnString, $dsn['login'], $dsn['password'], $options);
+            $this->pdo = new \PDO($dsnString, $dsn['login'], $dsn['password'], $options);
 
             // Set charset explicitly for older MySQL versions
             if (!empty($charset)) {
@@ -106,7 +106,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
 
             $this->_mysqlVersion = $this->getOne('SELECT VERSION()');
 
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             $this->lasterr = $e->getMessage();
             $this->lasterrcode = $e->getCode();
             throw new \FLEA\Db\Exception\SqlQuery(
@@ -144,7 +144,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
         try {
             $this->pdo->exec("USE `{$database}`");
             return true;
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             $this->lasterr = $e->getMessage();
             $this->lasterrcode = $e->getCode();
             throw new \FLEA\Db\Exception\SqlQuery(
@@ -161,7 +161,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
      * @param string $sql
      * @param array|null $inputarr
      * @param bool $throw
-     * @return PDOStatement|false
+     * @return \PDOStatement|false
      */
     public function execute(string $sql, ?array $inputarr = null, bool $throw = true)
     {
@@ -184,7 +184,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
                 $this->lastStmt = $stmt;
                 return $stmt;
             }
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             $this->lasterr = $e->getMessage();
             $this->lasterrcode = $e->getCode();
 
@@ -262,32 +262,32 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
     /**
      * Fetch row as indexed array
      *
-     * @param PDOStatement $res
+     * @param \PDOStatement $res
      * @return array|null
      */
-    public function fetchRow(PDOStatement $res): ?array
+    public function fetchRow(\PDOStatement $res): ?array
     {
-        return $res->fetch(PDO::FETCH_NUM);
+        return $res->fetch(\PDO::FETCH_NUM);
     }
 
     /**
      * Fetch row as associative array
      *
-     * @param PDOStatement $res
+     * @param \PDOStatement $res
      * @return array|null
      */
-    public function fetchAssoc(PDOStatement $res): ?array
+    public function fetchAssoc(\PDOStatement $res): ?array
     {
-        return $res->fetch(PDO::FETCH_ASSOC);
+        return $res->fetch(\PDO::FETCH_ASSOC);
     }
 
     /**
      * Free result
      *
-     * @param PDOStatement $res
+     * @param \PDOStatement $res
      * @return bool
      */
-    public function freeRes(PDOStatement $res): bool
+    public function freeRes(\PDOStatement $res): bool
     {
         return true; // PDO statements are automatically freed
     }
@@ -298,7 +298,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
      * @param string $sql
      * @param int|null $length
      * @param int|null $offset
-     * @return PDOStatement|false
+     * @return \PDOStatement|false
      * @throws \FLEA\Db\Exception\SqlQuery
      */
     public function selectLimit(string $sql, ?int $length = null, ?int $offset = null)

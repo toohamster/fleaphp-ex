@@ -2,9 +2,6 @@
 
 namespace FLEA\Db;
 
-
-use FLEA;
-
 /**
  * 定义 \FLEA\Db\TableDataGateway 类
  *

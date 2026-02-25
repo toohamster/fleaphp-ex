@@ -37,7 +37,7 @@ class Mysqlt extends \FLEA\Db\Driver\Mysql
     {
         try {
             return $this->pdo->beginTransaction() !== false;
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             return false;
         }
     }
@@ -56,7 +56,7 @@ class Mysqlt extends \FLEA\Db\Driver\Mysql
             } else {
                 return $this->pdo->rollBack() !== false;
             }
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             return false;
         }
     }

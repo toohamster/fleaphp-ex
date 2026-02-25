@@ -127,10 +127,10 @@ class Sqlitepdo
 		if ( file_exists( $dsn['db'] ) )
 		{
 			try{
-			$this->conn = new PDO( 'sqlite2:' . $dsn['db'] ); //链接sqlite2
-			} catch (PDOException $e) {
+			$this->conn = new \PDO( 'sqlite2:' . $dsn['db'] ); //链接sqlite2
+			} catch (\PDOException $e) {
 			}
-			if ( !$this->conn ) $this->conn = new PDO( 'sqlite:' . $dsn['db'] ); //失败后尝试sqlite3
+			if ( !$this->conn ) $this->conn = new \PDO( 'sqlite:' . $dsn['db'] ); //失败后尝试sqlite3
 			
 			if ( is_object( $this->conn ) )
 			{
@@ -413,10 +413,10 @@ class Sqlitepdo
 	/**
 	 * 从记录集中返回一行数据
 	 *
-	 * @param PDOStatement $res
+	 * @param \PDOStatement $res
 	 * @return array
 	 */
-	public function fetchRow(PDOStatement $res): ?array
+	public function fetchRow(\PDOStatement $res): ?array
 	{
 		$row = $res->fetch();
 		$temp = [];
@@ -431,12 +431,12 @@ class Sqlitepdo
 	/**
 	 * 从记录集中返回一行数据，字段名作为键名
 	 *
-	 * @param PDOStatement $res
+	 * @param \PDOStatement $res
 	 * @return array
 	 */
-	public function fetchAssoc(PDOStatement $res): ?array
+	public function fetchAssoc(\PDOStatement $res): ?array
 	{
-		$row = $res->fetch( PDO::FETCH_ASSOC );
+		$row = $res->fetch( \PDO::FETCH_ASSOC );
 		$temp = [];
 		foreach( $row as $key => $value )
 		{
@@ -449,10 +449,10 @@ class Sqlitepdo
 	/**
 	 * 释放查询句柄
 	 *
-	 * @param PDOStatement $res
+	 * @param \PDOStatement $res
 	 * @return boolean
 	 */
-	public function freeRes(PDOStatement $res): bool
+	public function freeRes(\PDOStatement $res): bool
 	{
 		// return sqlite_free_result($res);
 		return true; //sqlite 没有这样的函数
@@ -503,7 +503,7 @@ class Sqlitepdo
 			$res = $this->execute( $sql );
 		}
 		$data = [];
-		while ( $row = $res->fetch( PDO::FETCH_ASSOC ) )
+		while ( $row = $res->fetch( \PDO::FETCH_ASSOC ) )
 		{
 			$temp = [];
 			foreach( $row as $key => $value )
@@ -538,7 +538,7 @@ class Sqlitepdo
 		}
 		$data = [];
 
-		$row = $res->fetch( PDO::FETCH_ASSOC );
+		$row = $res->fetch( \PDO::FETCH_ASSOC );
 		if ( $row != false )
 		{
 			$temp = [];
@@ -558,7 +558,7 @@ class Sqlitepdo
 				unset( $row[$groupBy] );
 				$data[$rkv][] = $row;
 			}
-			while ( $row = $res->fetch( PDO::FETCH_ASSOC ) );
+			while ( $row = $res->fetch( \PDO::FETCH_ASSOC ) );
 		}
 		return $data;
 	}
@@ -587,7 +587,7 @@ class Sqlitepdo
 		$reference = [];
 		$offset = 0;
 		$data = [];
-		while ( $row = $res->fetch( PDO::FETCH_ASSOC ) )
+		while ( $row = $res->fetch( \PDO::FETCH_ASSOC ) )
 		{
 			$temp = [];
 			foreach( $row as $key => $value )
@@ -646,7 +646,7 @@ class Sqlitepdo
 		if ( $oneToOne )
 		{
 			// 一对一组装数据
-			while ( $row = $res->fetch( PDO::FETCH_ASSOC ) )
+			while ( $row = $res->fetch( \PDO::FETCH_ASSOC ) )
 			{
 				$temp = [];
 				foreach( $row as $key => $value )
@@ -663,7 +663,7 @@ class Sqlitepdo
 		else
 		{
 			// 一对多组装数据
-			while ( $row = $res->fetch( PDO::FETCH_ASSOC ) )
+			while ( $row = $res->fetch( \PDO::FETCH_ASSOC ) )
 			{
 				$rkv = $row[$refKeyName];
 				unset( $row[$refKeyName] );
@@ -694,7 +694,7 @@ class Sqlitepdo
 		{
 			$res = $this->execute( $sql );
 		}
-		$row = $res->fetch( PDO::FETCH_NUM );
+		$row = $res->fetch( \PDO::FETCH_NUM );
 		// sqlite_free_result($res);
 		return isset( $row[0] ) ? $row[0] : null;
 	}
@@ -715,7 +715,7 @@ class Sqlitepdo
 		{
 			$res = $this->execute( $sql );
 		}
-		$row = $res->fetch( PDO::FETCH_ASSOC );
+		$row = $res->fetch( \PDO::FETCH_ASSOC );
 		$temp = [];
 		foreach( $row as $key => $value )
 		{
@@ -743,7 +743,7 @@ class Sqlitepdo
 			$res = $this->execute( $sql );
 		}
 		$data = [];
-		while ( $row = $res->fetch( PDO::FETCH_NUM ) )
+		while ( $row = $res->fetch( \PDO::FETCH_NUM ) )
 		{
 			$data[] = $row[$col];
 		}
@@ -832,7 +832,7 @@ I 整数
 			return false;
 		}
 		$retarr = [];
-		$sql = $rs->fetch( PDO::FETCH_NUM );
+		$sql = $rs->fetch( \PDO::FETCH_NUM );
 		$sql = $sql[0];
 		$firstPar = strpos( $sql, '(' );
 		$endPar = strrpos( $sql, ')' )-1;
@@ -843,7 +843,7 @@ I 整数
 		// get index key
 		$sql = "select sql from sqlite_master where type='index' and tbl_name='$table'";
 		$rs = $this->execute( $sql );
-		$sql = $rs->fetch( PDO::FETCH_NUM );
+		$sql = $rs->fetch( \PDO::FETCH_NUM );
 		$sql = $sql[0];
 		$firstPar = strpos( $sql, '(' );
 		$endPar = strrpos( $sql, ')' )-1;
@@ -945,7 +945,7 @@ I 整数
 		try{
 		$this->conn->rollBack();
 		}
-		catch(PDOException $e)
+		catch(\PDOException $e)
 		{}
 		$this->conn->beginTransaction();
 	}

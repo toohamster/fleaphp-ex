@@ -398,7 +398,7 @@ abstract class AbstractDriver
      *
      * @return array
      */
-    abstract public function fetchRow(PDOStatement $res): ?array;
+    abstract public function fetchRow(\PDOStatement $res): ?array;
 
     /**
      * 从记录集中返回一行数据，字段名作为键名
@@ -407,7 +407,7 @@ abstract class AbstractDriver
      *
      * @return array
      */
-    abstract public function fetchAssoc(PDOStatement $res): ?array;
+    abstract public function fetchAssoc(\PDOStatement $res): ?array;
 
     /**
      * 释放查询句柄
@@ -416,7 +416,7 @@ abstract class AbstractDriver
      *
      * @return boolean
      */
-    abstract public function freeRes(PDOStatement $res): bool;
+    abstract public function freeRes(\PDOStatement $res): bool;
 
     /**
      * 进行限定记录集的查询
