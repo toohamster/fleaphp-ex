@@ -1,8 +1,10 @@
 <?php
 
+namespace FLEA\Db\Driver;
+
 
 /**
- * 定义 FLEA_Db_Driver_Mysql 驱动
+ * 定义 \FLEA\Db\Driver\Mysql 驱动
  *
  * @author toohamster
  * @package Core
@@ -18,29 +20,29 @@
  * @author toohamster
  * @version 2.0
  */
-class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
+class Mysql extends \FLEA\Db\Driver\AbstractDriver
 {
     /**
      * @var string
      */
-    public $NEXT_ID_SQL    = 'UPDATE %s SET id = LAST_INSERT_ID(id + 1)';
+    public $NEXT_ID_SQL = 'UPDATE %s SET id = LAST_INSERT_ID(id + 1)';
     public $CREATE_SEQ_SQL = 'CREATE TABLE %s (id INT NOT NULL)';
-    public $INIT_SEQ_SQL   = 'INSERT INTO %s VALUES (%s)';
-    public $DROP_SEQ_SQL   = 'DROP TABLE %s';
+    public $INIT_SEQ_SQL = 'INSERT INTO %s VALUES (%s)';
+    public $DROP_SEQ_SQL = 'DROP TABLE %s';
     public $META_COLUMNS_SQL = 'SHOW FULL COLUMNS FROM %s';
     public $PARAM_STYLE = DBO_PARAM_QM;
-    public $HAS_INSERT_ID  = true;
+    public $HAS_INSERT_ID = true;
     public $HAS_AFFECTED_ROWS = true;
     /**
-     * @var PDO|null
+     * @var \PDO
      */
     protected $pdo = null;
     /**
-     * @var PDOStatement|null
+     * @var \PDOStatement
      */
     protected $lastStmt = null;
     /**
-     * @var string|null
+     * @var string
      */
     protected $_mysqlVersion = null;
 
@@ -49,14 +51,16 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
      *
      * @param array|false $dsn
      * @return bool
-     * @throws FLEA_Db_Exception_SqlQuery
+     * @throws \FLEA\Db\Exception\SqlQuery
      */
     public function connect($dsn = false): bool
     {
         $this->lasterr = null;
         $this->lasterrcode = null;
 
-        if ($this->pdo && $dsn == false) { return true; }
+        if ($this->pdo && $dsn == false) {
+            return true;
+        }
         if (!$dsn) {
             $dsn = $this->dsn;
         } else {
@@ -68,11 +72,15 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
         } else {
             $host = $dsn['host'];
         }
-        if (!isset($dsn['login'])) { $dsn['login'] = ''; }
-        if (!isset($dsn['password'])) { $dsn['password'] = ''; }
+        if (!isset($dsn['login'])) {
+            $dsn['login'] = '';
+        }
+        if (!isset($dsn['password'])) {
+            $dsn['password'] = '';
+        }
 
         try {
-            $charset = isset($dsn['charset']) && $dsn['charset'] != '' ? $dsn['charset'] : FLEA::getAppInf('databaseCharset');
+            $charset = isset($dsn['charset']) && $dsn['charset'] != '' ? $dsn['charset'] : \FLEA::getAppInf('databaseCharset');
 
             $dsnString = "mysql:host={$host}";
             if (!empty($dsn['database'])) {
@@ -83,16 +91,16 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
             }
 
             $options = [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false,
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                \PDO::ATTR_EMULATE_PREPARES => false,
             ];
 
             if (!empty($dsn['options'])) {
                 $options = array_merge($options, $dsn['options']);
             }
 
-            $this->pdo = new PDO($dsnString, $dsn['login'], $dsn['password'], $options);
+            $this->pdo = new \PDO($dsnString, $dsn['login'], $dsn['password'], $options);
 
             // Set charset explicitly for older MySQL versions
             if (!empty($charset)) {
@@ -102,12 +110,12 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
             // Store connection in conn for compatibility
             $this->conn = $this->pdo;
 
-            $this->_mysqlVersion = $this->getOne('SELECT VERSION()');
+            $this->_mysqlVersion = $this->getOne(sql_statement('SELECT VERSION()'));
 
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             $this->lasterr = $e->getMessage();
             $this->lasterrcode = $e->getCode();
-            throw new FLEA_Db_Exception_SqlQuery(
+            throw new \FLEA\Db\Exception\SqlQuery(
                 "PDO Connection failed for host '{$host}'!",
                 $this->lasterr,
                 $this->lasterrcode
@@ -135,17 +143,17 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
      *
      * @param string $database
      * @return bool
-     * @throws FLEA_Db_Exception_SqlQuery
+     * @throws \FLEA\Db\Exception\SqlQuery
      */
     public function selectDb(string $database): bool
     {
         try {
             $this->pdo->exec("USE `{$database}`");
             return true;
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             $this->lasterr = $e->getMessage();
             $this->lasterrcode = $e->getCode();
-            throw new FLEA_Db_Exception_SqlQuery(
+            throw new \FLEA\Db\Exception\SqlQuery(
                 "SELECT DATABASE: '{$database}' FAILED!",
                 $this->lasterr,
                 $this->lasterrcode
@@ -156,55 +164,67 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
     /**
      * Execute SQL query
      *
-     * @param string $sql
+     * @param \FLEA\Db\SqlStatement $sql
      * @param array|null $inputarr
      * @param bool $throw
-     * @return PDOStatement|false
+     * @return \FLEA\Db\SqlStatement
      */
-    public function execute(string $sql, ?array $inputarr = null, bool $throw = true)
+    public function execute(\FLEA\Db\SqlStatement $sql, ?array $inputarr = null, bool $throw = true): \FLEA\Db\SqlStatement
     {
+        // 如果已经是 PDOStatement 对象,直接返回
+        if ($sql->isResource()) {
+            return $sql;
+        }
+
+        $sqlStr = $sql->getSql();
         if (is_array($inputarr)) {
-            $sql = $this->bind($sql, $inputarr);
+            $sqlStr = $this->bind($sqlStr, $inputarr);
         }
 
         if ($this->enableLog) {
-            $this->log[] = $sql;
-            log_message("sql: {$sql}", 'debug');
+            $this->log[] = $sqlStr;
+            log_message("sql: {$sqlStr}", 'debug');
         }
 
         $this->querycount++;
 
         try {
-            $stmt = $this->pdo->query($sql);
+            $stmt = $this->pdo->query($sqlStr);
             if ($stmt !== false) {
                 $this->lasterr = null;
                 $this->lasterrcode = null;
                 $this->lastStmt = $stmt;
-                return $stmt;
+                return \FLEA\Db\SqlStatement::create($stmt);
             }
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             $this->lasterr = $e->getMessage();
             $this->lasterrcode = $e->getCode();
 
             if ($throw) {
-                throw new FLEA_Db_Exception_SqlQuery($sql, $this->lasterr, $this->lasterrcode);
+                throw new \FLEA\Db\Exception\SqlQuery($sqlStr, $this->lasterr, $this->lasterrcode);
             }
         }
 
-        return false;
+        return $sql;
     }
 
     /**
      * Quote string for safe SQL usage
      *
      * @param mixed $value
-     * @return string|int|float
+     * @return mixed
      */
     public function qstr($value)
     {
-        if (is_int($value) || is_float($value)) { return $value; }
-        if (is_bool($value)) { return $value ? $this->TRUE_VALUE : $this->FALSE_VALUE; }
-        if (is_null($value)) { return $this->NULL_VALUE; }
+        if (is_int($value) || is_float($value)) {
+            return $value;
+        }
+        if (is_bool($value)) {
+            return $value ? $this->TRUE_VALUE : $this->FALSE_VALUE;
+        }
+        if (is_null($value)) {
+            return $this->NULL_VALUE;
+        }
         return $this->pdo->quote($value);
     }
 
@@ -260,32 +280,32 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
     /**
      * Fetch row as indexed array
      *
-     * @param PDOStatement $res
-     * @return array|false
+     * @param \PDOStatement $res
+     * @return array|null
      */
-    public function fetchRow(PDOStatement $res)
+    public function fetchRow(\PDOStatement $res): ?array
     {
-        return $res->fetch(PDO::FETCH_NUM);
+        return $res->fetch(\PDO::FETCH_NUM);
     }
 
     /**
      * Fetch row as associative array
      *
-     * @param PDOStatement $res
-     * @return array|false
+     * @param \PDOStatement $res
+     * @return array|null
      */
-    public function fetchAssoc(PDOStatement $res)
+    public function fetchAssoc(\PDOStatement $res): ?array
     {
-        return $res->fetch(PDO::FETCH_ASSOC);
+        return $res->fetch(\PDO::FETCH_ASSOC) ?: null;
     }
 
     /**
      * Free result
      *
-     * @param PDOStatement $res
+     * @param \PDOStatement $res
      * @return bool
      */
-    public function freeRes(PDOStatement $res): bool
+    public function freeRes(\PDOStatement $res): bool
     {
         return true; // PDO statements are automatically freed
     }
@@ -296,10 +316,10 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
      * @param string $sql
      * @param int|null $length
      * @param int|null $offset
-     * @return PDOStatement|false
-     * @throws FLEA_Db_Exception_SqlQuery
+     * @return \FLEA\Db\SqlStatement
+     * @throws \FLEA\Db\Exception\SqlQuery
      */
-    public function selectLimit(string $sql, ?int $length = null, ?int $offset = null)
+    public function selectLimit(string $sql, ?int $length = null, ?int $offset = null): \FLEA\Db\SqlStatement
     {
         if (!is_null($offset)) {
             $sql .= " LIMIT " . (int)$offset;
@@ -311,7 +331,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
         } elseif (!is_null($length)) {
             $sql .= " LIMIT " . (int)$length;
         }
-        return $this->execute($sql);
+        return $this->execute(\FLEA\Db\SqlStatement::create($sql));
     }
 
     /**
@@ -319,7 +339,7 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
      *
      * @param string $table
      * @return array|false
-     * @throws FLEA_Db_Exception_SqlQuery
+     * @throws \FLEA\Db\Exception\SqlQuery
      */
     public function metaColumns(string $table)
     {
@@ -335,47 +355,50 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
          *  R 自动增量或计数器
          */
         static $typeMap = array(
-            'BIT'           => 'I',
-            'TINYINT'       => 'I',
-            'BOOL'          => 'L',
-            'BOOLEAN'       => 'L',
-            'SMALLINT'      => 'I',
-            'MEDIUMINT'     => 'I',
-            'INT'           => 'I',
-            'INTEGER'       => 'I',
-            'BIGINT'        => 'I',
-            'FLOAT'         => 'N',
-            'DOUBLE'        => 'N',
+            'BIT' => 'I',
+            'TINYINT' => 'I',
+            'BOOL' => 'L',
+            'BOOLEAN' => 'L',
+            'SMALLINT' => 'I',
+            'MEDIUMINT' => 'I',
+            'INT' => 'I',
+            'INTEGER' => 'I',
+            'BIGINT' => 'I',
+            'FLOAT' => 'N',
+            'DOUBLE' => 'N',
             'DOUBLEPRECISION' => 'N',
-            'DECIMAL'       => 'N',
-            'DEC'           => 'N',
+            'DECIMAL' => 'N',
+            'DEC' => 'N',
 
-            'DATE'          => 'D',
-            'DATETIME'      => 'T',
-            'TIMESTAMP'     => 'T',
-            'TIME'          => 'T',
-            'YEAR'          => 'I',
+            'DATE' => 'D',
+            'DATETIME' => 'T',
+            'TIMESTAMP' => 'T',
+            'TIME' => 'T',
+            'YEAR' => 'I',
 
-            'CHAR'          => 'C',
-            'NCHAR'         => 'C',
-            'VARCHAR'       => 'C',
-            'NVARCHAR'      => 'C',
-            'BINARY'        => 'B',
-            'VARBINARY'     => 'B',
-            'TINYBLOB'      => 'X',
-            'TINYTEXT'      => 'X',
-            'BLOB'          => 'X',
-            'TEXT'          => 'X',
-            'MEDIUMBLOB'    => 'X',
-            'MEDIUMTEXT'    => 'X',
-            'LONGBLOB'      => 'X',
-            'LONGTEXT'      => 'X',
-            'ENUM'          => 'C',
-            'SET'           => 'C',
+            'CHAR' => 'C',
+            'NCHAR' => 'C',
+            'VARCHAR' => 'C',
+            'NVARCHAR' => 'C',
+            'BINARY' => 'B',
+            'VARBINARY' => 'B',
+            'TINYBLOB' => 'X',
+            'TINYTEXT' => 'X',
+            'BLOB' => 'X',
+            'TEXT' => 'X',
+            'MEDIUMBLOB' => 'X',
+            'MEDIUMTEXT' => 'X',
+            'LONGBLOB' => 'X',
+            'LONGTEXT' => 'X',
+            'ENUM' => 'C',
+            'SET' => 'C',
         );
 
-        $rs = $this->execute(sprintf($this->META_COLUMNS_SQL, $table));
-        if (!$rs) { return false; }
+        $rs = $this->execute(\FLEA\Db\SqlStatement::create(sprintf($this->META_COLUMNS_SQL, $table)));
+        $rs = $rs->getSql();
+        if (!$rs) {
+            return false;
+        }
         $retarr = [];
         while (($row = $this->fetchAssoc($rs))) {
             $field = [];
@@ -406,9 +429,11 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
             $field['notNull'] = ($row['Null'] != 'YES');
             $field['primaryKey'] = ($row['Key'] == 'PRI');
             $field['autoIncrement'] = (strpos($row['Extra'], 'auto_increment') !== false);
-            if ($field['autoIncrement']) { $field['simpleType'] = 'R'; }
-            $field['binary'] = (strpos($type,'blob') !== false);
-            $field['unsigned'] = (strpos($type,'unsigned') !== false);
+            if ($field['autoIncrement']) {
+                $field['simpleType'] = 'R';
+            }
+            $field['binary'] = (strpos($type, 'blob') !== false);
+            $field['unsigned'] = (strpos($type, 'unsigned') !== false);
 
             if ($field['type'] == 'tinyint' && $field['maxLength'] == 1) {
                 $field['simpleType'] = 'L';
@@ -449,7 +474,8 @@ class FLEA_Db_Driver_Mysql extends FLEA_Db_Driver_Abstract
         if (!empty($pattern)) {
             $sql .= ' LIKE ' . $this->qstr($schema);
         }
-        $res = $this->execute($sql, null, false);
+        $res = $this->execute(\FLEA\Db\SqlStatement::create($sql), null, false);
+        $res = $res->getSql();
         $tables = [];
         while (($row = $this->fetchRow($res))) {
             $tables[] = reset($row);

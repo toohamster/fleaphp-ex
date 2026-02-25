@@ -1,8 +1,10 @@
 <?php
 
+namespace FLEA\View;
+
 
 /**
- * 定义 FLEA_View_Simple 类
+ * 定义 \FLEA\View\Simple 类
  *
  * @author toohamster
  * @package Core
@@ -10,21 +12,21 @@
  */
 
 /**
- * FLEA_View_Simple 实现了一个简单的、使用 PHP 自身作为模版语言，
+ * \FLEA\View\Simple 实现了一个简单的、使用 PHP 自身作为模版语言，
  * 带有缓存功能的模版引擎
  *
  * @package Core
  * @author toohamster
  * @version 1.0
  */
-class FLEA_View_Simple
+class Simple
 {
     /**
      * 模板文件所在路径
      *
      * @var string
      */
-    public $path;
+    public $templateDir;
 
     /**
      * 缓存过期时间
@@ -71,18 +73,18 @@ class FLEA_View_Simple
      *
      * @param string $path 模板文件所在路径
      *
-     * @return FLEA_View_Simple
+     * @return \FLEA\View\Simple
      */
-    public function __construct(?string $path = null)
+    public function __construct(?string $templateDir = null)
     {
-        log_message('Construction FLEA_View_Simple', 'debug');
+        log_message('Construction \FLEA\View\Simple', 'debug');
 
-        $this->path = $path;
+        $this->templateDir = $templateDir;
         $this->cacheLifetime = 900;
         $this->enableCache = true;
         $this->cacheDir = './cache';
 
-        $viewConfig = (array)FLEA::getAppInf('viewConfig');
+        $viewConfig = (array)\FLEA::getAppInf('viewConfig');
         $keys = array(
             'templateDir', 'cacheDir', 'cacheLifeTime', 'enableCache',
         );
@@ -131,7 +133,7 @@ class FLEA_View_Simple
         extract($this->vars);
         ob_start();
 
-        include($this->path . DIRECTORY_SEPARATOR . $file);
+        include($this->templateDir . DIRECTORY_SEPARATOR . $file);
         $contents = ob_get_contents();
         ob_end_clean();
 

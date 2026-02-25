@@ -9,12 +9,14 @@
  * @package Core
  * @version 1.0
  */
-class FLEA_Config
+namespace FLEA;
+
+class Config
 {
     /**
      * 单例实例
      *
-     * @var FLEA_Config
+     * @var Config
      */
     private static $_instance = null;
 
@@ -40,45 +42,21 @@ class FLEA_Config
     public $dbo = [];
 
     /**
-     * 类文件搜索路径
-     *
-     * @var array
-     */
-    public $classPath = [];
-
-    /**
-     * 异常堆栈
-     *
-     * @var array
-     */
-    public $exceptionStack = [];
-
-    /**
-     * 异常处理器
-     *
-     * @var callable|null
-     */
-    public $exceptionHandler = null;
-
-    /**
      * 私有构造函数，防止外部实例化
      */
     private function __construct()
     {
-        $this->classPath = [];
         $this->appInf = [];
         $this->objects = [];
         $this->dbo = [];
-        $this->exceptionStack = [];
-        $this->exceptionHandler = null;
     }
 
     /**
      * 获取单例实例
      *
-     * @return FLEA_Config
+     * @return Config
      */
-    public static function getInstance()
+    public static function getInstance(): self
     {
         if (self::$_instance === null) {
             self::$_instance = new self();
@@ -168,13 +146,13 @@ class FLEA_Config
      * @param object $obj 对象实例
      * @param string|null $name 对象名称，默认使用类名
      * @return object
-     * @throws FLEA_Exception_ExistsKeyName 如果对象名称已存在
-     * @throws FLEA_Exception_TypeMismatch 如果参数不是对象
+     * @throws \FLEA\Exception\ExistsKeyName 如果对象名称已存在
+     * @throws \FLEA\Exception\TypeMismatch 如果参数不是对象
      */
-    public function registerObject(object $obj, ?string $name = null): object
+    public function registerObject($obj, ?string $name = null)
     {
         if (!is_object($obj)) {
-            throw new FLEA_Exception_TypeMismatch($obj, 'object', gettype($obj));
+            throw new \FLEA\Exception\TypeMismatch($obj, 'object', gettype($obj));
         }
 
         if (is_null($name)) {
@@ -182,7 +160,7 @@ class FLEA_Config
         }
 
         if (isset($this->objects[$name])) {
-            throw new FLEA_Exception_ExistsKeyName($name);
+            throw new \FLEA\Exception\ExistsKeyName($name);
         }
 
         $this->objects[$name] = $obj;
@@ -194,7 +172,7 @@ class FLEA_Config
      *
      * @param string|null $name 对象名称，为 null 时返回所有对象
      * @return object|array|null
-     * @throws FLEA_Exception_NotExistsKeyName 当对象不存在时
+     * @throws Exception\NotExistsKeyName 当对象不存在时
      */
     public function getRegistry(?string $name = null)
     {
@@ -204,7 +182,7 @@ class FLEA_Config
         if (isset($this->objects[$name]) && is_object($this->objects[$name])) {
             return $this->objects[$name];
         }
-        throw new FLEA_Exception_ExistsKeyName("Object with name '{$name}' already exists");
+        throw new \FLEA\Exception\NotExistsKeyName($name);
     }
 
     /**
@@ -250,105 +228,6 @@ class FLEA_Config
     public function hasDbo(string $dsnid): bool
     {
         return isset($this->dbo[$dsnid]);
-    }
-
-    /**
-     * 添加类文件搜索路径
-     *
-     * @param string $dir 目录路径
-     * @return void
-     */
-    public function addClassPath(string $dir): void
-    {
-        if (array_search($dir, $this->classPath, true)) {
-            return;
-        }
-        if (DIRECTORY_SEPARATOR == '/') {
-            $dir = str_replace('\\', DIRECTORY_SEPARATOR, $dir);
-        } else {
-            $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
-        }
-        $this->classPath[] = $dir;
-    }
-
-    /**
-     * 获取类文件搜索路径
-     *
-     * @return array
-     */
-    public function getClassPath(): array
-    {
-        return $this->classPath;
-    }
-
-    /**
-     * 获取异常处理器
-     *
-     * @return callable|null
-     */
-    public function getExceptionHandler(): ?callable
-    {
-        return $this->exceptionHandler;
-    }
-
-    /**
-     * 设置异常处理器
-     *
-     * @param callable $callback 异常处理回调函数
-     * @return callable|null 返回之前的异常处理器
-     */
-    public function setExceptionHandler($callback): ?callable
-    {
-        $current = $this->exceptionHandler;
-        $this->exceptionHandler = $callback;
-        return $current;
-    }
-
-    /**
-     * 推入异常到堆栈
-     *
-     * @param mixed $exception 异常对象或点标记
-     * @return void
-     */
-    public function pushException($exception): void
-    {
-        if (!is_array($this->exceptionStack)) {
-            $this->exceptionStack = [];
-        }
-        array_push($this->exceptionStack, $exception);
-    }
-
-    /**
-     * 从堆栈弹出异常
-     *
-     * @return mixed
-     */
-    public function popException()
-    {
-        if (!is_array($this->exceptionStack)) {
-            return null;
-        }
-        return array_pop($this->exceptionStack);
-    }
-
-    /**
-     * 获取异常堆栈
-     *
-     * @return array
-     */
-    public function getExceptionStack(): array
-    {
-        return $this->exceptionStack;
-    }
-
-    /**
-     * 检查异常堆栈是否为空
-     *
-     * @return bool
-     */
-    public function hasExceptionStack(): bool
-    {
-        return is_array($this->exceptionStack);
     }
 
     /**

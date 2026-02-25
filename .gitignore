@@ -5,11 +5,17 @@
 .idea/
 .git/
 runtime/
+cache/
 uploads/
 .phpintel/
 .env
+.log
 .DS_Store
 .phpunit*
 *.cache
 .phpstorm.meta.php
 .vscode/
+
+# Composer
+vendor/
+composer.phar

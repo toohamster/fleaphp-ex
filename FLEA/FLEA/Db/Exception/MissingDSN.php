@@ -1,8 +1,10 @@
 <?php
 
+namespace FLEA\Db\Exception;
+
 
 /**
- * 定义 FLEA_Db_Exception_MissingDSN 异常
+ * 定义 \FLEA\Db\Exception\MissingDSN 异常
  *
  * @author toohamster
  * @package Exception
@@ -10,18 +12,18 @@
  */
 
 /**
- * FLEA_Db_Exception_MissingDSN 异常指示没有提供连接数据库需要的 dbDSN 应用程序设置
+ * \FLEA\Db\Exception\MissingDSN 异常指示没有提供连接数据库需要的 dbDSN 应用程序设置
  *
  * @package Exception
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Db_Exception_MissingDSN extends FLEA_Exception
+class MissingDSN extends \FLEA\Exception
 {
     /**
      * 构造函数
      *
-     * @return FLEA_Db_Exception_MissingDSN
+     * @return \FLEA\Db\Exception\MissingDSN
      */
     function __construct()
     {

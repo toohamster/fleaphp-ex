@@ -1,8 +1,10 @@
 <?php
 
+namespace FLEA\Session;
+
 
 /**
- * 定义 FLEA_Session_Db 类
+ * 定义 \FLEA\Session\Db 类
  *
  * @author toohamster
  * @package Core
@@ -10,9 +12,9 @@
  */
 
 /**
- * FLEA_Session_Db 类提供将 session 保存到数据库的能力
+ * \FLEA\Session\Db 类提供将 session 保存到数据库的能力
  *
- * 要使用 FLEA_Session_Db，必须完成下列准备工作：
+ * 要使用 \FLEA\Session\Db，必须完成下列准备工作：
  *
  * - 创建需要的数据表
  *
@@ -21,18 +23,18 @@
  *     sess_data   text            存储 session 数据
  *     activity    int(11)         该 session 最后一次读取/写入时间
  *
- * - 修改应用程序设置 sessionProvider 为 FLEA_Session_Db
+ * - 修改应用程序设置 sessionProvider 为 \FLEA\Session\Db
  *
  * @package Core
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Session_Db
+class Db
 {
     /**
      * 数据库访问对象
      *
-     * @var FLEA_Db_Driver_Abstract
+     * @var \FLEA\Db\Driver\AbstractDriver
      */
     public $dbo = null;
 
@@ -76,23 +78,23 @@ class FLEA_Session_Db
     /**
      * 构造函数
      *
-     * @return FLEA_Session_Db
+     * @return \FLEA\Session\Db
      */
     public function __construct()
     {
-        $this->tableName = FLEA::getAppInf('sessionDbTableName');
-        $this->fieldId = FLEA::getAppInf('sessionDbFieldId');
-        $this->fieldData = FLEA::getAppInf('sessionDbFieldData');
-        $this->fieldActivity = FLEA::getAppInf('sessionDbFieldActivity');
-        $this->lifeTime = (int)FLEA::getAppInf('sessionDbLifeTime');
+        $this->tableName = \FLEA::getAppInf('sessionDbTableName');
+        $this->fieldId = \FLEA::getAppInf('sessionDbFieldId');
+        $this->fieldData = \FLEA::getAppInf('sessionDbFieldData');
+        $this->fieldActivity = \FLEA::getAppInf('sessionDbFieldActivity');
+        $this->lifeTime = (int)\FLEA::getAppInf('sessionDbLifeTime');
 
         session_set_save_handler(
-            array(& $this, 'sessionOpen'),
-            array(& $this, 'sessionClose'),
-            array(& $this, 'sessionRead'),
-            array(& $this, 'sessionWrite'),
-            array(& $this, 'sessionDestroy'),
-            array(& $this, 'sessionGc')
+            array($this, 'sessionOpen'),
+            array($this, 'sessionClose'),
+            array($this, 'sessionRead'),
+            array($this, 'sessionWrite'),
+            array($this, 'sessionDestroy'),
+            array($this, 'sessionGc')
         );
     }
 
@@ -114,9 +116,9 @@ class FLEA_Session_Db
      */
     public function sessionOpen(string $savePath, string $sessionName): bool
     {
-        $dsnName = FLEA::getAppInf('sessionDbDSN');
-        $dsn = FLEA::getAppInf($dsnName);
-        $this->dbo =& FLEA::getDBO($dsn);
+        $dsnName = \FLEA::getAppInf('sessionDbDSN');
+        $dsn = \FLEA::getAppInf($dsnName);
+        $this->dbo = \FLEA::getDBO($dsn);
         if (!$this->dbo) { return false; }
 
         if (!empty($this->dbo->dsn['prefix'])) {
@@ -127,7 +129,7 @@ class FLEA_Session_Db
         $this->fieldData = $this->dbo->qfield($this->fieldData);
         $this->fieldActivity = $this->dbo->qfield($this->fieldActivity);
 
-        $this->sessionGc(FLEA::getAppInf('sessionDbLifeTime'));
+        $this->sessionGc(\FLEA::getAppInf('sessionDbLifeTime'));
 
         return true;
     }
@@ -158,7 +160,7 @@ class FLEA_Session_Db
             $sql .= " AND {$this->fieldActivity} >= {$time}";
         }
 
-        return $this->dbo->getOne($sql);
+        return $this->dbo->getOne(sql_statement($sql));
     }
 
     /**
@@ -177,7 +179,7 @@ class FLEA_Session_Db
         $activity = time();
 
         $fields = (array)$this->_beforeWrite($sessid);
-        if ((int)$this->dbo->getOne($sql) > 0) {
+        if ((int)$this->dbo->getOne(sql_statement($sql)) > 0) {
             $sql = "UPDATE {$this->tableName} SET {$this->fieldData} = {$data}, {$this->fieldActivity} = {$activity}";
             if (!empty($fields)) {
                 $arr = [];
@@ -200,7 +202,7 @@ class FLEA_Session_Db
             $sql = "INSERT INTO {$this->tableName} ({$this->fieldId}, {$this->fieldData}, {$this->fieldActivity}{$extraFields}) VALUES ({$sessid}, {$data}, {$activity}{$extraValues})";
         }
 
-        $this->dbo->execute($sql);
+        $this->dbo->execute(sql_statement($sql));
         return true;
     }
 
@@ -215,7 +217,7 @@ class FLEA_Session_Db
     {
         $sessid = $this->dbo->qstr($sessid);
         $sql = "DELETE FROM {$this->tableName} WHERE {$this->fieldId} = {$sessid}";
-        return $this->dbo->execute($sql);
+        return $this->dbo->execute(sql_statement($sql));
     }
 
     /**
@@ -232,7 +234,7 @@ class FLEA_Session_Db
         }
         $time = time() - $maxlifetime;
         $sql = "DELETE FROM {$this->tableName} WHERE {$this->fieldActivity} < {$time}";
-        $this->dbo->execute($sql);
+        $this->dbo->execute(sql_statement($sql));
         return true;
     }
 
@@ -256,7 +258,7 @@ class FLEA_Session_Db
             $time = time() - $lifetime;
             $sql .= " WHERE {$this->fieldActivity} >= {$time}";
         }
-        return (int)$this->dbo->getOne($sql);
+        return (int)$this->dbo->getOne(sql_statement($sql));
     }
 
     /**
@@ -275,6 +277,6 @@ class FLEA_Session_Db
      */
     protected function _beforeWrite(string $sessid): array
     {
-        return array();
+        return [];
     }
 }

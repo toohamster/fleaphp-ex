@@ -1,8 +1,10 @@
 <?php
 
 
+
+namespace FLEA\Exception;
 /**
- * 定义 FLEA_Exception_NotImplemented 异常
+ * 定义 \FLEA\Exception_NotImplemented 异常
  *
  * @author toohamster
  * @package Exception
@@ -10,13 +12,13 @@
  */
 
 /**
- * FLEA_Exception_NotImplemented 异常指示某个方法没有实现
+ * \FLEA\Exception_NotImplemented 异常指示某个方法没有实现
  *
  * @package Exception
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Exception_NotImplemented extends FLEA_Exception
+class NotImplemented extends \FLEA\Exception
 {
     public $className;
     public $methodName;
@@ -27,7 +29,7 @@ class FLEA_Exception_NotImplemented extends FLEA_Exception
      * @param string $method
      * @param string $class
      *
-     * @return FLEA_Exception_NotImplemented
+     * @return \FLEA\Exception_NotImplemented
      */
     public function __construct(string $method, string $class = '')
     {

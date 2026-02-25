@@ -1,15 +1,9 @@
 <?php
 
-/**
- * 定义 FLEA_Controller_Action 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: Action.php 972 2007-10-09 20:56:54Z qeeyuan $
- */
+namespace FLEA\Controller;
 
 /**
- * FLEA_Controller_Action 实现了一个其它控制器的超类，
+ * \FLEA\Controller\Action 实现了一个其它控制器的超类，
  * 为开发者自己的控制器提供了一些方便的成员变量和方法
  *
  * 开发者不一定需要从这个类继承来构造自己的控制器。
@@ -19,7 +13,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Controller_Action
+class Action
 {
     /**
      * 当前控制的名字，用于 $this->url() 方法
@@ -38,7 +32,7 @@ class FLEA_Controller_Action
     /**
      * 当前使用的调度器的名字
      *
-     * @var FLEA_Dispatcher_Auth
+     * @var \FLEA\Dispatcher\Auth
      */
     public $_dispatcher = null;
 
@@ -61,7 +55,7 @@ class FLEA_Controller_Action
      *
      * @param string $controllerName
      *
-     * @return FLEA_Controller_Action
+     * @return \FLEA\Controller\Action
      */
     public function __construct(string $controllerName)
     {
@@ -84,8 +78,11 @@ class FLEA_Controller_Action
         static $instances = [];
 
         if (!isset($instances[$componentName])) {
-            $componentClassName = FLEA::getAppInf('component.' . $componentName);
-            FLEA::loadClass($componentClassName);
+            $componentClassName = \FLEA::getAppInf('component.' . $componentName);
+            // 使用 Composer PSR-4 自动加载
+            if (!class_exists($componentClassName, true)) {
+                throw new \FLEA\Exception\ExpectedClass($componentClassName);
+            }
             $instances[$componentName] = new $componentClassName($this);
         }
         return $instances[$componentName];
@@ -106,22 +103,22 @@ class FLEA_Controller_Action
     /**
      * 设置当前控制器使用的调度器对象
      *
-     * @param FLEA_Dispatcher_Simple $dispatcher
+     * @param \FLEA\Dispatcher\Simple $dispatcher
      */
-    public function __setDispatcher(FLEA_Dispatcher_Simple &$dispatcher): void
+    public function __setDispatcher(\FLEA\Dispatcher\Simple $dispatcher): void
     {
-        $this->_dispatcher =& $dispatcher;
+        $this->_dispatcher = $dispatcher;
     }
 
     /**
      * 获得当前使用的 Dispatcher
      *
-     * @return FLEA_Dispatcher_Auth
+     * @return \FLEA\Dispatcher\Auth
      */
-    protected function _getDispatcher(): FLEA_Dispatcher_Auth
+    protected function _getDispatcher(): \FLEA\Dispatcher\Auth
     {
         if (!is_object($this->_dispatcher)) {
-            $this->_dispatcher = FLEA::getSingleton(FLEA::getAppInf('dispatcher'));
+            $this->_dispatcher = \FLEA::getSingleton(\FLEA::getAppInf('dispatcher'));
         }
         return $this->_dispatcher;
     }
@@ -160,9 +157,9 @@ class FLEA_Controller_Action
      */
     protected function _getView(): object
     {
-        $viewClass = FLEA::getAppInf('view');
+        $viewClass = \FLEA::getAppInf('view');
         if ($viewClass != 'PHP') {
-            return FLEA::getSingleton($viewClass);
+            return \FLEA::getSingleton($viewClass);
         } else {
             $view = false;
             return $view;
@@ -177,7 +174,7 @@ class FLEA_Controller_Action
      */
     protected function _executeView(string $__flea_internal_viewName, ?array $data = null): void
     {
-        $viewClass = FLEA::getAppInf('view');
+        $viewClass = \FLEA::getAppInf('view');
         if ($viewClass == 'PHP') {
             if (strtolower(substr($__flea_internal_viewName, -4)) != '.php') {
                 $__flea_internal_viewName .= '.php';
@@ -231,7 +228,7 @@ class FLEA_Controller_Action
      */
     protected function _registerEvent(string $controlName, string $event, string $action, ?array $attribs = null): string
     {
-        $ajax = FLEA::initAjax();
+        $ajax = \FLEA::initAjax();
         return $ajax->registerEvent($controlName, $event,
                 url($this->_controllerName, $action), $attribs);
     }

@@ -1,8 +1,10 @@
 <?php
 
+namespace FLEA\Acl\Table;
+
 
 /**
- * 定义 FLEA_Acl_Table_Roles 类
+ * 定义 \FLEA\Acl_Table_Roles 类
  *
  * @author toohamster
  * @package Core
@@ -11,11 +13,11 @@
 
 
 /**
- * FLEA_Acl_Table_Roles 提供了角色数据的存储服务
+ * \FLEA\Acl_Table_Roles 提供了角色数据的存储服务
  *
  * @package Core
  */
-class FLEA_Acl_Table_Roles extends FLEA_Db_TableDataGateway
+class Roles extends \FLEA\Db\TableDataGateway
 {
     /**
      * 主键字段名
@@ -38,7 +40,7 @@ class FLEA_Acl_Table_Roles extends FLEA_Db_TableDataGateway
      */
     public $manyToMany = array(
         array(
-            'tableClass' => 'FLEA_Acl_Table_Permissions',
+            'tableClass' => '\FLEA\Acl_Table_Permissions',
             'foreignKey' => 'role_id',
             'assocForeignKey' => 'permission_id',
             'joinTable' => 'roles_has_permissions',

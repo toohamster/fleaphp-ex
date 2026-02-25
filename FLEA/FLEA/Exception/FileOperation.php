@@ -1,8 +1,10 @@
 <?php
 
 
+
+namespace FLEA\Exception;
 /**
- * 定义 FLEA_Exception_FileOperation 异常
+ * 定义 \FLEA\Exception_FileOperation 异常
  *
  * @author toohamster
  * @package Exception
@@ -10,13 +12,13 @@
  */
 
 /**
- * FLEA_Exception_FileOperation 异常指示文件系统操作失败
+ * \FLEA\Exception_FileOperation 异常指示文件系统操作失败
  *
  * @package Exception
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Exception_FileOperation extends FLEA_Exception
+class FileOperation extends \FLEA\Exception
 {
     /**
      * 正在进行的文件操作
@@ -37,7 +39,7 @@ class FLEA_Exception_FileOperation extends FLEA_Exception
      *
      * @param string $opeation
      *
-     * @return FLEA_Exception_FileOperation
+     * @return \FLEA\Exception_FileOperation
      */
     public function __construct(string $opeation)
     {

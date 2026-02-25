@@ -1,8 +1,10 @@
 <?php
 
 
+
+namespace FLEA\Rbac\Exception;
 /**
- * 定义 FLEA_Rbac_Exception_InvalidACTFile 异常
+ * 定义 \FLEA\Rbac\Exception\InvalidACTFile 异常
  *
  * @author toohamster
  * @package Exception
@@ -10,13 +12,13 @@
  */
 
 /**
- * FLEA_Rbac_Exception_InvalidACTFile 异常指示控制器的 ACT 文件无效
+ * \FLEA\Rbac\Exception\InvalidACTFile 异常指示控制器的 ACT 文件无效
  *
  * @package Exception
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Rbac_Exception_InvalidACTFile extends FLEA_Exception
+class InvalidACTFile extends \FLEA\Exception
 {
     /**
      * ACT 文件名
@@ -46,7 +48,7 @@ class FLEA_Rbac_Exception_InvalidACTFile extends FLEA_Exception
      * @param string $controllerName
      * @param mixed $act
      *
-     * @return FLEA_Rbac_Exception_InvalidACTFile
+     * @return \FLEA\Rbac\Exception\InvalidACTFile
      */
     function __construct($actFilename, $act, $controllerName = null)
     {

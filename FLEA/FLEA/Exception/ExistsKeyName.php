@@ -1,22 +1,16 @@
 <?php
 
+namespace FLEA\Exception;
 
 /**
- * 定义 FLEA_Exception_ExistsKeyName 异常
+ * 定义 ExistsKeyName 异常
  *
- * @author toohamster
- * @package Exception
- * @version $Id: ExistsKeyName.php 972 2007-10-09 20:56:54Z qeeyuan $
- */
-
-/**
- * FLEA_Exception_ExistsKeyName 异常指示需要的键名已经存在
+ * ExistsKeyName 异常指示需要的键名已经存在
  *
  * @package Exception
- * @author toohamster
  * @version 1.0
  */
-class FLEA_Exception_ExistsKeyName extends FLEA_Exception
+class ExistsKeyName extends \FLEA\Exception
 {
     public $keyname;
 
@@ -25,7 +19,7 @@ class FLEA_Exception_ExistsKeyName extends FLEA_Exception
      *
      * @param string $keyname
      *
-     * @return FLEA_Exception_ExistsKeyName
+     * @return ExistsKeyName
      */
     public function __construct(string $keyname)
     {

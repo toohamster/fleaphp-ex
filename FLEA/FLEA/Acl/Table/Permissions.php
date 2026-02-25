@@ -1,8 +1,10 @@
 <?php
 
+namespace FLEA\Acl\Table;
+
 
 /**
- * 定义 FLEA_Acl_Table_Permissions 类
+ * 定义 \FLEA\Acl_Table_Permissions 类
  *
  * @author toohamster
  * @package Core
@@ -11,11 +13,11 @@
 
 
 /**
- * FLEA_Acl_Table_Permissions 提供了权限数据的存储服务
+ * \FLEA\Acl_Table_Permissions 提供了权限数据的存储服务
  *
  * @package Core
  */
-class FLEA_Acl_Table_Permissions extends FLEA_Db_TableDataGateway
+class Permissions extends \FLEA\Db\TableDataGateway
 {
     /**
      * 主键字段名

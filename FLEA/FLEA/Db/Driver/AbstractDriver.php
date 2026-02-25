@@ -1,7 +1,9 @@
 <?php
 
+namespace FLEA\Db\Driver;
+
 /**
- * 定义 FLEA_Db_Driver_Abstract 类
+ * 定义 \FLEA\Db\Driver\AbstractDriver 类
  *
  * @author toohamster
  * @package Core
@@ -27,13 +29,13 @@ define('DBO_PARAM_DL_SEQUENCE', '$');
 define('DBO_PARAM_AT_NAMED',    '@');
 
 /**
- * FLEA_Db_Driver_Abstract 是所有数据库驱动的抽象基础类
+ * \FLEA\Db\Driver\AbstractDriver 是所有数据库驱动的抽象基础类
  *
  * @package Core
  * @author toohamster
  * @version 1.1
  */
-abstract class FLEA_Db_Driver_Abstract
+abstract class AbstractDriver
 {
     /**
      * 用于描绘 true、false 和 null 的数据库值
@@ -177,7 +179,7 @@ abstract class FLEA_Db_Driver_Abstract
         $tmp = (array)$dsn;
         unset($tmp['password']);
         $this->dsn = $dsn;
-        $this->enableLog = FLEA::getAppInf('logEnabled');
+        $this->enableLog = \FLEA::getAppInf('logEnabled');
         if (!function_exists('log_message')) {
             $this->enableLog = false;
         }
@@ -217,13 +219,13 @@ abstract class FLEA_Db_Driver_Abstract
     /**
      * 执行一个查询，返回一个 resource 或者 boolean 值
      *
-     * @param string $sql
-     * @param array $inputarr
+     * @param \FLEA\Db\SqlStatement $sql
+     * @param array|null $inputarr
      * @param boolean $throw 指示查询出错时是否抛出异常
      *
-     * @return resource|boolean
+     * @return \FLEA\Db\SqlStatement
      */
-    abstract public function execute(string $sql, ?array $inputarr = null, bool $throw = true);
+    abstract public function execute(\FLEA\Db\SqlStatement $sql, ?array $inputarr = null, bool $throw = true): \FLEA\Db\SqlStatement;
 
     /**
      * 转义字符串
@@ -232,7 +234,7 @@ abstract class FLEA_Db_Driver_Abstract
      *
      * @return mixed
      */
-    abstract public function qstr($value): string;
+    abstract public function qstr($value);
 
     /**
      * 按照指定的类型，返回值
@@ -322,10 +324,12 @@ abstract class FLEA_Db_Driver_Abstract
     public function nextId(string $seqName = 'sdbo_seq', int $startValue = 1)
     {
         $getNextIdSql = sprintf($this->NEXT_ID_SQL, $seqName);
-        $result = $this->execute($getNextIdSql, null, false);
+        $result = $this->execute(\FLEA\Db\SqlStatement::create($getNextIdSql), null, false);
+        $result = $result->getSql();
         if (!$result) {
             if (!$this->createSeq($seqName, $startValue)) { return false; }
-            $result = $this->execute($getNextIdSql);
+            $result = $this->execute(\FLEA\Db\SqlStatement::create($getNextIdSql));
+            $result = $result->getSql();
             if (!$result) { return false; }
         }
 
@@ -350,8 +354,8 @@ abstract class FLEA_Db_Driver_Abstract
      */
     public function createSeq(string $seqName = 'sdbo_seq', int $startValue = 1): bool
     {
-        if ($this->execute(sprintf($this->CREATE_SEQ_SQL, $seqName))) {
-            return $this->execute(sprintf($this->INIT_SEQ_SQL, $seqName, $startValue - 1));
+        if ($this->execute(\FLEA\Db\SqlStatement::create(sprintf($this->CREATE_SEQ_SQL, $seqName)))) {
+            return $this->execute(\FLEA\Db\SqlStatement::create(sprintf($this->INIT_SEQ_SQL, $seqName, $startValue - 1)));
         } else {
             return false;
         }
@@ -366,7 +370,7 @@ abstract class FLEA_Db_Driver_Abstract
      */
     public function dropSeq(string $seqName = 'sdbo_seq'): bool
     {
-        return $this->execute(sprintf($this->DROP_SEQ_SQL, $seqName));
+        return $this->execute(\FLEA\Db\SqlStatement::create(sprintf($this->DROP_SEQ_SQL, $seqName)));
     }
 
     /**
@@ -392,40 +396,40 @@ abstract class FLEA_Db_Driver_Abstract
     /**
      * 从记录集中返回一行数据
      *
-     * @param resouce $res
+     * @param \PDOStatement $res
      *
      * @return array
      */
-    abstract public function fetchRow($res): ?array;
+    abstract public function fetchRow(\PDOStatement $res): ?array;
 
     /**
      * 从记录集中返回一行数据，字段名作为键名
      *
-     * @param resouce $res
+     * @param \PDOStatement $res
      *
      * @return array
      */
-    abstract public function fetchAssoc($res): ?array;
+    abstract public function fetchAssoc(\PDOStatement $res): ?array;
 
     /**
      * 释放查询句柄
      *
-     * @param resource $res
+     * @param \PDOStatement $res
      *
      * @return boolean
      */
-    abstract public function freeRes($res): bool;
+    abstract public function freeRes(\PDOStatement $res): bool;
 
     /**
      * 进行限定记录集的查询
      *
      * @param string $sql
-     * @param int $length
-     * @param int $offset
+     * @param int|null $length
+     * @param int|null $offset
      *
-     * @return resource
+     * @return \FLEA\Db\SqlStatement
      */
-    abstract public function selectLimit(string $sql, ?int $length = null, ?int $offset = null);
+    abstract public function selectLimit(string $sql, ?int $length = null, ?int $offset = null): \FLEA\Db\SqlStatement;
 
     /**
      * 执行一个查询，返回查询结果记录集、指定字段的值集合以及以该字段值分组后的记录集
@@ -437,9 +441,9 @@ abstract class FLEA_Db_Driver_Abstract
      *
      * @return array
      */
-    public function getAllWithFieldRefs($sql, string $field, array &$fieldValues, array &$reference): ?array
+    public function getAllWithFieldRefs(\FLEA\Db\SqlStatement $sql, string $field, array &$fieldValues, array &$reference): ?array
     {
-        $res = is_resource($sql) ? $sql : $this->execute($sql);
+        $res = $sql->isResource() ? $sql->getSql() : $this->execute($sql)->getSql();
         $fieldValues = [];
         $reference = [];
         $offset = 0;
@@ -460,28 +464,28 @@ abstract class FLEA_Db_Driver_Abstract
     /**
      * 执行一个查询，并将数据按照指定字段分组后与 $assocRowset 记录集组装在一起
      *
-     * @param string|resource $sql
+     * @param \FLEA\Db\SqlStatement $sql
      * @param array $assocRowset
      * @param string $mappingName
      * @param boolean $oneToOne
      * @param string $refKeyName
      * @param mixed $limit
      */
-    public function assemble(string $sql, array &$assocRowset, string $mappingName, bool $oneToOne, string $refKeyName, $limit = null): void
+    public function assemble(\FLEA\Db\SqlStatement $sql, array &$assocRowset, string $mappingName, bool $oneToOne, string $refKeyName, $limit = null): void
     {
-        if (is_resource($sql)) {
-            $res = $sql;
+        if ($sql->isResource()) {
+            $res = $sql->getSql();
         } else {
             if (!is_null($limit)) {
                 if (is_array($limit)) {
-                    list($length, $offset) = $limit;
+                    [$length, $offset] = $limit;
                 } else {
                     $length = $limit;
                     $offset = 0;
                 }
-                $res = $this->selectLimit($sql, $length, $offset);
+                $res = $this->selectLimit($sql->getSql(), $length, $offset)->getSql();
             } else {
-                $res = $this->execute($sql);
+                $res = $this->execute($sql)->getSql();
             }
         }
 
@@ -506,13 +510,13 @@ abstract class FLEA_Db_Driver_Abstract
     /**
      * 执行一个查询，返回查询结果记录集
      *
-     * @param string|resource $sql
+     * @param \FLEA\Db\SqlStatement $sql
      *
      * @return array
      */
-    public function getAll($sql): ?array
+    public function getAll(\FLEA\Db\SqlStatement $sql): ?array
     {
-        $res = is_resource($sql) ? $sql : $this->execute($sql);
+        $res = $sql->isResource() ? $sql->getSql() : $this->execute($sql)->getSql();
         $rowset = [];
         while ($row = $this->fetchAssoc($res)) {
             $rowset[] = $row;
@@ -524,13 +528,13 @@ abstract class FLEA_Db_Driver_Abstract
     /**
      * 执行查询，返回第一条记录的第一个字段
      *
-     * @param string|resource $sql
+     * @param \FLEA\Db\SqlStatement $sql
      *
      * @return mixed
      */
-    public function getOne(string $sql)
+    public function getOne(\FLEA\Db\SqlStatement $sql)
     {
-        $res = is_resource($sql) ? $sql : $this->execute($sql);
+        $res = $sql->isResource() ? $sql->getSql() : $this->execute($sql)->getSql();
         $row = $this->fetchRow($res);
         $this->freeRes($res);
         return isset($row[0]) ? $row[0] : null;
@@ -539,13 +543,13 @@ abstract class FLEA_Db_Driver_Abstract
     /**
      * 执行查询，返回第一条记录
      *
-     * @param string|resource $sql
+     * @param \FLEA\Db\SqlStatement $sql
      *
      * @return mixed
      */
-    public function getRow(string $sql): ?array
+    public function getRow(\FLEA\Db\SqlStatement $sql): ?array
     {
-        $res = is_resource($sql) ? $sql : $this->execute($sql);
+        $res = $sql->isResource() ? $sql->getSql() : $this->execute($sql)->getSql();
         $row = $this->fetchAssoc($res);
         $this->freeRes($res);
         return $row;
@@ -554,14 +558,14 @@ abstract class FLEA_Db_Driver_Abstract
     /**
      * 执行查询，返回结果集的指定列
      *
-     * @param string|resource $sql
+     * @param \FLEA\Db\SqlStatement $sql
      * @param int $col 要返回的列，0 为第一列
      *
      * @return mixed
      */
-    public function getCol(string $sql, int $col = 0): array
+    public function getCol(\FLEA\Db\SqlStatement $sql, int $col = 0): array
     {
-        $res = is_resource($sql) ? $sql : $this->execute($sql);
+        $res = $sql->isResource() ? $sql->getSql() : $this->execute($sql)->getSql();
         $data = [];
         while ($row = $this->fetchRow($res)) {
             $data[] = $row[$col];
@@ -576,18 +580,14 @@ abstract class FLEA_Db_Driver_Abstract
      * $groupBy 参数如果为字符串或整数，表示结果集根据 $groupBy 参数指定的字段进行分组。
      * 如果 $groupBy 参数为 true，则表示根据每行记录的第一个字段进行分组。
      *
-     * @param string|resource $sql
+     * @param \FLEA\Db\SqlStatement $sql
      * @param string|int|boolean $groupBy
      *
      * @return array
      */
-    public function getAllGroupBy(string $sql, array &$groupBy): array
+    public function getAllGroupBy(\FLEA\Db\SqlStatement $sql, array &$groupBy): array
     {
-        if (is_resource($sql)) {
-            $res = $sql;
-        } else {
-            $res = $this->execute($sql);
-        }
+        $res = $sql->isResource() ? $sql->getSql() : $this->execute($sql)->getSql();
         $data = [];
         $row = $this->fetchAssoc($res);
         if ($row != false) {
@@ -663,7 +663,7 @@ abstract class FLEA_Db_Driver_Abstract
         $this->_transCount++;
         if ($this->_transCount > 1 && $this->HAS_SAVEPOINT) {
             $savepoint = 'savepoint_' . $this->_transCount;
-            $this->execute("SAVEPOINT {$savepoint}");
+            $this->execute(\FLEA\Db\SqlStatement::create("SAVEPOINT {$savepoint}"));
             array_push($this->_savepointStack, $savepoint);
         }
     }
@@ -684,7 +684,7 @@ abstract class FLEA_Db_Driver_Abstract
         if ($this->_transCount > 0 && $this->HAS_SAVEPOINT) {
             $savepoint = array_pop($this->_savepointStack);
             if ($this->_hasFailedQuery || $commitOnNoErrors == false) {
-                $this->execute("ROLLBACK TO SAVEPOINT {$savepoint}");
+                $this->execute(\FLEA\Db\SqlStatement::create("ROLLBACK TO SAVEPOINT {$savepoint}"));
             }
         } else {
             $this->_completeTrans($commitOnNoErrors);

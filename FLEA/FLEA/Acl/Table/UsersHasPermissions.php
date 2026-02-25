@@ -1,8 +1,10 @@
 <?php
 
+namespace FLEA\Acl\Table;
+
 
 /**
- * 定义 FLEA_Acl_Table_UsersHasPermissions 类
+ * 定义 \FLEA\Acl_Table_UsersHasPermissions 类
  *
  * @author toohamster
  * @package Core
@@ -11,13 +13,13 @@
 
 
 /**
- * FLEA_Acl_Table_UsersHasPermissions 用于关联用户和权限
+ * \FLEA\Acl_Table_UsersHasPermissions 用于关联用户和权限
  *
  * @package Core
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Acl_Table_UsersHasPermissions extends FLEA_Db_TableDataGateway
+class UsersHasPermissions extends \FLEA\Db\TableDataGateway
 {
     /**
      * 主键字段名

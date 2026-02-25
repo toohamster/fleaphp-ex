@@ -1,8 +1,10 @@
 <?php
 
 
+
+namespace FLEA\Exception;
 /**
- * 定义 FLEA_Exception_InvalidArguments 异常
+ * 定义 \FLEA\Exception_InvalidArguments 异常
  *
  * @author toohamster
  * @package Exception
@@ -10,13 +12,13 @@
  */
 
 /**
- * FLEA_Exception_InvalidArguments 异常指示一个参数错误
+ * \FLEA\Exception_InvalidArguments 异常指示一个参数错误
  *
  * @package Exception
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Exception_InvalidArguments extends FLEA_Exception
+class InvalidArguments extends \FLEA\Exception
 {
     public $arg;
     public $value;
@@ -27,7 +29,7 @@ class FLEA_Exception_InvalidArguments extends FLEA_Exception
      * @param string $arg
      * @param mixed $value
      *
-     * @return FLEA_Exception_InvalidArguments
+     * @return \FLEA\Exception_InvalidArguments
      */
     public function __construct(string $arg, $value = null)
     {

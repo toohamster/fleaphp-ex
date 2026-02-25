@@ -1,8 +1,10 @@
 <?php
 
+namespace FLEA\Db;
+
 
 /**
- * 定义 FLEA_Db_SqlHelper 类
+ * 定义 \FLEA\Db\SqlHelper 类
  *
  * @author toohamster
  * @package Core
@@ -10,23 +12,23 @@
  */
 
 /**
- * FLEA_Db_SqlHelper 类提供了各种生成 SQL 语句的辅助方法
+ * \FLEA\Db\SqlHelper 类提供了各种生成 SQL 语句的辅助方法
  *
  * @package Core
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Db_SqlHelper
+class SqlHelper
 {
     /**
      * 分析查询条件
      *
      * @param mixed $conditions
-     * @param FLEA_Db_TableDataGateway $table
+     * @param TableDataGateway $table
      *
-     * @return array
+     * @return array|string
      */
-    public static function parseConditions($conditions, $table): ?array
+    public static function parseConditions($conditions, TableDataGateway $table)
     {
         // 对于 NULL，直接返回 NULL
         if (is_null($conditions)) { return null; }

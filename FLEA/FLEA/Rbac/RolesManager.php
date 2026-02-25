@@ -1,8 +1,10 @@
 <?php
 
+namespace FLEA\Rbac;
+
 
 /**
- * 定义 FLEA_Rbac_RolesManager 类
+ * 定义 \FLEA\Rbac_RolesManager 类
  *
  * @author toohamster
  * @package Core
@@ -11,15 +13,15 @@
 
 
 /**
- * FLEA_Rbac_RolesManager 派生自 FLEA_Db_TableDataGateway，
+ * \FLEA\Rbac_RolesManager 派生自 \FLEA\Db\TableDataGateway，
  * 用于访问保存角色信息的数据表
  *
- * 如果数据表的名字不同，应该从 FLEA_Rbac_RolesManager
+ * 如果数据表的名字不同，应该从 \FLEA\Rbac_RolesManager
  * 派生类并使用自定义的数据表名字、主键字段名等。
  *
  * @package Core
  */
-class FLEA_Rbac_RolesManager extends FLEA_Db_TableDataGateway
+class RolesManager extends \FLEA\Db\TableDataGateway
 {
     /**
      * 主键字段名
@@ -47,7 +49,7 @@ class FLEA_Rbac_RolesManager extends FLEA_Db_TableDataGateway
      *
      * @param array $params
      *
-     * @return FLEA_Rbac_RolesManager
+     * @return \FLEA\Rbac_RolesManager
      */
     public function __construct(?array $params = null)
     {

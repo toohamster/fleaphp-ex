@@ -1,4 +1,7 @@
 <?php
+
+namespace FLEA;
+
 /////////////////////////////////////////////////////////////////////////////
 // FleaPHP Framework
 //
@@ -8,8 +11,9 @@
 // 或者访问 http://www.fleaphp.org/ 获得详细信息。
 /////////////////////////////////////////////////////////////////////////////
 
+
 /**
- * 定义 FLEA_Rbac 类
+ * 定义 \FLEA\Rbac 类
  *
  * @author toohamster
  * @package Core
@@ -17,16 +21,16 @@
  */
 
 /**
- * FLEA_Rbac 提供基于角色的权限检查服务
+ * \FLEA\Rbac 提供基于角色的权限检查服务
  *
- * FLEA_Rbac 并不提供用户管理和角色管理服务，
- * 这些服务由 FLEA_Rbac_UsersManager 和 FLEA_Rbac_RolesManager 提供。
+ * \FLEA\Rbac 并不提供用户管理和角色管理服务，
+ * 这些服务由 \FLEA\Rbac_UsersManager 和 \FLEA\Rbac_RolesManager 提供。
  *
  * @package Core
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Rbac
+class Rbac
 {
     /**
      * 指示在 session 中用什么名字保存用户的信息
@@ -45,11 +49,11 @@ class FLEA_Rbac
     /**
      * 构造函数
      *
-     * @return FLEA_Rbac
+     * @return \FLEA\Rbac
      */
     public function __construct()
     {
-        $this->_sessionKey = FLEA::getAppInf('RBACSessionKey');
+        $this->_sessionKey = \FLEA::getAppInf('RBACSessionKey');
         if ($this->_sessionKey == 'RBAC_USERDATA') {
             trigger_error(_ET(0x0701005), E_USER_WARNING);
         }
@@ -141,7 +145,7 @@ class FLEA_Rbac
             }
             // 如果 deny 也为 RBAC_EVERYONE，则表示 ACT 出现了冲突
             if ($ACT['deny'] == RBAC_EVERYONE) {
-                throw new FLEA_Rbac_Exception_InvalidACT($ACT);
+                throw new \FLEA\Rbac\Exception\InvalidACT($ACT);
             }
 
             // 只有 deny 中没有用户的角色信息，则检查通过

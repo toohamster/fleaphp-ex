@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA;
+
 
 /**
  * 定义 FLEA_WebControls 类
@@ -18,7 +20,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_WebControls
+class WebControls
 {
     /**
      * 扩展的控件
@@ -48,7 +50,7 @@ class FLEA_WebControls
         } elseif ($extendsDir != '') {
             $this->_extendsDir[] = $extendsDir;
         }
-        $extendsDir = FLEA::getAppInf('webControlsExtendsDir');
+        $extendsDir = \FLEA::getAppInf('webControlsExtendsDir');
         if (is_array($extendsDir)) {
             $this->_extendsDir = array_merge($this->_extendsDir, $extendsDir);
         } elseif ($extendsDir != '') {
@@ -165,9 +167,9 @@ class FLEA_WebControls
      */
     protected function _getView()
     {
-        $viewClass = FLEA::getAppInf('view');
+        $viewClass = \FLEA::getAppInf('view');
         if ($viewClass != 'PHP') {
-            return FLEA::getSingleton($viewClass);
+            return \FLEA::getSingleton($viewClass);
         } else {
             $view = false;
             return $view;
@@ -750,7 +752,7 @@ class FLEA_WebControls
      *
      * @return boolean
      */
-    protected function __processMultiDimArray(& $items, & $key, & $caption, $key2caption = false)
+    protected function __processMultiDimArray(& $items, $key, $caption, $key2caption = false)
     {
         if ($caption == '') {
             $first = reset($items);

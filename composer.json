@@ -1,0 +1,42 @@
+{
+    "name": "fleaphp/fleaphp",
+    "description": "A lightweight PHP framework with MVC architecture, database abstraction layer, and RBAC support",
+    "type": "library",
+    "keywords": [
+        "framework",
+        "mvc",
+        "database",
+        "orm",
+        "rbac",
+        "php"
+    ],
+    "license": "LGPL-2.1-or-later",
+    "authors": [
+        {
+            "name": "FleaPHP Team",
+            "homepage": "http://www.fleaphp.org"
+        }
+    ],
+    "require": {
+        "php": ">=7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "FLEA\\": "FLEA/FLEA/"
+        },
+        "files": [
+            "FLEA/Functions.php",
+            "FLEA/FLEA.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "FLEA\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

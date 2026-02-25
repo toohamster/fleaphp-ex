@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA;
+
 
 /**
  * FleaPHP 用简单、具有一致性的模型来实现 Ajax 操作。
@@ -25,7 +27,7 @@
  *
  * 上述两行代码确保 Ajax 支持需要的 JavaScript 脚本被载入。
  *
- * 此处的 $ajax 对象是 FLEA_Ajax 类的一个实例。通过 FLEA::initAjax() 获得。
+ * 此处的 $ajax 对象是 FLEA_Ajax 类的一个实例。通过 \FLEA::initAjax() 获得。
  *
  * @author toohamster
  * @package Core
@@ -39,7 +41,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Ajax
+class Ajax
 {
     /**
      * 已经注册的事件
@@ -107,7 +109,7 @@ class FLEA_Ajax
     {
         $out = '';
         if ($wrapper) {
-            $out .= "<script language=\"JavaScript\" type=\"text/javascript\">\n";
+            $out .= "<script language=\"javascript\" type=\"text/javascript\">\n";
         }
 
         // 输出检查 JavaScript 库是否已经正确加载的 JavaScript 代码
@@ -235,8 +237,8 @@ EOT;
             parse_str($attribs['params'], $params);
             $params = (array)$params;
             if (!empty($params)) {
-                $params = encode_url_args($params, FLEA::getAppInf('urlMode'));
-                switch (FLEA::getAppInf('urlMode')) {
+                $params = encode_url_args($params, \FLEA::getAppInf('urlMode'));
+                switch (\FLEA::getAppInf('urlMode')) {
                 case URL_PATHINFO:
                 case URL_REWRITE:
                     $url .= '/' . $params;
@@ -320,7 +322,7 @@ EOT;
      *
      * @param array $attribs
      */
-    protected function _formatAttribs(& $attribs)
+    protected function _formatAttribs(array &$attribs)
     {
         // 格式化参数
         foreach ($attribs as $option => $value) {

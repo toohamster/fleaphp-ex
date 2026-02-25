@@ -1,8 +1,10 @@
 <?php
 
+namespace FLEA\Acl\Table;
+
 
 /**
- * 定义 FLEA_Acl_Table_UsersHasRoles 类
+ * 定义 \FLEA\Acl_Table_UsersHasRoles 类
  *
  * @author toohamster
  * @package Core
@@ -11,13 +13,13 @@
 
 
 /**
- * FLEA_Acl_Table_UsersHasRoles 用于关联用户和角色
+ * \FLEA\Acl_Table_UsersHasRoles 用于关联用户和角色
  *
  * @package Core
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Acl_Table_UsersHasRoles extends FLEA_Db_TableDataGateway
+class UsersHasRoles extends \FLEA\Db\TableDataGateway
 {
     /**
      * 主键字段名

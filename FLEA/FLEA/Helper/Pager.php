@@ -1,8 +1,10 @@
 <?php
 
 
+
+namespace FLEA\Helper;
 /**
- * 定义 FLEA_Helper_Pager 类
+ * 定义 \FLEA\Helper\Pager 类
  *
  * @author toohamster
  * @package Core
@@ -10,23 +12,23 @@
  */
 
 /**
- * FLEA_Helper_Pager 类提供数据查询分页功能
+ * \FLEA\Helper\Pager 类提供数据查询分页功能
  *
- * FLEA_Helper_Pager 使用很简单，只需要构造时传入 FLEA_Db_TableDataGateway 实例以及查询条件即可。
+ * \FLEA\Helper\Pager 使用很简单，只需要构造时传入 \FLEA\Db\TableDataGateway 实例以及查询条件即可。
  *
  * @package Core
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Helper_Pager
+class Pager
 {
     /**
-     * 如果 $this->source 是一个 FLEA_Db_TableDataGateway 对象，则调用
+     * 如果 $this->source 是一个 \FLEA\Db\TableDataGateway 对象，则调用
      * $this->source->findAll() 来获取记录集。
      *
      * 否则通过 $this->dbo->selectLimit() 来获取记录集。
      *
-     * @var FLEA_Db_TableDataGateway|string
+     * @var \FLEA\Db\TableDataGateway|string
      */
     public $source;
 
@@ -34,7 +36,7 @@ class FLEA_Helper_Pager
      * 数据库访问对象，当 $this->source 参数为 SQL 语句时，必须调用
      * $this->setDBO() 设置查询时要使用的数据库访问对象。
      *
-     * @var SDBO
+     * @var \FLEA\Db\Driver\AbstractDriver
      */
     public $dbo;
 
@@ -167,34 +169,32 @@ class FLEA_Helper_Pager
     /**
      * 构造函数
      *
-     * 如果 $source 参数是一个 TableDataGateway 对象，则 FLEA_Helper_Pager 会调用
+     * 如果 $source 参数是一个 TableDataGateway 对象，则 \FLEA\Helper\Pager 会调用
      * 该 TDG 对象的 findCount() 和 findAll() 来确定记录总数并返回记录集。
      *
-     * 如果 $source 参数是一个字符串，则假定为 SQL 语句。这时，FLEA_Helper_Pager
+     * 如果 $source 参数是一个字符串，则假定为 SQL 语句。这时，\FLEA\Helper\Pager
      * 不会自动调用计算各项分页参数。必须通过 setCount() 方法来设置作为分页计算
      * 基础的记录总数。
      *
      * 同时，如果 $source 参数为一个字符串，则不需要 $conditions 和 $sortby 参数。
-     * 而且可以通过 setDBO() 方法设置要使用的数据库访问对象。否则 FLEA_Helper_Pager
+     * 而且可以通过 setDBO() 方法设置要使用的数据库访问对象。否则 \FLEA\Helper\Pager
      * 将尝试获取一个默认的数据库访问对象。
      *
-     * @param TableDataGateway|string $source
+     * @param \FLEA\Db\TableDataGateway|string $source
      * @param int $currentPage
      * @param int $pageSize
      * @param mixed $conditions
-     * @param string $sortby
+     * @param null $sortby
      * @param int $basePageIndex
-     *
-     * @return FLEA_Helper_Pager
      */
-    public function __construct(& $source, $currentPage, $pageSize = 20, $conditions = null, $sortby = null, $basePageIndex = 0)
+    public function __construct($source, $currentPage, $pageSize = 20, $conditions = null, $sortby = null, $basePageIndex = 0)
     {
         $this->_basePageIndex = $basePageIndex;
         $this->_currentPage = $this->currentPage = $currentPage;
         $this->pageSize = $pageSize;
 
         if (is_object($source)) {
-            $this->source =& $source;
+            $this->source = $source;
             $this->_conditions = $conditions;
             $this->_sortby = $sortby;
             $this->totalCount = $this->count = (int)$this->source->findCount($conditions);
@@ -202,8 +202,8 @@ class FLEA_Helper_Pager
         } elseif (!empty($source)) {
             $this->source = $source;
             $sql = "SELECT COUNT(*) FROM ( $source ) as _count_table";
-            $this->dbo =& FLEA::getDBO();
-            $this->totalCount = $this->count = (int)$this->dbo->getOne($sql);
+            $this->dbo = \FLEA::getDBO();
+            $this->totalCount = $this->count = (int)$this->dbo->getOne(\FLEA\Db\SqlStatement::create($sql));
             $this->computingPage();
         }
     }
@@ -246,11 +246,11 @@ class FLEA_Helper_Pager
     /**
      * 设置数据库访问对象
      *
-     * @param SDBO $dbo
+     * @param \FLEA\Db\Driver\AbstractDriver $dbo
      */
-    public function setDBO(& $dbo)
+    public function setDBO($dbo)
     {
-        $this->dbo =& $dbo;
+        $this->dbo = $dbo;
     }
 
     /**
@@ -273,7 +273,7 @@ class FLEA_Helper_Pager
             $rowset = $this->source->findAll($this->_conditions, $this->_sortby, $limit, $fields, $queryLinks);
         } else {
             if (is_null($this->dbo)) {
-                $this->dbo =& FLEA::getDBO(false);
+                $this->dbo = FLEA::getDBO(false);
             }
             $rs = $this->dbo->selectLimit($this->source, $this->pageSize, $offset);
             $rowset = $this->dbo->getAll($rs);

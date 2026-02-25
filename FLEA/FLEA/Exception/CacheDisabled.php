@@ -1,8 +1,10 @@
 <?php
 
 
+
+namespace FLEA\Exception;
 /**
- * 定义 FLEA_Exception_CacheDisabled 异常
+ * 定义 \FLEA\Exception_CacheDisabled 异常
  *
  * @author toohamster
  * @package Exception
@@ -10,13 +12,13 @@
  */
 
 /**
- * FLEA_Exception_CacheDisabled 异常指示缓存功能被禁用
+ * \FLEA\Exception_CacheDisabled 异常指示缓存功能被禁用
  *
  * @package Exception
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Exception_CacheDisabled extends FLEA_Exception
+class CacheDisabled extends \FLEA\Exception
 {
     /**
      * 缓存目录
@@ -28,7 +30,7 @@ class FLEA_Exception_CacheDisabled extends FLEA_Exception
      *
      * @param string $cacheDir
      *
-     * @return FLEA_Exception_CacheDisabled
+     * @return \FLEA\Exception_CacheDisabled
      */
     public function __construct(string $cacheDir)
     {

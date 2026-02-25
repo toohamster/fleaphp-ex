@@ -1,8 +1,10 @@
 <?php
 
+namespace FLEA\Db;
+
 
 /**
- * 定义 FLEA_Db_ActiveRecord 类
+ * 定义 \FLEA\Db\ActiveRecord 类
  *
  * @author 起源科技(www.qeeyuan.com)
  * @package Core
@@ -10,13 +12,13 @@
  */
 
 /**
- * FLEA_Db_ActiveRecord 类实现了 ActiveRecord 模式
+ * \FLEA\Db\ActiveRecord 类实现了 ActiveRecord 模式
  *
  * @author 起源科技(www.qeeyuan.com)
  * @package Core
  * @version $Id: ActiveRecord.php 972 2007-10-09 20:56:54Z qeeyuan $
  */
-class FLEA_Db_ActiveRecord
+class ActiveRecord
 {
     /**
      * 定义该对象要聚合的其他对象
@@ -28,7 +30,7 @@ class FLEA_Db_ActiveRecord
     /**
      * 用于完成数据库操作的 TableDataGateway 继承类
      *
-     * @var FLEA_Db_TableDataGateway
+     * @var \FLEA\Db\TableDataGateway
      */
     public $_table;
 
@@ -71,7 +73,7 @@ class FLEA_Db_ActiveRecord
      *
      * @param mixed $conditions
      *
-     * @return FLEA_Db_ActiveRecord
+     * @return \FLEA\Db\ActiveRecord
      */
     public function __construct($conditions = null)
     {
@@ -94,12 +96,15 @@ class FLEA_Db_ActiveRecord
         $tableClass = $options['tableClass'];
 
         $objid = "{$myclass}_tdg";
-        if (FLEA::isRegistered($objid)) {
-            $this->_table = FLEA::registry($objid);
+        if (\FLEA::isRegistered($objid)) {
+            $this->_table = \FLEA::registry($objid);
         } else {
-            FLEA::loadClass($tableClass);
+            // 使用 Composer PSR-4 自动加载
+            if (!class_exists($tableClass, true)) {
+                throw new \FLEA\Exception\ExpectedClass($tableClass);
+            }
             $this->_table = new $tableClass(array('skipCreateLinks' => true));
-            FLEA::register($this->_table, $objid);
+            \FLEA::register($this->_table, $objid);
         }
 
         if (!empty($options['propertiesMapping'])) {
@@ -133,7 +138,10 @@ class FLEA_Db_ActiveRecord
             /**
              * 获得聚合对象的定义信息
              */
-            FLEA::loadClass($define['class']);
+            // 使用 Composer PSR-4 自动加载
+            if (!class_exists($define['class'], true)) {
+                throw new \FLEA\Exception\ExpectedClass($define['class']);
+            }
             $options = call_user_func(array($define['class'], 'define'));
 
             $link = array(

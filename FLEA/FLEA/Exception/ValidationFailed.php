@@ -1,8 +1,10 @@
 <?php
 
 
+
+namespace FLEA\Exception;
 /**
- * 定义 FLEA_Exception_ValidationFailed 异常
+ * 定义 \FLEA\Exception_ValidationFailed 异常
  *
  * @author toohamster
  * @package Exception
@@ -10,13 +12,13 @@
  */
 
 /**
- * FLEA_Exception_ValidationFailed 异常指示数据验证失败
+ * \FLEA\Exception_ValidationFailed 异常指示数据验证失败
  *
  * @package Exception
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Exception_ValidationFailed extends FLEA_Exception
+class ValidationFailed extends \FLEA\Exception
 {
     /**
      * 被验证的数据
@@ -38,7 +40,7 @@ class FLEA_Exception_ValidationFailed extends FLEA_Exception
      * @param array $result
      * @param mixed $data
      *
-     * @return FLEA_Exception_ValidationFailed
+     * @return \FLEA\Exception_ValidationFailed
      */
     public function __construct(array $result, $data = null)
     {

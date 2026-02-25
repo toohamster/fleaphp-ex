@@ -1,8 +1,10 @@
 <?php
 
+namespace FLEA\Acl\Table;
+
 
 /**
- * 定义 FLEA_Acl_Table_UserGroups 类
+ * 定义 \FLEA\Acl_Table_UserGroups 类
  *
  * @author toohamster
  * @package Core
@@ -11,13 +13,13 @@
 
 
 /**
- * FLEA_Acl_Table_UserGroups 类提供了用户组数据的存储服务
+ * \FLEA\Acl_Table_UserGroups 类提供了用户组数据的存储服务
  *
  * @package Core
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
+class UserGroups extends \FLEA\Db\TableDataGateway
 {
     /**
      * 主键字段名
@@ -40,17 +42,17 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
      */
     public $manyToMany = array(
         array(
-            'tableClass' => 'FLEA_Acl_Table_Roles',
+            'tableClass' => '\FLEA\Acl_Table_Roles',
             'foreignKey' => 'user_group_id',
             'assocForeignKey' => 'role_id',
-            'joinTableClass' => 'FLEA_Acl_Table_UserGroupsHasRoles',
+            'joinTableClass' => '\FLEA\Acl_Table_UserGroupsHasRoles',
             'mappingName' => 'roles',
         ),
         array(
-            'tableClass' => 'FLEA_Acl_Table_Permissions',
+            'tableClass' => '\FLEA\Acl_Table_Permissions',
             'foreignKey' => 'user_group_id',
             'assocForeignKey' => 'permission_id',
-            'joinTableClass' => 'FLEA_Acl_Table_UserGroupsHasPermissions',
+            'joinTableClass' => '\FLEA\Acl_Table_UserGroupsHasPermissions',
             'mappingName' => 'permissions',
         ),
     );
@@ -76,7 +78,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
             $parent = parent::find($parentId);
             if (!$parent) {
                 // 指定的父用户组不存在
-                throw new FLEA_Acl_Exception_UserGroupNotFound($parentId);
+                throw new \FLEA\Acl_Exception_UserGroupNotFound($parentId);
             }
         } else {
             // 如果未指定 $parentId 为 0 或 null，则创建一个顶级用户组
@@ -103,10 +105,10 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
         // 根据父用户组的左值和右值更新数据
         $sql = "UPDATE {$this->fullTableName} SET left_value = left_value + 2 " .
                "WHERE left_value >= {$parent['right_value']}";
-        $this->dbo->execute($sql);
+        $this->dbo->execute(sql_statement($sql));
         $sql = "UPDATE {$this->fullTableName} SET right_value = right_value + 2 " .
                "WHERE right_value >= {$parent['right_value']}";
-        $this->dbo->execute($sql);
+        $this->dbo->execute(sql_statement($sql));
 
         // 插入新用户组记录
         $group['left_value'] = $parent['right_value'];
@@ -147,7 +149,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
     public function removeByPkv($groupId) {
         $group = parent::find((int)$groupId);
         if (!$group) {
-            throw new FLEA_Acl_Exception_UserGroupNotFound($groupId);
+            throw new \FLEA\Acl_Exception_UserGroupNotFound($groupId);
         }
 
         $this->dbo->startTrans();
@@ -173,7 +175,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
         $sql = "UPDATE {$this->fullTableName} " .
                "SET left_value = left_value - {$span} " .
                "WHERE left_value > {$group['right_value']}";
-        if (!$this->dbo->execute($sql)) {
+        if (!$this->dbo->execute(sql_statement($sql))) {
             $this->dbo->completeTrans(false);
             return false;
         }
@@ -181,7 +183,7 @@ class FLEA_Acl_Table_UserGroups extends FLEA_Db_TableDataGateway
         $sql = "UPDATE {$this->fullTableName} " .
                "SET right_value = right_value - {$span} " .
                "WHERE right_value > {$group['right_value']}";
-        if (!$this->dbo->execute($sql)) {
+        if (!$this->dbo->execute(sql_statement($sql))) {
             $this->dbo->completeTrans(false);
             return false;
         }

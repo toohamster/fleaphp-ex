@@ -1,8 +1,10 @@
 <?php
 
 
+
+namespace FLEA\Rbac\Exception;
 /**
- * 定义 FLEA_Rbac_Exception_InvalidACT 异常
+ * 定义 \FLEA\Rbac\Exception\InvalidACT 异常
  *
  * @author toohamster
  * @package Exception
@@ -10,13 +12,13 @@
  */
 
 /**
- * FLEA_Rbac_Exception_InvalidACT 异常指示一个无效的 ACT
+ * \FLEA\Rbac\Exception\InvalidACT 异常指示一个无效的 ACT
  *
  * @package Exception
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Rbac_Exception_InvalidACT extends FLEA_Exception
+class InvalidACT extends \FLEA\Exception
 {
     /**
      * 无效的 ACT 内容
@@ -30,7 +32,7 @@ class FLEA_Rbac_Exception_InvalidACT extends FLEA_Exception
      *
      * @param mixed $act
      *
-     * @return FLEA_Rbac_Exception_InvalidACT
+     * @return \FLEA\Rbac\Exception\InvalidACT
      */
     function __construct($act)
     {

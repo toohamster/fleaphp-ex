@@ -1,8 +1,10 @@
 <?php
 
+namespace FLEA\Helper;
+
 
 /**
- * 定义 FLEA_Helper_FileUploader 和 FLEA_Helper_FileUploader_File 对象
+ * 定义 \FLEA\Helper\FileUploader 和 \FLEA\Helper\FileUploader_File 对象
  *
  * @author toohamster
  * @package Core
@@ -10,7 +12,7 @@
  */
 
 /**
- * FLEA_Helper_FileUploader 实现了一个简单的、可扩展的文件上传助手
+ * \FLEA\Helper\FileUploader 实现了一个简单的、可扩展的文件上传助手
  *
  * 使用方法：
  *
@@ -19,7 +21,7 @@
  * $maxSize = 150 * 1024; // 150KB
  * $uploadDir = __DIR__ . '/upload';
  *
- * $uploader = new FLEA_Helper_FileUploader();
+ * $uploader = new \FLEA\Helper\FileUploader();
  * $files =& $uploader->getFiles();
  * foreach ($files as $file) {
  *     if (!$file->check($allowExts, $maxSize)) {
@@ -37,7 +39,7 @@
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Helper_FileUploader
+class FileUploader
 {
     /**
      * 所有的 UploadFile 对象实例
@@ -58,7 +60,7 @@ class FLEA_Helper_FileUploader
      *
      * @param boolean $cascade
      *
-     * @return FLEA_Helper_FileUploader
+     * @return \FLEA\Helper\FileUploader
      */
     public function __construct($cascade = false)
     {
@@ -70,7 +72,7 @@ class FLEA_Helper_FileUploader
                     for ($i = 0; $i < count($struct['error']); $i++) {
 
                         if ($struct['error'][$i] != UPLOAD_ERR_NO_FILE) {
-                            $arr[] = new FLEA_Helper_FileUploader_File($struct, $field, $i);
+                            $arr[] = new \FLEA\Helper\FileUploader_File($struct, $field, $i);
                             if (!$cascade) {
                                 $this->_files["{$field}{$i}"] =& $arr[count($arr) - 1];
                             }
@@ -81,7 +83,7 @@ class FLEA_Helper_FileUploader
                     }
                 } else {
                     if ($struct['error'] != UPLOAD_ERR_NO_FILE) {
-                        $this->_files[$field] = new FLEA_Helper_FileUploader_File($struct, $field);
+                        $this->_files[$field] = new \FLEA\Helper\FileUploader_File($struct, $field);
                     }
                 }
             }
@@ -126,12 +128,12 @@ class FLEA_Helper_FileUploader
      *
      * @param string $name
      *
-     * @return FLEA_Helper_FileUploader_File
+     * @return \FLEA\Helper\FileUploader_File
      */
     public function getFile($name)
     {
         if (!isset($this->_files[$name])) {
-            throw new FLEA_Exception_ExpectedFile('$_FILES[' . $name . ']');
+            throw new \FLEA\Exception_ExpectedFile('$_FILES[' . $name . ']');
         }
         return $this->_files[$name];
     }
@@ -156,7 +158,7 @@ class FLEA_Helper_FileUploader
     public function batchMove($destDir)
     {
         foreach ($this->_files as $file) {
-            /* @var $file FLEA_Helper_FileUploader_File */
+            /* @var $file \FLEA\Helper\FileUploader_File */
             $file->move($destDir . '/' . $file->getFilename());
         }
     }

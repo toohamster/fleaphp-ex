@@ -1,29 +1,15 @@
 <?php
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2007 FleaPHP.org (www.fleaphp.org)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
+
+namespace FLEA\Dispatcher;
 
 /**
- * 定义 FLEA_Dispatcher_Simple 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: Simple.php 1028 2008-02-02 05:50:59Z qeeyuan $
- */
-
-/**
- * FLEA_Dispatcher_Simple 分析 HTTP 请求，并转发到合适的 Controller 对象处理
+ * \FLEA\Dispatcher\Simple 分析 HTTP 请求，并转发到合适的 Controller 对象处理
  *
  * @package Core
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Dispatcher_Simple
+class Simple
 {
     /**
      * 保存了请求信息的数组
@@ -44,14 +30,14 @@ class FLEA_Dispatcher_Simple
      *
      * @param array $request
      *
-     * @return FLEA_Dispatcher_Simple
+     * @return \FLEA\Dispatcher\Simple
      */
     public function __construct(array &$request)
     {
         $this->_requestBackup =& $request;
 
-        $controllerAccessor = strtolower(FLEA::getAppInf('controllerAccessor'));
-        $actionAccessor = strtolower(FLEA::getAppInf('actionAccessor'));
+        $controllerAccessor = strtolower(\FLEA::getAppInf('controllerAccessor'));
+        $actionAccessor = strtolower(\FLEA::getAppInf('actionAccessor'));
 
         $r = array_change_key_case($request, CASE_LOWER);
         $data = array('controller' => null, 'action' => null);
@@ -87,21 +73,20 @@ class FLEA_Dispatcher_Simple
      */
     protected function _executeAction(string $controllerName, string $actionName, string $controllerClass)
     {
-        $callback = FLEA::getAppInf('dispatcherFailedCallback');
+        $callback = \FLEA::getAppInf('dispatcherFailedCallback');
 
         // 确定动作方法名
-        $actionPrefix = FLEA::getAppInf('actionMethodPrefix');
-        $actionMethod = $actionPrefix . $actionName . FLEA::getAppInf('actionMethodSuffix');
+        $actionPrefix = \FLEA::getAppInf('actionMethodPrefix');
+        $actionMethod = $actionPrefix . $actionName . \FLEA::getAppInf('actionMethodSuffix');
 
         $controller = null;
-        $controllerClassFilename = null;
         do {
-            // 载入控制对应的类定义
+            // 使用 Composer PSR-4 自动加载器加载控制器类
             if (!$this->_loadController($controllerClass)) { break; }
 
             // 构造控制器对象
-            FLEA::setAppInf('FLEA.internal.currentControllerName', $controllerName);
-            FLEA::setAppInf('FLEA.internal.currentActionName', $actionName);
+            \FLEA::setAppInf('FLEA.internal.currentControllerName', $controllerName);
+            \FLEA::setAppInf('FLEA.internal.currentActionName', $actionName);
             $controller = new $controllerClass($controllerName);
             if (!method_exists($controller, $actionMethod)) { break; }
             if (method_exists($controller, '__setController')) {
@@ -131,14 +116,14 @@ class FLEA_Dispatcher_Simple
         }
 
         if (is_null($controller)) {
-            throw new FLEA_Exception_MissingController(
+            throw new \FLEA\Exception\MissingController(
                     $controllerName, $actionName, $this->_requestBackup,
-                    $controllerClass, $actionMethod, $controllerClassFilename);
+                    $controllerClass, $actionMethod, null);
         }
 
-        throw new FLEA_Exception_MissingAction(
+        throw new \FLEA\Exception\MissingAction(
                 $controllerName, $actionName, $this->_requestBackup,
-                $controllerClass, $actionMethod, $controllerClassFilename);
+                $controllerClass, $actionMethod, null);
     }
 
     /**
@@ -152,9 +137,9 @@ class FLEA_Dispatcher_Simple
     {
         $controllerName = preg_replace('/[^a-z0-9_]+/i', '', $this->_request['controller']);
         if ($controllerName == '') {
-            $controllerName = FLEA::getAppInf('defaultController');
+            $controllerName = \FLEA::getAppInf('defaultController');
         }
-        if (FLEA::getAppInf('urlLowerChar')) {
+        if (\FLEA::getAppInf('urlLowerChar')) {
             $controllerName = strtolower($controllerName);
         }
         return $controllerName;
@@ -181,7 +166,7 @@ class FLEA_Dispatcher_Simple
     {
         $actionName = preg_replace('/[^a-z0-9]+/i', '', $this->_request['action']);
         if ($actionName == '') {
-            $actionName = FLEA::getAppInf('defaultAction');
+            $actionName = \FLEA::getAppInf('defaultAction');
         }
         return $actionName;
     }
@@ -205,13 +190,13 @@ class FLEA_Dispatcher_Simple
      */
     public function getControllerClass(string $controllerName): string
     {
-        $controllerClass = FLEA::getAppInf('controllerClassPrefix');
-        if (FLEA::getAppInf('urlLowerChar')) {
+        $controllerClass = \FLEA::getAppInf('controllerClassPrefix');
+        if (\FLEA::getAppInf('urlLowerChar')) {
             $controllerClass .= ucfirst(strtolower($controllerName));
         } else {
             $controllerClass .= $controllerName;
         }
-        return $controllerClass;
+        return $controllerClass . 'Controller';
     }
 
     /**
@@ -227,8 +212,8 @@ class FLEA_Dispatcher_Simple
         $args = [];
         parse_str($url['query'], $args);
         $args = array_change_key_case($args, CASE_LOWER);
-        $controllerAccessor = strtolower(FLEA::getAppInf('controllerAccessor'));
-        $actionAccessor = strtolower(FLEA::getAppInf('actionAccessor'));
+        $controllerAccessor = strtolower(\FLEA::getAppInf('controllerAccessor'));
+        $actionAccessor = strtolower(\FLEA::getAppInf('actionAccessor'));
 
         $controllerName = isset($args[$controllerAccessor]) ?
                 $args[$controllerAccessor] : null;
@@ -243,17 +228,18 @@ class FLEA_Dispatcher_Simple
     /**
      * 载入控制器类
      *
+     * 使用 Composer PSR-4 自动加载器
+     *
      * @param string $controllerClass
      *
      * @return boolean
      */
     protected function _loadController(string $controllerClass): bool
     {
-        $controllerClassFilename = FLEA::getFilePath($controllerClass . '.php', true);
-        if (!is_readable($controllerClassFilename)) {
+        // 使用 Composer PSR-4 自动加载器加载类
+        if (!class_exists($controllerClass, true)) {
             return false;
         }
-        include_once($controllerClassFilename);
-        return class_exists($controllerClass);
+        return true;
     }
 }

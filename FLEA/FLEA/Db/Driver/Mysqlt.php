@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA\Db\Driver;
+
 /**
  * Transaction-enabled MySQL driver
  *
@@ -7,7 +9,7 @@
  * @author toohamster
  * @version 2.0
  */
-class FLEA_Db_Driver_Mysqlt extends FLEA_Db_Driver_Mysql
+class Mysqlt extends \FLEA\Db\Driver\Mysql
 {
     /**
      * @var bool
@@ -35,7 +37,7 @@ class FLEA_Db_Driver_Mysqlt extends FLEA_Db_Driver_Mysql
     {
         try {
             return $this->pdo->beginTransaction() !== false;
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             return false;
         }
     }
@@ -54,7 +56,7 @@ class FLEA_Db_Driver_Mysqlt extends FLEA_Db_Driver_Mysql
             } else {
                 return $this->pdo->rollBack() !== false;
             }
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             return false;
         }
     }

@@ -1,8 +1,10 @@
 <?php
 
+namespace FLEA\Acl;
+
 
 /**
- * 定义 FLEA_Acl_Manager 类
+ * 定义 \FLEA\Acl_Manager 类
  *
  * @author toohamster
  * @package Core
@@ -10,13 +12,13 @@
  */
 
 /**
- * FLEA_Acl_Manager 提供 ACL 数据的全面管理功能
+ * \FLEA\Acl_Manager 提供 ACL 数据的全面管理功能
  *
  * @package Core
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Acl_Manager
+class Manager
 {
     /**
      * 所有使用到的表数据对象类名称
@@ -24,14 +26,14 @@ class FLEA_Acl_Manager
      * @var array
      */
     public $_tableClass = array(
-        'users' =>                  'FLEA_Acl_Table_Users',
-        'roles' =>                  'FLEA_Acl_Table_Roles',
-        'userGroups' =>             'FLEA_Acl_Table_UserGroups',
-        'permissions' =>            'FLEA_Acl_Table_Permissions',
-        'userGroupsHasRoles' =>     'FLEA_Acl_Table_UserGroupsHasRoles',
-        'userGroupsHasPermissions' => 'FLEA_Acl_Table_UserGroupsHasPermissions',
-        'userHasRoles' =>           'FLEA_Acl_Table_UserHasRoles',
-        'userHasPermissions' =>     'FLEA_Acl_Table_UserHasPermissions',
+        'users' =>                  '\FLEA\Acl_Table_Users',
+        'roles' =>                  '\FLEA\Acl_Table_Roles',
+        'userGroups' =>             '\FLEA\Acl_Table_UserGroups',
+        'permissions' =>            '\FLEA\Acl_Table_Permissions',
+        'userGroupsHasRoles' =>     '\FLEA\Acl_Table_UserGroupsHasRoles',
+        'userGroupsHasPermissions' => '\FLEA\Acl_Table_UserGroupsHasPermissions',
+        'userHasRoles' =>           '\FLEA\Acl_Table_UserHasRoles',
+        'userHasPermissions' =>     '\FLEA\Acl_Table_UserHasPermissions',
     );
 
     function __construct(array $tableClass = [])
@@ -47,13 +49,13 @@ class FLEA_Acl_Manager
     public function getUserWithPermissions($conditions): ?array
     {
         $tableUsers = FLEA::getSingleton($this->_tableClass['users']);
-        /* @var $tableUsers FLEA_Acl_Table_Users */
+        /* @var $tableUsers \FLEA\Acl_Table_Users */
         $user = $tableUsers->find($conditions);
         if (empty($user)) { return false; }
 
         // 取得用户所在用户组的层次数据
         $tableUserGroups = FLEA::getSingleton($this->_tableClass['userGroups']);
-        /* @var $tableUserGroups FLEA_Acl_Table_UserGroups */
+        /* @var $tableUserGroups \FLEA\Acl_Table_UserGroups */
         $rowset = $tableUserGroups->getPath($user['group']);
 
         // 找出用户组的单一路径

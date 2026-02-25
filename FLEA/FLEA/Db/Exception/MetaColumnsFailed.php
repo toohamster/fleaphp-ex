@@ -1,8 +1,10 @@
 <?php
 
+namespace FLEA\Db\Exception;
+
 
 /**
- * 定义 FLEA_Db_Exception_MetaColumnsFailed 异常
+ * 定义 \FLEA\Db\Exception\MetaColumnsFailed 异常
  *
  * @author toohamster
  * @package Exception
@@ -10,13 +12,13 @@
  */
 
 /**
- * FLEA_Db_Exception_MetaColumnsFailed 异常指示查询数据表的元数据时发生错误
+ * \FLEA\Db\Exception\MetaColumnsFailed 异常指示查询数据表的元数据时发生错误
  *
  * @package Exception
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Db_Exception_MetaColumnsFailed extends FLEA_Exception
+class MetaColumnsFailed extends \FLEA\Exception
 {
     public $tableName;
 
@@ -25,7 +27,7 @@ class FLEA_Db_Exception_MetaColumnsFailed extends FLEA_Exception
      *
      * @param string $tableName
      *
-     * @return FLEA_Db_Exception_MetaColumnsFailed
+     * @return \FLEA\Db\Exception\MetaColumnsFailed
      */
     public function __construct($tableName)
     {

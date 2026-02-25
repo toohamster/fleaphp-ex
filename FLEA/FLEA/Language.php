@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA;
+
 
 /**
  * 定义 FLEA_Language 类
@@ -71,53 +73,9 @@
  *
  * @author toohamster
  * @package Core
- * @version $Id: Language.php 1005 2007-11-03 07:43:55Z qeeyuan $
+ * @version 1.0
  */
 
-/**
- * 调用 FLEA_Language::get() 获取翻译
- *
- * 用法：
- * <code>
- * $msg = _T('ENGLISH', 'chinese');
- * $msg = sprintf(_T('ENGLISH: %s'), 'chinese');
- * </code>
- *
- * @param string $key
- * @param string $language 指定为 '' 时表示从默认语言包中获取翻译
- *
- * @return string
- */
-function _T(string $key, string $language = ''): string
-{
-    static $instance = null;
-    if (!isset($instance['obj'])) {
-        $instance = [];
-        $obj = FLEA::getSingleton('FLEA_Language');
-        $instance = array('obj' => $obj);
-    }
-    return $instance['obj']->get($key, $language);
-}
-
-/**
- * 载入语言字典文件
- *
- * @param string $dictname
- * @param string $language 指定为 '' 时表示将字典载入默认语言包中
- * @param boolean $noException
- *
- * @return boolean
- */
-function load_language(string $dictname, string $language = '', bool $noException = false): bool
-{
-    static $instance = null;
-    if (!isset($instance['obj'])) {
-        $instance = [];
-        $obj = FLEA::getSingleton('FLEA_Language');
-        $instance = array('obj' => $obj);
-    }
-    return $instance['obj']->load($dictname, $language, $noException);
-}
 
 /**
  * FLEA_Language 提供了语言转换功能
@@ -126,7 +84,7 @@ function load_language(string $dictname, string $language = '', bool $noExceptio
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Language
+class Language
 {
     /**
      * 保存当前载入的字典
@@ -149,7 +107,7 @@ class FLEA_Language
      */
     public function __construct()
     {
-        $autoload = FLEA::getAppInf('autoLoadLanguage');
+        $autoload = \FLEA::getAppInf('autoLoadLanguage');
         if (!is_array($autoload)) {
             $autoload = explode(',', $autoload);
         }
@@ -187,13 +145,13 @@ class FLEA_Language
             $dictname = preg_replace('/[^a-z0-9\-_]+/i', '', strtolower($dictname));
             $language = preg_replace('/[^a-z0-9\-_]+/i', '', strtolower($language));
             if ($language == '') {
-                $language = FLEA::getAppInf('defaultLanguage');
+                $language = \FLEA::getAppInf('defaultLanguage');
                 $default = true;
             } else {
                 $default = false;
             }
 
-            $filename = FLEA::getAppInf('languageFilesDir') . DS .
+            $filename = \FLEA::getAppInf('languageFilesDir') . DS .
                 $language . DS . $dictname . '.php';
             if (isset($this->_loadedFiles[$filename])) { continue; }
 
@@ -209,7 +167,7 @@ class FLEA_Language
                     $this->_dict[0] =& $this->_dict[$language];
                 }
             } else if (!$noException) {
-                throw new FLEA_Exception_ExpectedFile($filename);
+                throw new \FLEA\Exception_ExpectedFile($filename);
             }
         }
     }

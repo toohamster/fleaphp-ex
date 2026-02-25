@@ -1,5 +1,7 @@
 <?php
 
+namespace FLEA;
+
 
 /**
  * 定义 FLEA_Log 类
@@ -10,32 +12,13 @@
  */
 
 /**
- * 追加日志记录
- *
- * @param string $msg
- * @param string $level
- */
-function log_message($msg, $level = 'log', $title = '')
-{
-    static $instance = null;
-
-    if (is_null($instance)) {
-        $instance = [];
-        $obj = FLEA::getSingleton('FLEA_Log');
-        $instance = array('obj' => $obj);
-    }
-
-    return $instance['obj']->appendLog($msg, $level, $title);
-}
-
-/**
  * FLEA_Log 类提供基本的日志服务
  *
  * @package Core
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Log
+class Log
 {
     /**
      * 保存运行期间的日志，在教本结束时将日志内容写入到文件
@@ -86,10 +69,10 @@ class FLEA_Log
      */
     public function __construct()
     {
-        $dir = FLEA::getAppInf('logFileDir');
+        $dir = \FLEA::getAppInf('logFileDir');
         if (empty($dir)) {
             // 如果没有指定日志存放目录，则保存到内部缓存目录中
-            $dir = FLEA::getAppInf('internalCacheDir');
+            $dir = \FLEA::getAppInf('internalCacheDir');
         }
         $dir = realpath($dir);
         if (substr($dir, -1) != DIRECTORY_SEPARATOR) {
@@ -99,8 +82,8 @@ class FLEA_Log
             $this->_enabled = false;
         } else {
             $this->_logFileDir = $dir;
-            $this->_logFilename = $this->_logFileDir . FLEA::getAppInf('logFilename');
-            $errorLevel = explode(',', strtolower(FLEA::getAppInf('logErrorLevel')));
+            $this->_logFilename = $this->_logFileDir . \FLEA::getAppInf('logFilename');
+            $errorLevel = explode(',', strtolower(\FLEA::getAppInf('logErrorLevel')));
             $errorLevel = array_map('trim', $errorLevel);
             $errorLevel = array_filter($errorLevel, 'trim');
             $this->_errorLevel = [];
@@ -119,7 +102,7 @@ class FLEA_Log
             }
 
             // 注册脚本结束时要运行的方法，将缓存的日志内容写入文件
-            register_shutdown_function(array(& $this, '__writeLog'));
+            register_shutdown_function(array($this, '__writeLog'));
 
             // 检查文件是否已经超过指定大小
             if (file_exists($this->_logFilename)) {
@@ -127,7 +110,7 @@ class FLEA_Log
             } else {
                 $filesize = 0;
             }
-            $maxsize = (int)FLEA::getAppInf('logFileMaxSize');
+            $maxsize = (int)\FLEA::getAppInf('logFileMaxSize');
             if ($maxsize >= 512) {
                 $maxsize = $maxsize * 1024;
                 if ($filesize >= $maxsize) {

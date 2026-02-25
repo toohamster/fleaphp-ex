@@ -1,8 +1,10 @@
 <?php
 
+namespace FLEA\Db\Exception;
+
 
 /**
- * 定义 FLEA_Db_Exception_MissingLink 异常
+ * 定义 \FLEA\Db\Exception\MissingLink 异常
  *
  * @author toohamster
  * @package Exception
@@ -10,13 +12,13 @@
  */
 
 /**
- * FLEA_Db_Exception_MissingLink 异常指示尝试访问的关联不存在
+ * \FLEA\Db\Exception\MissingLink 异常指示尝试访问的关联不存在
  *
  * @package Exception
  * @author toohamster
  * @version 1.0
  */
-class FLEA_Db_Exception_MissingLink extends FLEA_Exception
+class MissingLink extends \FLEA\Exception
 {
     public $name;
 
@@ -25,7 +27,7 @@ class FLEA_Db_Exception_MissingLink extends FLEA_Exception
      *
      * @param $name
      *
-     * @return FLEA_Db_Exception_MissingLink
+     * @return \FLEA\Db\Exception\MissingLink
      */
     public function __construct($name)
     {
