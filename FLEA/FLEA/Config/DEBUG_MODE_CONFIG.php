@@ -20,14 +20,9 @@ return array(
     'defaultTimezone'           => null,
 
     /**
-     * 指示使用 MVC 模式时，需要载入哪一个文件
-     */
-    'MVCPackageFilename'        => FLEA_DIR . '/Controller/Action.php',
-
-    /**
      * 指示控制器的 url 参数名和默认控制器名
      *
-     * 控制器名字只能是a-z字母和0-9数字，以及“_”下划线。
+     * 控制器名字只能是a-z字母和0-9数字，以及"_"下划线。
      */
     'controllerAccessor'        => 'controller',
     'defaultController'         => 'Default',

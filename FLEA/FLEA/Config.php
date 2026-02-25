@@ -42,18 +42,10 @@ class Config
     public $dbo = [];
 
     /**
-     * 类文件搜索路径
-     *
-     * @var array
-     */
-    public $classPath = [];
-
-    /**
      * 私有构造函数，防止外部实例化
      */
     private function __construct()
     {
-        $this->classPath = [];
         $this->appInf = [];
         $this->objects = [];
         $this->dbo = [];
@@ -236,35 +228,6 @@ class Config
     public function hasDbo(string $dsnid): bool
     {
         return isset($this->dbo[$dsnid]);
-    }
-
-    /**
-     * 添加类文件搜索路径
-     *
-     * @param string $dir 目录路径
-     * @return void
-     */
-    public function addClassPath(string $dir): void
-    {
-        if (array_search($dir, $this->classPath, true)) {
-            return;
-        }
-        if (DIRECTORY_SEPARATOR == '/') {
-            $dir = str_replace('\\', DIRECTORY_SEPARATOR, $dir);
-        } else {
-            $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
-        }
-        $this->classPath[] = $dir;
-    }
-
-    /**
-     * 获取类文件搜索路径
-     *
-     * @return array
-     */
-    public function getClassPath(): array
-    {
-        return $this->classPath;
     }
 
     /**

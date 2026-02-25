@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * 定义 FLEA 类和基础函数，并初始化 FleaPHP 运行环境
  *
@@ -10,7 +9,7 @@
  *
  * @author toohamster
  * @package Core
- * @version $Id: FLEA.php 1525 2008-11-25 08:34:37Z dualface $
+ * @version 1.0
  */
 
 /**
@@ -29,44 +28,42 @@ define('FLEA_VERSION', '1.7.1524');
 define('DS', DIRECTORY_SEPARATOR);
 
 // 标准 URL 模式
-define('URL_STANDARD',  'URL_STANDARD');
+define('URL_STANDARD', 'URL_STANDARD');
 
 // PATHINFO 模式
-define('URL_PATHINFO',  'URL_PATHINFO');
+define('URL_PATHINFO', 'URL_PATHINFO');
 
 // URL 重写模式
-define('URL_REWRITE',   'URL_REWRITE');
+define('URL_REWRITE', 'URL_REWRITE');
 
 /**#@+
  * 定义 RBAC 基本角色常量
  */
 // RBAC_EVERYONE 表示任何用户（不管该用户是否具有角色信息）
-define('RBAC_EVERYONE',     'RBAC_EVERYONE');
+define('RBAC_EVERYONE', 'RBAC_EVERYONE');
 
 // RBAC_HAS_ROLE 表示具有任何角色的用户
-define('RBAC_HAS_ROLE',     'RBAC_HAS_ROLE');
+define('RBAC_HAS_ROLE', 'RBAC_HAS_ROLE');
 
 // RBAC_NO_ROLE 表示不具有任何角色的用户
-define('RBAC_NO_ROLE',      'RBAC_NO_ROLE');
+define('RBAC_NO_ROLE', 'RBAC_NO_ROLE');
 
 // RBAC_NULL 表示该设置没有值
-define('RBAC_NULL',         'RBAC_NULL');
+define('RBAC_NULL', 'RBAC_NULL');
 
 // ACTION_ALL 表示控制器中的所有动作
-define('ACTION_ALL',        'ACTION_ALL');
+define('ACTION_ALL', 'ACTION_ALL');
 /**#@-*/
 
 /**
  * 初始化 FleaPHP 框架
  */
 
-// 初始化配置管理器（Composer 的 PSR-4 自动加载器会自动加载类）
-use FLEA\Config;
-
-$config = Config::getInstance();
-$config->addClassPath(__DIR__);
 define('FLEA_DIR', __DIR__ . '/FLEA');
 define('FLEA_3RD_DIR', __DIR__ . '/3rd');
+
+// 初始化配置管理器（Composer 的 PSR-4 自动加载器会自动加载类）
+use FLEA\Config;
 
 /**
  * 载入默认设置文件
@@ -74,11 +71,13 @@ define('FLEA_3RD_DIR', __DIR__ . '/3rd');
  * 如果没有定义 DEPLOY_MODE 常量为 true，则使用调试模式初始化 FleaPHP
  */
 if (!defined('DEPLOY_MODE') || DEPLOY_MODE != true) {
-    $config->mergeAppInf(require(FLEA_DIR . '/Config/DEBUG_MODE_CONFIG.php'));
+    Config::getInstance()->mergeAppInf(require(FLEA_DIR . '/Config/DEBUG_MODE_CONFIG.php'));
     define('DEBUG_MODE', true);
-    if (!defined('DEPLOY_MODE')) { define('DEPLOY_MODE', false); }
+    if (!defined('DEPLOY_MODE')) {
+        define('DEPLOY_MODE', false);
+    }
 } else {
-    $config->mergeAppInf(require(FLEA_DIR . '/Config/DEPLOY_MODE_CONFIG.php'));
+    Config::getInstance()->mergeAppInf(require(FLEA_DIR . '/Config/DEPLOY_MODE_CONFIG.php'));
     define('DEBUG_MODE', false);
 }
 
@@ -88,10 +87,7 @@ if (DEBUG_MODE) {
     error_reporting(0);
 }
 
-
 // 注意：FLEA 框架现在使用 Composer PSR-4 自动加载器
-// 不再注册 spl_autoload_register(array('FLEA', 'autoload'))
-// 旧的 autoload/loadClass/loadFile/getFilePath/import 方法已移除
 
 /**
  * FLEA 类提供了 FleaPHP 框架的基本服务
@@ -216,12 +212,12 @@ class FLEA
             // 返回已经存在的对象实例
             return FLEA::registry($className);
         }
-        
+
         // 使用 Composer PSR-4 自动加载器加载类
         if (!class_exists($className, false)) {
             throw new \FLEA\Exception\ExpectedClass($className);
         }
-        
+
         $obj = new $className();
         FLEA::register($obj, $className);
         return $obj;
@@ -327,7 +323,9 @@ class FLEA
         } else {
             $cacheFile = $cacheDir . DS . md5($cacheId) . '.php';
         }
-        if (!file_exists($cacheFile)) { return false; }
+        if (!file_exists($cacheFile)) {
+            return false;
+        }
 
         if ($timeIsLifetime && $time == -1) {
             $data = safe_file_get_contents($cacheFile);
@@ -341,9 +339,13 @@ class FLEA
 
         $filetime = filemtime($cacheFile);
         if ($timeIsLifetime) {
-            if (time() >= $filetime + $time) { return false; }
+            if (time() >= $filetime + $time) {
+                return false;
+            }
         } else {
-            if ($time >= $filetime) { return false; }
+            if ($time >= $filetime) {
+                return false;
+            }
         }
         $data = safe_file_get_contents($cacheFile);
         $hash = substr($data, 16, 32);
@@ -551,18 +553,20 @@ class FLEA
         } else {
             $dsn = str_replace('@/', '@localhost/', $dsn);
             $parse = parse_url($dsn);
-            if (empty($parse['scheme'])) { return false; }
+            if (empty($parse['scheme'])) {
+                return false;
+            }
 
             $dsn = [];
-            $dsn['host']     = isset($parse['host']) ? $parse['host'] : 'localhost';
-            $dsn['port']     = isset($parse['port']) ? $parse['port'] : '';
-            $dsn['login']    = isset($parse['user']) ? $parse['user'] : '';
+            $dsn['host'] = isset($parse['host']) ? $parse['host'] : 'localhost';
+            $dsn['port'] = isset($parse['port']) ? $parse['port'] : '';
+            $dsn['login'] = isset($parse['user']) ? $parse['user'] : '';
             $dsn['password'] = isset($parse['pass']) ? $parse['pass'] : '';
-            $dsn['driver']   = isset($parse['scheme']) ? strtolower($parse['scheme']) : '';
+            $dsn['driver'] = isset($parse['scheme']) ? strtolower($parse['scheme']) : '';
             $dsn['database'] = isset($parse['path']) ? substr($parse['path'], 1) : '';
-            $dsn['options']  = isset($parse['query']) ? $parse['query'] : '';
+            $dsn['options'] = isset($parse['query']) ? $parse['query'] : '';
             $dsn['prefix'] = FLEA::getAppInf('dbTablePrefix');
-            $dsn['schema']   = '';
+            $dsn['schema'] = '';
         }
         $dsnid = "{$dsn['driver']}://{$dsn['login']}:{$dsn['password']}@{$dsn['host']}_{$dsn['prefix']}/{$dsn['database']}/{$dsn['schema']}/{$dsn['options']}";
         $dsn['id'] = $dsnid;
@@ -601,7 +605,9 @@ class FLEA
         static $firstTime = true;
 
         // 避免重复调用 FLEA::init()
-        if (!$firstTime) { return; }
+        if (!$firstTime) {
+            return;
+        }
         $firstTime = false;
 
         // 设置默认时区
@@ -642,11 +648,7 @@ class FLEA
             FLEA::setAppInf('internalCacheDir', __DIR__ . '/_Cache');
         }
 
-        // 根据 URL 模式设置，决定是否要载入 URL 分析过滤器
-        if (FLEA::getAppInf('urlMode') != URL_STANDARD) {
-            // 调用 URI 过滤器
-            ___uri_filter();
-        }
+        self::executeUriFilter();
 
         // 处理 requestFilters
         foreach ((array)FLEA::getAppInf('requestFilters') as $file) {
@@ -655,7 +657,6 @@ class FLEA
                 require_once($file);
             }
         }
-
 
         // 处理 autoLoad
         foreach ((array)FLEA::getAppInf('autoLoad') as $file) {
@@ -692,5 +693,52 @@ class FLEA
             header('Content-Type: text/html; charset=' . FLEA::getAppInf('responseCharset'));
         }
     }
-}
 
+    /**
+     * URI 过滤器
+     * 根据应用程序设置 'urlMode' 分析 $_GET 参数
+     * 该函数由框架自动调用，应用程序不需要调用该函数
+     *
+     * @return void
+     */
+    private static function executeUriFilter(): void
+    {
+        // 根据 URL 模式设置，决定是否要执行
+        if (FLEA::getAppInf('urlMode') == URL_STANDARD) {
+            return;
+        }
+
+        // 调用 URI 过滤器
+        $pathinfo = !empty($_SERVER['PATH_INFO']) ?
+            $_SERVER['PATH_INFO'] :
+            (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '');
+
+        $parts = explode('/', substr($pathinfo, 1));
+        if (isset($parts[0]) && strlen($parts[0])) {
+            $_GET[FLEA::getAppInf('controllerAccessor')] = $parts[0];
+        }
+        if (isset($parts[1]) && strlen($parts[1])) {
+            $_GET[FLEA::getAppInf('actionAccessor')] = $parts[1];
+        }
+
+        $style = FLEA::getAppInf('urlParameterPairStyle');
+        if ($style == '/') {
+            for ($i = 2; $i < count($parts); $i += 2) {
+                if (isset($parts[$i + 1])) {
+                    $_GET[$parts[$i]] = $parts[$i + 1];
+                }
+            }
+        } else {
+            for ($i = 2; $i < count($parts); $i++) {
+                $p = $parts[$i];
+                $arr = explode($style, $p);
+                if (isset($arr[1])) {
+                    $_GET[$arr[0]] = $arr[1];
+                }
+            }
+        }
+
+        // 将 $_GET 合并到 $_REQUEST
+        $_REQUEST = array_merge($_REQUEST, $_GET);
+    }
+}
