@@ -105,10 +105,10 @@ class UserGroups extends \FLEA\Db\TableDataGateway
         // 根据父用户组的左值和右值更新数据
         $sql = "UPDATE {$this->fullTableName} SET left_value = left_value + 2 " .
                "WHERE left_value >= {$parent['right_value']}";
-        $this->dbo->execute($sql);
+        $this->dbo->execute(sql_statement($sql));
         $sql = "UPDATE {$this->fullTableName} SET right_value = right_value + 2 " .
                "WHERE right_value >= {$parent['right_value']}";
-        $this->dbo->execute($sql);
+        $this->dbo->execute(sql_statement($sql));
 
         // 插入新用户组记录
         $group['left_value'] = $parent['right_value'];
@@ -175,7 +175,7 @@ class UserGroups extends \FLEA\Db\TableDataGateway
         $sql = "UPDATE {$this->fullTableName} " .
                "SET left_value = left_value - {$span} " .
                "WHERE left_value > {$group['right_value']}";
-        if (!$this->dbo->execute($sql)) {
+        if (!$this->dbo->execute(sql_statement($sql))) {
             $this->dbo->completeTrans(false);
             return false;
         }
@@ -183,7 +183,7 @@ class UserGroups extends \FLEA\Db\TableDataGateway
         $sql = "UPDATE {$this->fullTableName} " .
                "SET right_value = right_value - {$span} " .
                "WHERE right_value > {$group['right_value']}";
-        if (!$this->dbo->execute($sql)) {
+        if (!$this->dbo->execute(sql_statement($sql))) {
             $this->dbo->completeTrans(false);
             return false;
         }

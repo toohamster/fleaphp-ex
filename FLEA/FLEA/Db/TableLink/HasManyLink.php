@@ -124,7 +124,7 @@ class HasManyLink extends TableLink
 
         if ($this->counterCache) {
             $sql = "UPDATE {$this->mainTDG->qtableName} SET {$this->counterCache} = (SELECT COUNT(*) FROM {$this->assocTDG->qtableName} WHERE {$this->qforeignKey} = {$qpkv}) WHERE {$this->mainTDG->qpk} = {$qpkv}";
-            $this->mainTDG->dbo->execute($sql);
+            $this->mainTDG->dbo->execute(sql_statement($sql));
         }
 
         return true;

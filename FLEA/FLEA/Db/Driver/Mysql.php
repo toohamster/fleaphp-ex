@@ -110,7 +110,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
             // Store connection in conn for compatibility
             $this->conn = $this->pdo;
 
-            $this->_mysqlVersion = $this->getOne('SELECT VERSION()');
+            $this->_mysqlVersion = $this->getOne(sql_statement('SELECT VERSION()'));
 
         } catch (\PDOException $e) {
             $this->lasterr = $e->getMessage();
@@ -164,51 +164,57 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
     /**
      * Execute SQL query
      *
-     * @param string $sql
+     * @param \FLEA\Db\SqlStatement $sql
      * @param array|null $inputarr
      * @param bool $throw
-     * @return \PDOStatement|false
+     * @return \FLEA\Db\SqlStatement
      */
-    public function execute(string $sql, ?array $inputarr = null, bool $throw = true)
+    public function execute(\FLEA\Db\SqlStatement $sql, ?array $inputarr = null, bool $throw = true): \FLEA\Db\SqlStatement
     {
+        // 如果已经是 PDOStatement 对象,直接返回
+        if ($sql->isResource()) {
+            return $sql;
+        }
+
+        $sqlStr = $sql->getSql();
         if (is_array($inputarr)) {
-            $sql = $this->bind($sql, $inputarr);
+            $sqlStr = $this->bind($sqlStr, $inputarr);
         }
 
         if ($this->enableLog) {
-            $this->log[] = $sql;
-            log_message("sql: {$sql}", 'debug');
+            $this->log[] = $sqlStr;
+            log_message("sql: {$sqlStr}", 'debug');
         }
 
         $this->querycount++;
 
         try {
-            $stmt = $this->pdo->query($sql);
+            $stmt = $this->pdo->query($sqlStr);
             if ($stmt !== false) {
                 $this->lasterr = null;
                 $this->lasterrcode = null;
                 $this->lastStmt = $stmt;
-                return $stmt;
+                return \FLEA\Db\SqlStatement::create($stmt);
             }
         } catch (\PDOException $e) {
             $this->lasterr = $e->getMessage();
             $this->lasterrcode = $e->getCode();
 
             if ($throw) {
-                throw new \FLEA\Db\Exception\SqlQuery($sql, $this->lasterr, $this->lasterrcode);
+                throw new \FLEA\Db\Exception\SqlQuery($sqlStr, $this->lasterr, $this->lasterrcode);
             }
         }
 
-        return false;
+        return $sql;
     }
 
     /**
      * Quote string for safe SQL usage
      *
      * @param mixed $value
-     * @return string
+     * @return mixed
      */
-    public function qstr($value): string
+    public function qstr($value)
     {
         if (is_int($value) || is_float($value)) {
             return $value;
@@ -310,10 +316,10 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
      * @param string $sql
      * @param int|null $length
      * @param int|null $offset
-     * @return \PDOStatement|false
+     * @return \FLEA\Db\SqlStatement
      * @throws \FLEA\Db\Exception\SqlQuery
      */
-    public function selectLimit(string $sql, ?int $length = null, ?int $offset = null)
+    public function selectLimit(string $sql, ?int $length = null, ?int $offset = null): \FLEA\Db\SqlStatement
     {
         if (!is_null($offset)) {
             $sql .= " LIMIT " . (int)$offset;
@@ -325,7 +331,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
         } elseif (!is_null($length)) {
             $sql .= " LIMIT " . (int)$length;
         }
-        return $this->execute($sql);
+        return $this->execute(\FLEA\Db\SqlStatement::create($sql));
     }
 
     /**
@@ -388,7 +394,8 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
             'SET' => 'C',
         );
 
-        $rs = $this->execute(sprintf($this->META_COLUMNS_SQL, $table));
+        $rs = $this->execute(\FLEA\Db\SqlStatement::create(sprintf($this->META_COLUMNS_SQL, $table)));
+        $rs = $rs->getSql();
         if (!$rs) {
             return false;
         }
@@ -467,7 +474,8 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
         if (!empty($pattern)) {
             $sql .= ' LIKE ' . $this->qstr($schema);
         }
-        $res = $this->execute($sql, null, false);
+        $res = $this->execute(\FLEA\Db\SqlStatement::create($sql), null, false);
+        $res = $res->getSql();
         $tables = [];
         while (($row = $this->fetchRow($res))) {
             $tables[] = reset($row);

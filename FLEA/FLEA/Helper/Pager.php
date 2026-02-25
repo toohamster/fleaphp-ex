@@ -36,7 +36,7 @@ class Pager
      * 数据库访问对象，当 $this->source 参数为 SQL 语句时，必须调用
      * $this->setDBO() 设置查询时要使用的数据库访问对象。
      *
-     * @var \FLEA\Db\Driver\AbstractDriver|\FLEA\Db\Driver\Mysql|\FLEA\Db\Driver\Mysqlt|\FLEA\Db\Driver\Sqlitepdo
+     * @var \FLEA\Db\Driver\AbstractDriver
      */
     public $dbo;
 
@@ -180,14 +180,12 @@ class Pager
      * 而且可以通过 setDBO() 方法设置要使用的数据库访问对象。否则 \FLEA\Helper\Pager
      * 将尝试获取一个默认的数据库访问对象。
      *
-     * @param TableDataGateway|string $source
+     * @param \FLEA\Db\TableDataGateway|string $source
      * @param int $currentPage
      * @param int $pageSize
      * @param mixed $conditions
-     * @param string $sortby
+     * @param null $sortby
      * @param int $basePageIndex
-     *
-     * @return \FLEA\Helper\Pager
      */
     public function __construct($source, $currentPage, $pageSize = 20, $conditions = null, $sortby = null, $basePageIndex = 0)
     {
@@ -204,8 +202,8 @@ class Pager
         } elseif (!empty($source)) {
             $this->source = $source;
             $sql = "SELECT COUNT(*) FROM ( $source ) as _count_table";
-            $this->dbo = FLEA::getDBO();
-            $this->totalCount = $this->count = (int)$this->dbo->getOne($sql);
+            $this->dbo = \FLEA::getDBO();
+            $this->totalCount = $this->count = (int)$this->dbo->getOne(\FLEA\Db\SqlStatement::create($sql));
             $this->computingPage();
         }
     }
@@ -248,7 +246,7 @@ class Pager
     /**
      * 设置数据库访问对象
      *
-     * @param \FLEA\Db\Driver\AbstractDriver|\FLEA\Db\Driver\Mysql|\FLEA\Db\Driver\Mysqlt|\FLEA\Db\Driver\Sqlitepdo $dbo
+     * @param \FLEA\Db\Driver\AbstractDriver $dbo
      */
     public function setDBO($dbo)
     {
@@ -275,7 +273,7 @@ class Pager
             $rowset = $this->source->findAll($this->_conditions, $this->_sortby, $limit, $fields, $queryLinks);
         } else {
             if (is_null($this->dbo)) {
-                $this->dbo =& FLEA::getDBO(false);
+                $this->dbo = FLEA::getDBO(false);
             }
             $rs = $this->dbo->selectLimit($this->source, $this->pageSize, $offset);
             $rowset = $this->dbo->getAll($rs);

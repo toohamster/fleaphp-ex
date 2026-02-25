@@ -202,7 +202,7 @@ class Db
             $sql = "INSERT INTO {$this->tableName} ({$this->fieldId}, {$this->fieldData}, {$this->fieldActivity}{$extraFields}) VALUES ({$sessid}, {$data}, {$activity}{$extraValues})";
         }
 
-        $this->dbo->execute($sql);
+        $this->dbo->execute(sql_statement($sql));
         return true;
     }
 
@@ -217,7 +217,7 @@ class Db
     {
         $sessid = $this->dbo->qstr($sessid);
         $sql = "DELETE FROM {$this->tableName} WHERE {$this->fieldId} = {$sessid}";
-        return $this->dbo->execute($sql);
+        return $this->dbo->execute(sql_statement($sql));
     }
 
     /**
@@ -234,7 +234,7 @@ class Db
         }
         $time = time() - $maxlifetime;
         $sql = "DELETE FROM {$this->tableName} WHERE {$this->fieldActivity} < {$time}";
-        $this->dbo->execute($sql);
+        $this->dbo->execute(sql_statement($sql));
         return true;
     }
 

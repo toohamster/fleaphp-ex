@@ -49,7 +49,7 @@ function class_loader()
 /**
  * 创建 SQL 语句对象
  *
- * @param \PDOStatement|string $sql
+ * @param \PDOStatement|\FLEA\Db\SqlStatement|string $sql
  * @return \FLEA\Db\SqlStatement
  */
 function sql_statement($sql): \FLEA\Db\SqlStatement

@@ -436,7 +436,7 @@ class TableDataGateway
         if (null !== $length || null !== $offset) {
             $result = $this->dbo->selectLimit($sql, $length, $offset);
         } else {
-            $result = $this->dbo->execute($sql);
+            $result = $this->dbo->execute(sql_statement($sql));
         }
 
         if ($enableLinks) {
@@ -690,11 +690,11 @@ class TableDataGateway
             $offset = null;
         }
         if (is_null($length) && is_null($offset)) {
-            return $this->dbo->getAll($sql);
+            return $this->dbo->getAll(sql_statement($sql));
         }
 
-        $result = $this->dbo->selectLimit($sql, $length, $offset);
-        if ($result) {
+        $result = $this->dbo->selectLimit(sql_statement($sql), $length, $offset);
+        if ($result->getSql()) {
             $rowset = $this->dbo->getAll($result);
         } else {
             $rowset = false;
@@ -783,7 +783,7 @@ class TableDataGateway
         $fields = substr($fields, 0, -2);
         $values = substr($values, 0, -2);
         $sql = "REPLACE INTO {$this->fullTableName} ({$fields}) VALUES ({$values})";
-        if (!$this->dbo->execute($sql)) { return false; }
+        if (!$this->dbo->execute(sql_statement($sql))->getSql()) { return false; }
 
         if (!empty($row[$this->primaryKey])) {
             return $row[$this->primaryKey];
@@ -868,7 +868,7 @@ class TableDataGateway
             $sql = "UPDATE {$this->qtableName} SET {$pairs} WHERE {$this->qpk} = " . $this->dbo->qstr($pkv);
 
             // 执行更新操作
-            if (!$this->dbo->execute($sql, $values)) {
+            if (!$this->dbo->execute(sql_statement($sql), $values)->getSql()) {
                 $this->dbo->completeTrans(false);
                 return false;
             }
@@ -940,7 +940,7 @@ class TableDataGateway
         list($pairs, $values) = $this->dbo->getPlaceholderPair($row, $this->fields);
         $pairs = implode(',', $pairs);
         $sql = "UPDATE {$this->qtableName} SET {$pairs} {$whereby}";
-        return $this->dbo->execute($sql, $values);
+        return $this->dbo->execute(sql_statement($sql), $values);
     }
 
     /**
@@ -986,7 +986,7 @@ class TableDataGateway
 
         $whereby = $this->getWhere($conditions, false);
         $sql = "UPDATE {$this->qtableName} SET {$field} = {$field} + {$incr}{$pairs} {$whereby}";
-        return $this->dbo->execute($sql, $values);
+        return $this->dbo->execute(sql_statement($sql), $values);
     }
 
     /**
@@ -1015,7 +1015,7 @@ class TableDataGateway
 
         $whereby = $this->getWhere($conditions, false);
         $sql = "UPDATE {$this->qtableName} SET {$field} = {$field}- {$decr}{$pairs} {$whereby}";
-        return $this->dbo->execute($sql, $values);
+        return $this->dbo->execute(sql_statement($sql), $values);
     }
 
     /**
@@ -1250,7 +1250,7 @@ class TableDataGateway
 
         // 删除主表数据
         $sql = "DELETE FROM {$this->qtableName} WHERE {$this->qpk} = {$qpkv}";
-        if ($this->dbo->execute($sql) == false) {
+        if (!$this->dbo->execute(sql_statement($sql))->isResource()) {
             $this->dbo->completeTrans(false);
             return false;
         }
@@ -1318,7 +1318,7 @@ class TableDataGateway
     public function removeAll(): bool
     {
         $sql = "DELETE FROM {$this->qtableName}";
-        $ret = $this->execute($sql);
+        $ret = $this->execute(sql_statement($sql));
         return $ret;
     }
 
@@ -1350,7 +1350,7 @@ class TableDataGateway
                 default:
                     break;
                 }
-                if ($this->dbo->execute($sql) == false) {
+                if (!$this->dbo->execute(sql_statement($sql))->isResource()) {
                     $this->dbo->completeTrans(false);
                     return false;
                 }
@@ -1358,7 +1358,7 @@ class TableDataGateway
         }
 
         $sql = "DELETE FROM {$this->qtableName}";
-        if ($this->dbo->execute($sql) == false) {
+        if (!$this->dbo->execute(sql_statement($sql))->isResource()) {
             $this->dbo->completeTrans(false);
             return false;
         }
@@ -1602,7 +1602,7 @@ class TableDataGateway
      *
      * @return mixed
      */
-    public function execute(string $sql, $inputarr = false)
+    public function execute(\FLEA\Db\SqlStatement $sql, $inputarr = false)
     {
         return $this->dbo->execute($sql, $inputarr);
     }
@@ -2154,7 +2154,7 @@ class TableDataGateway
             }
 
             $sql = "UPDATE {$link->assocTDG->qtableName} SET {$f} = (SELECT COUNT(*) FROM {$this->qtableName} WHERE {$conditions}) WHERE {$link->assocTDG->qpk} = {$fkv}";
-            $this->dbo->execute($sql);
+            $this->dbo->execute(sql_statement($sql));
         }
     }
 }

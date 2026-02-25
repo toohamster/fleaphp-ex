@@ -193,7 +193,7 @@ class ManyToManyLink extends TableLink
         } else {
             $sql = "INSERT INTO {$this->qjoinTable} ({$this->qforeignKey}, {$this->qassocForeignKey}) VALUES ({$qpkv}, ";
             foreach ($insertAssoc as $assocId) {
-                if (!$this->dbo->execute($sql . $this->dbo->qstr($assocId) . ')')) {
+                if (!$this->dbo->execute(sql_statement($sql . $this->dbo->qstr($assocId) . ')')) {
                     return false;
                 }
             }
@@ -211,7 +211,7 @@ class ManyToManyLink extends TableLink
         } else {
             $sql = "DELETE FROM {$this->qjoinTable} WHERE {$this->qforeignKey} = {$qpkv} AND {$this->qassocForeignKey} = ";
             foreach ($removeAssoc as $assocId) {
-                if (!$this->dbo->execute($sql . $this->dbo->qstr($assocId))) {
+                if (!$this->dbo->execute(sql_statement($sql . $this->dbo->qstr($assocId))) {
                     return false;
                 }
             }
@@ -219,7 +219,7 @@ class ManyToManyLink extends TableLink
 
         if ($this->counterCache) {
             $sql = "UPDATE {$this->mainTDG->qtableName} SET {$this->counterCache} = (SELECT COUNT(*) FROM {$this->qjoinTable} WHERE {$this->qforeignKey} = {$qpkv}) WHERE {$this->mainTDG->qpk} = {$qpkv}";
-            $this->mainTDG->dbo->execute($sql);
+            $this->mainTDG->dbo->execute(sql_statement($sql));
         }
 
         return true;
@@ -236,7 +236,7 @@ class ManyToManyLink extends TableLink
     {
         if (!$this->init) { $this->init(); }
         $sql = "DELETE FROM {$this->qjoinTable} WHERE {$this->qforeignKey} = {$qpkv} ";
-        return $this->dbo->execute($sql);
+        return $this->dbo->execute(sql_statement($sql));
     }
 
     /**
@@ -251,7 +251,7 @@ class ManyToManyLink extends TableLink
         if (!$this->init) { $this->init(); }
         $qpkv = $this->dbo->qstr($pkv);
         $sql = "DELETE FROM {$this->qjoinTable} WHERE {$this->qassocForeignKey} = {$qpkv} ";
-        return $this->dbo->execute($sql);
+        return $this->dbo->execute(sql_statement($sql));
     }
 
     /**
