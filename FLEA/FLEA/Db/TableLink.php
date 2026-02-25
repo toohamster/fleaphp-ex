@@ -377,7 +377,7 @@ class TableLink
         } else {
             if ($this->assocTDGObjectId) {
                 // 使用 Composer PSR-4 自动加载
-                if (!class_exists($this->tableClass, false)) {
+                if (!class_exists($this->tableClass, true)) {
                     throw new \FLEA\Exception\ExpectedClass($this->tableClass);
                 }
                 $this->assocTDG = new $this->tableClass(array('dbo' => $this->dbo));

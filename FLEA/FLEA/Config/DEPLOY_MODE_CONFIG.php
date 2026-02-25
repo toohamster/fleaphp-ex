@@ -77,7 +77,7 @@ return array(
     /**
      * 控制器类名称前缀
      */
-    'controllerClassPrefix'     => 'Controller_',
+    'controllerClassPrefix'     => '\\App\\Controller\\',
 
     /**
      * 控制器中，动作方法名的前缀和后缀

@@ -237,7 +237,7 @@ class Simple
     protected function _loadController(string $controllerClass): bool
     {
         // 使用 Composer PSR-4 自动加载器加载类
-        if (!class_exists($controllerClass, false)) {
+        if (!class_exists($controllerClass, true)) {
             return false;
         }
         return true;

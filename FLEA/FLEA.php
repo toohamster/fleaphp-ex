@@ -214,7 +214,7 @@ class FLEA
         }
 
         // 使用 Composer PSR-4 自动加载器加载类
-        if (!class_exists($className, false)) {
+        if (!class_exists($className, true)) {
             throw new \FLEA\Exception\ExpectedClass($className);
         }
 
@@ -464,7 +464,7 @@ class FLEA
         $setting = FLEA::getAppInf($settingName);
         if ($setting) {
             // 使用 Composer PSR-4 自动加载
-            if (!class_exists($setting, false)) {
+            if (!class_exists($setting, true)) {
                 throw new \FLEA\Exception\ExpectedClass($setting);
             }
         } else {
@@ -520,7 +520,7 @@ class FLEA
         $driver = ucfirst(strtolower($dsn['driver']));
         $className = '\\FLEA\\Db\\Driver\\' . $driver;
         // 使用 Composer PSR-4 自动加载
-        if (!class_exists($className, false)) {
+        if (!class_exists($className, true)) {
             throw new \FLEA\Exception\ExpectedClass($className);
         }
 
@@ -586,7 +586,7 @@ class FLEA
         $dispatcherClass = FLEA::getAppInf('dispatcher');
 
         // 使用 Composer PSR-4 自动加载
-        if (!class_exists($dispatcherClass, false)) {
+        if (!class_exists($dispatcherClass, true)) {
             throw new \FLEA\Exception\ExpectedClass($dispatcherClass);
         }
 
@@ -635,7 +635,7 @@ class FLEA
         if (FLEA::getAppInf('logEnabled') && FLEA::getAppInf('logProvider')) {
             // 使用 Composer PSR-4 自动加载
             $logProviderClass = FLEA::getAppInf('logProvider');
-            if (!class_exists($logProviderClass, false)) {
+            if (!class_exists($logProviderClass, true)) {
                 throw new \FLEA\Exception\ExpectedClass($logProviderClass);
             }
         }
@@ -683,7 +683,7 @@ class FLEA
         if (FLEA::getAppInf('multiLanguageSupport')) {
             // 使用 Composer PSR-4 自动加载
             $languageProviderClass = FLEA::getAppInf('languageSupportProvider');
-            if (!class_exists($languageProviderClass, false)) {
+            if (!class_exists($languageProviderClass, true)) {
                 throw new \FLEA\Exception\ExpectedClass($languageProviderClass);
             }
         }
