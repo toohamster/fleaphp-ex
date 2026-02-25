@@ -1693,17 +1693,10 @@ try {
 
 ### 设置异常处理器
 
-使用 `__SET_EXCEPTION_HANDLER()` 设置异常处理器：
+使用 `set_exception_handler()` 设置异常处理器：
 
 ```php
-// 保存当前的异常处理器
-$prevHandler = __SET_EXCEPTION_HANDLER('myExceptionHandler');
-
-function myExceptionHandler($ex)
-{
-    // 自定义异常处理逻辑
-    echo '发生异常: ' . $ex->getMessage();
-}
+set_exception_handler(FLEA::getAppInf('exceptionHandler'));
 ```
 
 ---

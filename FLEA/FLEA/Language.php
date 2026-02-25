@@ -73,53 +73,9 @@ namespace FLEA;
  *
  * @author toohamster
  * @package Core
- * @version $Id: Language.php 1005 2007-11-03 07:43:55Z qeeyuan $
+ * @version 1.0
  */
 
-/**
- * 调用 FLEA_Language::get() 获取翻译
- *
- * 用法：
- * <code>
- * $msg = _T('ENGLISH', 'chinese');
- * $msg = sprintf(_T('ENGLISH: %s'), 'chinese');
- * </code>
- *
- * @param string $key
- * @param string $language 指定为 '' 时表示从默认语言包中获取翻译
- *
- * @return string
- */
-function _T(string $key, string $language = ''): string
-{
-    static $instance = null;
-    if (!isset($instance['obj'])) {
-        $instance = [];
-        $obj = FLEA::getSingleton('FLEA_Language');
-        $instance = array('obj' => $obj);
-    }
-    return $instance['obj']->get($key, $language);
-}
-
-/**
- * 载入语言字典文件
- *
- * @param string $dictname
- * @param string $language 指定为 '' 时表示将字典载入默认语言包中
- * @param boolean $noException
- *
- * @return boolean
- */
-function load_language(string $dictname, string $language = '', bool $noException = false): bool
-{
-    static $instance = null;
-    if (!isset($instance['obj'])) {
-        $instance = [];
-        $obj = FLEA::getSingleton('FLEA_Language');
-        $instance = array('obj' => $obj);
-    }
-    return $instance['obj']->load($dictname, $language, $noException);
-}
 
 /**
  * FLEA_Language 提供了语言转换功能

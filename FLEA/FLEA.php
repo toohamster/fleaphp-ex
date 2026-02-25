@@ -65,8 +65,8 @@ use FLEA\Config;
 
 $config = Config::getInstance();
 $config->addClassPath(__DIR__);
-define('FLEA_DIR', $config->getClassPath()[0] . DS . 'FLEA');
-define('FLEA_3RD_DIR', $config->getClassPath()[0] . DS . '3rd');
+define('FLEA_DIR', __DIR__ . '/FLEA');
+define('FLEA_3RD_DIR', __DIR__ . '/3rd');
 
 /**
  * 载入默认设置文件
@@ -88,8 +88,6 @@ if (DEBUG_MODE) {
     error_reporting(0);
 }
 
-// 设置异常处理例程
-__SET_EXCEPTION_HANDLER('__FLEA_EXCEPTION_HANDLER');
 
 // 注意：FLEA 框架现在使用 Composer PSR-4 自动加载器
 // 不再注册 spl_autoload_register(array('FLEA', 'autoload'))
@@ -118,15 +116,14 @@ class FLEA
      */
     public static function loadAppInf($flea_internal_config = null): void
     {
-        $config = Config::getInstance();
         if (!is_array($flea_internal_config) && is_string($flea_internal_config)) {
             if (!is_readable($flea_internal_config)) {
-                throw new Exception\ExpectedFile($flea_internal_config);
+                throw new \FLEA\Exception\ExpectedFile($flea_internal_config);
             }
             $flea_internal_config = require($flea_internal_config);
         }
         if (is_array($flea_internal_config)) {
-            $config->mergeAppInf($flea_internal_config);
+            Config::getInstance()->mergeAppInf($flea_internal_config);
         }
     }
 
@@ -147,8 +144,7 @@ class FLEA
      */
     public static function getAppInf(string $option, $default = null)
     {
-        $config = Config::getInstance();
-        return $config->getAppInf($option, $default);
+        return Config::getInstance()->getAppInf($option, $default);
     }
 
     /**
@@ -223,7 +219,7 @@ class FLEA
         
         // 使用 Composer PSR-4 自动加载器加载类
         if (!class_exists($className, false)) {
-            throw new Exception\ExpectedClass($className);
+            throw new \FLEA\Exception\ExpectedClass($className);
         }
         
         $obj = new $className();
@@ -253,8 +249,7 @@ class FLEA
      */
     public static function register(object $obj, ?string $name = null): ?object
     {
-        $config = Config::getInstance();
-        return $config->registerObject($obj, $name);
+        return Config::getInstance()->registerObject($obj, $name);
     }
 
     /**
@@ -268,8 +263,7 @@ class FLEA
      */
     public static function registry(?string $name = null)
     {
-        $config = Config::getInstance();
-        return $config->getRegistry($name);
+        return Config::getInstance()->getRegistry($name);
     }
 
     /**
@@ -278,7 +272,7 @@ class FLEA
      * example:
      * <code>
      * if (FLEA::isRegistered('MyClass')) {
-     *      $obj =& FLEA::registry('MyClass');
+     *      $obj = FLEA::registry('MyClass');
      * } else {
      *      $obj = new MyClass();
      * }
@@ -290,8 +284,7 @@ class FLEA
      */
     public static function isRegistered(string $name): bool
     {
-        $config = Config::getInstance();
-        return $config->isRegistered($name);
+        return Config::getInstance()->isRegistered($name);
     }
 
 
@@ -414,7 +407,7 @@ class FLEA
     public static function purgeCache(string $cacheId, bool $cacheIdIsFilename = false): bool
     {
         $cacheDir = FLEA::getAppInf('internalCacheDir');
-        if (is_null($cacheDir)) {
+        if (empty($cacheDir)) {
             throw new \FLEA\Exception\CacheDisabled($cacheDir);
         }
 
@@ -432,25 +425,25 @@ class FLEA
 
 
     /**
-     * 初始化 WebControls，返回 FLEA_WebControls 对象实例
+     * 初始化 WebControls，返回 \FLEA\WebControls 对象实例
      *
      * 可以修改应用程序设置 webControlsClassName，指定另一个 WebControls 类。
      *
-     * @return FLEA_WebControls
+     * @return \FLEA\WebControls
      */
-    public static function initWebControls(): FLEA_WebControls
+    public static function initWebControls(): \FLEA\WebControls
     {
         return FLEA::getSingleton(FLEA::getAppInf('webControlsClassName'));
     }
 
     /**
-     * 初始化 Ajax，返回 FLEA_Ajax 对象实例
+     * 初始化 Ajax，返回 \FLEA\Ajax 对象实例
      *
      * 可以修改应用程序设置 ajaxClassName，指定另一个 Ajax 类。
      *
-     * @return FLEA_Ajax
+     * @return \FLEA\Ajax
      */
-    public static function initAjax(): FLEA_Ajax
+    public static function initAjax(): \FLEA\Ajax
     {
         return FLEA::getSingleton(FLEA::getAppInf('ajaxClassName'));
     }
@@ -459,7 +452,7 @@ class FLEA
      * 载入一个助手
      *
      * 所有的助手都定义在应用程序设置中，并且以 helper. 开头。
-     * 例如 helper.array 指定为 \FLEA\Helper\Array、helper.image 指定为 \FLEA\Helper\Image。
+     * 例如 helper.image 指定为 \FLEA\Helper\Image。
      *
      * @param string $helperName
      */
@@ -470,10 +463,10 @@ class FLEA
         if ($setting) {
             // 使用 Composer PSR-4 自动加载
             if (!class_exists($setting, false)) {
-                throw new Exception\ExpectedClass($setting);
+                throw new \FLEA\Exception\ExpectedClass($setting);
             }
         } else {
-            throw new Exception\NotExistsKeyName('helper.' . $helperName);
+            throw new \FLEA\Exception\NotExistsKeyName('helper.' . $helperName);
         }
     }
 
@@ -514,7 +507,7 @@ class FLEA
         $dsn = FLEA::parseDSN($dsn);
 
         if (!is_array($dsn) || !isset($dsn['driver'])) {
-            throw new FLEA_Db_Exception_InvalidDSN($dsn);
+            throw new \FLEA\Db\Exception\InvalidDSN($dsn);
         }
 
         $dsnid = $dsn['id'];
@@ -523,12 +516,12 @@ class FLEA
         }
 
         $driver = ucfirst(strtolower($dsn['driver']));
-        $className = 'FLEA_Db_Driver_' . $driver;
-        if ($driver == 'Mysql' || $driver == 'Mysqlt') {
-            require_once(FLEA_DIR . '/Db/Driver/Mysql.php');
-        } else {
-            FLEA::loadClass($className);
+        $className = '\\FLEA\\Db\\Driver\\' . $driver;
+        // 使用 Composer PSR-4 自动加载
+        if (!class_exists($className, false)) {
+            throw new \FLEA\Exception\ExpectedClass($className);
         }
+
         $dbo = new $className($dsn);
         /* @var $dbo \FLEA\Db\Driver\AbstractDriver */
         $dbo->connect();
@@ -583,15 +576,15 @@ class FLEA
      */
     public static function runMVC(): void
     {
-        $MVCPackageFilename = FLEA::getAppInf('MVCPackageFilename');
-        if ($MVCPackageFilename != '') {
-            require_once($MVCPackageFilename);
-        }
         FLEA::init();
 
         // 载入调度器并转发请求到控制器
         $dispatcherClass = FLEA::getAppInf('dispatcher');
-        FLEA::loadClass($dispatcherClass);
+
+        // 使用 Composer PSR-4 自动加载
+        if (!class_exists($dispatcherClass, false)) {
+            throw new \FLEA\Exception\ExpectedClass($dispatcherClass);
+        }
 
         $dispatcher = new $dispatcherClass($_GET);
         FLEA::register($dispatcher, $dispatcherClass);
@@ -628,7 +621,6 @@ class FLEA
         /**
          * 安装应用程序指定的异常处理例程
          */
-        __SET_EXCEPTION_HANDLER(FLEA::getAppInf('exceptionHandler'));
         set_exception_handler(FLEA::getAppInf('exceptionHandler'));
 
         /**
@@ -638,7 +630,7 @@ class FLEA
             // 使用 Composer PSR-4 自动加载
             $logProviderClass = FLEA::getAppInf('logProvider');
             if (!class_exists($logProviderClass, false)) {
-                throw new Exception\ExpectedClass($logProviderClass);
+                throw new \FLEA\Exception\ExpectedClass($logProviderClass);
             }
         }
 
@@ -647,15 +639,13 @@ class FLEA
          */
         $cachedir = FLEA::getAppInf('internalCacheDir');
         if (empty($cachedir)) {
-            FLEA::setAppInf('internalCacheDir', __DIR__ . DS . '_Cache');
+            FLEA::setAppInf('internalCacheDir', __DIR__ . '/_Cache');
         }
 
         // 根据 URL 模式设置，决定是否要载入 URL 分析过滤器
         if (FLEA::getAppInf('urlMode') != URL_STANDARD) {
             // 调用 URI 过滤器
-            if (defined('FLEA_VERSION')) {
-                ___uri_filter();
-            }
+            ___uri_filter();
         }
 
         // 处理 requestFilters
@@ -666,13 +656,6 @@ class FLEA
             }
         }
 
-        // 处理 $loadMVC
-        if ($loadMVC) {
-            $MVCPackageFilename = FLEA::getAppInf('MVCPackageFilename');
-            if ($MVCPackageFilename != '') {
-                require_once($MVCPackageFilename);
-            }
-        }
 
         // 处理 autoLoad
         foreach ((array)FLEA::getAppInf('autoLoad') as $file) {
@@ -700,11 +683,8 @@ class FLEA
             // 使用 Composer PSR-4 自动加载
             $languageProviderClass = FLEA::getAppInf('languageSupportProvider');
             if (!class_exists($languageProviderClass, false)) {
-                throw new Exception\ExpectedClass($languageProviderClass);
+                throw new \FLEA\Exception\ExpectedClass($languageProviderClass);
             }
-        }
-        if (!function_exists('_T')) {
-            function _T() {};
         }
 
         // 自动输出内容头信息

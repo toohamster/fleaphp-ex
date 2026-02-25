@@ -49,13 +49,6 @@ class Config
     public $classPath = [];
 
     /**
-     * 异常处理器
-     *
-     * @var callable|null
-     */
-    public $exceptionHandler = null;
-
-    /**
      * 私有构造函数，防止外部实例化
      */
     private function __construct()
@@ -64,7 +57,6 @@ class Config
         $this->appInf = [];
         $this->objects = [];
         $this->dbo = [];
-        $this->exceptionHandler = null;
     }
 
     /**
@@ -273,29 +265,6 @@ class Config
     public function getClassPath(): array
     {
         return $this->classPath;
-    }
-
-    /**
-     * 获取异常处理器
-     *
-     * @return callable|null
-     */
-    public function getExceptionHandler(): ?callable
-    {
-        return $this->exceptionHandler;
-    }
-
-    /**
-     * 设置异常处理器
-     *
-     * @param callable $callback 异常处理回调函数
-     * @return callable|null 返回之前的异常处理器
-     */
-    public function setExceptionHandler($callback): ?callable
-    {
-        $current = $this->exceptionHandler;
-        $this->exceptionHandler = $callback;
-        return $current;
     }
 
     /**

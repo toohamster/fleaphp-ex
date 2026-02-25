@@ -342,50 +342,6 @@ function safe_file_get_contents(string $filename): ?string
  */
 
 /**
- * 设置新的异常处理例程，返回当前使用的异常处理例程
- *
- * 当抛出的异常没有任何 __TRY() 捕获时，将调用异常处理例程。FleaPHP 默认的
- * 异常处理例程会显示异常的详细信息，已经程序运行路径，帮助开发者定位错误。
- *
- * 用法：
- * <code>
- * // 保存现在使用的异常处理例程
- * global $prevExceptionHandler;
- * $prevExceptionHandler = __SET_EXCEPTION_HANDLER('app_exception_handler');
- *
- * function app_exception_handler(& $ex) {
- *     global $prevExceptionHandler;
- *
- *     if (is_a($ex, 'APP_Exception')) {
- *        // 处理该异常
- *        ...
- *     } else {
- *        // 调用原有的异常处理例程
- *        if ($prevExceptionHandler) {
- *            call_user_func_array($prevExceptionHandler, array(& $exception));
- *        }
- *     }
- * }
- * </code>
- *
- * 上面的代码设置了一个新的异常处理例程，同时可以在必要时调用原有的异常处理例程。
- * 虽然不强制要求开发者这样做，但参照上面的代码片段可以形成一个异常处理例程调用链。
- *
- * @package Core
- *
- * @param callback $callback
- *
- * @return mixed
- */
-function __SET_EXCEPTION_HANDLER($callback)
-{
-    $config = Config::getInstance();
-    $current = $config->getExceptionHandler();
-    $config->setExceptionHandler($callback);
-    return $current;
-}
-
-/**
  * FleaPHP 默认的异常处理例程
  *
  * @package Core
@@ -541,6 +497,49 @@ function _ET(int $errorCode, bool $appError = false): string
 
     return "Error code: {$errorCode}";
 }
+
+/**
+ * 调用 FLEA_Language::get() 获取翻译
+ *
+ * 用法：
+ * <code>
+ * $msg = _T('ENGLISH', 'chinese');
+ * $msg = sprintf(_T('ENGLISH: %s'), 'chinese');
+ * </code>
+ *
+ * @param string $key
+ * @param string $language 指定为 '' 时表示从默认语言包中获取翻译
+ *
+ * @return string
+ */
+function _T(string $key, string $language = ''): string
+{
+    static $instance = null;
+    if (is_null($instance)) {
+        $instance = FLEA::getSingleton('\\FLEA\\Language');
+    }
+    return $instance->get($key, $language);
+}
+
+/**
+ * 载入语言字典文件
+ *
+ * @param string $dictname
+ * @param string $language 指定为 '' 时表示将字典载入默认语言包中
+ * @param boolean $noException
+ *
+ * @return boolean
+ */
+function load_language(string $dictname, string $language = '', bool $noException = false): bool
+{
+    static $instance = null;
+    if (is_null($instance)) {
+        $instance = FLEA::getSingleton('\\FLEA\\Language');
+    }
+    return $instance->load($dictname, $language, $noException);
+}
+
+
 
 /**
  * 创建目录（包括所有必要的父目录）

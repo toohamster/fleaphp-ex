@@ -2,23 +2,6 @@
 
 namespace FLEA\Dispatcher;
 
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2007 FleaPHP.org (www.fleaphp.org)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
-
-/**
- * 定义 \FLEA\Dispatcher\Simple 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: Simple.php 1028 2008-02-02 05:50:59Z qeeyuan $
- */
-
 /**
  * \FLEA\Dispatcher\Simple 分析 HTTP 请求，并转发到合适的 Controller 对象处理
  *
