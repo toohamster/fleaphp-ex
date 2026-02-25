@@ -11,6 +11,25 @@
  */
 
 /**
+ * 追加日志记录
+ *
+ * @param string $msg
+ * @param string $level
+ * @param string $title
+ * @return mixed
+ */
+function log_message($msg, $level = 'log', $title = '')
+{
+    static $instance = null;
+
+    if (is_null($instance)) {
+        $instance = \FLEA::getSingleton(\FLEA\Log::class);
+    }
+
+    return $instance->appendLog($msg, $level, $title);
+}
+
+/**
  * 返回类加载器对象
  *
  * @return \Composer\Autoload\ClassLoader

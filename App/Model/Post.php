@@ -31,8 +31,7 @@ class Post extends TableDataGateway
         return $this->findAll(
             array('status' => 1),
             'created_at DESC',
-            $limit,
-            $offset
+            [$limit, $offset]
         );
     }
 

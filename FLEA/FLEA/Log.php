@@ -12,25 +12,6 @@ namespace FLEA;
  */
 
 /**
- * 追加日志记录
- *
- * @param string $msg
- * @param string $level
- */
-function log_message($msg, $level = 'log', $title = '')
-{
-    static $instance = null;
-
-    if (is_null($instance)) {
-        $instance = [];
-        $obj = \FLEA::getSingleton('FLEA_Log');
-        $instance = array('obj' => $obj);
-    }
-
-    return $instance['obj']->appendLog($msg, $level, $title);
-}
-
-/**
  * FLEA_Log 类提供基本的日志服务
  *
  * @package Core

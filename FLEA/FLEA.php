@@ -204,10 +204,10 @@ class FLEA
      *
      * @param string $className 完整的类名（包含命名空间）
      * @return object
+     * @throws \FLEA\Exception\ExpectedClass
      */
     public static function getSingleton(string $className): object
     {
-        static $instances = [];
         if (FLEA::isRegistered($className)) {
             // 返回已经存在的对象实例
             return FLEA::registry($className);
@@ -218,9 +218,7 @@ class FLEA
             throw new \FLEA\Exception\ExpectedClass($className);
         }
 
-        $obj = new $className();
-        FLEA::register($obj, $className);
-        return $obj;
+        return FLEA::register(new $className(), $className);
     }
 
     /**

@@ -401,12 +401,13 @@ class TableDataGateway
      * 查询所有符合条件的记录及相关数据，返回一个包含多行记录的二维数组，失败时返回 false
      *
      * @param mixed $conditions
-     * @param string $sort
-     * @param mixed $limit
-     * @param mixed $fields
-     * @param mixed $queryLinks
+     * @param string|null $sort
+     * @param array|int|null $limit
+     * @param array|string $fields
+     * @param bool $queryLinks
      *
      * @return array
+     * @throws \FLEA\Exception\NotImplemented
      */
     public function findAll($conditions = null, ?string $sort = null, $limit = null, $fields = '*', bool $queryLinks = true): ?array
     {
@@ -415,7 +416,7 @@ class TableDataGateway
         $sortby = $sort != '' ? " ORDER BY {$sort}" : '';
         // 处理 $limit
         if (is_array($limit)) {
-            list($length, $offset) = $limit;
+            [$length, $offset] = $limit;
         } else {
             $length = $limit;
             $offset = null;

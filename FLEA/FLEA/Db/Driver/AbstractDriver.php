@@ -220,7 +220,7 @@ abstract class AbstractDriver
      * 执行一个查询，返回一个 resource 或者 boolean 值
      *
      * @param string $sql
-     * @param array $inputarr
+     * @param array|null $inputarr
      * @param boolean $throw 指示查询出错时是否抛出异常
      *
      * @return resource|boolean
@@ -394,7 +394,7 @@ abstract class AbstractDriver
     /**
      * 从记录集中返回一行数据
      *
-     * @param PDOStatement $res
+     * @param \PDOStatement $res
      *
      * @return array
      */
@@ -403,7 +403,7 @@ abstract class AbstractDriver
     /**
      * 从记录集中返回一行数据，字段名作为键名
      *
-     * @param PDOStatement $res
+     * @param \PDOStatement $res
      *
      * @return array
      */
@@ -412,7 +412,7 @@ abstract class AbstractDriver
     /**
      * 释放查询句柄
      *
-     * @param PDOStatement $res
+     * @param \PDOStatement $res
      *
      * @return boolean
      */

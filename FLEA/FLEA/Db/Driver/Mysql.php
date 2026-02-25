@@ -25,24 +25,24 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
     /**
      * @var string
      */
-    public $NEXT_ID_SQL    = 'UPDATE %s SET id = LAST_INSERT_ID(id + 1)';
+    public $NEXT_ID_SQL = 'UPDATE %s SET id = LAST_INSERT_ID(id + 1)';
     public $CREATE_SEQ_SQL = 'CREATE TABLE %s (id INT NOT NULL)';
-    public $INIT_SEQ_SQL   = 'INSERT INTO %s VALUES (%s)';
-    public $DROP_SEQ_SQL   = 'DROP TABLE %s';
+    public $INIT_SEQ_SQL = 'INSERT INTO %s VALUES (%s)';
+    public $DROP_SEQ_SQL = 'DROP TABLE %s';
     public $META_COLUMNS_SQL = 'SHOW FULL COLUMNS FROM %s';
     public $PARAM_STYLE = DBO_PARAM_QM;
-    public $HAS_INSERT_ID  = true;
+    public $HAS_INSERT_ID = true;
     public $HAS_AFFECTED_ROWS = true;
     /**
-     * @var PDO|null
+     * @var \PDO
      */
     protected $pdo = null;
     /**
-     * @var \PDOStatement|null
+     * @var \PDOStatement
      */
     protected $lastStmt = null;
     /**
-     * @var string|null
+     * @var string
      */
     protected $_mysqlVersion = null;
 
@@ -58,7 +58,9 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
         $this->lasterr = null;
         $this->lasterrcode = null;
 
-        if ($this->pdo && $dsn == false) { return true; }
+        if ($this->pdo && $dsn == false) {
+            return true;
+        }
         if (!$dsn) {
             $dsn = $this->dsn;
         } else {
@@ -70,8 +72,12 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
         } else {
             $host = $dsn['host'];
         }
-        if (!isset($dsn['login'])) { $dsn['login'] = ''; }
-        if (!isset($dsn['password'])) { $dsn['password'] = ''; }
+        if (!isset($dsn['login'])) {
+            $dsn['login'] = '';
+        }
+        if (!isset($dsn['password'])) {
+            $dsn['password'] = '';
+        }
 
         try {
             $charset = isset($dsn['charset']) && $dsn['charset'] != '' ? $dsn['charset'] : \FLEA::getAppInf('databaseCharset');
@@ -204,9 +210,15 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
      */
     public function qstr($value): string
     {
-        if (is_int($value) || is_float($value)) { return $value; }
-        if (is_bool($value)) { return $value ? $this->TRUE_VALUE : $this->FALSE_VALUE; }
-        if (is_null($value)) { return $this->NULL_VALUE; }
+        if (is_int($value) || is_float($value)) {
+            return $value;
+        }
+        if (is_bool($value)) {
+            return $value ? $this->TRUE_VALUE : $this->FALSE_VALUE;
+        }
+        if (is_null($value)) {
+            return $this->NULL_VALUE;
+        }
         return $this->pdo->quote($value);
     }
 
@@ -337,47 +349,49 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
          *  R 自动增量或计数器
          */
         static $typeMap = array(
-            'BIT'           => 'I',
-            'TINYINT'       => 'I',
-            'BOOL'          => 'L',
-            'BOOLEAN'       => 'L',
-            'SMALLINT'      => 'I',
-            'MEDIUMINT'     => 'I',
-            'INT'           => 'I',
-            'INTEGER'       => 'I',
-            'BIGINT'        => 'I',
-            'FLOAT'         => 'N',
-            'DOUBLE'        => 'N',
+            'BIT' => 'I',
+            'TINYINT' => 'I',
+            'BOOL' => 'L',
+            'BOOLEAN' => 'L',
+            'SMALLINT' => 'I',
+            'MEDIUMINT' => 'I',
+            'INT' => 'I',
+            'INTEGER' => 'I',
+            'BIGINT' => 'I',
+            'FLOAT' => 'N',
+            'DOUBLE' => 'N',
             'DOUBLEPRECISION' => 'N',
-            'DECIMAL'       => 'N',
-            'DEC'           => 'N',
+            'DECIMAL' => 'N',
+            'DEC' => 'N',
 
-            'DATE'          => 'D',
-            'DATETIME'      => 'T',
-            'TIMESTAMP'     => 'T',
-            'TIME'          => 'T',
-            'YEAR'          => 'I',
+            'DATE' => 'D',
+            'DATETIME' => 'T',
+            'TIMESTAMP' => 'T',
+            'TIME' => 'T',
+            'YEAR' => 'I',
 
-            'CHAR'          => 'C',
-            'NCHAR'         => 'C',
-            'VARCHAR'       => 'C',
-            'NVARCHAR'      => 'C',
-            'BINARY'        => 'B',
-            'VARBINARY'     => 'B',
-            'TINYBLOB'      => 'X',
-            'TINYTEXT'      => 'X',
-            'BLOB'          => 'X',
-            'TEXT'          => 'X',
-            'MEDIUMBLOB'    => 'X',
-            'MEDIUMTEXT'    => 'X',
-            'LONGBLOB'      => 'X',
-            'LONGTEXT'      => 'X',
-            'ENUM'          => 'C',
-            'SET'           => 'C',
+            'CHAR' => 'C',
+            'NCHAR' => 'C',
+            'VARCHAR' => 'C',
+            'NVARCHAR' => 'C',
+            'BINARY' => 'B',
+            'VARBINARY' => 'B',
+            'TINYBLOB' => 'X',
+            'TINYTEXT' => 'X',
+            'BLOB' => 'X',
+            'TEXT' => 'X',
+            'MEDIUMBLOB' => 'X',
+            'MEDIUMTEXT' => 'X',
+            'LONGBLOB' => 'X',
+            'LONGTEXT' => 'X',
+            'ENUM' => 'C',
+            'SET' => 'C',
         );
 
         $rs = $this->execute(sprintf($this->META_COLUMNS_SQL, $table));
-        if (!$rs) { return false; }
+        if (!$rs) {
+            return false;
+        }
         $retarr = [];
         while (($row = $this->fetchAssoc($rs))) {
             $field = [];
@@ -408,9 +422,11 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
             $field['notNull'] = ($row['Null'] != 'YES');
             $field['primaryKey'] = ($row['Key'] == 'PRI');
             $field['autoIncrement'] = (strpos($row['Extra'], 'auto_increment') !== false);
-            if ($field['autoIncrement']) { $field['simpleType'] = 'R'; }
-            $field['binary'] = (strpos($type,'blob') !== false);
-            $field['unsigned'] = (strpos($type,'unsigned') !== false);
+            if ($field['autoIncrement']) {
+                $field['simpleType'] = 'R';
+            }
+            $field['binary'] = (strpos($type, 'blob') !== false);
+            $field['unsigned'] = (strpos($type, 'unsigned') !== false);
 
             if ($field['type'] == 'tinyint' && $field['maxLength'] == 1) {
                 $field['simpleType'] = 'L';
