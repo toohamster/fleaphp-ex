@@ -89,7 +89,7 @@ return array(
     /**
      * 应用程序要使用的 url 调度器
      */
-    'dispatcher'                => 'FLEA_Dispatcher_Simple',
+    'dispatcher'                => '\FLEA\Dispatcher\Simple',
 
     /**
      * 调度器调度失败（例如控制器或控制器方法不存在）后，要调用的处理程序
@@ -169,12 +169,12 @@ return array(
     /**
      * 初始化 Ajax 时要载入的类
      */
-    'ajaxClassName'             => 'FLEA_Ajax',
+    'ajaxClassName'             => '\FLEA\Ajax',
 
     /**
      * 初始化 WebControls 时要载入的类
      */
-    'webControlsClassName'      => 'FLEA_WebControls',
+    'webControlsClassName'      => '\FLEA\WebControls',
 
     /**
      * WebControls 扩展控件的保存目录
@@ -208,7 +208,7 @@ return array(
     /**
      * 指定提供多语言支持的提供程序
      */
-    'languageSupportProvider'   => 'FLEA_Language',
+    'languageSupportProvider'   => '\FLEA\Language',
 
     /**
      * 指示语言文件的保存位置
@@ -227,12 +227,12 @@ return array(
 
     // }}}
 
-    // {{{ FLEA_Dispatcher_Auth 和 RBAC 组件
+    // {{{ \FLEA\Dispatcher\Auth 和 RBAC 组件
 
     /**
      * 调度器要使用的验证服务提供程序
      */
-    'dispatcherAuthProvider'    => 'FLEA_Rbac',
+    'dispatcherAuthProvider'    => '\FLEA\Rbac',
 
     /**
      * 指示 RBAC 组件要使用的默认 ACT 文件
@@ -284,7 +284,7 @@ return array(
     /**
      * 指示日志服务的程序
      */
-    'logProvider'               => 'FLEA_Log',
+    'logProvider'               => '\FLEA\Log',
 
     /**
      * 指示用什么目录保存日志文件
@@ -335,51 +335,31 @@ return array(
     /**
      * 数据验证服务助手
      */
-    'helper.verifier'           => 'FLEA_Helper_Verifier',
-
-    /**
-     * 加密算法助手
-     */
-    'helper.encryption'         => 'FLEA_Helper_Encryption',
-
-    /**
-     * 数组处理助手
-     */
-    'helper.array'              => 'FLEA_Helper_Array',
+    'helper.verifier'           => '\FLEA\Helper\Verifier',
 
     /**
      * 文件系统操作助手
      */
-    'helper.file'               => 'FLEA_Helper_FileSystem',
+    'helper.file'               => '\FLEA\Helper\SendFile',
 
     /**
      * 图像处理助手
      */
-    'helper.image'              => 'FLEA_Helper_Image',
+    'helper.image'              => '\FLEA\Helper\Image',
 
     /**
      * 分页助手
      */
-    'helper.pager'              => 'FLEA_Helper_Pager',
+    'helper.pager'              => '\FLEA\Helper\Pager',
 
     /**
      * 文件上传助手
      */
-    'helper.uploader'           => 'FLEA_Helper_FileUploader',
+    'helper.uploader'           => '\FLEA\Helper\FileUploader',
 
-    /**
-     * YAML 助手
-     */
-    'helper.yaml'               => 'FLEA_Helper_Yaml',
+    // }}}}
 
-    /**
-     * HTML 助手
-     */
-    'helper.html'               => 'FLEA_Helper_Html',
-
-    // }}}
-
-    // {{{ FLEA_Session_Db 设置
+    // {{{ \FLEA\Session\Db 设置
 
     /**
      * 指示使用应用程序中哪一个 DSN 连接 session 数据表
