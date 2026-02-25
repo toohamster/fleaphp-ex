@@ -9,7 +9,7 @@ use \FLEA\Controller\Action;
 /**
  * 文章控制器
  */
-class Post extends Action
+class PostController extends Action
 {
     /**
      * @var Post

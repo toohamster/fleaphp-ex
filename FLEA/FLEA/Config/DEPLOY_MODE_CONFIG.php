@@ -67,7 +67,7 @@ return array(
     /**
      * 是否将 url 参数中包含的控制器名字和动作名字强制转为小写
      */
-    'urlLowerChar'              => false,
+    'urlLowerChar'              => true,
 
     /**
      * 调用 url() 函数时，要调用的 callback 方法

@@ -105,9 +105,9 @@ class Action
      *
      * @param \FLEA\Dispatcher\Simple $dispatcher
      */
-    public function __setDispatcher(\FLEA\Dispatcher\Simple &$dispatcher): void
+    public function __setDispatcher(\FLEA\Dispatcher\Simple $dispatcher): void
     {
-        $this->_dispatcher =& $dispatcher;
+        $this->_dispatcher = $dispatcher;
     }
 
     /**

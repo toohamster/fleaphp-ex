@@ -278,7 +278,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
      */
     public function fetchAssoc(\PDOStatement $res): ?array
     {
-        return $res->fetch(\PDO::FETCH_ASSOC);
+        return $res->fetch(\PDO::FETCH_ASSOC) ?: null;
     }
 
     /**

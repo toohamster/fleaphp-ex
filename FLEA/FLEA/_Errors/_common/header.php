@@ -174,7 +174,7 @@ EOT;
 <script language="javascript" type="text/javascript">
 function switch_filedesc(id)
 {
-    public el = document.getElementById(id);
+    var el = document.getElementById(id);
     if (el.style.display == 'none') {
         el.style.display = 'block';
     } else {

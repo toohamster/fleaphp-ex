@@ -196,7 +196,7 @@ class Simple
         } else {
             $controllerClass .= $controllerName;
         }
-        return $controllerClass;
+        return $controllerClass . 'Controller';
     }
 
     /**

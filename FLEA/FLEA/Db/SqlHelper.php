@@ -24,11 +24,11 @@ class SqlHelper
      * 分析查询条件
      *
      * @param mixed $conditions
-     * @param \FLEA\Db\TableDataGateway $table
+     * @param TableDataGateway $table
      *
-     * @return array
+     * @return array|string
      */
-    public static function parseConditions($conditions, $table): ?array
+    public static function parseConditions($conditions, TableDataGateway $table)
     {
         // 对于 NULL，直接返回 NULL
         if (is_null($conditions)) { return null; }

@@ -1842,7 +1842,7 @@ class TableDataGateway
                     continue;
                 }
 
-                $link =& $this->links[$linkid];
+                $link = $this->links[$linkid];
                 /* @var $link \FLEA\Db\TableLink */
                 if (!$link->init) { $link->init(); }
                 $distinct = 'DISTINCT ';
