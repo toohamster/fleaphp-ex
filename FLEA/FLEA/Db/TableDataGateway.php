@@ -274,10 +274,10 @@ class TableDataGateway
             if (!empty($params['verifierProvider'])) {
                 $provider = $params['verifierProvider'];
             } else {
-                $provider = FLEA::getAppInf('helper.verifier');
+                $provider = \FLEA::getAppInf('helper.verifier');
             }
             if (!empty($provider)) {
-                $this->verifier = FLEA::getSingleton($provider);
+                $this->verifier = \FLEA::getSingleton($provider);
             }
         }
 
@@ -289,9 +289,9 @@ class TableDataGateway
         // 初始化数据访问对象
         if (!isset($params['dbo'])) {
             if (isset($params['dbDSN'])) {
-                $dbo = FLEA::getDBO($params['dbDSN']);
+                $dbo = \FLEA::getDBO($params['dbDSN']);
             } else {
-                $dbo = FLEA::getDBO();
+                $dbo = \FLEA::getDBO();
             }
         } else {
             $dbo = $params['dbo'];
@@ -1965,7 +1965,7 @@ class TableDataGateway
      */
     protected function _prepareMeta(bool $flushCache = false): bool
     {
-        $cached = FLEA::getAppInf('dbMetaCached');
+        $cached = \FLEA::getAppInf('dbMetaCached');
         $cacheId = $this->dbo->dsn['id'] . '/' . $this->fullTableName;
 
         $readFromCache = ($cached != false && $flushCache == false);
@@ -1973,7 +1973,7 @@ class TableDataGateway
             /**
              * 尝试从缓存读取
              */
-            $meta = FLEA::getCache($cacheId, FLEA::getAppInf('dbMetaLifetime'));
+            $meta = \FLEA::getCache($cacheId, \FLEA::getAppInf('dbMetaLifetime'));
             if (is_array($meta)) {
                 $this->meta = $meta;
                 return true;
@@ -1989,7 +1989,7 @@ class TableDataGateway
         }
 
         if ($cached) {
-            return FLEA::writeCache($cacheId, $this->meta);
+            return \FLEA::writeCache($cacheId, $this->meta);
         } else {
             return true;
         }

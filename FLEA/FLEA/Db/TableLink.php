@@ -272,9 +272,9 @@ class TableLink
         $dsnid = $this->dbo->dsn['id'];
 
         if (is_null($defaultDsnId)) {
-            $defaultDSN = FLEA::getAppInf('dbDSN');
+            $defaultDSN = \FLEA::getAppInf('dbDSN');
             if ($defaultDSN) {
-                $defaultDSN = FLEA::parseDSN($defaultDSN);
+                $defaultDSN = \FLEA::parseDSN($defaultDSN);
                 $defaultDsnId = $defaultDSN['id'];
             } else {
                 $defaultDsnId = -1;
@@ -372,8 +372,8 @@ class TableLink
     public function init(): void
     {
         if ($this->init) { return; }
-        if (FLEA::isRegistered($this->assocTDGObjectId)) {
-            $this->assocTDG = FLEA::registry($this->assocTDGObjectId);
+        if (\FLEA::isRegistered($this->assocTDGObjectId)) {
+            $this->assocTDG = \FLEA::registry($this->assocTDGObjectId);
         } else {
             if ($this->assocTDGObjectId) {
                 // 使用 Composer PSR-4 自动加载
@@ -381,9 +381,9 @@ class TableLink
                     throw new \FLEA\Exception\ExpectedClass($this->tableClass);
                 }
                 $this->assocTDG = new $this->tableClass(array('dbo' => $this->dbo));
-                FLEA::register($this->assocTDG, $this->assocTDGObjectId);
+                \FLEA::register($this->assocTDG, $this->assocTDGObjectId);
             } else {
-                $this->assocTDG = FLEA::getSingleton($this->tableClass);
+                $this->assocTDG = \FLEA::getSingleton($this->tableClass);
             }
         }
         $this->init = true;

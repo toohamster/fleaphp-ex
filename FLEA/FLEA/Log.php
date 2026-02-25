@@ -23,7 +23,7 @@ function log_message($msg, $level = 'log', $title = '')
 
     if (is_null($instance)) {
         $instance = [];
-        $obj = FLEA::getSingleton('FLEA_Log');
+        $obj = \FLEA::getSingleton('FLEA_Log');
         $instance = array('obj' => $obj);
     }
 
@@ -88,10 +88,10 @@ class Log
      */
     public function __construct()
     {
-        $dir = FLEA::getAppInf('logFileDir');
+        $dir = \FLEA::getAppInf('logFileDir');
         if (empty($dir)) {
             // 如果没有指定日志存放目录，则保存到内部缓存目录中
-            $dir = FLEA::getAppInf('internalCacheDir');
+            $dir = \FLEA::getAppInf('internalCacheDir');
         }
         $dir = realpath($dir);
         if (substr($dir, -1) != DIRECTORY_SEPARATOR) {
@@ -101,8 +101,8 @@ class Log
             $this->_enabled = false;
         } else {
             $this->_logFileDir = $dir;
-            $this->_logFilename = $this->_logFileDir . FLEA::getAppInf('logFilename');
-            $errorLevel = explode(',', strtolower(FLEA::getAppInf('logErrorLevel')));
+            $this->_logFilename = $this->_logFileDir . \FLEA::getAppInf('logFilename');
+            $errorLevel = explode(',', strtolower(\FLEA::getAppInf('logErrorLevel')));
             $errorLevel = array_map('trim', $errorLevel);
             $errorLevel = array_filter($errorLevel, 'trim');
             $this->_errorLevel = [];
@@ -129,7 +129,7 @@ class Log
             } else {
                 $filesize = 0;
             }
-            $maxsize = (int)FLEA::getAppInf('logFileMaxSize');
+            $maxsize = (int)\FLEA::getAppInf('logFileMaxSize');
             if ($maxsize >= 512) {
                 $maxsize = $maxsize * 1024;
                 if ($filesize >= $maxsize) {

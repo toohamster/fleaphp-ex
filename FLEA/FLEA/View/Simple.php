@@ -84,7 +84,7 @@ class Simple
         $this->enableCache = true;
         $this->cacheDir = './cache';
 
-        $viewConfig = (array)FLEA::getAppInf('viewConfig');
+        $viewConfig = (array)\FLEA::getAppInf('viewConfig');
         $keys = array(
             'templateDir', 'cacheDir', 'cacheLifeTime', 'enableCache',
         );

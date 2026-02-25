@@ -261,7 +261,7 @@ class ManyToManyLink extends TableLink
     {
         parent::init();
         if ($this->joinTableClass) {
-            $this->joinTDG = FLEA::getSingleton($this->joinTableClass);
+            $this->joinTDG = \FLEA::getSingleton($this->joinTableClass);
             $this->joinTable = $this->joinTDG->tableName;
             $joinSchema = $this->joinTDG->schema;
         } else {

@@ -27,7 +27,7 @@ namespace FLEA;
  *
  * 上述两行代码确保 Ajax 支持需要的 JavaScript 脚本被载入。
  *
- * 此处的 $ajax 对象是 FLEA_Ajax 类的一个实例。通过 FLEA::initAjax() 获得。
+ * 此处的 $ajax 对象是 FLEA_Ajax 类的一个实例。通过 \FLEA::initAjax() 获得。
  *
  * @author toohamster
  * @package Core
@@ -237,8 +237,8 @@ EOT;
             parse_str($attribs['params'], $params);
             $params = (array)$params;
             if (!empty($params)) {
-                $params = encode_url_args($params, FLEA::getAppInf('urlMode'));
-                switch (FLEA::getAppInf('urlMode')) {
+                $params = encode_url_args($params, \FLEA::getAppInf('urlMode'));
+                switch (\FLEA::getAppInf('urlMode')) {
                 case URL_PATHINFO:
                 case URL_REWRITE:
                     $url .= '/' . $params;

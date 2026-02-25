@@ -78,7 +78,7 @@ class Action
         static $instances = [];
 
         if (!isset($instances[$componentName])) {
-            $componentClassName = FLEA::getAppInf('component.' . $componentName);
+            $componentClassName = \FLEA::getAppInf('component.' . $componentName);
             // 使用 Composer PSR-4 自动加载
             if (!class_exists($componentClassName, false)) {
                 throw new \FLEA\Exception\ExpectedClass($componentClassName);
@@ -118,7 +118,7 @@ class Action
     protected function _getDispatcher(): \FLEA\Dispatcher\Auth
     {
         if (!is_object($this->_dispatcher)) {
-            $this->_dispatcher = FLEA::getSingleton(FLEA::getAppInf('dispatcher'));
+            $this->_dispatcher = \FLEA::getSingleton(\FLEA::getAppInf('dispatcher'));
         }
         return $this->_dispatcher;
     }
@@ -157,9 +157,9 @@ class Action
      */
     protected function _getView(): object
     {
-        $viewClass = FLEA::getAppInf('view');
+        $viewClass = \FLEA::getAppInf('view');
         if ($viewClass != 'PHP') {
-            return FLEA::getSingleton($viewClass);
+            return \FLEA::getSingleton($viewClass);
         } else {
             $view = false;
             return $view;
@@ -174,7 +174,7 @@ class Action
      */
     protected function _executeView(string $__flea_internal_viewName, ?array $data = null): void
     {
-        $viewClass = FLEA::getAppInf('view');
+        $viewClass = \FLEA::getAppInf('view');
         if ($viewClass == 'PHP') {
             if (strtolower(substr($__flea_internal_viewName, -4)) != '.php') {
                 $__flea_internal_viewName .= '.php';
@@ -228,7 +228,7 @@ class Action
      */
     protected function _registerEvent(string $controlName, string $event, string $action, ?array $attribs = null): string
     {
-        $ajax = FLEA::initAjax();
+        $ajax = \FLEA::initAjax();
         return $ajax->registerEvent($controlName, $event,
                 url($this->_controllerName, $action), $attribs);
     }

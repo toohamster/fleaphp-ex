@@ -50,7 +50,7 @@ class WebControls
         } elseif ($extendsDir != '') {
             $this->_extendsDir[] = $extendsDir;
         }
-        $extendsDir = FLEA::getAppInf('webControlsExtendsDir');
+        $extendsDir = \FLEA::getAppInf('webControlsExtendsDir');
         if (is_array($extendsDir)) {
             $this->_extendsDir = array_merge($this->_extendsDir, $extendsDir);
         } elseif ($extendsDir != '') {
@@ -167,9 +167,9 @@ class WebControls
      */
     protected function _getView()
     {
-        $viewClass = FLEA::getAppInf('view');
+        $viewClass = \FLEA::getAppInf('view');
         if ($viewClass != 'PHP') {
-            return FLEA::getSingleton($viewClass);
+            return \FLEA::getSingleton($viewClass);
         } else {
             $view = false;
             return $view;

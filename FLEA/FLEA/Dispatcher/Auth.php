@@ -28,7 +28,7 @@ class Auth extends \FLEA\Dispatcher\Simple
     public function __construct(array $request)
     {
         parent::__construct($request);
-        $this->_auth = FLEA::getSingleton(FLEA::getAppInf('dispatcherAuthProvider'));
+        $this->_auth = \FLEA::getSingleton(\FLEA::getAppInf('dispatcherAuthProvider'));
     }
 
     /**
@@ -108,7 +108,7 @@ class Auth extends \FLEA\Dispatcher\Simple
             return $this->_executeAction($controllerName, $actionName, $controllerClass);
         } else {
             // 检查失败
-            $callback = FLEA::getAppInf('dispatcherAuthFailedCallback');
+            $callback = \FLEA::getAppInf('dispatcherAuthFailedCallback');
 
             $rawACT = $this->getControllerACT($controllerName, $controllerClass);
             if (is_null($rawACT) || empty($rawACT)) { return true; }
@@ -198,22 +198,22 @@ class Auth extends \FLEA\Dispatcher\Simple
     public function getControllerACT($controllerName, $controllerClass)
     {
         // 首先尝试从全局 ACT 查询控制器的 ACT
-        $ACT = FLEA::getAppInfValue('globalACT', $controllerName);
+        $ACT = \FLEA::getAppInfValue('globalACT', $controllerName);
         if ($ACT) { return $ACT; }
 
         // 将控制器类名转换为文件路径
         $actFilename = str_replace('\\', DIRECTORY_SEPARATOR, $controllerClass) . '.act.php';
         
         if (!file_exists($actFilename)) {
-            if (FLEA::getAppInf('autoQueryDefaultACTFile')) {
+            if (\FLEA::getAppInf('autoQueryDefaultACTFile')) {
                 $ACT = $this->getControllerACTFromDefaultFile($controllerName);
                 if ($ACT) { return $ACT; }
             }
 
-            if (FLEA::getAppInf('controllerACTLoadWarning')) {
+            if (\FLEA::getAppInf('controllerACTLoadWarning')) {
                 trigger_error(sprintf(_ET(0x0701006), $controllerName), E_USER_WARNING);
             }
-            return FLEA::getAppInf('defaultControllerACT');
+            return \FLEA::getAppInf('defaultControllerACT');
         }
 
         return $this->_loadACTFile($actFilename);
@@ -226,12 +226,12 @@ class Auth extends \FLEA\Dispatcher\Simple
      */
     public function getControllerACTFromDefaultFile($controllerName)
     {
-        $actFilename = realpath(FLEA::getAppInf('defaultControllerACTFile'));
+        $actFilename = realpath(\FLEA::getAppInf('defaultControllerACTFile'));
         if (!$actFilename) {
-            if (FLEA::getAppInf('controllerACTLoadWarning')) {
+            if (\FLEA::getAppInf('controllerACTLoadWarning')) {
                 trigger_error(sprintf(_ET(0x0701006), $controllerName), E_USER_WARNING);
             }
-            return FLEA::getAppInf('defaultControllerACT');
+            return \FLEA::getAppInf('defaultControllerACT');
         }
 
         $ACT = $this->_loadACTFile($actFilename);
@@ -241,7 +241,7 @@ class Auth extends \FLEA\Dispatcher\Simple
         $controllerName = strtoupper($controllerName);
         return isset($ACT[$controllerName]) ?
             $ACT[$controllerName] :
-            FLEA::getAppInf('defaultControllerACT');
+            \FLEA::getAppInf('defaultControllerACT');
     }
 
     /**

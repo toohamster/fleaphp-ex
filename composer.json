@@ -22,19 +22,7 @@
     },
     "autoload": {
         "psr-4": {
-            "FLEA\\": "FLEA/FLEA/",
-            "FLEA\\Db\\": "FLEA/FLEA/Db/",
-            "FLEA\\Db\\Driver\\": "FLEA/FLEA/Db/Driver/",
-            "FLEA\\Db\\TableLink\\": "FLEA/FLEA/Db/TableLink/",
-            "FLEA\\Db\\Exception\\": "FLEA/FLEA/Db/Exception/",
-            "FLEA\\Controller\\": "FLEA/FLEA/Controller/",
-            "FLEA\\Dispatcher\\": "FLEA/FLEA/Dispatcher/",
-            "FLEA\\Helper\\": "FLEA/FLEA/Helper/",
-            "FLEA\\Helper\\FileUploader\\": "FLEA/FLEA/Helper/FileUploader/",
-            "FLEA\\View\\": "FLEA/FLEA/View/",
-            "FLEA\\Session\\": "FLEA/FLEA/Session/",
-            "FLEA\\Rbac\\": "FLEA/Rbac/",
-            "FLEA\\Acl\\": "FLEA/Acl/"
+            "FLEA\\": "FLEA/FLEA/"
         },
         "files": [
             "FLEA/Functions.php",

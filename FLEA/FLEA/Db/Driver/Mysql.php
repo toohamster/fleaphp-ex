@@ -74,7 +74,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
         if (!isset($dsn['password'])) { $dsn['password'] = ''; }
 
         try {
-            $charset = isset($dsn['charset']) && $dsn['charset'] != '' ? $dsn['charset'] : FLEA::getAppInf('databaseCharset');
+            $charset = isset($dsn['charset']) && $dsn['charset'] != '' ? $dsn['charset'] : \FLEA::getAppInf('databaseCharset');
 
             $dsnString = "mysql:host={$host}";
             if (!empty($dsn['database'])) {

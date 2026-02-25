@@ -96,15 +96,15 @@ class ActiveRecord
         $tableClass = $options['tableClass'];
 
         $objid = "{$myclass}_tdg";
-        if (FLEA::isRegistered($objid)) {
-            $this->_table = FLEA::registry($objid);
+        if (\FLEA::isRegistered($objid)) {
+            $this->_table = \FLEA::registry($objid);
         } else {
             // 使用 Composer PSR-4 自动加载
             if (!class_exists($tableClass, false)) {
                 throw new \FLEA\Exception\ExpectedClass($tableClass);
             }
             $this->_table = new $tableClass(array('skipCreateLinks' => true));
-            FLEA::register($this->_table, $objid);
+            \FLEA::register($this->_table, $objid);
         }
 
         if (!empty($options['propertiesMapping'])) {

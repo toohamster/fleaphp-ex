@@ -107,7 +107,7 @@ class Language
      */
     public function __construct()
     {
-        $autoload = FLEA::getAppInf('autoLoadLanguage');
+        $autoload = \FLEA::getAppInf('autoLoadLanguage');
         if (!is_array($autoload)) {
             $autoload = explode(',', $autoload);
         }
@@ -145,13 +145,13 @@ class Language
             $dictname = preg_replace('/[^a-z0-9\-_]+/i', '', strtolower($dictname));
             $language = preg_replace('/[^a-z0-9\-_]+/i', '', strtolower($language));
             if ($language == '') {
-                $language = FLEA::getAppInf('defaultLanguage');
+                $language = \FLEA::getAppInf('defaultLanguage');
                 $default = true;
             } else {
                 $default = false;
             }
 
-            $filename = FLEA::getAppInf('languageFilesDir') . DS .
+            $filename = \FLEA::getAppInf('languageFilesDir') . DS .
                 $language . DS . $dictname . '.php';
             if (isset($this->_loadedFiles[$filename])) { continue; }
 

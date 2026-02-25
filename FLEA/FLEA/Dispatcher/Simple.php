@@ -36,8 +36,8 @@ class Simple
     {
         $this->_requestBackup =& $request;
 
-        $controllerAccessor = strtolower(FLEA::getAppInf('controllerAccessor'));
-        $actionAccessor = strtolower(FLEA::getAppInf('actionAccessor'));
+        $controllerAccessor = strtolower(\FLEA::getAppInf('controllerAccessor'));
+        $actionAccessor = strtolower(\FLEA::getAppInf('actionAccessor'));
 
         $r = array_change_key_case($request, CASE_LOWER);
         $data = array('controller' => null, 'action' => null);
@@ -73,11 +73,11 @@ class Simple
      */
     protected function _executeAction(string $controllerName, string $actionName, string $controllerClass)
     {
-        $callback = FLEA::getAppInf('dispatcherFailedCallback');
+        $callback = \FLEA::getAppInf('dispatcherFailedCallback');
 
         // 确定动作方法名
-        $actionPrefix = FLEA::getAppInf('actionMethodPrefix');
-        $actionMethod = $actionPrefix . $actionName . FLEA::getAppInf('actionMethodSuffix');
+        $actionPrefix = \FLEA::getAppInf('actionMethodPrefix');
+        $actionMethod = $actionPrefix . $actionName . \FLEA::getAppInf('actionMethodSuffix');
 
         $controller = null;
         do {
@@ -85,8 +85,8 @@ class Simple
             if (!$this->_loadController($controllerClass)) { break; }
 
             // 构造控制器对象
-            FLEA::setAppInf('FLEA.internal.currentControllerName', $controllerName);
-            FLEA::setAppInf('FLEA.internal.currentActionName', $actionName);
+            \FLEA::setAppInf('FLEA.internal.currentControllerName', $controllerName);
+            \FLEA::setAppInf('FLEA.internal.currentActionName', $actionName);
             $controller = new $controllerClass($controllerName);
             if (!method_exists($controller, $actionMethod)) { break; }
             if (method_exists($controller, '__setController')) {
@@ -137,9 +137,9 @@ class Simple
     {
         $controllerName = preg_replace('/[^a-z0-9_]+/i', '', $this->_request['controller']);
         if ($controllerName == '') {
-            $controllerName = FLEA::getAppInf('defaultController');
+            $controllerName = \FLEA::getAppInf('defaultController');
         }
-        if (FLEA::getAppInf('urlLowerChar')) {
+        if (\FLEA::getAppInf('urlLowerChar')) {
             $controllerName = strtolower($controllerName);
         }
         return $controllerName;
@@ -166,7 +166,7 @@ class Simple
     {
         $actionName = preg_replace('/[^a-z0-9]+/i', '', $this->_request['action']);
         if ($actionName == '') {
-            $actionName = FLEA::getAppInf('defaultAction');
+            $actionName = \FLEA::getAppInf('defaultAction');
         }
         return $actionName;
     }
@@ -190,8 +190,8 @@ class Simple
      */
     public function getControllerClass(string $controllerName): string
     {
-        $controllerClass = FLEA::getAppInf('controllerClassPrefix');
-        if (FLEA::getAppInf('urlLowerChar')) {
+        $controllerClass = \FLEA::getAppInf('controllerClassPrefix');
+        if (\FLEA::getAppInf('urlLowerChar')) {
             $controllerClass .= ucfirst(strtolower($controllerName));
         } else {
             $controllerClass .= $controllerName;
@@ -212,8 +212,8 @@ class Simple
         $args = [];
         parse_str($url['query'], $args);
         $args = array_change_key_case($args, CASE_LOWER);
-        $controllerAccessor = strtolower(FLEA::getAppInf('controllerAccessor'));
-        $actionAccessor = strtolower(FLEA::getAppInf('actionAccessor'));
+        $controllerAccessor = strtolower(\FLEA::getAppInf('controllerAccessor'));
+        $actionAccessor = strtolower(\FLEA::getAppInf('actionAccessor'));
 
         $controllerName = isset($args[$controllerAccessor]) ?
                 $args[$controllerAccessor] : null;

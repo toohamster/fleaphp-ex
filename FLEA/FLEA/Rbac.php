@@ -2,8 +2,6 @@
 
 namespace FLEA;
 
-use FLEA;
-
 /////////////////////////////////////////////////////////////////////////////
 // FleaPHP Framework
 //
@@ -12,6 +10,7 @@ use FLEA;
 // 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
 // 或者访问 http://www.fleaphp.org/ 获得详细信息。
 /////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * 定义 \FLEA\Rbac 类
@@ -54,7 +53,7 @@ class Rbac
      */
     public function __construct()
     {
-        $this->_sessionKey = FLEA::getAppInf('RBACSessionKey');
+        $this->_sessionKey = \FLEA::getAppInf('RBACSessionKey');
         if ($this->_sessionKey == 'RBAC_USERDATA') {
             trigger_error(_ET(0x0701005), E_USER_WARNING);
         }
