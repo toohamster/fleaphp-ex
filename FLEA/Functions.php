@@ -47,6 +47,17 @@ function class_loader()
 }
 
 /**
+ * 创建 SQL 语句对象
+ *
+ * @param \PDOStatement|string $sql
+ * @return \FLEA\Db\SqlStatement
+ */
+function sql_statement($sql): \FLEA\Db\SqlStatement
+{
+    return \FLEA\Db\SqlStatement::create($sql);
+}
+
+/**
  * 重定向浏览器到指定的 URL
  *
  * @param string $url 要重定向的 URL
