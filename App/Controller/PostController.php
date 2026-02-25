@@ -22,6 +22,11 @@ class PostController extends Action
     protected $commentModel;
 
     /**
+     * @var \FLEA\View\Simple
+     */
+    public $view;
+
+    /**
      * 构造函数
      */
     public function __construct()
@@ -29,6 +34,7 @@ class PostController extends Action
         parent::__construct('Post');
         $this->postModel = new Post();
         $this->commentModel = new Comment();
+        $this->view = $this->_getView();
     }
 
     /**

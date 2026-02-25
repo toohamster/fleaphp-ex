@@ -30,7 +30,13 @@ return array(
     'dispatcher' => \FLEA\Dispatcher\Simple::class,
 
     // 模板引擎
-    'view' => 'PHP',
+    'view' => \FLEA\View\Simple::class,
+    'viewConfig' => array(
+        'templateDir' => __DIR__ . '/View',
+        'cacheDir' => __DIR__ . '/../cache',
+        'cacheLifeTime' => 900,
+        'enableCache' => false,
+    ),
 
     // 错误显示（开发环境）
     'displayErrors' => true,

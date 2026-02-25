@@ -590,6 +590,7 @@ class FLEA
 
         $dispatcher = new $dispatcherClass($_GET);
         FLEA::register($dispatcher, $dispatcherClass);
+        /**@var \FLEA\Dispatcher\Simple $dispatcher*/
         $dispatcher->dispatching();
     }
 

@@ -63,3 +63,84 @@ $posts = $this->postModel->getPublishedPosts($pageSize, $offset);
 
 ---
 
+
+## 2026-02-25 - 设置博客应用使用 Simple 视图引擎
+
+### 修改文件
+- `App/Config.php` - 应用配置文件
+- `App/Controller/PostController.php` - 文章控制器
+
+### Config.php 修改
+
+添加了视图配置:
+```php
+'view' => \FLEA\View\Simple::class,
+'viewConfig' => array(
+    'templateDir' => __DIR__ . '/View',
+    'cacheDir' => __DIR__ . '/../cache',
+    'cacheLifeTime' => 900,
+    'enableCache' => false,
+),
+```
+
+**修改前**:
+```php
+'view' => 'PHP',
+```
+
+**修改后**:
+```php
+'view' => \FLEA\View\Simple::class,
+'viewConfig' => array(
+    'templateDir' => __DIR__ . '/View',
+    'cacheDir' => __DIR__ . '/../cache',
+    'cacheLifeTime' => 900,
+    'enableCache' => false,
+),
+```
+
+### PostController.php 修改
+
+添加了视图支持:
+
+```php
+/**
+ * @var \FLEA\View\Simple
+ */
+public $view;
+
+/**
+ * 构造函数
+ */
+public function __construct()
+{
+    parent::__construct('Post');
+    $this->postModel = new Post();
+    $this->commentModel = new Comment();
+    $this->view = $this->_getView();  // 获取视图对象
+}
+```
+
+### 视图文件位置
+
+模板文件位于:
+- `App/View/post/index.php` - 文章列表页
+- `App/View/post/view.php` - 文章详情页
+- `App/View/post/create.php` - 创建文章页
+- `App/View/post/edit.php` - 编辑文章页
+
+### 配置说明
+
+- **templateDir**: 模板文件目录,指向 `App/View/`
+- **cacheDir**: 缓存文件目录,指向 `cache/`
+- **cacheLifeTime**: 缓存过期时间(秒)
+- **enableCache**: 是否启用缓存(开发环境关闭)
+
+### 验证
+
+- ✅ 配置文件语法正确
+- ✅ 控制器可以正常使用视图
+- ✅ 模板文件路径正确
+
+---
+

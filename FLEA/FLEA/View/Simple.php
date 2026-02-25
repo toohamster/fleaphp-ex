@@ -26,7 +26,7 @@ class Simple
      *
      * @var string
      */
-    public $path;
+    public $templateDir;
 
     /**
      * 缓存过期时间
@@ -75,11 +75,11 @@ class Simple
      *
      * @return \FLEA\View\Simple
      */
-    public function __construct(?string $path = null)
+    public function __construct(?string $templateDir = null)
     {
         log_message('Construction \FLEA\View\Simple', 'debug');
 
-        $this->path = $path;
+        $this->templateDir = $templateDir;
         $this->cacheLifetime = 900;
         $this->enableCache = true;
         $this->cacheDir = './cache';
@@ -133,7 +133,7 @@ class Simple
         extract($this->vars);
         ob_start();
 
-        include($this->path . DIRECTORY_SEPARATOR . $file);
+        include($this->templateDir . DIRECTORY_SEPARATOR . $file);
         $contents = ob_get_contents();
         ob_end_clean();
 

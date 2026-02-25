@@ -636,3 +636,133 @@ catch(\PDOException $e)
 ## 2026-02-24 - 更新文档以反映 PSR-4 迁移
 
 ---
+
+## 2026-02-25 - 引入 SqlStatement 类统一 SQL 处理
+
+### 背景
+
+在 FLEA\Db\ 的一些场景里,`$sql` 变量除了字符串类型之外也有可能是 `\PDOStatement` 对象。为了统一处理这两种情况,引入了 `\FLEA\Db\SqlStatement` 类来封装 SQL 语句或 PDOStatement 对象。
+
+### 新增文件
+- `FLEA/FLEA/Db/SqlStatement.php` - SQL 语句封装类
+- `FLEA/Functions.php` - 新增 `sql_statement()` 全局函数
+
+### SqlStatement 类设计
+
+类提供了以下功能:
+- 封装 SQL 字符串或 PDOStatement 对象
+- 通过 `isResource()` 判断内部类型
+- 通过 `getSql()` 获取内部对象
+- 通过静态方法 `create()` 创建实例
+
+### 修改的核心方法
+
+#### AbstractDriver.php
+
+修改了以下方法的参数类型为 `\FLEA\Db\SqlStatement`:
+- `execute()` - 参数和返回值改为 `\FLEA\Db\SqlStatement`
+- `selectLimit()` - 参数改为 `string`,返回值改为 `\FLEA\Db\SqlStatement`
+- `getAll()`, `getOne()`, `getRow()`, `getCol()`, `getAllGroupBy()`, `getAllWithFieldRefs()`, `assemble()` - 参数改为 `\FLEA\Db\SqlStatement`
+
+#### 核心逻辑优化
+
+在 `execute()` 方法中添加了性能优化:
+```php
+public function execute(\FLEA\Db\SqlStatement $sql, ?array $inputarr = null, bool $throw = true): \FLEA\Db\SqlStatement
+{
+    // 如果已经是 PDOStatement 对象,直接返回
+    if ($sql->isResource()) {
+        return $sql;
+    }
+    // ... 执行逻辑 ...
+}
+```
+
+### 兼容性处理
+
+所有查询方法统一使用:
+```php
+$res = $sql->isResource() ? $sql->getSql() : $this->execute($sql)->getSql();
+```
+
+### 修改的框架文件
+
+1. `FLEA/FLEA/Db/Driver/AbstractDriver.php` - 抽象驱动基类
+2. `FLEA/FLEA/Db/Driver/Mysql.php` - MySQL 驱动实现
+3. `FLEA/FLEA/Db/TableDataGateway.php` - 数据表网关
+4. `FLEA/FLEA/Helper/Pager.php` - 分页助手
+
+### 修改的辅助文件
+
+1. `FLEA/FLEA/Db/TableLink/ManyToManyLink.php` - 多对多关联
+2. `FLEA/FLEA/Db/TableLink/HasManyLink.php` - 一对多关联
+3. `FLEA/FLEA/Acl/Table/UserGroups.php` - 用户组管理
+4. `FLEA/FLEA/Session/Db.php` - Session 存储
+
+### 优势
+
+1. **统一接口** - 统一使用 SqlStatement 对象处理
+2. **类型安全** - 方法参数类型明确
+3. **性能优化** - 避免重复执行已执行的查询
+4. **向后兼容** - 使用 sql_statement() 函数包装现有代码
+
+### 验证
+
+- ✅ 所有修改的文件通过了 PHP 语法检查
+- ✅ SqlStatement 类功能完整
+- ✅ sql_statement() 全局函数正常工作
+- ✅ 框架核心方法全部适配
+- ✅ 辅助类全部适配
+
+---
+
+## 2026-02-25 - 修复 Sqlitepdo.php 驱动错误
+
+### 修改文件
+- `FLEA/FLEA/Db/Driver/Sqlitepdo.php`
+
+### 修复的错误
+
+1. **failTrans() 方法逻辑错误** - 将 `$this->_transCommit = true` 改为 `false`
+2. **使用数组解构** - 将 `list()` 改为 `[$length, $offset]`
+3. **connect() 返回值** - 改为返回 `true`
+4. **affectedRows() 方法** - 修复注释和参数
+
+### 注
+
+Sqlitepdo.php 驱动文件已被删除,仅保留修改记录。
+
+---
+
+## 2026-02-25 - Simple 视图引擎优化
+
+### 修改文件
+- `FLEA/FLEA/View/Simple.php`
+
+### 修改内容
+
+1. **重命名属性**
+   - 将 `$path` 重命名为 `$templateDir`
+   - 使变量名与配置键名保持一致
+
+2. **简化构造函数**
+   - 移除了对 `templateDir` 的特殊判断逻辑
+   - 统一使用 `$this->{$key} = $viewConfig[$key]` 赋值
+
+3. **更新模板加载**
+   - 将 `$this->path` 改为 `$this->templateDir`
+
+### 优化效果
+
+1. 变量名与配置键名保持一致
+2. 代码更简洁
+3. 类型安全性更好
+
+### 验证
+
+- ✅ Simple.php 语法检查通过
+- ✅ 配置加载逻辑正确
+- ✅ 模板路径处理正确
+
+---
+
