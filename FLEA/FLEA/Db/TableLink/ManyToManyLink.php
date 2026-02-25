@@ -169,7 +169,7 @@ class ManyToManyLink extends TableLink
         // 首先取出现有的关联信息
         $qpkv = $this->dbo->qstr($pkv);
         $sql = "SELECT {$this->qassocForeignKey} FROM {$this->qjoinTable} WHERE {$this->qforeignKey} = {$qpkv} ";
-        $existsMiddle = (array)$this->dbo->getCol($sql);
+        $existsMiddle = (array)$this->dbo->getCol(sql_statement($sql));
 
         // 然后确定要添加的关联信息
         $insertAssoc = array_diff($apkvs, $existsMiddle);

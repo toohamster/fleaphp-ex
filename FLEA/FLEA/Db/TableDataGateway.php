@@ -719,7 +719,7 @@ class TableDataGateway
             $fields = $this->dbo->qfields($fields, $this->fullTableName);
         }
         $sql = "SELECT {$distinct}COUNT({$fields}) FROM {$this->qtableName}{$whereby}";
-        return (int)$this->dbo->getOne($sql);
+        return (int)$this->dbo->getOne(sql_statement($sql));
     }
 
     /**
@@ -2135,7 +2135,7 @@ class TableDataGateway
             } else {
                 $pkv = $this->dbo->qstr($row[$this->primaryKey]);
                 $sql = "SELECT {$link->foreignKey} FROM {$this->qtableName} WHERE {$this->qpk} = {$pkv}";
-                $fkv = $this->dbo->getOne($sql);
+                $fkv = $this->dbo->getOne(sql_statement($sql));
             }
 
             $conditions = "{$link->qforeignKey} = {$fkv}";

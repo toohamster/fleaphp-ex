@@ -60,7 +60,7 @@ class HasManyLink extends TableLink
 
         // 首先取出现有的关联信息
         $sql = "SELECT {$this->assocTDG->qpk} FROM {$this->assocTDG->qtableName} WHERE {$this->qforeignKey} = {$qpkv} ";
-        $existsAssoc = (array)$this->dbo->getCol($sql);
+        $existsAssoc = (array)$this->dbo->getCol(sql_statement($sql));
 
         // 确定要添加的关联信息
         $insertAssoc = [];

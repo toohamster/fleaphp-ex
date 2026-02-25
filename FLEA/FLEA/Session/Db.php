@@ -82,19 +82,19 @@ class Db
      */
     public function __construct()
     {
-        $this->tableName = FLEA::getAppInf('sessionDbTableName');
-        $this->fieldId = FLEA::getAppInf('sessionDbFieldId');
-        $this->fieldData = FLEA::getAppInf('sessionDbFieldData');
-        $this->fieldActivity = FLEA::getAppInf('sessionDbFieldActivity');
-        $this->lifeTime = (int)FLEA::getAppInf('sessionDbLifeTime');
+        $this->tableName = \FLEA::getAppInf('sessionDbTableName');
+        $this->fieldId = \FLEA::getAppInf('sessionDbFieldId');
+        $this->fieldData = \FLEA::getAppInf('sessionDbFieldData');
+        $this->fieldActivity = \FLEA::getAppInf('sessionDbFieldActivity');
+        $this->lifeTime = (int)\FLEA::getAppInf('sessionDbLifeTime');
 
         session_set_save_handler(
-            array(& $this, 'sessionOpen'),
-            array(& $this, 'sessionClose'),
-            array(& $this, 'sessionRead'),
-            array(& $this, 'sessionWrite'),
-            array(& $this, 'sessionDestroy'),
-            array(& $this, 'sessionGc')
+            array($this, 'sessionOpen'),
+            array($this, 'sessionClose'),
+            array($this, 'sessionRead'),
+            array($this, 'sessionWrite'),
+            array($this, 'sessionDestroy'),
+            array($this, 'sessionGc')
         );
     }
 
@@ -116,9 +116,9 @@ class Db
      */
     public function sessionOpen(string $savePath, string $sessionName): bool
     {
-        $dsnName = FLEA::getAppInf('sessionDbDSN');
-        $dsn = FLEA::getAppInf($dsnName);
-        $this->dbo =& FLEA::getDBO($dsn);
+        $dsnName = \FLEA::getAppInf('sessionDbDSN');
+        $dsn = \FLEA::getAppInf($dsnName);
+        $this->dbo = \FLEA::getDBO($dsn);
         if (!$this->dbo) { return false; }
 
         if (!empty($this->dbo->dsn['prefix'])) {
@@ -129,7 +129,7 @@ class Db
         $this->fieldData = $this->dbo->qfield($this->fieldData);
         $this->fieldActivity = $this->dbo->qfield($this->fieldActivity);
 
-        $this->sessionGc(FLEA::getAppInf('sessionDbLifeTime'));
+        $this->sessionGc(\FLEA::getAppInf('sessionDbLifeTime'));
 
         return true;
     }
@@ -160,7 +160,7 @@ class Db
             $sql .= " AND {$this->fieldActivity} >= {$time}";
         }
 
-        return $this->dbo->getOne($sql);
+        return $this->dbo->getOne(sql_statement($sql));
     }
 
     /**
@@ -179,7 +179,7 @@ class Db
         $activity = time();
 
         $fields = (array)$this->_beforeWrite($sessid);
-        if ((int)$this->dbo->getOne($sql) > 0) {
+        if ((int)$this->dbo->getOne(sql_statement($sql)) > 0) {
             $sql = "UPDATE {$this->tableName} SET {$this->fieldData} = {$data}, {$this->fieldActivity} = {$activity}";
             if (!empty($fields)) {
                 $arr = [];
@@ -258,7 +258,7 @@ class Db
             $time = time() - $lifetime;
             $sql .= " WHERE {$this->fieldActivity} >= {$time}";
         }
-        return (int)$this->dbo->getOne($sql);
+        return (int)$this->dbo->getOne(sql_statement($sql));
     }
 
     /**
@@ -277,6 +277,6 @@ class Db
      */
     protected function _beforeWrite(string $sessid): array
     {
-        return array();
+        return [];
     }
 }
