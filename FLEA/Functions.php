@@ -10,6 +10,7 @@
  * @version 1.0
  */
 
+use FLEA;
 use FLEA\Config;
 
 /**
@@ -457,12 +458,12 @@ function dump_trace(): void
 function microtime_float(?string $time = null): float
 {
     if ($time === null) {
-        list($usec, $sec) = explode(' ', microtime());
-        return (float)$usec + (float)$sec;
+        return microtime(true);
     }
-
-    list($usec, $sec) = explode(' ', $time);
-    return (float)$usec + (float)$sec;
+    
+    // 处理传入的时间字符串
+    $parts = explode(' ', $time);
+    return (float)($parts[0] ?? 0) + (float)($parts[1] ?? 0);
 }
 
 /**
@@ -511,6 +512,7 @@ function _ET(int $errorCode, bool $appError = false): string
  * @param string $language 指定为 '' 时表示从默认语言包中获取翻译
  *
  * @return string
+ * @throws FLEA\Exception\ExpectedClass
  */
 function _T(string $key, string $language = ''): string
 {
@@ -529,6 +531,7 @@ function _T(string $key, string $language = ''): string
  * @param boolean $noException
  *
  * @return boolean
+ * @throws FLEA\Exception\ExpectedClass
  */
 function load_language(string $dictname, string $language = '', bool $noException = false): bool
 {
@@ -548,7 +551,7 @@ function load_language(string $dictname, string $language = '', bool $noExceptio
  * @param int $mode 权限模式
  * @return bool
  */
-function mkdirs($dir, $mode = 0777)
+function mkdirs($dir, $mode = 0777): bool
 {
     return is_dir($dir) || (mkdirs(dirname($dir), $mode) && @mkdir($dir, $mode));
 }
@@ -559,7 +562,7 @@ function mkdirs($dir, $mode = 0777)
  * @param string $dir 目录路径
  * @return bool
  */
-function rmdirs($dir)
+function rmdirs($dir): bool
 {
     if (!is_dir($dir)) {
         return false;
@@ -624,7 +627,7 @@ function array_col_values(array $arr, string $col): array
  *
  * @param array $arr
  * @param string $keyField
- * @param string $valueField
+ * @param string|null $valueField
  *
  * @return array
  */
@@ -670,13 +673,13 @@ function array_group_by(array &$arr, string $keyField): array
  *
  * @param array $arr 原始数据
  * @param string $fid 节点ID字段名
- * @param string $fparent 节点父ID字段名
- * @param string $fchildrens 保存子节点的字段名
+ * @param string $parentIdKey 节点父ID字段名
+ * @param string $childrenIdKey 保存子节点的字段名
  * @param boolean $returnReferences 是否在返回结果中包含节点引用
  *
  * return array
  */
-function array_to_tree(array $arr, string $fid, string $fparent = 'parent_id', string $fchildrens = 'childrens', bool $returnReferences = false): array
+function array_to_tree(array $arr, string $fid, string $parentIdKey = 'parent_id', string $childrenIdKey = 'children', bool $returnReferences = false): array
 {
     $pkvRefs = [];
     foreach ($arr as $offset => $row) {
@@ -685,38 +688,38 @@ function array_to_tree(array $arr, string $fid, string $fparent = 'parent_id', s
 
     $tree = [];
     foreach ($arr as $offset => $row) {
-        $parentId = $row[$fparent];
+        $parentId = $row[$parentIdKey];
         if ($parentId) {
             if (!isset($pkvRefs[$parentId])) { continue; }
             $parent =& $pkvRefs[$parentId];
-            $parent[$fchildrens][] =& $arr[$offset];
+            $parent[$childrenIdKey][] =& $arr[$offset];
         } else {
             $tree[] =& $arr[$offset];
         }
     }
     if ($returnReferences) {
-        return array('tree' => $tree, 'refs' => $pkvRefs);
-    } else {
-        return $tree;
+        return ['tree' => $tree, 'refs' => $pkvRefs];
     }
+
+    return $tree;
 }
 
 /**
  * 将树转换为平面的数组
  *
  * @param array $node
- * @param string $fchildrens
+ * @param string $fchildren
  *
  * @return array
  */
-function tree_to_array(array &$node, string $fchildrens = 'childrens'): array
+function tree_to_array(array &$node, string $fchildren = 'children'): array
 {
     $ret = [];
-    if (isset($node[$fchildrens]) && is_array($node[$fchildrens])) {
-        foreach ($node[$fchildrens] as $child) {
-            $ret = array_merge($ret, tree_to_array($child, $fchildrens));
+    if (isset($node[$fchildren]) && is_array($node[$fchildren])) {
+        foreach ($node[$fchildren] as $child) {
+            $ret = array_merge($ret, tree_to_array($child, $fchildren));
         }
-        unset($node[$fchildrens]);
+        unset($node[$fchildren]);
         $ret[] = $node;
     } else {
         $ret[] = $node;
@@ -728,14 +731,14 @@ function tree_to_array(array &$node, string $fchildrens = 'childrens'): array
  * 根据指定的键值对数组排序
  *
  * @param array $array 要排序的数组
- * @param string $keyname 键值名称
- * @param int $sortDirection 排序方向
+ * @param string $key 键值名称
+ * @param int $sort 排序方向
  *
  * @return array
  */
-function array_column_sort(array $array, string $keyname, int $sortDirection = SORT_ASC): array
+function array_column_sort(array $array, string $key, int $sort = SORT_ASC): array
 {
-    return array_sortby_multifields($array, array($keyname => $sortDirection));
+    return array_sortby_multifields($array, [$key => $sort]);
 }
 
 /**
@@ -1019,41 +1022,61 @@ function html_form_close(): void
 }
 
 /**
- * 加载 YAML 配置文件
+ * 载入 YAML 文件，返回分析结果
  *
- * @param string $filename 文件名
- * @param bool $cacheEnabled 是否启用缓存
- * @param mixed $replace 要替换的内容
- * @return mixed
+ * load_yaml() 会自动使用缓存，只有当 YAML 文件被改变后，缓存才会更新。
+ *
+ * 关于 YAML 的详细信息,请参考 www.yaml.org 。
+ *
+ * 用法：
+ * <code>
+ * $data = load_yaml('myData.yaml');
+ * </code>
+ *
+ * 注意：为了安全起见，不要使用 YAML 存储敏感信息，例如密码。
+ * 或者将 YAML 文件的扩展名设置为 .yaml.php，并且在每一个 YAML 文件开头添加“exit()”。
+ * 例如：
+ * <code>
+ * # <?php exit(); ?>
+ *
+ * invoice: 34843
+ * date   : 2001-01-23
+ * bill-to: &id001
+ * ......
+ * </code>
+ *
+ * 这样可以确保即便浏览器直接访问该 .yaml.php 文件，也无法看到内容。
+ *
+ * @param string $filename
+ * @param boolean $cacheEnabled 是否缓存分析内容
+ * @param null $replace
+ *
+ * @return array
+ * @throws FLEA\Exception\CacheDisabled
+ * @throws FLEA\Exception\ExpectedFile
  */
-function load_yaml($filename, $cacheEnabled = true, $replace = null)
+function load_yaml(string $filename, $cacheEnabled = true, $replace = null): array
 {
-    $cacheKey = 'yaml_' . md5($filename);
-
-    if ($cacheEnabled) {
-        $cached = FLEA::loadCache($cacheKey);
-        if ($cached !== null) {
-            return $cached;
-        }
+    static $yamlServ = null;
+    if ($yamlServ === null) {
+        require_once FLEA_3RD_DIR . '/Spyc/spyc.php';
+        $yamlServ = new Spyc();
     }
 
-    $content = file_get_contents($filename);
-    if ($content === false) {
-        return null;
-    }
-
-    $yaml = new \FLEA\Helper\Yaml();
-    $data = $yaml->parse($content);
-
-    if ($replace !== null) {
-        $data = array_replace_recursive($data, $replace);
+    if (!file_exists($filename)) {
+        throw new \FLEA\Exception\ExpectedFile($filename);
     }
 
     if ($cacheEnabled) {
-        FLEA::saveCache($cacheKey, $data);
+        $arr = FLEA::getCache('yaml-' . $filename, filemtime($filename), false);
+        if ($arr) { return $arr; }
     }
 
-    return $data;
+    $arr = $yamlServ->load($filename, $replace);
+    if ($cacheEnabled) {
+        FLEA::writeCache('yaml-' . $filename, $arr);
+    }
+    return $arr;
 }
 
 /**
