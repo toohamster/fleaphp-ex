@@ -6,6 +6,14 @@
 
 ## 2026-02-26
 
+### fix: 修复关联查询中 TableDataGateway 类型错误
+
+- `FLEA/FLEA/Db/TableDataGateway.php`：`$assocRowset = null` 改为 `[]`（匹配 array 类型）
+- `FLEA/FLEA/Db/TableDataGateway.php`：3 处 `assemble()` 调用使用 `sql_statement()` 包装
+- `FLEA/FLEA/Db/TableLink.php`：`init()` 添加 null 检查，防止 `isRegistered(null)` 错误
+
+---
+
 ### feat: 建立 Post 和 Comment 模型关联关系并优化控制器查询
 
 - `App/Model/Post.php`：添加 `$hasMany` 关联，一个文章有多个评论

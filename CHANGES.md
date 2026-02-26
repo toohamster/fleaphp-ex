@@ -4,8 +4,13 @@
 
 ---
 
-
 ## 2026-02-26
+
+### fix: 修复关联查询中 TableDataGateway 类型错误
+
+- `Db/TableDataGateway.php` 第 448 行：`$assocRowset = null` 改为 `$assocRowset = []`（匹配 `array` 类型参数）
+- `Db/TableDataGateway.php` 第 474、540、610 行：`assemble($sql, ...)` 改为 `assemble(sql_statement($sql), ...)`
+- `Db/TableLink.php` 第 375 行：添加 null 检查，防止 `isRegistered(null)` 类型错误
 
 ### fix: 修复多处函数返回类型与实际返回值不一致
 

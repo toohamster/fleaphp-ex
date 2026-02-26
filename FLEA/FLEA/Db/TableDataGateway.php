@@ -445,7 +445,7 @@ class TableDataGateway
              * 并且准备一个以主键值为键名的二维数组用于关联数据的装配
              */
             $pkvs = [];
-            $assocRowset = null;
+            $assocRowset = [];
             $rowset = $this->dbo->getAllWithFieldRefs($result, $this->pka, $pkvs, $assocRowset);
             $in = 'IN (' . implode(',', array_map(array(& $this->dbo, 'qstr'), $pkvs)) . ')';
         } else {
@@ -471,7 +471,7 @@ class TableDataGateway
             if (!$link->countOnly) {
                 array_walk($assocRowset, $callback, $mn);
                 $sql = $link->getFindSQL($in);
-                $this->dbo->assemble($sql, $assocRowset, $mn, $link->oneToOne, $this->pka, $link->limit);
+                $this->dbo->assemble(sql_statement($sql), $assocRowset, $mn, $link->oneToOne, $this->pka, $link->limit);
             } else {
                 $link->calcCount($assocRowset, $mn, $in);
             }
@@ -537,7 +537,7 @@ class TableDataGateway
             $in = 'IN (' . implode(',', array_map(array(& $this->dbo, 'qstr'), $in)) . ')';
 
             $sql = $link->getFindSQL($in);
-            $this->dbo->assemble($sql, $assocRowset, $link->mappingName, $link->oneToOne, $link->mainTDG->pka, $link->limit);
+            $this->dbo->assemble(sql_statement($sql), $assocRowset, $link->mappingName, $link->oneToOne, $link->mainTDG->pka, $link->limit);
         }
 
         return true;
@@ -607,7 +607,7 @@ class TableDataGateway
             $in = 'IN (' . implode(',', array_map(array(& $this->dbo, 'qstr'), $in)) . ')';
 
             $sql = $link->getFindSQL($in);
-            $this->dbo->assemble($sql, $assocRowset, $link->mappingName, $link->oneToOne, $link->mainTDG->pka, $link->limit);
+            $this->dbo->assemble(sql_statement($sql), $assocRowset, $link->mappingName, $link->oneToOne, $link->mainTDG->pka, $link->limit);
         }
 
         return true;

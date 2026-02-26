@@ -372,7 +372,7 @@ class TableLink
     public function init(): void
     {
         if ($this->init) { return; }
-        if (\FLEA::isRegistered($this->assocTDGObjectId)) {
+        if ($this->assocTDGObjectId && \FLEA::isRegistered($this->assocTDGObjectId)) {
             $this->assocTDG = \FLEA::registry($this->assocTDGObjectId);
         } else {
             if ($this->assocTDGObjectId) {
