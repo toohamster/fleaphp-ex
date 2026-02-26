@@ -6,6 +6,16 @@
 
 ## 2026-02-26
 
+### fix: 修复模型中 TableDataGateway 方法调用错误及移除冗余时间戳
+
+- `App/Model/Post.php`：`updatePost()` 改用 `updateByConditions()`，代码更清晰
+- `App/Model/Post.php`：`deletePost()` 改用 `removeByPkv()`，修复参数类型错误
+- `App/Model/Post.php`：`createPost()` 移除冗余时间戳设置（框架自动处理）
+- `App/Model/Comment.php`：`deleteComment()` 改用 `removeByPkv()`，修复参数类型错误
+- `App/Model/Comment.php`：`createComment()` 移除冗余时间戳设置（框架自动处理）
+
+---
+
 ### feat: 替换控制器中 die() 函数为框架异常处理
 
 - 将 actionView() 方法中的 die() 调用替换为 \FLEA\Exception\InvalidArguments 异常

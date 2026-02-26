@@ -44,7 +44,6 @@ class Comment extends TableDataGateway
      */
     public function createComment($data)
     {
-        $data['created_at'] = date('Y-m-d H:i:s');
         $data['status'] = 1; // 自动审核通过
         return $this->create($data);
     }
@@ -57,7 +56,7 @@ class Comment extends TableDataGateway
      */
     public function deleteComment($id)
     {
-        return $this->remove($id);
+        return $this->removeByPkv($id);
     }
 
     /**

@@ -4,6 +4,110 @@
 
 ---
 
+## 2026-02-26
+
+### fix: 修复模型中 TableDataGateway 方法调用错误及移除冗余时间戳设置
+
+#### 修改文件
+- `App/Model/Post.php`
+- `App/Model/Comment.php`
+
+#### 问题描述
+
+**问题 1: `remove()` 方法参数类型错误**
+
+`TableDataGateway::remove()` 方法签名：
+```php
+public function remove(array &$row, bool $removeLink = true): bool
+```
+
+原代码错误地传递了主键值（int）而不是数组：
+```php
+// ❌ 错误：$id 是 int，但 remove() 期望 array
+return $this->remove($id);
+```
+
+**问题 2: 冗余的时间戳设置**
+
+`TableDataGateway` 类已自动处理时间戳字段：
+- `$createdTimeFields = array('CREATED', 'CREATED_ON', 'CREATED_AT')` - create 时自动填充
+- `$updatedTimeFields = array('UPDATED', 'UPDATED_ON', 'UPDATED_AT')` - create 和 update 时自动填充
+
+原代码手动设置时间是冗余的：
+```php
+// ❌ 冗余代码
+$data['created_at'] = date('Y-m-d H:i:s');
+$data['updated_at'] = date('Y-m-d H:i:s');
+```
+
+#### 修复内容
+
+**Post.php:**
+
+1. `updatePost($id, $data)` - 改用 `updateByConditions()`:
+```php
+// ✅ 修复后
+public function updatePost($id, $data)
+{
+    return $this->updateByConditions([$this->primaryKey => $id], $data);
+}
+```
+
+2. `deletePost($id)` - 改用 `removeByPkv()`:
+```php
+// ✅ 修复后
+public function deletePost($id)
+{
+    return $this->removeByPkv($id);
+}
+```
+
+3. `createPost($data)` - 移除冗余时间戳:
+```php
+// ✅ 修复后
+public function createPost($data)
+{
+    return $this->create($data);
+}
+```
+
+**Comment.php:**
+
+1. `deleteComment($id)` - 改用 `removeByPkv()`:
+```php
+// ✅ 修复后
+public function deleteComment($id)
+{
+    return $this->removeByPkv($id);
+}
+```
+
+2. `createComment($data)` - 移除冗余时间戳（保留 status 设置）:
+```php
+// ✅ 修复后
+public function createComment($data)
+{
+    $data['status'] = 1; // 自动审核通过
+    return $this->create($data);
+}
+```
+
+#### 方法说明
+
+| 方法 | 用途 | 参数 |
+|------|------|------|
+| `remove()` | 删除单条记录 | `array &$row` - 完整的记录数组 |
+| `removeByPkv()` | 根据主键值删除 | `$pkv` - 主键值 |
+| `update()` | 更新记录 | `array &$row` - 必须包含主键 |
+| `updateByConditions()` | 根据条件更新 | `$conditions`, `$data` |
+
+#### 验证
+- ✅ 语法检查通过
+- ✅ 方法调用与父类签名一致
+- ✅ 移除了冗余代码
+
+---
+
 ## 2026-02-25 - 修复 getPublishedPosts 方法参数传递错误
 
 ### 修改文件
