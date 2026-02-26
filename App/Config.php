@@ -1,8 +1,8 @@
 <?php
 
-return array(
+return [
     // 数据库配置
-    'dbDSN' => array(
+    'dbDSN' => [
         'driver' => 'mysql',
         'host' => '127.0.0.1',
         'port' => '3306',
@@ -10,7 +10,7 @@ return array(
         'password' => '11111111',
         'database' => 'blog',
         'charset' => 'utf8mb4',
-    ),
+    ],
 
     // 控制器配置
     'controllerAccessor' => 'controller',
@@ -31,12 +31,12 @@ return array(
 
     // 模板引擎
     'view' => \FLEA\View\Simple::class,
-    'viewConfig' => array(
+    'viewConfig' => [
         'templateDir' => __DIR__ . '/View',
         'cacheDir' => __DIR__ . '/../cache',
         'cacheLifeTime' => 900,
         'enableCache' => false,
-    ),
+    ],
 
     // 错误显示（开发环境）
     'displayErrors' => true,
@@ -45,4 +45,4 @@ return array(
 
     // 缓存目录
     'internalCacheDir' => __DIR__ . '/../cache',
-);
+];

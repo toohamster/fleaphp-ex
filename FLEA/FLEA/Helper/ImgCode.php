@@ -274,7 +274,7 @@ class ImgCode
             $r = hexdec(substr($color, 0, 1));
             $g = hexdec(substr($color, 1, 1));
             $b = hexdec(substr($color, 2, 1));
-            return array($r, $g, $b);
+            return [$r, $g, $b];
         } elseif ($l != 6) {
             $color = $defualt;
         }
@@ -282,6 +282,6 @@ class ImgCode
         $r = hexdec(substr($color, 0, 2));
         $g = hexdec(substr($color, 2, 2));
         $b = hexdec(substr($color, 4, 2));
-        return array($r, $g, $b);
+        return [$r, $g, $b];
     }
 }

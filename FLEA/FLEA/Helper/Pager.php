@@ -269,7 +269,7 @@ class Pager
 
         $offset = ($this->currentPage - $this->_basePageIndex) * $this->pageSize;
         if (is_object($this->source)) {
-            $limit = array($this->pageSize, $offset);
+            $limit = [$this->pageSize, $offset];
             $rowset = $this->source->findAll($this->_conditions, $this->_sortby, $limit, $fields, $queryLinks);
         } else {
             if (is_null($this->dbo)) {
@@ -290,7 +290,7 @@ class Pager
      */
     public function getPagerData($returnPageNumbers = true)
     {
-        $data = array(
+        $data = [
             'pageSize' => $this->pageSize,
             'totalCount' => $this->totalCount,
             'count' => $this->count,
@@ -305,7 +305,7 @@ class Pager
             'nextPageNumber' => $this->nextPageNumber,
             'currentPage' => $this->currentPage,
             'currentPageNumber' => $this->currentPageNumber,
-        );
+        ];
 
         if ($returnPageNumbers) {
             $data['pagesNumber'] = [];
@@ -346,7 +346,7 @@ class Pager
 
         $data = [];
         for ($i = $begin; $i <= $end; $i++) {
-            $data[] = array('index' => $i, 'number' => ($i + 1 - $this->_basePageIndex));
+            $data[] = ['index' => $i, 'number' => ($i + 1 - $this->_basePageIndex)];
         }
         return $data;
     }

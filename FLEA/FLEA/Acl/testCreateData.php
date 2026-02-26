@@ -2,13 +2,13 @@
 
 require('FLEA.php');
 
-$dbDSN = array(
+$dbDSN = [
     'driver'    => 'mysqlt',
     'host'      => 'localhost',
     'login'     => 'root',
     'password'  => '',
     'database'  => 'test'
-);
+];
 
 FLEA::setAppInf('dbDSN', $dbDSN);
 FLEA::setAppInf('internalCacheDir', 'D:/temp');
@@ -21,19 +21,19 @@ $dbo->startTrans();
  */
 $tablePermissions = FLEA::getSingleton('FLEA_Acl_Table_Permissions');
 /* @var $tablePermissions FLEA_Acl_Table_Permissions */
-$permissions = array(
-    array('name' => '/Project/Create'),
-    array('name' => '/Project/View'),
-    array('name' => '/Project/Edit'),
-    array('name' => '/Project/Delete'),
-    array('name' => '/Bug/Create'),
-    array('name' => '/Bug/View'),
-    array('name' => '/Bug/Edit'),
-    array('name' => '/Bug/AddComment'),
-    array('name' => '/Bug/SetFixed'),
-    array('name' => '/Bug/SetClosed'),
-    array('name' => '/Bug/Delete'),
-);
+$permissions = [
+    ['name' => '/Project/Create'],
+    ['name' => '/Project/View'],
+    ['name' => '/Project/Edit'],
+    ['name' => '/Project/Delete'],
+    ['name' => '/Bug/Create'],
+    ['name' => '/Bug/View'],
+    ['name' => '/Bug/Edit'],
+    ['name' => '/Bug/AddComment'],
+    ['name' => '/Bug/SetFixed'],
+    ['name' => '/Bug/SetClosed'],
+    ['name' => '/Bug/Delete'],
+];
 $tablePermissions->createRowset($permissions);
 
 $permissions = $tablePermissions->findAll();
@@ -45,40 +45,40 @@ $permissions = array_to_hashmap($permissions, 'name');
  */
 $tableRoles = FLEA::getSingleton('FLEA_Acl_Table_Roles');
 /* @var $tableRoles FLEA_Acl_Table_Roles */
-$role = array(
+$role = [
     'name' => 'ProjectManager',
-    'permissions' => array(
+    'permissions' => [
         $permissions['/Project/Create'],
         $permissions['/Project/View'],
         $permissions['/Project/Edit'],
         $permissions['/Project/Delete'],
         $permissions['/Bug/Delete'],
-    ),
+    ],
 );
 $tableRoles->create($role);
 
-$role = array(
+$role = [
     'name' => 'Developer',
-    'permissions' => array(
+    'permissions' => [
         $permissions['/Project/View'],
         $permissions['/Bug/View'],
         $permissions['/Bug/AddComment'],
         $permissions['/Bug/SetFixed'],
         $permissions['/Bug/Delete'],
-    ),
+    ],
 );
 $tableRoles->create($role);
 
-$role = array(
+$role = [
     'name' => 'Tester',
-    'permissions' => array(
+    'permissions' => [
         $permissions['/Project/Create'],
         $permissions['/Bug/Create'],
         $permissions['/Bug/Edit'],
         $permissions['/Bug/View'],
         $permissions['/Bug/AddComment'],
         $permissions['/Bug/SetClosed'],
-    ),
+    ],
 );
 $tableRoles->create($role);
 
@@ -101,43 +101,43 @@ $roles = array_to_hashmap($roles, 'name');
  */
 $tableUserGroups = FLEA::getSingleton('FLEA_Acl_Table_UserGroups');
 /* @var $tableUserGroups FLEA_Acl_Table_UserGroups */
-$group = array(
+$group = [
     'name' => '开发组',
-    'roles' => array(
+    'roles' => [
         $roles['Developer'],
-    )
+    ]
 );
 $tableUserGroups->create($group);
-$parent = $tableUserGroups->find(array('name' => '开发组'));
+$parent = $tableUserGroups->find(['name' => '开发组']);
 
-$group = array(
+$group = [
     'name' => 'QeePHP Team',
     'parent_id' => $parent['user_group_id'],
-    'roles' => array(
+    'roles' => [
         $roles['Developer'],
-    )
+    ]
 );
 $tableUserGroups->create($group);
 
-$group = array(
+$group = [
     'name' => 'PHPChina Team',
     'parent_id' => $parent['user_group_id'],
-    'roles' => array(
+    'roles' => [
         $roles['Developer'],
-    )
+    ]
 );
 $tableUserGroups->create($group);
 
-$group = array(
+$group = [
     'name' => '测试组',
     'parent_id' => $parent['user_group_id'],
-    'roles' => array(
+    'roles' => [
         $roles['Tester'],
         /**
-         * 将 is_include 指定为 0，表示该用户组排除了“Developer”角色
+         * 将 is_include 指定为 0，表示该用户组排除了”Developer”角色
          */
-        array_merge($roles['Developer'], array('#JOIN#' => array('is_include' => 0))),
-    )
+        array_merge($roles['Developer'], ['#JOIN#' => ['is_include' => 0]]),
+    ]
 );
 $tableUserGroups->create($group);
 
@@ -149,26 +149,26 @@ $groups = array_to_hashmap($groups, 'name');
  */
 $tableUsers = FLEA::getSingleton('FLEA_Acl_Table_Users');
 /* @var $tableUsers FLEA_Acl_Table_Users */
-$users = array(
-    array(
+$users = [
+    [
         'username' => 'liaoyulei',
         'password' => '123456',
         'email' => 'liaoyulei@qeeyuan.com',
         'user_group_id' => $groups['QeePHP Team']['user_group_id'],
-    ),
-    array(
+    ],
+    [
         'username' => 'liwei',
         'password' => '123456',
         'email' => 'liwei@qeeyuan.com',
         'user_group_id' => $groups['QeePHP Team']['user_group_id'],
-    ),
-    array(
+    ],
+    [
         'username' => 'liye',
         'password' => '123456',
         'email' => 'liye@qeeyuan.com',
         'user_group_id' => $groups['QeePHP Team']['user_group_id'],
-    ),
-    array(
+    ],
+    [
         'username' => 'dali',
         'password' => '123456',
         'email' => 'dali@qeeyuan.com',
@@ -180,34 +180,34 @@ $tableUsers->createRowset($users);
 /**
  * 为用户指派单独的角色
  */
-$user = $tableUsers->find(array('username' => 'liaoyulei'));
+$user = $tableUsers->find(['username' => 'liaoyulei']);
 $user['roles'][] = $roles['ProjectManager'];
 $tableUsers->update($user);
 
-$user = $tableUsers->find(array('username' => 'liye'));
+$user = $tableUsers->find(['username' => 'liye']);
 $user['roles'][] = $roles['Tester'];
 $tableUsers->update($user);
 
-$user = $tableUsers->find(array('username' => 'dali'));
+$user = $tableUsers->find(['username' => 'dali']);
 $user['roles'][] = $roles['Tester'];
 $tableUsers->update($user);
 
 
 
-$users = array(
-    array(
+$users = [
+    [
         'username' => '米粒子',
         'password' => '123456',
         'email' => 'milizi@phpchina.com',
         'user_group_id' => $groups['PHPChina Team']['user_group_id'],
     ),
-    array(
+    [
         'username' => '默默',
         'password' => '123456',
         'email' => 'momo@phpchina.com',
         'user_group_id' => $groups['PHPChina Team']['user_group_id'],
     ),
-    array(
+    [
         'username' => '冰刺猬',
         'password' => '123456',
         'email' => 'bingciwei@phpchina.com',
@@ -216,18 +216,18 @@ $users = array(
 );
 $tableUsers->createRowset($users);
 
-$user = $tableUsers->find(array('username' => '米粒子'));
+$user = $tableUsers->find(['username' => '米粒子']);
 $user['roles'][] = $roles['ProjectManager'];
 $tableUsers->update($user);
 
-$users = array(
-    array(
+$users = [
+    [
         'username' => '肥同小可',
         'password' => '123456',
         'email' => 'feitongxiaoke@phpchina.com',
         'user_group_id' => $groups['测试组']['user_group_id'],
     ),
-    array(
+    [
         'username' => '雷茂峰',
         'password' => '123456',
         'email' => 'leimaofeng@phpchina.com',
@@ -236,7 +236,7 @@ $users = array(
 );
 $tableUsers->createRowset($users);
 
-$user = $tableUsers->find(array('username' => '肥同小可'));
+$user = $tableUsers->find(['username' => '肥同小可']);
 $user['roles'][] = $roles['Developer'];
 $tableUsers->update($user);
 

@@ -94,13 +94,13 @@ class UsersManager extends \FLEA\Db\TableDataGateway
      *
      * @var array
      */
-    public $functionFields = array(
+    public $functionFields = [
         'registerIpField' => null,
         'lastLoginField' => null,
         'lastLoginIpField' => null,
         'loginCountField' => null,
         'isLockedField' => null,
-    );
+    ];
 
     /**
      * 构造函数
@@ -162,7 +162,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
      */
     public function existsUserId($id): bool
     {
-        return $this->findCount(array($this->primaryKey => $id)) > 0;
+        return $this->findCount([$this->primaryKey => $id]) > 0;
     }
 
     /**
@@ -174,7 +174,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
      */
     public function existsUsername(string $username): bool
     {
-        return $this->findCount(array($this->usernameField => $username)) > 0;
+        return $this->findCount([$this->usernameField => $username]) > 0;
     }
 
     /**
@@ -186,7 +186,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
      */
     public function existsEmail(string $email): bool
     {
-        return $this->findCount(array($this->emailField => $email)) > 0;
+        return $this->findCount([$this->emailField => $email]) > 0;
     }
 
     /**
@@ -222,7 +222,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
         if ($returnUserdata) {
             $user = $this->findByField($this->usernameField, $username);
         } else {
-            $fields = array($this->primaryKey, $this->passwordField);
+            $fields = [$this->primaryKey, $this->passwordField];
             if (isset($this->functionFields['loginCountField'])
                 && $this->functionFields['loginCountField'] != '')
             {
@@ -291,7 +291,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
     {
         $user = $this->findByField(
             $this->usernameField, $username, null,
-            array($this->primaryKey, $this->passwordField)
+            [$this->primaryKey, $this->passwordField]
         );
         if (!$user) { return false; }
         if (!$this->checkPassword($oldPassword, $user[$this->passwordField])) {
@@ -411,12 +411,12 @@ class UsersManager extends \FLEA\Db\TableDataGateway
 
         if (!isset($user[$this->rolesField]) ||
             !is_array($user[$this->rolesField])) {
-            return array();
+            return [];
         }
         $roles = [];
         foreach ($user[$this->rolesField] as $role) {
             if (!is_array($role)) {
-                return array($user[$this->rolesField][$rolenameField]);
+                return [$user[$this->rolesField][$rolenameField]];
             }
             $roles[] = $role[$rolenameField];
         }

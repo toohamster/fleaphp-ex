@@ -85,9 +85,9 @@ class Simple
         $this->cacheDir = './cache';
 
         $viewConfig = (array)\FLEA::getAppInf('viewConfig');
-        $keys = array(
+        $keys = [
             'templateDir', 'cacheDir', 'cacheLifeTime', 'enableCache',
-        );
+        ];
         foreach ($keys as $key)
         {
             if (array_key_exists($key, $viewConfig))

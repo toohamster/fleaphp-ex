@@ -791,7 +791,7 @@ abstract class AbstractDriver
                 $values[$key] =& $inputarr[$key];
             }
         }
-        return array($holders, $values);
+        return [$holders, $values];
     }
 
     /**
@@ -829,6 +829,6 @@ abstract class AbstractDriver
                 $values[$key] =& $inputarr[$key];
             }
         }
-        return array($pairs, $values);
+        return [$pairs, $values];
     }
 }

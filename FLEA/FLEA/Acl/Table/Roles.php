@@ -38,15 +38,15 @@ class Roles extends \FLEA\Db\TableDataGateway
      *
      * @var array
      */
-    public $manyToMany = array(
-        array(
+    public $manyToMany = [
+        [
             'tableClass' => '\FLEA\Acl_Table_Permissions',
             'foreignKey' => 'role_id',
             'assocForeignKey' => 'permission_id',
             'joinTable' => 'roles_has_permissions',
             'mappingName' => 'permissions',
-        ),
-    );
+        ],
+    ];
 
     /**
      * 构造函数

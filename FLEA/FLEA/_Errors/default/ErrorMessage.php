@@ -9,7 +9,7 @@
  * @version $Id: ErrorMessage.php 972 2007-10-09 20:56:54Z qeeyuan $
  */
 
-return array(
+return [
     // FLEA_Exception_ExpectedFile
     0x0102001 => 'Required file "%s" is missing.',
     // FLEA_Exception_ExpectedClass

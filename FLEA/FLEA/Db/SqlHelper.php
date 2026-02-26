@@ -60,7 +60,7 @@ class SqlHelper
             if (is_string($offset)) {
                 if (!is_array($cond)) {
                     // 字段名 => 值
-                    $cond = array($offset, $cond);
+                    $cond = [$offset, $cond];
                 } else {
                     if (strtolower($offset) == 'in()') {
                         if (count($cond) == 1 && is_array(reset($cond)) && is_string(key($cond))) {
@@ -68,7 +68,7 @@ class SqlHelper
                         } else {
                             $tmp = $table->qpk . ' IN (' . implode(',', array_map(array($table->dbo, 'qstr'), $cond)). ')';
                         }
-                        $cond = array('', $tmp, '', $expr, true);
+                        $cond = ['', $tmp, '', $expr, true];
                     } else {
                         // 字段名 => 数组
                         array_unshift($cond, $offset);
@@ -77,7 +77,7 @@ class SqlHelper
             } elseif (is_int($offset)) {
                 if (!is_array($cond)) {
                     // 值
-                    $cond = array('', $cond, '', $expr, true);
+                    $cond = ['', $cond, '', $expr, true];
                 }
             } else {
                 continue;
@@ -96,7 +96,7 @@ class SqlHelper
                     [$scheme, $field] = explode('.', $field);
                     $linkname = strtoupper($scheme);
                     if (isset($table->links[$linkname])) {
-                        $linksWhere[$linkname][] = array($field, $value, $op, $expr, $isCommand);
+                        $linksWhere[$linkname][] = [$field, $value, $op, $expr, $isCommand];
                         break;
                     } else {
                         $field = "{$scheme}.{$field}";
@@ -119,7 +119,7 @@ class SqlHelper
         if (empty($linksWhere)) {
             return $where;
         } else {
-            return array($where, $linksWhere);
+            return [$where, $linksWhere];
         }
     }
 

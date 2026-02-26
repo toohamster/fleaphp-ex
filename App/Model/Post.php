@@ -22,13 +22,13 @@ class Post extends TableDataGateway
     /**
      * 定义一对多关联：一个文章有多个评论
      */
-    public array $hasMany = array(
-        array(
+    public array $hasMany = [
+        [
             'tableClass' => Comment::class,
             'foreignKey' => 'post_id',
             'mappingName' => 'comments',
-        ),
-    );
+        ],
+    ];
 
     /**
      * 获取所有已发布的文章
@@ -40,7 +40,7 @@ class Post extends TableDataGateway
     public function getPublishedPosts($limit = 10, $offset = 0)
     {
         return $this->findAll(
-            array('status' => 1),
+            ['status' => 1],
             'created_at DESC',
             [$limit, $offset],
             '*',
@@ -100,6 +100,6 @@ class Post extends TableDataGateway
      */
     public function getTotalCount()
     {
-        return $this->findCount(array('status' => 1));
+        return $this->findCount(['status' => 1]);
     }
 }

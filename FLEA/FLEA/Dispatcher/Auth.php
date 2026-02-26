@@ -114,7 +114,7 @@ class Auth extends \FLEA\Dispatcher\Simple
             if (is_null($rawACT) || empty($rawACT)) { return true; }
             $ACT = $this->_auth->prepareACT($rawACT);
             $roles = $this->_auth->getRolesArray();
-            $args = array($controllerName, $actionName, $controllerClass, $ACT, $roles);
+            $args = [$controllerName, $actionName, $controllerClass, $ACT, $roles];
 
             // 如果控制器定义了的 _onAuthFailed 静态方法，则调用该方法
             if ($this->_loadController($controllerClass)) {

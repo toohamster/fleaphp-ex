@@ -67,12 +67,12 @@ class Image
             $fileext = pathinfo($filename, PATHINFO_EXTENSION);
         }
         $fileext = strtolower($fileext);
-        $ext2functions = array(
+        $ext2functions = [
             'jpg' => 'imagecreatefromjpeg',
             'jpeg' => 'imagecreatefromjpeg',
             'png' => 'imagecreatefrompng',
             'gif' => 'imagecreatefromgif',
-        );
+        ];
         if (!isset($ext2functions[$fileext])) {
             throw new \FLEA\Exception_NotImplemented('imagecreatefrom' . $fileext);
         }
@@ -195,9 +195,9 @@ class Image
 
         if (!is_array($nocut)) {
             if ($nocut) {
-                $nocut = array('enabled' => true, 'pos' => 'center', 'bgcolor' => '0xffffff');
+                $nocut = ['enabled' => true, 'pos' => 'center', 'bgcolor' => '0xffffff'];
             } else {
-                $nocut = array('enabled' => false);
+                $nocut = ['enabled' => false];
             }
         } else {
             $nocut['enabled'] = $nocut['enabled'] ?? true;
@@ -256,7 +256,7 @@ class Image
             imagefilledrectangle($dest, 0, 0, $width, $height, $bgcolor);
             imagecolordeallocate($dest, $bgcolor);
 
-            $args = array($dest, $this->_handle, $ox, $oy, 0, 0, $dx, $dy, $sx, $sy);
+            $args = [$dest, $this->_handle, $ox, $oy, 0, 0, $dx, $dy, $sx, $sy];
         } else {
             // 允许图像溢出
             if ($sy * $ratio < $height) {
@@ -269,7 +269,7 @@ class Image
                 $sy = $height * $ratio;
             }
 
-            $args = array($dest, $this->_handle, 0, 0, 0, 0, $width, $height, $sx, $sy);
+            $args = [$dest, $this->_handle, 0, 0, 0, 0, $width, $height, $sx, $sy];
         }
 
         if ($highQuality) {
@@ -340,6 +340,6 @@ class Image
             $hex = $default;
         }
         $dec = hexdec($hex);
-        return array(($dec >> 16) & 0xff, ($dec >> 8) & 0xff, $dec & 0xff);
+        return [($dec >> 16) & 0xff, ($dec >> 8) & 0xff, $dec & 0xff];
     }
 }

@@ -25,7 +25,7 @@ class Manager
      *
      * @var array
      */
-    public $_tableClass = array(
+    public $_tableClass = [
         'users' =>                  '\FLEA\Acl_Table_Users',
         'roles' =>                  '\FLEA\Acl_Table_Roles',
         'userGroups' =>             '\FLEA\Acl_Table_UserGroups',
@@ -34,7 +34,7 @@ class Manager
         'userGroupsHasPermissions' => '\FLEA\Acl_Table_UserGroupsHasPermissions',
         'userHasRoles' =>           '\FLEA\Acl_Table_UserHasRoles',
         'userHasPermissions' =>     '\FLEA\Acl_Table_UserHasPermissions',
-    );
+    ];
 
     function __construct(array $tableClass = [])
     {
@@ -78,7 +78,7 @@ class Manager
             foreach ($roles as $role) {
                 $roleid = $role['role_id'];
                 if ($role['_join_is_include']) {
-                    $userRoles[$roleid] = array('role_id' => $roleid, 'name' => $role['name']);
+                    $userRoles[$roleid] = ['role_id' => $roleid, 'name' => $role['name']];
                 } else {
                     unset($userRoles[$roleid]);
                 }
@@ -88,7 +88,7 @@ class Manager
         foreach ((array)$user['roles'] as $role) {
             $roleid = $role['role_id'];
             if ($role['_join_is_include']) {
-                $userRoles[$roleid] = array('role_id' => $roleid, 'name' => $role['name']);
+                $userRoles[$roleid] = ['role_id' => $roleid, 'name' => $role['name']];
             } else {
                 unset($userRoles[$roleid]);
             }

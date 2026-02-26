@@ -21,30 +21,30 @@ namespace FLEA\Acl\Table;
  */
 class Users extends \FLEA\Rbac\UsersManager
 {
-    public $belongsTo = array(
-        array(
+    public $belongsTo = [
+        [
             'tableClass' => '\FLEA\Acl_Table_UserGroups',
             'foreignKey' => 'user_group_id',
             'mappingName' => 'group',
-        ),
-    );
+        ],
+    ];
 
-    public $manyToMany = array(
-        array(
+    public $manyToMany = [
+        [
             'tableClass' => '\FLEA\Acl_Table_Roles',
             'foreignKey' => 'user_id',
             'assocForeignKey' => 'role_id',
             'joinTableClass' => '\FLEA\Acl_Table_UsersHasRoles',
             'mappingName' => 'roles',
-        ),
-        array(
+        ],
+        [
             'tableClass' => '\FLEA\Acl_Table_Permissions',
             'foreignKey' => 'user_id',
             'assocForeignKey' => 'permission_id',
             'joinTableClass' => '\FLEA\Acl_Table_UsersHasPermissions',
             'mappingName' => 'permissions',
-        ),
-    );
+        ],
+    ];
 
     /**
      * 构造函数

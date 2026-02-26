@@ -152,7 +152,7 @@ class TableDataGateway
      *
      * @var array
      */
-    public $createdTimeFields = array('CREATED', 'CREATED_ON', 'CREATED_AT');
+    public $createdTimeFields = ['CREATED', 'CREATED_ON', 'CREATED_AT'];
 
     /**
      * 创建和更新记录时，要自动填入当前时间的字段
@@ -162,7 +162,7 @@ class TableDataGateway
      *
      * @var array
      */
-    public $updatedTimeFields = array('UPDATED', 'UPDATED_ON', 'UPDATED_AT');
+    public $updatedTimeFields = ['UPDATED', 'UPDATED_ON', 'UPDATED_AT'];
 
     /**
      * 指示进行 CRUD 操作时是否处理关联
@@ -519,7 +519,7 @@ class TableDataGateway
             case BELONGS_TO:
                 $pkv = $arow[$link->mainTDG->primaryKey];
                 $in[] = $pkv;
-                $assocRowset = array($pkv => & $arow);
+                $assocRowset = [$pkv => & $arow];
                 $arow[$link->mappingName] = null;
                 break;
             case HAS_MANY:
@@ -625,7 +625,7 @@ class TableDataGateway
      */
     public function findByField(string $field, $value, ?string $sort = null, $fields = '*'): ?array
     {
-        return $this->find(array($field => $value), $sort, $fields);
+        return $this->find([$field => $value], $sort, $fields);
     }
 
     /**
@@ -641,7 +641,7 @@ class TableDataGateway
      */
     public function findAllByField(string $field, $value, ?string $sort = null, $limit = null, $fields = '*'): ?array
     {
-        return $this->findAll(array($field => $value), $sort, $limit, $fields);
+        return $this->findAll([$field => $value], $sort, $limit, $fields);
     }
 
     /**
@@ -658,12 +658,12 @@ class TableDataGateway
      */
     public function findAllByPkvs($pkvs, $conditions = null, ?string $sort = null, $limit = null, $fields = '*', bool $queryLinks = true): ?array
     {
-        $in = array('in()' => $pkvs);
+        $in = ['in()' => $pkvs];
         if (empty($conditions)) {
             $conditions = $in;
         } else {
             if (!is_array($conditions)) {
-                $conditions = array($in, $conditions);
+                $conditions = [$in, $conditions];
             } else {
                 array_push($conditions, $in);
             }
@@ -956,7 +956,7 @@ class TableDataGateway
      */
     public function updateField($conditions, string $field, $value): bool
     {
-        $row = array($field => $value);
+        $row = [$field => $value];
         return $this->updateByConditions($conditions, $row);
     }
 
@@ -1245,7 +1245,7 @@ class TableDataGateway
 
         if (!empty($counterCacheLinks)) {
             $counterCacheLinks[] = $this->primaryKey;
-            $row = $this->find(array($this->primaryKey => $pkv), null, $counterCacheLinks, false);
+            $row = $this->find([$this->primaryKey => $pkv], null, $counterCacheLinks, false);
         }
 
         // 删除主表数据
@@ -1520,7 +1520,7 @@ class TableDataGateway
     {
         if (!is_array($defines)) { return; }
         if (!is_array(reset($defines))) {
-            $defines = array($defines);
+            $defines = [$defines];
         }
 
         // 创建关联对象
@@ -1677,7 +1677,7 @@ class TableDataGateway
          */
 
         $parts = [];
-        $callback = array($this->dbo, 'qstr');
+        $callback = [$this->dbo, 'qstr'];
         $next_op = '';
 
         foreach ($where as $key => $value) {
@@ -1692,7 +1692,7 @@ class TableDataGateway
                 if ($next_op != '') {
                     $parts[] = $next_op;
                 }
-                $field = $this->_parseWhereQfield(array('', $key));
+                $field = $this->_parseWhereQfield(['', $key]);
                 if (is_array($value)) {
                     $value = array_map($callback, $value);
                     $parts[] = $field . ' IN (' . implode(',', $value) . ')';
@@ -1729,7 +1729,7 @@ class TableDataGateway
         // 首先从查询条件中提取出可以识别的字段名
         if (strpos($where, '[') !== false) {
             // 提取字段名
-            $where = preg_replace_callback('/\[([a-z0-9_\-\.]+)\]/i', array($this, '_parseWhereQfield'), $where);
+            $where = preg_replace_callback('/\[([a-z0-9_\-\.]+)\]/i', [$this, '_parseWhereQfield'], $where);
         }
 
         return $this->qinto($where, $args);
@@ -1889,7 +1889,7 @@ class TableDataGateway
         } while (false);
 
         if ($queryLinks) {
-            return array($whereby, $distinct);
+            return [$whereby, $distinct];
         } else {
             return $whereby;
         }

@@ -201,7 +201,7 @@ class ManyToManyLink extends TableLink
 
         // 最后删除不再需要的关联信息
         if ($this->joinTableIsEntity) {
-            $conditions = array($this->foreignKey => $pkv);
+            $conditions = [$this->foreignKey => $pkv];
             foreach ($removeAssoc as $assocId) {
                 $conditions[$this->assocForeignKey] = $assocId;
                 if ($this->joinTDG->removeByConditions($conditions) === false) {

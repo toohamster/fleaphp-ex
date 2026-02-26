@@ -112,7 +112,7 @@ class Verifier
                             break;
                         }
                         if (!isset($data[$name]) || is_null($data[$name])) {
-                            $result[$name] = array('check' => 'notNull', 'rule' => $rule);
+                            $result[$name] = ['check' => 'notNull', 'rule' => $rule];
                             break;
                         }
                     } else {
@@ -126,7 +126,7 @@ class Verifier
                             break;
                         }
                         if (!isset($data[$name]) || $data[$name] == '') {
-                            $result[$name] = array('check' => 'notEmpty', 'rule' => $rule);
+                            $result[$name] = ['check' => 'notEmpty', 'rule' => $rule];
                             break;
                         }
                     } else {
@@ -138,7 +138,7 @@ class Verifier
 
                 $ret = $this->check($data[$name], $rule);
                 if ($ret !== true) {
-                    $result[$name] = array('check' => $ret, 'rule' => $rule);
+                    $result[$name] = ['check' => $ret, 'rule' => $rule];
                 }
             } while (false);
         }

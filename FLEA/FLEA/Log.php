@@ -96,7 +96,7 @@ class Log extends AbstractLogger
             }
 
             // 注册脚本结束时要运行的方法，将缓存的日志内容写入文件
-            register_shutdown_function(array($this, '__writeLog'));
+            register_shutdown_function([$this, '__writeLog']);
 
             // 检查文件是否已经超过指定大小
             if (file_exists($this->_logFilename)) {

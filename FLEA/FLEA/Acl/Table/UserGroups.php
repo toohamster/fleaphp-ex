@@ -40,22 +40,22 @@ class UserGroups extends \FLEA\Db\TableDataGateway
      *
      * @var array
      */
-    public $manyToMany = array(
-        array(
+    public $manyToMany = [
+        [
             'tableClass' => '\FLEA\Acl_Table_Roles',
             'foreignKey' => 'user_group_id',
             'assocForeignKey' => 'role_id',
             'joinTableClass' => '\FLEA\Acl_Table_UserGroupsHasRoles',
             'mappingName' => 'roles',
-        ),
-        array(
+        ],
+        [
             'tableClass' => '\FLEA\Acl_Table_Permissions',
             'foreignKey' => 'user_group_id',
             'assocForeignKey' => 'permission_id',
             'joinTableClass' => '\FLEA\Acl_Table_UserGroupsHasPermissions',
             'mappingName' => 'permissions',
-        ),
-    );
+        ],
+    ];
 
     /**
      * 根用户组名
@@ -82,16 +82,16 @@ class UserGroups extends \FLEA\Db\TableDataGateway
             }
         } else {
             // 如果未指定 $parentId 为 0 或 null，则创建一个顶级用户组
-            $parent = parent::find(array('name' => $this->_rootGroupName));
+            $parent = parent::find(['name' => $this->_rootGroupName]);
             if (!$parent) {
                 // 如果根用户组不存在，则自动创建
-                $parent = array(
+                $parent = [
                     'name' => $this->_rootGroupName,
                     'description' => '',
                     'left_value' => 1,
                     'right_value' => 2,
                     'parent_id' => -1,
-                );
+                ];
                 if (!parent::create($parent)) {
                     return false;
                 }
