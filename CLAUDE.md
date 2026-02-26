@@ -16,8 +16,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # 初始化数据库
 mysql -u root -p < blog.sql
 
-# 安装/更新 Composer autoloader
-composer install
+# 安装/更新依赖
+php74 ~/bin/composer.phar install
 
 # 启动开发服务器
 php74 -S 127.0.0.1:8081

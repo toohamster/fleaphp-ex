@@ -6,6 +6,24 @@
 
 ## 2026-02-26
 
+### refactor(log): 移除 appendLog，log_message() 直接调用 log()
+
+- `\FLEA\Log` 移除 `appendLog()` 方法
+- `Functions.php` 的 `log_message()` 保留 `$title` 参数和 `print_r` 处理逻辑，改为直接调用 `$instance->log($level, $message)`
+
+---
+
+### feat(log): 升级 \FLEA\Log 支持 PSR-3 LoggerInterface
+
+- `composer require psr/log:^1.1`（PHP 7.4 兼容版本）
+- `\FLEA\Log` 继承 `Psr\Log\AbstractLogger`，自动获得 `debug()`、`info()`、`warning()`、`error()` 等标准方法
+- 实现 `log($level, $message, array $context)` 作为核心方法，支持 `{key}` 占位符插值
+- 保留 `appendLog()` 向后兼容，供 `log_message()` 函数调用，行为不变
+
+---
+
+
+
 ### fix(security): 修复 extract() 变量注入风险
 
 > **注：此改动已被撤销，记录仅供参考**

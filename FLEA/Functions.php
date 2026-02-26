@@ -13,10 +13,10 @@
 /**
  * 追加日志记录
  *
- * @param string $msg
+ * @param mixed  $msg
  * @param string $level
  * @param string $title
- * @return mixed
+ * @return void
  */
 function log_message($msg, $level = 'log', $title = '')
 {
@@ -26,7 +26,8 @@ function log_message($msg, $level = 'log', $title = '')
         $instance = \FLEA::getSingleton(\FLEA\Log::class);
     }
 
-    return $instance->appendLog($msg, $level, $title);
+    $message = $title !== '' ? "{$title}:" . print_r($msg, true) : print_r($msg, true);
+    $instance->log($level, $message);
 }
 
 /**
