@@ -14,7 +14,7 @@ FLEA::setAppInf('dbDSN', $dbDSN);
 FLEA::setAppInf('internalCacheDir', 'D:/temp');
 
 $acl = FLEA::getSingleton('FLEA_Acl_Manager');
-/* @var $acl FLEA_Acl_Manager */
+/* @var $acl \FLEA\Acl\Manager */
 
 $user = $acl->getUserWithPermissions(['username' => 'liaoyulei']);
 dump($user);

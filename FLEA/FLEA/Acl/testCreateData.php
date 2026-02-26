@@ -13,7 +13,7 @@ $dbDSN = [
 FLEA::setAppInf('dbDSN', $dbDSN);
 FLEA::setAppInf('internalCacheDir', 'D:/temp');
 
-$dbo =& FLEA::getDBO();
+$dbo = FLEA::getDBO();
 $dbo->startTrans();
 
 /**
@@ -37,7 +37,6 @@ $permissions = [
 $tablePermissions->createRowset($permissions);
 
 $permissions = $tablePermissions->findAll();
-FLEA::loadHelper('array');
 $permissions = array_to_hashmap($permissions, 'name');
 
 /**
