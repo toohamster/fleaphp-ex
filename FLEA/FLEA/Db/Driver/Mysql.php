@@ -472,7 +472,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
             $sql .= " FROM {$schema}";
         }
         if (!empty($pattern)) {
-            $sql .= ' LIKE ' . $this->qstr($schema);
+            $sql .= ' LIKE ' . $this->qstr($pattern);
         }
         $res = $this->execute(\FLEA\Db\SqlStatement::create($sql), null, false);
         $res = $res->getSql();
