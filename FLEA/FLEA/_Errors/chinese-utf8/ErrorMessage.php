@@ -78,4 +78,4 @@ return [
     // FLEA_Db_Exception_MissingLinkOption
     0x0202002 => '创建数据表关联时缺少必须的 "%s" 选项.',
 
-);
+];

@@ -193,7 +193,7 @@ class ManyToManyLink extends TableLink
         } else {
             $sql = "INSERT INTO {$this->qjoinTable} ({$this->qforeignKey}, {$this->qassocForeignKey}) VALUES ({$qpkv}, ";
             foreach ($insertAssoc as $assocId) {
-                if (!$this->dbo->execute(sql_statement($sql . $this->dbo->qstr($assocId) . ')')) {
+                if (!$this->dbo->execute(sql_statement($sql . $this->dbo->qstr($assocId) . ')'))) {
                     return false;
                 }
             }
@@ -211,7 +211,7 @@ class ManyToManyLink extends TableLink
         } else {
             $sql = "DELETE FROM {$this->qjoinTable} WHERE {$this->qforeignKey} = {$qpkv} AND {$this->qassocForeignKey} = ";
             foreach ($removeAssoc as $assocId) {
-                if (!$this->dbo->execute(sql_statement($sql . $this->dbo->qstr($assocId))) {
+                if (!$this->dbo->execute(sql_statement($sql . $this->dbo->qstr($assocId) . ')'))) {
                     return false;
                 }
             }

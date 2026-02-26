@@ -54,7 +54,7 @@ $role = [
         $permissions['/Project/Delete'],
         $permissions['/Bug/Delete'],
     ],
-);
+];
 $tableRoles->create($role);
 
 $role = [
@@ -66,7 +66,7 @@ $role = [
         $permissions['/Bug/SetFixed'],
         $permissions['/Bug/Delete'],
     ],
-);
+];
 $tableRoles->create($role);
 
 $role = [
@@ -79,7 +79,7 @@ $role = [
         $permissions['/Bug/AddComment'],
         $permissions['/Bug/SetClosed'],
     ],
-);
+];
 $tableRoles->create($role);
 
 /**
@@ -106,7 +106,7 @@ $group = [
     'roles' => [
         $roles['Developer'],
     ]
-);
+];
 $tableUserGroups->create($group);
 $parent = $tableUserGroups->find(['name' => '开发组']);
 
@@ -116,7 +116,7 @@ $group = [
     'roles' => [
         $roles['Developer'],
     ]
-);
+];
 $tableUserGroups->create($group);
 
 $group = [
@@ -125,7 +125,7 @@ $group = [
     'roles' => [
         $roles['Developer'],
     ]
-);
+];
 $tableUserGroups->create($group);
 
 $group = [
@@ -138,7 +138,7 @@ $group = [
          */
         array_merge($roles['Developer'], ['#JOIN#' => ['is_include' => 0]]),
     ]
-);
+];
 $tableUserGroups->create($group);
 
 $groups = $tableUserGroups->findAll();
@@ -173,8 +173,8 @@ $users = [
         'password' => '123456',
         'email' => 'dali@qeeyuan.com',
         'user_group_id' => $groups['QeePHP Team']['user_group_id'],
-    ),
-);
+    ],
+];
 $tableUsers->createRowset($users);
 
 /**
@@ -200,20 +200,20 @@ $users = [
         'password' => '123456',
         'email' => 'milizi@phpchina.com',
         'user_group_id' => $groups['PHPChina Team']['user_group_id'],
-    ),
+    ],
     [
         'username' => '默默',
         'password' => '123456',
         'email' => 'momo@phpchina.com',
         'user_group_id' => $groups['PHPChina Team']['user_group_id'],
-    ),
+    ],
     [
         'username' => '冰刺猬',
         'password' => '123456',
         'email' => 'bingciwei@phpchina.com',
         'user_group_id' => $groups['PHPChina Team']['user_group_id'],
-    ),
-);
+    ],
+];
 $tableUsers->createRowset($users);
 
 $user = $tableUsers->find(['username' => '米粒子']);
@@ -226,14 +226,14 @@ $users = [
         'password' => '123456',
         'email' => 'feitongxiaoke@phpchina.com',
         'user_group_id' => $groups['测试组']['user_group_id'],
-    ),
+    ],
     [
         'username' => '雷茂峰',
         'password' => '123456',
         'email' => 'leimaofeng@phpchina.com',
         'user_group_id' => $groups['测试组']['user_group_id'],
-    ),
-);
+    ],
+];
 $tableUsers->createRowset($users);
 
 $user = $tableUsers->find(['username' => '肥同小可']);

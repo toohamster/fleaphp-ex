@@ -77,5 +77,5 @@ return [
     0x0202001 => 'Invalid table association type "%s".',
     // FLEA_Db_Exception_MissingLinkOption
     0x0202002 => 'Option "%s" is required when creating table association.',
-    
-);
+
+];

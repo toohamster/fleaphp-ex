@@ -400,4 +400,4 @@ return [
     'sessionDbLifeTime'         => 1440,
 
     // }}}
-);
+];
