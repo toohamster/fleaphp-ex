@@ -6,6 +6,22 @@
 
 ## 2026-02-26
 
+### refactor: 使用 PHP 7.4 数组解构和 null 合并运算符简化代码
+
+**FLEA/FLEA/Ajax.php**
+- 1 处 `isset()` 三元表达式改为 `??` 运算符
+
+**FLEA/FLEA/Controller/Action.php**
+- `_isAjax()`：1 处 `isset()` 三元表达式改为 `??` 运算符
+
+**FLEA/FLEA/_Errors/_common/header.php**
+- 2 处 `isset()` 三元表达式改为 `??` 运算符
+- 1 处 `isset()` 三元表达式改为 `??` 条件表达式
+
+---
+
+## 2026-02-26
+
 ### fix: 修复关联查询中 TableDataGateway 类型错误
 
 - `FLEA/FLEA/Db/TableDataGateway.php`：`$assocRowset = null` 改为 `[]`（匹配 array 类型）
