@@ -411,7 +411,7 @@ class TableDataGateway
      */
     public function findAll($conditions = null, ?string $sort = null, $limit = null, $fields = '*', bool $queryLinks = true): ?array
     {
-        list($whereby, $distinct) = $this->getWhere($conditions);
+        [$whereby, $distinct] = $this->getWhere($conditions);
         // 处理排序
         $sortby = $sort != '' ? " ORDER BY {$sort}" : '';
         // 处理 $limit
@@ -684,7 +684,7 @@ class TableDataGateway
     {
         // 处理 $limit
         if (is_array($limit)) {
-            list($length, $offset) = $limit;
+            [$length, $offset] = $limit;
         } else {
             $length = $limit;
             $offset = null;
@@ -712,7 +712,7 @@ class TableDataGateway
      */
     public function findCount($conditions = null, $fields = null): int
     {
-        list($whereby, $distinct) = $this->getWhere($conditions);
+        [$whereby, $distinct] = $this->getWhere($conditions);
         if (is_null($fields)) {
             $fields = $this->qpk;
         } else {
@@ -860,7 +860,7 @@ class TableDataGateway
         // 生成 SQL 语句
         $pkv = $row[$this->primaryKey];
         unset($row[$this->primaryKey]);
-        list($pairs, $values) = $this->dbo->getPlaceholderPair($row, $this->fields);
+        [$pairs, $values] = $this->dbo->getPlaceholderPair($row, $this->fields);
         $row[$this->primaryKey] = $pkv;
 
         if (!empty($pairs)) {
@@ -937,7 +937,7 @@ class TableDataGateway
         $whereby = $this->getWhere($conditions, false);
         $this->_setUpdatedTimeFields($row);
 
-        list($pairs, $values) = $this->dbo->getPlaceholderPair($row, $this->fields);
+        [$pairs, $values] = $this->dbo->getPlaceholderPair($row, $this->fields);
         $pairs = implode(',', $pairs);
         $sql = "UPDATE {$this->qtableName} SET {$pairs} {$whereby}";
         return $this->dbo->execute(sql_statement($sql), $values);
@@ -978,7 +978,7 @@ class TableDataGateway
 
         $row = [];
         $this->_setUpdatedTimeFields($row);
-        list($pairs, $values) = $this->dbo->getPlaceholderPair($row, $this->fields);
+        [$pairs, $values] = $this->dbo->getPlaceholderPair($row, $this->fields);
         $pairs = implode(',', $pairs);
         if ($pairs) {
             $pairs = ', ' . $pairs;
@@ -1007,7 +1007,7 @@ class TableDataGateway
 
         $row = [];
         $this->_setUpdatedTimeFields($row);
-        list($pairs, $values) = $this->dbo->getPlaceholderPair($row, $this->fields);
+        [$pairs, $values] = $this->dbo->getPlaceholderPair($row, $this->fields);
         $pairs = implode(',', $pairs);
         if ($pairs) {
             $pairs = ', ' . $pairs;
@@ -1081,7 +1081,7 @@ class TableDataGateway
         }
 
         // 生成 SQL 语句
-        list($holders, $values) = $this->dbo->getPlaceholder($row, $this->fields);
+        [$holders, $values] = $this->dbo->getPlaceholder($row, $this->fields);
         $holders = implode(',', $holders);
         $fields = $this->dbo->qfields(array_keys($values));
         $sql = "INSERT INTO {$this->qtableName} ({$fields}) VALUES ({$holders})";
@@ -1747,13 +1747,13 @@ class TableDataGateway
         $p = explode('.', $matches[1]);
         switch (count($p)) {
         case 3:
-            list($schema, $table, $field) = $p;
+            [$schema, $table, $field] = $p;
             if ($table == $this->tableName) {
                 $table = $this->fullTableName;
             }
             return $this->dbo->qfield($field, $table, $schema);
         case 2:
-            list($table, $field) = $p;
+            [$table, $field] = $p;
             if ($table == $this->tableName) {
                 $table = $this->fullTableName;
             }
@@ -1830,7 +1830,7 @@ class TableDataGateway
             }
 
             $arr = $where;
-            list($where, $linksWhere) = $arr;
+            [$where, $linksWhere] = $arr;
             unset($arr);
 
             if (!$this->autoLink || !$queryLinks) {
@@ -1871,7 +1871,7 @@ class TableDataGateway
                     $whereby = $where != '' ? " WHERE {$where} AND " : ' WHERE';
                 }
                 foreach ($lws as $lw) {
-                    list($field, $value, $op, $expr, $isCommand) = $lw;
+                    [$field, $value, $op, $expr, $isCommand] = $lw;
                     if (!$isCommand) {
                         $field = $link->assocTDG->qfield($field);
                         $value = $this->dbo->qstr($value);

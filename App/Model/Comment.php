@@ -12,17 +12,17 @@ class Comment extends TableDataGateway
     /**
      * 数据表名
      */
-    public $tableName = 'comments';
+    public string $tableName = 'comments';
 
     /**
      * 主键字段
      */
-    public $primaryKey = 'id';
+    public string $primaryKey = 'id';
 
     /**
      * 定义从属关联：一个评论属于一个文章
      */
-    public $belongsTo = array(
+    public array $belongsTo = array(
         array(
             'tableClass' => Post::class,
             'foreignKey' => 'post_id',

@@ -169,7 +169,7 @@ class ImgCode
             }
             if ($length <= 0) { $length = 4; }
             $code = '';
-            list($usec, $sec) = explode(" ", microtime());
+            [$usec, $sec] = explode(" ", microtime());
             srand($sec + $usec * 100000);
             $len = strlen($seed) - 1;
             for ($i = 0; $i < $length; $i++) {
@@ -188,10 +188,10 @@ class ImgCode
                 (int)$options['paddingTop'] : 2;
         $paddingBottom = isset($options['paddingBottom']) ?
                 (int)$options['paddingBottom'] : 2;
-        $color = isset($options['color']) ? $options['color'] : '0xffffff';
-        $bgcolor = isset($options['bgcolor']) ? $options['bgcolor'] : '0x666666';
-        $border = isset($options['border']) ? (int)$options['border'] : 1;
-        $bdColor = isset($options['borderColor']) ? $options['borderColor'] : '0x000000';
+        $color = $options['color'] ?? '0xffffff';
+        $bgcolor = $options['bgcolor'] ?? '0x666666';
+        $border = (int) ($options['border'] ?? 1);
+        $bdColor = $options['borderColor'] ?? '0x000000';
 
         // 确定要使用的字体
         if (!isset($options['font'])) {
@@ -217,19 +217,19 @@ class ImgCode
 
         // 绘制边框
         if ($border) {
-            list($r, $g, $b) = $this->_hex2rgb($bdColor);
+            [$r, $g, $b] = $this->_hex2rgb($bdColor);
             $borderColor = imagecolorallocate($img, $r, $g, $b);
             imagefilledrectangle($img, 0, 0, $width, $height, $borderColor);
         }
 
         // 绘制背景
-        list($r, $g, $b) = $this->_hex2rgb($bgcolor);
+        [$r, $g, $b] = $this->_hex2rgb($bgcolor);
         $backgroundColor = imagecolorallocate($img, $r, $g, $b);
         imagefilledrectangle($img, $border, $border,
                 $width - $border - 1, $height - $border - 1, $backgroundColor);
 
         // 绘制文字
-        list($r, $g, $b) = $this->_hex2rgb($color);
+        [$r, $g, $b] = $this->_hex2rgb($color);
         $textColor = imagecolorallocate($img, $r, $g, $b);
         imagestring($img, $font, $paddingLeft + $border, $paddingTop + $border,
                 $code, $textColor);

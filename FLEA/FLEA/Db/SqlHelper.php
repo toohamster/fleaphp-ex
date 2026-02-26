@@ -88,12 +88,12 @@ class SqlHelper
             if (!isset($cond[3])) { $cond[3] = $expr; }
             if (!isset($cond[4])) { $cond[4] = false; }
 
-            list($field, $value, $op, $expr, $isCommand) = $cond;
+            [$field, $value, $op, $expr, $isCommand] = $cond;
 
             $str = '';
             do {
                 if (strpos($field, '.') !== false) {
-                    list($scheme, $field) = explode('.', $field);
+                    [$scheme, $field] = explode('.', $field);
                     $linkname = strtoupper($scheme);
                     if (isset($table->links[$linkname])) {
                         $linksWhere[$linkname][] = array($field, $value, $op, $expr, $isCommand);

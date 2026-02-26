@@ -147,12 +147,12 @@ class ActiveRecord
             $link = array(
                 'tableClass' => $options['tableClass'],
                 'mappingName' => $define['mappingName'],
-                'foreignKey' => isset($define['foreignKey']) ? $define['foreignKey'] : null,
+                'foreignKey' => $define['foreignKey'] ?? null,
             );
 
             if ($define['mappingType'] == MANY_TO_MANY) {
-                $link['joinTable'] = isset($define['joinTable']) ? $define['joinTable'] : null;
-                $link['assocForeignKey'] = isset($define['assocForeignKey']) ? $define['assocForeignKey'] : null;
+                $link['joinTable'] = $define['joinTable'] ?? null;
+                $link['assocForeignKey'] = $define['assocForeignKey'] ?? null;
             }
 
             $this->_table->createLink($link, $define['mappingType']);

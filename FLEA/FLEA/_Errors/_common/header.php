@@ -33,8 +33,8 @@ function __error_dump_trace($ex)
     $trace = $ex->getTrace();
     $ix = count($trace);
     foreach ($trace as $point) {
-        $file = isset($point['file']) ? $point['file'] : null;
-        $line = isset($point['line']) ? $point['line'] : null;
+        $file = $point['file'] ?? null;
+        $line = $point['line'] ?? null;
         $id = md5("{$file}({$line})");
         $function = isset($point['class']) ? "{$point['class']}::{$point['function']}" : $point['function'];
 

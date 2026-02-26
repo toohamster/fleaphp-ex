@@ -201,7 +201,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
         if (isset($this->functionFields['registerIpField'])
             && $this->functionFields['registerIpField'] != '')
         {
-            $row[$this->functionFields['registerIpField']] = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1';
+            $row[$this->functionFields['registerIpField']] = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         }
         return parent::create($row);
     }
@@ -258,7 +258,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
         if (isset($this->functionFields['lastLoginIpField'])
             && $this->functionFields['lastLoginIpField'] != '')
         {
-            $update[$this->functionFields['lastLoginIpField']] = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1';
+            $update[$this->functionFields['lastLoginIpField']] = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         }
 
         if (isset($this->functionFields['loginCountField'])

@@ -167,7 +167,7 @@ class Image
             $oy = ($height - $sy) / 2;
         }
 
-        list($r, $g, $b) = $this->extractColor($bgcolor, '0xffffff');
+        [$r, $g, $b] = $this->extractColor($bgcolor, '0xffffff');
         $bgcolor = imagecolorallocate($dest, $r, $g, $b);
         imagefilledrectangle($dest, 0, 0, $width, $height, $bgcolor);
         imagecolordeallocate($dest, $bgcolor);
@@ -200,9 +200,9 @@ class Image
                 $nocut = array('enabled' => false);
             }
         } else {
-            $nocut['enabled'] = isset($nocut['enabled']) ? $nocut['enabled']: true;
-            $nocut['pos'] = isset($nocut['pos']) ? $nocut['pos']: 'center';
-            $nocut['bgcolor'] = isset($nocut['bgcolor']) ? $nocut['bgcolor']: '0xffffff';
+            $nocut['enabled'] = $nocut['enabled'] ?? true;
+            $nocut['pos'] = $nocut['pos'] ?? 'center';
+            $nocut['bgcolor'] = $nocut['bgcolor'] ?? '0xffffff';
         }
 
         if ($nocut['enabled']) {
@@ -251,7 +251,7 @@ class Image
                 $oy = ($height - $sy * $ratio) / 2;
             }
 
-            list($r, $g, $b) = $this->extractColor($nocut['bgcolor'], '0xffffff');
+            [$r, $g, $b] = $this->extractColor($nocut['bgcolor'], '0xffffff');
             $bgcolor = imagecolorallocate($dest, $r, $g, $b);
             imagefilledrectangle($dest, 0, 0, $width, $height, $bgcolor);
             imagecolordeallocate($dest, $bgcolor);

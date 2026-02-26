@@ -449,7 +449,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
                 }
             }
 
-            $field['description'] = isset($row['Comment']) ? $row['Comment'] : '';
+            $field['description'] = $row['Comment'] ?? '';
 
             $retarr[strtoupper($field['name'])] = $field;
         }
