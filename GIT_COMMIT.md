@@ -6,6 +6,22 @@
 
 ## 2026-02-26
 
+### fix: 修复数组语法错误，将 ); 改为 ];
+
+修复之前将 array() 替换为 [] 时遗留的括号不匹配问题
+
+**修改的文件:**
+- `Config/DEBUG_MODE_CONFIG.php`: 结尾 `);` → `];`
+- `Config/DEPLOY_MODE_CONFIG.php`: 结尾 `);` → `];`
+- `_Errors/default/ErrorMessage.php`: 结尾 `);` → `];`
+- `_Errors/chinese-utf8/ErrorMessage.php`: 结尾 `);` → `];`
+- `Db/TableLink/ManyToManyLink.php`: 修复 `execute()` 调用中的括号
+- `Acl/testCreateData.php`: 多处数组闭合括号 `);` → `];`
+
+---
+
+## 2026-02-26
+
 ### refactor: Acl 目录使用 PSR-4 命名空间和更新旧注释
 
 **代码改动:**
