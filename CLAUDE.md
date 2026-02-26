@@ -8,6 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - FLEA/ 目录有重要改动后，更新 `FLEA/CHANGES.md`
 - App/ 目录有重要改动后，更新 `App/APP_CHANGES.md`
 - 每次代码改动完成后，将 git commit 说明追加到 `GIT_COMMIT.md`（最新记录在最前）
+- 代码改动完成后等待用户 review，用户确认后再执行 git commit
 - 明确需求后再操作，不确定先问，不猜测
 - 只做用户明确要求的事，完成后立即停止，不自行添加"改进"
 
