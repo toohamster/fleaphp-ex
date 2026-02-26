@@ -212,7 +212,7 @@ class Action
      */
     protected function _isAjax(): bool
     {
-        $r = isset($_SERVER['HTTP_X_REQUESTED_WITH']) ? strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) : '';
+        $r = strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '');
         return $r == 'xmlhttprequest';
     }
 

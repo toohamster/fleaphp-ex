@@ -274,7 +274,7 @@ EOT;
                 $beforeRequest[] = "    {$target}.{$targetType}(\"\");";
             }
 
-            $success = isset($attribs['success']) ? trim($attribs['success']) : '';
+            $success = trim($attribs['success'] ?? '');
             if ($success) {
                 $success = preg_replace('/function.+{/i', '{', $success);
                 if (substr($success, -1) != ';') { $success .= ';'; }
