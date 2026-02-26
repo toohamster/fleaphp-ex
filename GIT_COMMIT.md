@@ -6,6 +6,15 @@
 
 ## 2026-02-26
 
+### feat: 建立 Post 和 Comment 模型关联关系并优化控制器查询
+
+- `App/Model/Post.php`：添加 `$hasMany` 关联，一个文章有多个评论
+- `App/Model/Comment.php`：添加 `$belongsTo` 关联，一个评论属于一个文章
+- `App/Controller/PostController.php`：actionView() 利用关联减少数据库查询（3 次 → 1 次）
+- `App/Model/Post.php`：getPublishedPosts() 禁用关联查询，避免不必要开销
+
+---
+
 ### fix: 修复模型中 TableDataGateway 方法调用错误及移除冗余时间戳
 
 - `App/Model/Post.php`：`updatePost()` 改用 `updateByConditions()`，代码更清晰

@@ -20,6 +20,17 @@ class Post extends TableDataGateway
     public $primaryKey = 'id';
 
     /**
+     * 定义一对多关联：一个文章有多个评论
+     */
+    public $hasMany = array(
+        array(
+            'tableClass' => Comment::class,
+            'foreignKey' => 'post_id',
+            'mappingName' => 'comments',
+        ),
+    );
+
+    /**
      * 获取所有已发布的文章
      *
      * @param int $limit 限制数量
@@ -31,7 +42,9 @@ class Post extends TableDataGateway
         return $this->findAll(
             array('status' => 1),
             'created_at DESC',
-            [$limit, $offset]
+            [$limit, $offset],
+            '*',
+            false  // 不查询关联数据
         );
     }
 

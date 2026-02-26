@@ -46,6 +46,7 @@ class PostController extends Action
         $pageSize = 10;
         $offset = ($page - 1) * $pageSize;
 
+        // 不启用关联查询，只获取文章数据
         $posts = $this->postModel->getPublishedPosts($pageSize, $offset);
         $total = $this->postModel->getTotalCount();
         $totalPages = ceil($total / $pageSize);
@@ -69,14 +70,15 @@ class PostController extends Action
             throw new \FLEA\Exception\InvalidArguments('文章ID不能为空');
         }
 
-        $post = $this->postModel->getPostById($id);
+        $post = $this->postModel->find($id, null, '*', true);
 
         if (!$post) {
             throw new \FLEA\Exception\InvalidArguments('文章不存在');
         }
 
-        $comments = $this->commentModel->getCommentsByPostId($id);
-        $commentCount = $this->commentModel->getCommentCount($id);
+        // 从关联中获取评论数据
+        $comments = isset($post['comments']) ? $post['comments'] : array();
+        $commentCount = count($comments);
 
         $this->view->assign('post', $post);
         $this->view->assign('comments', $comments);
