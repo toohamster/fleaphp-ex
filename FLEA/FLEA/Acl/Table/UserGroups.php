@@ -4,7 +4,7 @@ namespace FLEA\Acl\Table;
 
 
 /**
- * 定义 \FLEA\Acl_Table_UserGroups 类
+ * 定义 \FLEA\Acl\Table\UserGroups 类
  *
  * @author toohamster
  * @package Core
@@ -13,7 +13,7 @@ namespace FLEA\Acl\Table;
 
 
 /**
- * \FLEA\Acl_Table_UserGroups 类提供了用户组数据的存储服务
+ * \FLEA\Acl\Table\UserGroups 类提供了用户组数据的存储服务
  *
  * @package Core
  * @author toohamster
@@ -42,17 +42,17 @@ class UserGroups extends \FLEA\Db\TableDataGateway
      */
     public $manyToMany = [
         [
-            'tableClass' => '\FLEA\Acl_Table_Roles',
+            'tableClass' => \FLEA\Acl\Table\Roles::class,
             'foreignKey' => 'user_group_id',
             'assocForeignKey' => 'role_id',
-            'joinTableClass' => '\FLEA\Acl_Table_UserGroupsHasRoles',
+            'joinTableClass' => \FLEA\Acl\Table\UserGroupsHasRoles::class,
             'mappingName' => 'roles',
         ],
         [
-            'tableClass' => '\FLEA\Acl_Table_Permissions',
+            'tableClass' => \FLEA\Acl\Table\Permissions::class,
             'foreignKey' => 'user_group_id',
             'assocForeignKey' => 'permission_id',
-            'joinTableClass' => '\FLEA\Acl_Table_UserGroupsHasPermissions',
+            'joinTableClass' => \FLEA\Acl\Table\UserGroupsHasPermissions::class,
             'mappingName' => 'permissions',
         ],
     ];

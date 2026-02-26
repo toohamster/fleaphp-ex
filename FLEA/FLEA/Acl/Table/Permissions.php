@@ -4,7 +4,7 @@ namespace FLEA\Acl\Table;
 
 
 /**
- * 定义 \FLEA\Acl_Table_Permissions 类
+ * 定义 \FLEA\Acl\Table\Permissions 类
  *
  * @author toohamster
  * @package Core
@@ -13,7 +13,7 @@ namespace FLEA\Acl\Table;
 
 
 /**
- * \FLEA\Acl_Table_Permissions 提供了权限数据的存储服务
+ * \FLEA\Acl\Table\Permissions 提供了权限数据的存储服务
  *
  * @package Core
  */

@@ -4,7 +4,7 @@ namespace FLEA\Acl\Table;
 
 
 /**
- * 定义 \FLEA\Acl_Table_UserGroupsHasRoles 类
+ * 定义 \FLEA\Acl\Table\UserGroupsHasRoles 类
  *
  * @author toohamster
  * @package Core
@@ -13,7 +13,7 @@ namespace FLEA\Acl\Table;
 
 
 /**
- * \FLEA\Acl_Table_UserGroupsHasRoles 用于关联用户组和角色
+ * \FLEA\Acl\Table\UserGroupsHasRoles 用于关联用户组和角色
  *
  * @package Core
  * @author toohamster
