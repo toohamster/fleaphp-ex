@@ -6,6 +6,16 @@
 
 ## 2026-02-26
 
+### fix: 修复多处函数返回类型与实际返回值不一致
+
+- `FLEA.php` `parseDSN()`：`return false` → `return null`（匹配 `?array`）
+- `AbstractDriver.php` `affectedRows()`：`return false` → `return 0`（匹配 `: int`）
+- `AbstractDriver.php` `startTrans()`：末尾补充 `return true`（匹配 `: bool`）
+- `AbstractDriver.php` `completeTrans()`：else 分支后补充 `return true`（匹配 `: bool`）
+- `AbstractDriver.php` `getPlaceholderPair()`：返回类型 `string` → `array`
+
+---
+
 ### fix: 修复 TableDataGateway::insert() 中 execute() 调用错误
 
 - `Db/TableDataGateway.php` 第 1090 行：`Execute($sql, ...)` 改为 `execute(sql_statement($sql), ...)`，与其他调用一致

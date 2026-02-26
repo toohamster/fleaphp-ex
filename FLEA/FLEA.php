@@ -552,7 +552,7 @@ class FLEA
             $dsn = str_replace('@/', '@localhost/', $dsn);
             $parse = parse_url($dsn);
             if (empty($parse['scheme'])) {
-                return false;
+                return null;
             }
 
             $dsn = [];
