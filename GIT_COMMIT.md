@@ -6,6 +6,12 @@
 
 ## 2026-02-26
 
+### fix: 修复 TableDataGateway::insert() 中 execute() 调用错误
+
+- `Db/TableDataGateway.php` 第 1090 行：`Execute($sql, ...)` 改为 `execute(sql_statement($sql), ...)`，与其他调用一致
+
+---
+
 ### fix: 修复 AbstractDriver::getPlaceholder() 返回类型声明错误
 
 - `Db/Driver/AbstractDriver.php`：`getPlaceholder()` 返回类型由错误的 `string` 改为 `array`
