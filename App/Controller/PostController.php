@@ -66,13 +66,13 @@ class PostController extends Action
         $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
         if (!$id) {
-            die('文章ID不能为空');
+            throw new \FLEA\Exception\InvalidArguments('文章ID不能为空');
         }
 
         $post = $this->postModel->getPostById($id);
 
         if (!$post) {
-            die('文章不存在');
+            throw new \FLEA\Exception\InvalidArguments('文章不存在');
         }
 
         $comments = $this->commentModel->getCommentsByPostId($id);
@@ -122,13 +122,13 @@ class PostController extends Action
         $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
         if (!$id) {
-            die('文章ID不能为空');
+            throw new \FLEA\Exception\InvalidArguments('文章ID不能为空');
         }
 
         $post = $this->postModel->getPostById($id);
 
         if (!$post) {
-            die('文章不存在');
+            throw new \FLEA\Exception\InvalidArguments('文章不存在');
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -163,7 +163,7 @@ class PostController extends Action
         $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
         if (!$id) {
-            die('文章ID不能为空');
+            throw new \FLEA\Exception\InvalidArguments('文章ID不能为空');
         }
 
         if (isset($_GET['confirm']) && $_GET['confirm'] === 'yes') {
