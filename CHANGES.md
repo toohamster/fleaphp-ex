@@ -6,6 +6,62 @@
 
 ## 2026-02-26
 
+### refactor: Acl 目录使用 PSR-4 命名空间和 ::class 常量
+
+**FLEA/FLEA/Acl/Manager.php**
+- `$_tableClass` 数组中的 8 个类名从 `'\FLEA\Acl_Table_*'` 改为 `\FLEA\Acl\Table\*::class`
+
+**FLEA/FLEA/Acl/Table/UserGroups.php**
+- `$manyToMany` 数组中的类名改用 `::class` 常量
+
+**FLEA/FLEA/Acl/Table/Users.php**
+- `$belongsTo` 和 `$manyToMany` 数组中的类名改用 `::class` 常量
+
+**FLEA/FLEA/Acl/Table/Roles.php**
+- `$manyToMany` 数组中的 `tableClass` 改用 `::class` 常量
+- `joinTable` 保留为表名字符串（该表没有对应的实体类）
+
+**FLEA/FLEA/Acl/Table/Permissions.php**
+- 注释中的类名从 `\FLEA\Acl_Table_Permissions` 改为 `\FLEA\Acl\Table\Permissions`
+
+**FLEA/FLEA/Acl/Table/UserGroupsHasRoles.php**
+- 注释中的类名从 `\FLEA\Acl_Table_UserGroupsHasRoles` 改为 `\FLEA\Acl\Table\UserGroupsHasRoles`
+
+**FLEA/FLEA/Acl/Table/UserGroupsHasPermissions.php**
+- 注释中的类名从 `\FLEA\Acl_Table_UserGroupsHasPermissions` 改为 `\FLEA\Acl\Table\UserGroupsHasPermissions`
+
+**FLEA/FLEA/Acl/Table/UsersHasRoles.php**
+- 注释中的类名从 `\FLEA\Acl_Table_UsersHasRoles` 改为 `\FLEA\Acl\Table\UsersHasRoles`
+
+**FLEA/FLEA/Acl/Table/UsersHasPermissions.php**
+- 注释中的类名从 `\FLEA\Acl_Table_UsersHasPermissions` 改为 `\FLEA\Acl\Table\UsersHasPermissions`
+
+**FLEA/FLEA/Acl/Exception/UserGroupNotFound.php**
+- 注释中的类名从 `\FLEA\Acl_Exception_UserGroupNotFound` 改为 `\FLEA\Acl\Exception\UserGroupNotFound`
+
+**FLEA/FLEA/Acl/Manager.php**
+- 注释中的类名从 `\FLEA\Acl_Manager` 改为 `\FLEA\Acl\Manager`
+- `@var` 类型注释同步更新
+
+**FLEA/FLEA/Acl/Table/UserGroups.php**
+- 注释中的类名从 `\FLEA\Acl_Table_UserGroups` 改为 `\FLEA\Acl\Table\UserGroups`
+
+**FLEA/FLEA/Acl/Table/Users.php**
+- 注释中的类名从 `\FLEA\Acl_Table_Users` 改为 `\FLEA\Acl\Table\Users`
+
+**FLEA/FLEA/Acl/Table/Roles.php**
+- 注释中的类名从 `\FLEA\Acl_Table_Roles` 改为 `\FLEA\Acl\Table\Roles`
+
+优势:
+- 符合 PSR-4 命名空间规范
+- 使用 `::class` 常量提供类型安全
+- IDE 可以提供更好的自动完成和重构支持
+- 注释与实际的命名空间保持一致
+
+---
+
+## 2026-02-26
+
 ### refactor: TableLink 类使用 ::class 常量代替字符串类名
 
 **FLEA/FLEA/Db/TableLink.php**

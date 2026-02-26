@@ -6,6 +6,31 @@
 
 ## 2026-02-26
 
+### refactor: Acl 目录使用 PSR-4 命名空间和更新旧注释
+
+**代码改动:**
+- `FLEA/FLEA/Acl/Manager.php`: `$_tableClass` 属性从旧式类名字符串改为 `\FLEA\Acl\Table\*::class`
+- `FLEA/FLEA/Acl/Table/UserGroups.php`: `$manyToMany` 数组改用 ::class 常量
+- `FLEA/FLEA/Acl/Table/Users.php`: `$belongsTo` 和 `$manyToMany` 数组改用 ::class 常量
+- `FLEA/FLEA/Acl/Table/Roles.php`: `$manyToMany` 数组改用 ::class 常量
+- 其他 Acl 文件：更新注释中的旧式类名为 PSR-4 格式
+
+**注释更新:**
+- `Manager.php`: `\FLEA\Acl_Manager` → `\FLEA\Acl\Manager`
+- `Table/UserGroups.php`: `\FLEA\Acl_Table_UserGroups` → `\FLEA\Acl\Table\UserGroups`
+- `Table/Users.php`: `\FLEA\Acl_Table_Users` → `\FLEA\Acl\Table\Users`
+- `Table/Roles.php`: `\FLEA\Acl_Table_Roles` → `\FLEA\Acl\Table\Roles`
+- `Table/Permissions.php`: `\FLEA\Acl_Table_Permissions` → `\FLEA\Acl\Table\Permissions`
+- `Table/UserGroupsHasRoles.php`: `\FLEA\Acl_Table_UserGroupsHasRoles` → `\FLEA\Acl\Table\UserGroupsHasRoles`
+- `Table/UserGroupsHasPermissions.php`: `\FLEA\Acl_Table_UserGroupsHasPermissions` → `\FLEA\Acl\Table\UserGroupsHasPermissions`
+- `Table/UsersHasRoles.php`: `\FLEA\Acl_Table_UsersHasRoles` → `\FLEA\Acl\Table\UsersHasRoles`
+- `Table/UsersHasPermissions.php`: `\FLEA\Acl_Table_UsersHasPermissions` → `\FLEA\Acl\Table\UsersHasPermissions`
+- `Exception/UserGroupNotFound.php`: `\FLEA\Acl_Exception_UserGroupNotFound` → `\FLEA\Acl\Exception\UserGroupNotFound`
+
+---
+
+## 2026-02-26
+
 ### refactor: 将 array() 替换为短数组语法 []
 
 批量将代码中的 array() 替换为 PHP 5.4+ 支持的短数组语法 []
