@@ -6,6 +6,15 @@
 
 ## 2026-02-26
 
+### feat: 替换控制器中 die() 函数为框架异常处理
+
+- 将 actionView() 方法中的 die() 调用替换为 \FLEA\Exception\InvalidArguments 异常
+- 将 actionEdit() 方法中的 die() 调用替换为 \FLEA\Exception\InvalidArguments 异常
+- 将 actionDelete() 方法中的 die() 调用替换为 \FLEA\Exception\InvalidArguments 异常
+- 提升了错误处理的一致性和健壮性
+
+---
+
 ### fix: 修复多处函数返回类型与实际返回值不一致
 
 - `FLEA.php` `parseDSN()`：`return false` → `return null`（匹配 `?array`）
