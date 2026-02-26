@@ -6,6 +6,77 @@
 
 ## 2026-02-26
 
+### feat: 建立 Post 和 Comment 模型关联关系并优化控制器查询
+
+#### 修改文件
+- `App/Model/Post.php`
+- `App/Model/Comment.php`
+- `App/Controller/PostController.php`
+
+#### 新增关联关系
+
+**Post.php - 添加 `$hasMany` 关联:**
+```php
+public $hasMany = array(
+    array(
+        'tableClass' => Comment::class,
+        'foreignKey' => 'post_id',
+        'mappingName' => 'comments',
+    ),
+);
+```
+
+**Comment.php - 添加 `$belongsTo` 关联:**
+```php
+public $belongsTo = array(
+    array(
+        'tableClass' => Post::class,
+        'foreignKey' => 'post_id',
+        'mappingName' => 'post',
+    ),
+);
+```
+
+#### 控制器优化
+
+**actionView() - 利用关联减少数据库查询:**
+```php
+// 优化前：3 次查询
+$post = $this->postModel->getPostById($id);
+$comments = $this->commentModel->getCommentsByPostId($id);
+$commentCount = $this->commentModel->getCommentCount($id);
+
+// 优化后：1 次查询
+$post = $this->postModel->find($id, null, '*', true);
+$comments = isset($post['comments']) ? $post['comments'] : array();
+$commentCount = count($comments);
+```
+
+#### Post.php 修改
+
+**getPublishedPosts() - 禁用关联查询:**
+```php
+// 列表页不需要加载评论数据，避免不必要的查询开销
+return $this->findAll(
+    array('status' => 1),
+    'created_at DESC',
+    [$limit, $offset],
+    '*',
+    false  // 不查询关联数据
+);
+```
+
+#### 优化效果
+
+| 方法 | 优化前查询次数 | 优化后查询次数 |
+|------|----------------|----------------|
+| actionIndex() | 2 次 | 2 次（不变） |
+| actionView() | 3 次 | 1 次 |
+
+---
+
+## 2026-02-26
+
 ### fix: 修复模型中 TableDataGateway 方法调用错误及移除冗余时间戳设置
 
 #### 修改文件

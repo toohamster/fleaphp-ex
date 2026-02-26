@@ -20,6 +20,17 @@ class Comment extends TableDataGateway
     public $primaryKey = 'id';
 
     /**
+     * 定义从属关联：一个评论属于一个文章
+     */
+    public $belongsTo = array(
+        array(
+            'tableClass' => Post::class,
+            'foreignKey' => 'post_id',
+            'mappingName' => 'post',
+        ),
+    );
+
+    /**
      * 获取文章的评论
      *
      * @param int $postId 文章ID

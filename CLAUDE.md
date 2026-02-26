@@ -29,7 +29,7 @@ php74 -S 127.0.0.1:8081
 Database config defaults (change in `App/Config.php`):
 - Host: `127.0.0.1:3306`, DB: `blog`, User: `root`, Password: `11111111`
 
-Run via web server: `http://localhost/fleaphp-ex/index.php`
+Run via web server: `http://127.0.0.1:8081/index.php`
 
 PHP version: **7.4.32**（命令：`php74`）
 
