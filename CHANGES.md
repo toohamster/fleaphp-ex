@@ -6,6 +6,36 @@
 
 ## 2026-02-26
 
+### refactor: TableLink 类使用 ::class 常量代替字符串类名
+
+**FLEA/FLEA/Db/TableLink.php**
+- `createLink()` 方法中的 `$typeMap` 数组使用 `::class` 常量
+
+修改前:
+```php
+static $typeMap = [
+    HAS_ONE => '\FLEA\Db\TableLink\HasOneLink',
+    ...
+];
+```
+
+修改后:
+```php
+static $typeMap = [
+    HAS_ONE => \FLEA\Db\TableLink\HasOneLink::class,
+    ...
+];
+```
+
+优势:
+- 类型安全，IDE 可以提供更好的支持
+- 类名改变时 IDE 可自动重构
+- 符合现代 PHP 最佳实践
+
+---
+
+## 2026-02-26
+
 ### refactor: 将 array() 替换为短数组语法 []
 
 批量将代码中的 array() 替换为 PHP 5.4+ 支持的短数组语法 []
