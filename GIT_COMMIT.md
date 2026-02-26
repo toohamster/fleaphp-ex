@@ -6,6 +6,12 @@
 
 ## 2026-02-26
 
+### fix: 修复 AbstractDriver::getPlaceholder() 返回类型声明错误
+
+- `Db/Driver/AbstractDriver.php`：`getPlaceholder()` 返回类型由错误的 `string` 改为 `array`
+
+---
+
 ### refactor(log): 移除 AbstractDriver 中 log_message 的存在性检查
 
 - `Db/Driver/AbstractDriver.php`：移除 `function_exists('log_message')` 检查，`log_message` 始终可用

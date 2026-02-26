@@ -764,7 +764,7 @@ abstract class AbstractDriver
      *
      * @return array
      */
-    public function getPlaceholder(array &$inputarr, $fields = null): string
+    public function getPlaceholder(array &$inputarr, $fields = null): array
     {
         $holders = [];
         $values = [];
