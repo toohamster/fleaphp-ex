@@ -25,42 +25,42 @@ class Log
      *
      * @var string
      */
-    public $_log = '';
+    public string $_log = '';
 
     /**
      * 日期格式
      *
      * @var string
      */
-    public $dateFormat = 'Y-m-d H:i:s';
+    public string $dateFormat = 'Y-m-d H:i:s';
 
     /**
      * 保存日志文件的目录
      *
      * @var string
      */
-    public $_logFileDir;
+    public ?string $_logFileDir = null;
 
     /**
      * 保存日志的文件名
      *
      * @var string
      */
-    public $_logFilename;
+    public ?string $_logFilename = null;
 
     /**
      * 是否允许日志保存
      *
      * @var boolean
      */
-    public $_enabled = true;
+    public bool $_enabled = true;
 
     /**
      * 要写入日志文件的错误级别
      *
      * @var array
      */
-    public $_errorLevel;
+    public ?array $_errorLevel = null;
 
     /**
      * 构造函数
@@ -91,7 +91,7 @@ class Log
                $this->_errorLevel[$e] = true;
             }
 
-            list($usec, $sec) = explode(" ", FLEA_LOADED_TIME);
+            [$usec, $sec] = explode(" ", FLEA_LOADED_TIME);
             $this->_log = sprintf("[%s %s] ======= FleaPHP Loaded =======\n",
                 date($this->dateFormat, $sec), $usec);
 
@@ -147,10 +147,10 @@ class Log
     public function __writeLog()
     {
         // 计算应用程序执行时间（不包含入口文件）
-        list($usec, $sec) = explode(" ", FLEA_LOADED_TIME);
+        [$usec, $sec] = explode(" ", FLEA_LOADED_TIME);
         $beginTime = (float)$sec + (float)$usec;
         $endTime = microtime();
-        list($usec, $sec) = explode(" ", $endTime);
+        [$usec, $sec] = explode(" ", $endTime);
         $endTime = (float)$sec + (float)$usec;
         $elapsedTime = $endTime - $beginTime;
         $this->_log .= sprintf("[%s %s] ======= FleaPHP End (elapsed: %f seconds) =======\n\n",

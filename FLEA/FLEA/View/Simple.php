@@ -26,7 +26,7 @@ class Simple
      *
      * @var string
      */
-    public $templateDir;
+    public ?string $templateDir = null;
 
     /**
      * 缓存过期时间
@@ -34,7 +34,7 @@ class Simple
      * @access public
      * @var int
      */
-    public $cacheLifetime;
+    public int $cacheLifetime;
 
     /**
      * 指示是否使用 cache
@@ -42,7 +42,7 @@ class Simple
      * @access public
      * @var boolean
      */
-    public $enableCache;
+    public bool $enableCache;
 
     /**
      * 缓存文件保存位置
@@ -50,7 +50,7 @@ class Simple
      * @access public
      * @var string
      */
-    public $cacheDir;
+    public string $cacheDir;
 
     /**
      * 模板变量
@@ -58,7 +58,7 @@ class Simple
      * @access private
      * @var array
      */
-    public $vars = [];
+    public array $vars = [];
 
     /**
      * 保存各个缓存内容的缓存状态
@@ -66,7 +66,7 @@ class Simple
      * @access private
      * @var array
      */
-    public $cacheState = [];
+    public array $cacheState = [];
 
     /**
      * 构造函数

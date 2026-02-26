@@ -38,7 +38,7 @@ class Pager
      *
      * @var \FLEA\Db\Driver\AbstractDriver
      */
-    public $dbo;
+    public ?\FLEA\Db\Driver\AbstractDriver $dbo = null;
 
     /**
      * 查询条件
@@ -52,119 +52,119 @@ class Pager
      *
      * @var string
      */
-    public $_sortby;
+    public ?string $_sortby = null;
 
     /**
      * 计算实际页码时的基数
      *
      * @var int
      */
-    public $_basePageIndex = 0;
+    public int $_basePageIndex = 0;
 
     /**
      * 每页记录数
      *
      * @var int
      */
-    public $pageSize = -1;
+    public int $pageSize = -1;
 
     /**
      * 数据表中符合查询条件的记录总数
      *
      * @var int
      */
-    public $totalCount = -1;
+    public int $totalCount = -1;
 
     /**
      * 数据表中符合查询条件的记录总数
      *
      * @var int
      */
-    public $count = -1;
+    public int $count = -1;
 
     /**
      * 符合条件的记录页数
      *
      * @var int
      */
-    public $pageCount = -1;
+    public int $pageCount = -1;
 
     /**
      * 第一页的索引，从 0 开始
      *
      * @var int
      */
-    public $firstPage = -1;
+    public int $firstPage = -1;
 
     /**
      * 第一页的页码
      *
      * @var int
      */
-    public $firstPageNumber = -1;
+    public int $firstPageNumber = -1;
 
     /**
      * 最后一页的索引，从 0 开始
      *
      * @var int
      */
-    public $lastPage = -1;
+    public int $lastPage = -1;
 
     /**
      * 最后一页的页码
      *
      * @var int
      */
-    public $lastPageNumber = -1;
+    public int $lastPageNumber = -1;
 
     /**
      * 上一页的索引
      *
      * @var int
      */
-    public $prevPage = -1;
+    public int $prevPage = -1;
 
     /**
      * 上一页的页码
      *
      * @var int
      */
-    public $prevPageNumber = -1;
+    public int $prevPageNumber = -1;
 
     /**
      * 下一页的索引
      *
      * @var int
      */
-    public $nextPage = -1;
+    public int $nextPage = -1;
 
     /**
      * 下一页的页码
      *
      * @var int
      */
-    public $nextPageNumber = -1;
+    public int $nextPageNumber = -1;
 
     /**
      * 当前页的索引
      *
      * @var int
      */
-    public $currentPage = -1;
+    public int $currentPage = -1;
 
     /**
      * 构造函数中提供的当前页索引，用于 setBasePageIndex() 后重新计算页码
      *
      * @var int
      */
-    public $_currentPage = -1;
+    public int $_currentPage = -1;
 
     /**
      * 当前页的页码
      *
      * @var int
      */
-    public $currentPageNumber = -1;
+    public int $currentPageNumber = -1;
 
     /**
      * 构造函数

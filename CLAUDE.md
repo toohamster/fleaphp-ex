@@ -27,7 +27,7 @@ Database config defaults (change in `App/Config.php`):
 
 Run via web server: `http://localhost/fleaphp-ex/index.php`
 
-PHP version: **7.4.32**
+PHP version: **8.2.8**（命令：`php82`）
 
 ## Architecture
 

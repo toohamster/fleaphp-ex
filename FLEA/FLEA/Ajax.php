@@ -219,7 +219,7 @@ EOT;
      */
     protected function _insertAjaxRequest(array $eventArr, array &$bindEvents): string
     {
-        list($control, $event, $url, $attribs, $functionName) = $eventArr;
+        [$control, $event, $url, $attribs, $functionName] = $eventArr;
         $this->_formatAttribs($attribs);
         $bindEvents[] = "    $(\"{$control}\").bind(\"{$event}\", function() { return {$functionName}(); });";
 
