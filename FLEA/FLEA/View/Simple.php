@@ -77,7 +77,7 @@ class Simple
      */
     public function __construct(?string $templateDir = null)
     {
-        log_message('Construction \FLEA\View\Simple', 'debug');
+        log_message('Construction \FLEA\View\Simple', \Psr\Log\LogLevel::DEBUG);
 
         $this->templateDir = $templateDir;
         $this->cacheLifetime = 900;

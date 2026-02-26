@@ -306,7 +306,13 @@ return array(
     /**
      * 指示哪些级别的错误要保存到日志中
      */
-    'logErrorLevel'             => 'notice, debug, warning, error, exception, log',
+    'logErrorLevel'             => [
+        \Psr\Log\LogLevel::DEBUG,
+        \Psr\Log\LogLevel::NOTICE,
+        \Psr\Log\LogLevel::WARNING,
+        \Psr\Log\LogLevel::ERROR,
+        \Psr\Log\LogLevel::CRITICAL,
+    ],
 
     /**
      * 异常处理例程

@@ -82,13 +82,8 @@ class Log extends AbstractLogger
         } else {
             $this->_logFileDir = $dir;
             $this->_logFilename = $this->_logFileDir . \FLEA::getAppInf('logFilename');
-            $errorLevel = explode(',', strtolower(\FLEA::getAppInf('logErrorLevel')));
-            $errorLevel = array_map('trim', $errorLevel);
-            $errorLevel = array_filter($errorLevel, 'trim');
-            $this->_errorLevel = [];
-            foreach ($errorLevel as $e) {
-               $this->_errorLevel[$e] = true;
-            }
+            $errorLevel = (array)\FLEA::getAppInf('logErrorLevel');
+            $this->_errorLevel = array_flip($errorLevel);
 
             [$usec, $sec] = explode(" ", FLEA_LOADED_TIME);
             $this->_log = sprintf("[%s %s] ======= FleaPHP Loaded =======\n",

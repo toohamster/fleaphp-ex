@@ -18,7 +18,7 @@
  * @param string $title
  * @return void
  */
-function log_message($msg, $level = 'log', $title = '')
+function log_message($msg, $level = \Psr\Log\LogLevel::DEBUG, $title = '')
 {
     static $instance = null;
 

@@ -6,6 +6,28 @@
 
 ## 2026-02-26
 
+### refactor(log): 移除 AbstractDriver 中 log_message 的存在性检查
+
+- `Db/Driver/AbstractDriver.php`：移除 `function_exists('log_message')` 检查，`log_message` 始终可用
+
+---
+
+### refactor(log): log_message() 调用处改用 LogLevel 常量
+
+- `View/Simple.php`：`'debug'` → `LogLevel::DEBUG`
+- `Db/Driver/Mysql.php`：`'debug'` → `LogLevel::DEBUG`
+
+---
+
+### refactor(log): logErrorLevel 改用 \Psr\Log\LogLevel 常量
+
+- `DEPLOY_MODE_CONFIG.php` / `DEBUG_MODE_CONFIG.php`：`logErrorLevel` 从逗号字符串改为 `LogLevel` 常量数组
+- `Log.php`：解析逻辑简化为 `array_flip((array)$config)`
+- `Functions.php`：`log_message()` 默认级别改为 `LogLevel::DEBUG`
+- 映射：原 `exception` → `LogLevel::CRITICAL`，原 `log` 移除
+
+---
+
 ### refactor(log): 移除 appendLog，log_message() 直接调用 log()
 
 - `\FLEA\Log` 移除 `appendLog()` 方法

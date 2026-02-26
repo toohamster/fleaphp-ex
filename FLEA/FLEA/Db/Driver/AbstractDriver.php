@@ -180,9 +180,6 @@ abstract class AbstractDriver
         unset($tmp['password']);
         $this->dsn = $dsn;
         $this->enableLog = \FLEA::getAppInf('logEnabled');
-        if (!function_exists('log_message')) {
-            $this->enableLog = false;
-        }
     }
 
     /**

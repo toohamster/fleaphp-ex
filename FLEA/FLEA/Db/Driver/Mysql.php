@@ -183,7 +183,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
 
         if ($this->enableLog) {
             $this->log[] = $sqlStr;
-            log_message("sql: {$sqlStr}", 'debug');
+            log_message("sql: {$sqlStr}", \Psr\Log\LogLevel::DEBUG);
         }
 
         $this->querycount++;

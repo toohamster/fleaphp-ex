@@ -2,7 +2,23 @@
 
 ## 2026-02-26
 
-### refactor(log): 移除 appendLog，log_message() 直接调用 log()
+### refactor(log): 移除 AbstractDriver 中 log_message 的存在性检查
+
+- `Db/Driver/AbstractDriver.php`：移除 `function_exists('log_message')` 检查，`log_message` 始终可用
+
+
+
+- `View/Simple.php`：`'debug'` → `LogLevel::DEBUG`
+- `Db/Driver/Mysql.php`：`'debug'` → `LogLevel::DEBUG`
+
+
+
+- `DEPLOY_MODE_CONFIG.php`：`logErrorLevel` 改为 `[LogLevel::WARNING, LogLevel::ERROR, LogLevel::CRITICAL]`（原 `exception` → `CRITICAL`，`log` 移除）
+- `DEBUG_MODE_CONFIG.php`：`logErrorLevel` 改为 `[LogLevel::DEBUG, LogLevel::NOTICE, LogLevel::WARNING, LogLevel::ERROR, LogLevel::CRITICAL]`
+- `Log.php`：解析逻辑从 `explode` 字符串改为 `array_flip((array)$config)`
+- `Functions.php`：`log_message()` 默认级别从 `'log'` 改为 `LogLevel::DEBUG`
+
+
 
 - `\FLEA\Log` 移除 `appendLog()` 方法
 - `Functions.php` 的 `log_message()` 保留 `$title` 参数和 `print_r` 处理逻辑，改为直接调用 `$instance->log($level, $message)`
