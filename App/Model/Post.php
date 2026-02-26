@@ -54,8 +54,6 @@ class Post extends TableDataGateway
      */
     public function createPost($data)
     {
-        $data['created_at'] = date('Y-m-d H:i:s');
-        $data['updated_at'] = date('Y-m-d H:i:s');
         return $this->create($data);
     }
 
@@ -68,8 +66,7 @@ class Post extends TableDataGateway
      */
     public function updatePost($id, $data)
     {
-        $data['updated_at'] = date('Y-m-d H:i:s');
-        return $this->update($data);
+        return $this->updateByConditions([$this->primaryKey => $id], $data);
     }
 
     /**
@@ -80,7 +77,7 @@ class Post extends TableDataGateway
      */
     public function deletePost($id)
     {
-        return $this->remove($id);
+        return $this->removeByPkv($id);
     }
 
     /**

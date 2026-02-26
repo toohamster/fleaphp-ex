@@ -183,7 +183,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
 
         if ($this->enableLog) {
             $this->log[] = $sqlStr;
-            log_message("sql: {$sqlStr}", 'debug');
+            log_message("sql: {$sqlStr}", \Psr\Log\LogLevel::DEBUG);
         }
 
         $this->querycount++;
@@ -472,7 +472,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
             $sql .= " FROM {$schema}";
         }
         if (!empty($pattern)) {
-            $sql .= ' LIKE ' . $this->qstr($schema);
+            $sql .= ' LIKE ' . $this->qstr($pattern);
         }
         $res = $this->execute(\FLEA\Db\SqlStatement::create($sql), null, false);
         $res = $res->getSql();

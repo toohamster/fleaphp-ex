@@ -180,9 +180,6 @@ abstract class AbstractDriver
         unset($tmp['password']);
         $this->dsn = $dsn;
         $this->enableLog = \FLEA::getAppInf('logEnabled');
-        if (!function_exists('log_message')) {
-            $this->enableLog = false;
-        }
     }
 
     /**
@@ -390,7 +387,7 @@ abstract class AbstractDriver
      */
     public function affectedRows(): int
     {
-        return $this->HAS_AFFECTED_ROWS ? $this->_affectedRows() : false;
+        return $this->HAS_AFFECTED_ROWS ? $this->_affectedRows() : 0;
     }
 
     /**
@@ -666,6 +663,7 @@ abstract class AbstractDriver
             $this->execute(\FLEA\Db\SqlStatement::create("SAVEPOINT {$savepoint}"));
             array_push($this->_savepointStack, $savepoint);
         }
+        return true;
     }
 
     /**
@@ -689,6 +687,7 @@ abstract class AbstractDriver
         } else {
             $this->_completeTrans($commitOnNoErrors);
         }
+        return true;
     }
 
     /**
@@ -767,7 +766,7 @@ abstract class AbstractDriver
      *
      * @return array
      */
-    public function getPlaceholder(array &$inputarr, $fields = null): string
+    public function getPlaceholder(array &$inputarr, $fields = null): array
     {
         $holders = [];
         $values = [];
@@ -803,7 +802,7 @@ abstract class AbstractDriver
      *
      * @return array
      */
-    public function getPlaceholderPair(array &$inputarr, $fields = null): string
+    public function getPlaceholderPair(array &$inputarr, $fields = null): array
     {
         $pairs = [];
         $values = [];

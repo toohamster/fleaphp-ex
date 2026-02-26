@@ -1087,7 +1087,7 @@ class TableDataGateway
         $sql = "INSERT INTO {$this->qtableName} ({$fields}) VALUES ({$holders})";
 
         // 插入数据
-        if (!$this->dbo->Execute($sql, $values, true)) {
+        if (!$this->dbo->execute(sql_statement($sql), $values, true)) {
             if ($unsetpk) { unset($row[$this->primaryKey]); }
             $this->dbo->completeTrans(false);
             return false;

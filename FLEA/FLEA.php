@@ -540,29 +540,29 @@ class FLEA
     public static function parseDSN($dsn): ?array
     {
         if (is_array($dsn)) {
-            $dsn['host'] = isset($dsn['host']) ? $dsn['host'] : '';
-            $dsn['port'] = isset($dsn['port']) ? $dsn['port'] : '';
-            $dsn['login'] = isset($dsn['login']) ? $dsn['login'] : '';
-            $dsn['password'] = isset($dsn['password']) ? $dsn['password'] : '';
-            $dsn['database'] = isset($dsn['database']) ? $dsn['database'] : '';
-            $dsn['options'] = isset($dsn['options']) ? $dsn['options'] : '';
-            $dsn['prefix'] = isset($dsn['prefix']) ? $dsn['prefix'] : FLEA::getAppInf('dbTablePrefix');
-            $dsn['schema'] = isset($dsn['schema']) ? $dsn['schema'] : '';
+            $dsn['host'] ??= '';
+            $dsn['port'] ??= '';
+            $dsn['login'] ??= '';
+            $dsn['password'] ??= '';
+            $dsn['database'] ??= '';
+            $dsn['options'] ??= '';
+            $dsn['prefix'] ??= FLEA::getAppInf('dbTablePrefix');
+            $dsn['schema'] ??= '';
         } else {
             $dsn = str_replace('@/', '@localhost/', $dsn);
             $parse = parse_url($dsn);
             if (empty($parse['scheme'])) {
-                return false;
+                return null;
             }
 
             $dsn = [];
-            $dsn['host'] = isset($parse['host']) ? $parse['host'] : 'localhost';
-            $dsn['port'] = isset($parse['port']) ? $parse['port'] : '';
-            $dsn['login'] = isset($parse['user']) ? $parse['user'] : '';
-            $dsn['password'] = isset($parse['pass']) ? $parse['pass'] : '';
-            $dsn['driver'] = isset($parse['scheme']) ? strtolower($parse['scheme']) : '';
+            $dsn['host'] = $parse['host'] ?? 'localhost';
+            $dsn['port'] = $parse['port'] ?? '';
+            $dsn['login'] = $parse['user'] ?? '';
+            $dsn['password'] = $parse['pass'] ?? '';
+            $dsn['driver'] = strtolower($parse['scheme'] ?? '');
             $dsn['database'] = isset($parse['path']) ? substr($parse['path'], 1) : '';
-            $dsn['options'] = isset($parse['query']) ? $parse['query'] : '';
+            $dsn['options'] = $parse['query'] ?? '';
             $dsn['prefix'] = FLEA::getAppInf('dbTablePrefix');
             $dsn['schema'] = '';
         }
