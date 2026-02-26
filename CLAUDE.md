@@ -13,13 +13,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Setup
 
 ```bash
-# Initialize database with sample data
+# 初始化数据库
 mysql -u root -p < blog.sql
 
-# Install/update Composer autoloader
+# 安装/更新 Composer autoloader
 composer install
-# or just regenerate autoloader
-composer dump-autoload
+
+# 启动开发服务器
+php74 -S 127.0.0.1:8081
+# 访问：http://127.0.0.1:8081/index.php
 ```
 
 Database config defaults (change in `App/Config.php`):
