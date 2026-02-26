@@ -299,10 +299,10 @@ class TableLink
     public static function createLink(array $define, int $type, \FLEA\Db\TableDataGateway &$mainTDG): \FLEA\Db\TableLink
     {
         static $typeMap = [
-            HAS_ONE         => '\FLEA\Db\TableLink\HasOneLink',
-            BELONGS_TO      => '\FLEA\Db\TableLink\BelongsToLink',
-            HAS_MANY        => '\FLEA\Db\TableLink\HasManyLink',
-            MANY_TO_MANY    => '\FLEA\Db\TableLink\ManyToManyLink',
+            HAS_ONE         => \FLEA\Db\TableLink\HasOneLink::class,
+            BELONGS_TO      => \FLEA\Db\TableLink\BelongsToLink::class,
+            HAS_MANY        => \FLEA\Db\TableLink\HasManyLink::class,
+            MANY_TO_MANY    => \FLEA\Db\TableLink\ManyToManyLink::class,
         ];
         static $instances = [];
 
