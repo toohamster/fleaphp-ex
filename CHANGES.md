@@ -6,6 +6,53 @@
 
 ## 2026-02-26
 
+### refactor: 将 array() 替换为短数组语法 []
+
+批量将代码中的 array() 替换为 PHP 5.4+ 支持的短数组语法 []
+
+**修改的文件:**
+- `Ajax.php`: 数组定义使用 [] 语法
+- `Config/DEBUG_MODE_CONFIG.php`: 配置数组使用 [] 语法
+- `Config/DEPLOY_MODE_CONFIG.php`: 配置数组使用 [] 语法
+- `Db/ActiveRecord.php`: 数组定义和 call_user_func 参数使用 [] 语法
+- `Db/Driver/AbstractDriver.php`: 返回值使用 [] 语法
+- `Db/Driver/Mysql.php`: 静态数组使用 [] 语法
+- `Db/SqlHelper.php`: 数组定义和返回值使用 [] 语法
+- `Db/TableDataGateway.php`: 数组定义和返回值使用 [] 语法
+- `Db/TableLink.php`: 数组定义使用 [] 语法
+- `Db/TableLink/ManyToManyLink.php`: 数组定义使用 [] 语法
+- `Dispatcher/Auth.php`: 数组定义使用 [] 语法
+- `Dispatcher/Simple.php`: 数组定义和返回值使用 [] 语法
+- `Helper/FileUploader/File.php`: 数组定义使用 [] 语法
+- `Helper/Image.php`: 数组定义和返回值使用 [] 语法
+- `Helper/ImgCode.php`: 数组定义和返回值使用 [] 语法
+- `Helper/Pager.php`: 数组定义使用 [] 语法
+- `Helper/Verifier.php`: 数组定义使用 [] 语法
+- `Log.php`: 回调函数使用 [] 语法
+- `Rbac.php`: 数组定义使用 [] 语法
+- `Rbac/UsersManager.php`: 数组定义使用 [] 语法
+- `Session/Db.php`: session_set_save_handler 参数使用 [] 语法
+- `View/Simple.php`: 数组定义使用 [] 语法
+- `WebControls.php`: extractAttribs 调用使用 [] 语法
+- `_Errors/default/ErrorMessage.php`: 返回值使用 [] 语法
+- `_Errors/chinese-utf8/ErrorMessage.php`: 返回值使用 [] 语法
+
+### refactor: 使用 PHP 7.4 数组解构和 null 合并运算符简化代码
+
+**FLEA/FLEA/Ajax.php**
+- 1 处 `isset()` 三元表达式改为 `??` 运算符
+
+**FLEA/FLEA/Controller/Action.php**
+- `_isAjax()`：1 处 `isset()` 三元表达式改为 `??` 运算符
+
+**FLEA/FLEA/_Errors/_common/header.php**
+- 2 处 `isset()` 三元表达式改为 `??` 运算符
+- 1 处 `isset()` 三元表达式改为 `??` 条件表达式
+
+---
+
+## 2026-02-26
+
 ### fix: 修复关联查询中 TableDataGateway 类型错误
 
 - `Db/TableDataGateway.php` 第 448 行：`$assocRowset = null` 改为 `$assocRowset = []`（匹配 `array` 类型参数）

@@ -6,6 +6,28 @@
 
 ## 2026-02-26
 
+### refactor: 将 array() 替换为短数组语法 []
+
+**App/Config.php**
+- 配置数组使用 [] 语法
+
+**App/Controller/PostController.php**
+- 1 处 `isset()` 三元表达式改为 `??` 运算符
+
+**App/Model/Post.php**
+- `$hasMany` 数组定义使用 [] 语法
+- `getPublishedPosts()` 查询条件使用 [] 语法
+- `getTotalCount()` 查询条件使用 [] 语法
+
+**App/Model/Comment.php**
+- `$belongsTo` 数组定义使用 [] 语法
+- `getCommentsByPostId()` 查询条件使用 [] 语法
+- `getCommentCount()` 查询条件使用 [] 语法
+
+---
+
+## 2026-02-26
+
 ### feat: 建立 Post 和 Comment 模型关联关系并优化控制器查询
 
 #### 修改文件
