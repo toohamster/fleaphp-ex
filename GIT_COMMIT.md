@@ -6,6 +6,36 @@
 
 ## 2026-02-26
 
+### refactor: 将 array() 替换为短数组语法 []
+
+批量将代码中的 array() 替换为 PHP 5.4+ 支持的短数组语法 []
+同时优化部分 isset 三元表达式为 ?? 运算符
+
+**App 目录**
+- App/Config.php: 配置数组使用 [] 语法
+- App/Controller/PostController.php: 1 处 ?? 运算符优化
+- App/Model/Post.php: 数组定义和查询条件使用 [] 语法
+- App/Model/Comment.php: 数组定义和查询条件使用 [] 语法
+
+**FLEA/FLEA 目录**
+- Acl/*: 多个文件数组定义使用 [] 语法
+- Ajax.php: 数组定义使用 [] 语法
+- Config/*: 配置数组使用 [] 语法
+- Db/*: 多个文件数组定义和返回值使用 [] 语法
+- Dispatcher/*: 数组定义使用 [] 语法
+- Helper/*: 多个文件数组定义和返回值使用 [] 语法
+- Log.php: 回调函数使用 [] 语法
+- Rbac.php: 数组定义使用 [] 语法
+- Rbac/UsersManager.php: 数组定义使用 [] 语法
+- Session/Db.php: session_set_save_handler 使用 [] 语法
+- View/Simple.php: 数组定义使用 [] 语法
+- WebControls.php: 多个 extractAttribs 调用使用 [] 语法
+- _Errors/*: ErrorMessage 使用 [] 语法
+
+---
+
+## 2026-02-26
+
 ### refactor: 使用 PHP 7.4 数组解构和 null 合并运算符简化代码
 
 **FLEA/FLEA/Ajax.php**
