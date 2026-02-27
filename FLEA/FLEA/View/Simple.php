@@ -19,7 +19,7 @@ namespace FLEA\View;
  * @author toohamster
  * @version 1.0
  */
-class Simple
+class Simple implements ViewInterface
 {
     /**
      * 模板文件所在路径

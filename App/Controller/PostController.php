@@ -22,7 +22,7 @@ class PostController extends Action
     protected $commentModel;
 
     /**
-     * @var \FLEA\View\Simple
+     * @var \FLEA\View\ViewInterface
      */
     public $view;
 
