@@ -4,6 +4,15 @@
 
 ---
 
+### docs: 更新 TableDataGateway.php 方法注释中的事件方法名
+
+更新方法注释中的旧事件方法名（移除下划线前缀），与新的方法名保持一致。
+
+**修改的文件:**
+- `FLEA/FLEA/Db/TableDataGateway.php`: 更新注释中的 `_beforeCreate` → `beforeCreate`, `_beforeCreateDb` → `beforeCreateDb`, `_afterCreateDb` → `afterCreateDb`, `_beforeUpdate` → `beforeUpdate`, `_beforeUpdateDb` → `beforeUpdateDb`, `_afterUpdateDb` → `afterUpdateDb`, `_beforeRemove` → `beforeRemove`, `_afterRemoveDb` → `afterRemoveDb`, `_beforeRemoveDbByPkv` → `beforeRemoveDbByPkv`, `_afterRemoveDbByPkv` → `afterRemoveDbByPkv`
+
+---
+
 ### refactor: 更新子类中重写的 TableDataGateway 事件方法
 
 更新子类中重写的事件方法名，与父类 TableDataGateway 的新方法名保持一致。

@@ -816,7 +816,7 @@ class TableDataGateway
     /**
      * 更新一条现有的记录，成功返回 true，失败返回 false
      *
-     * 该操作会引发 _beforeUpdate()、_beforeUpdateDb() 和 _afterUpdateDb() 事件。
+     * 该操作会引发 beforeUpdate()、beforeUpdateDb() 和 afterUpdateDb() 事件。
      *
      * @param array $row
      * @param boolean $saveLinks
@@ -848,7 +848,7 @@ class TableDataGateway
         // 开始事务
         $this->dbo->startTrans();
 
-        // 调用 _beforeUpdateDb() 事件
+        // 调用 beforeUpdateDb() 事件
         if (!$this->beforeUpdateDb($row)) {
             $this->dbo->completeTrans(false);
             return false;
@@ -1018,7 +1018,7 @@ class TableDataGateway
     /**
      * 插入一条新记录，返回新记录的主键值
      *
-     * create() 操作会引发 _beforeCreate()、_beforeCreateDb() 和 _afterCreateDb() 事件。
+     * create() 操作会引发 beforeCreate()、beforeCreateDb() 和 afterCreateDb() 事件。
      *
      * @param array $row
      * @param boolean $saveLinks
@@ -1068,7 +1068,7 @@ class TableDataGateway
             }
         }
 
-        // 调用 _beforeCreateDb() 事件
+        // 调用 beforeCreateDb() 事件
         $this->dbo->startTrans();
 
         if (!$this->beforeCreateDb($row)) {
@@ -1157,7 +1157,7 @@ class TableDataGateway
     /**
      * 删除记录
      *
-     * remove() 操作会引发 _beforeRemove()、_beforeRemoveDbByPkv()、_afterRemoveDbByPkv 和 _afterRemoveDb() 事件。
+     * remove() 操作会引发 beforeRemove()、beforeRemoveDbByPkv()、afterRemoveDbByPkv 和 afterRemoveDb() 事件。
      *
      * @param array $row
      *
@@ -1182,7 +1182,7 @@ class TableDataGateway
     /**
      * 根据主键值删除记录
      *
-     * removeByPkv() 引发 _beforeRemoveDbByPkv() 和 _afterRemoveDbByPkv() 事件。
+     * removeByPkv() 引发 beforeRemoveDbByPkv() 和 afterRemoveDbByPkv() 事件。
      *
      * @param mixed $pkv
      * @param boolean $removeLink
@@ -1991,7 +1991,7 @@ class TableDataGateway
     }
 
     /**
-     * 调用 create() 方法后立即引发 _beforeCreate 事件
+     * 调用 create() 方法后立即引发 beforeCreate 事件
      *
      * 如果要阻止 create() 创建记录，该方法应该返回 false，否则返回 true。
      *
@@ -2005,7 +2005,7 @@ class TableDataGateway
     }
 
     /**
-     * 调用 create() 方法后，表数据入口对数据进行处理后存入数据库前引发 _beforeCreateDb 事件
+     * 调用 create() 方法后，表数据入口对数据进行处理后存入数据库前引发 beforeCreateDb 事件
      *
      * 如果要阻止 create() 创建记录，该方法应该返回 false，否则返回 true。
      *
@@ -2019,7 +2019,7 @@ class TableDataGateway
     }
 
     /**
-     * 调用 create() 方法并且成功将数据存入数据库后引发 _afterCreateDb 事件
+     * 调用 create() 方法并且成功将数据存入数据库后引发 afterCreateDb 事件
      *
      * @param array $row
      */
@@ -2029,7 +2029,7 @@ class TableDataGateway
 
 
     /**
-     * 调用 update() 方法后立即引发 _beforeUpdate 事件
+     * 调用 update() 方法后立即引发 beforeUpdate 事件
      *
      * 如果要阻止 update() 更新记录，该方法应该返回 false，否则返回 true。
      *
@@ -2043,7 +2043,7 @@ class TableDataGateway
     }
 
     /**
-     * 调用 update() 方法后，表数据入口对数据进行处理后存入数据库前引发 _beforeUpdateDb 事件
+     * 调用 update() 方法后，表数据入口对数据进行处理后存入数据库前引发 beforeUpdateDb 事件
      *
      * 如果要阻止 update() 更新记录，该方法应该返回 false，否则返回 true。
      *
@@ -2057,7 +2057,7 @@ class TableDataGateway
     }
 
     /**
-     * 调用 update() 方法并且成功将数据更新到数据库后引发 _afterUpdateDb 事件
+     * 调用 update() 方法并且成功将数据更新到数据库后引发 afterUpdateDb 事件
      *
      * @param array $row
      */
@@ -2066,7 +2066,7 @@ class TableDataGateway
     }
 
     /**
-     * 调用 remove() 方法后立即引发 _beforeRemove 事件
+     * 调用 remove() 方法后立即引发 beforeRemove 事件
      *
      * 如果要阻止 remove() 删除记录，该方法应该返回 false，否则返回 true。
      *
@@ -2080,7 +2080,7 @@ class TableDataGateway
     }
 
     /**
-     * 调用 remove() 方法并且成功删除记录后引发 _afterRemoveDb 事件
+     * 调用 remove() 方法并且成功删除记录后引发 afterRemoveDb 事件
      *
      * @param array $row
      */
@@ -2089,9 +2089,9 @@ class TableDataGateway
     }
 
     /**
-     * 调用 remove() 或 removeByPkv() 方法后立即引发 _beforeRemoveDbByPkv 事件
+     * 调用 remove() 或 removeByPkv() 方法后立即引发 beforeRemoveDbByPkv 事件
      *
-     * 调用 remove() 方法时，_beforeRemoveDbByPkv 事件出现在 _beforeRemove 事件之后。
+     * 调用 remove() 方法时，beforeRemoveDbByPkv 事件出现在 beforeRemove 事件之后。
      *
      * 如果要阻止 remove() 或 removeByPkv() 删除记录，
      * 该方法应该返回 false，否则返回 true。
@@ -2106,7 +2106,7 @@ class TableDataGateway
     }
 
     /**
-     * 调用 remove() 或 removeByPkv() 方法并且成功删除记录后引发 _afterRemoveDbByPkv 事件
+     * 调用 remove() 或 removeByPkv() 方法并且成功删除记录后引发 afterRemoveDbByPkv 事件
      *
      * @param mixed $pkv
      */
