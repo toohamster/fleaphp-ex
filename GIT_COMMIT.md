@@ -6,6 +6,17 @@
 
 ## 2026-02-26
 
+### fix: 修复 ManyToManyLink.php 中 DELETE 语句多余的括号
+
+第 214 行 DELETE 语句不需要闭合括号，移除多余的 . ')'
+
+**修改:**
+- `Db/TableLink/ManyToManyLink.php`: DELETE 语句移除多余的 `.')'`
+
+---
+
+## 2026-02-26
+
 ### fix: 修复数组语法错误，将 ); 改为 ];
 
 修复之前将 array() 替换为 [] 时遗留的括号不匹配问题
