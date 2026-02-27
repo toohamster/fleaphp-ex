@@ -48,8 +48,6 @@ class Rbac
 
     /**
      * 构造函数
-     *
-     * @return \FLEA\Rbac
      */
     public function __construct()
     {

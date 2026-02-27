@@ -54,8 +54,6 @@ class Action
      * 构造函数
      *
      * @param string $controllerName
-     *
-     * @return \FLEA\Controller\Action
      */
     public function __construct(string $controllerName)
     {

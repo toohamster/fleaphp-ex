@@ -77,8 +77,6 @@ class Db
 
     /**
      * 构造函数
-     *
-     * @return \FLEA\Session\Db
      */
     public function __construct()
     {

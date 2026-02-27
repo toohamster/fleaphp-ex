@@ -247,8 +247,6 @@ class TableDataGateway
      *   - skipCreateLinks: 指示初始化表数据入口时，是否不建立关联关系
      *
      * @param array $params
-     *
-     * @return \FLEA\Db\TableDataGateway
      */
     public function __construct(?array $params = null)
     {

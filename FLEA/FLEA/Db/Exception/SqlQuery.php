@@ -33,8 +33,6 @@ class SqlQuery extends \FLEA\Exception
      * @param string $sql
      * @param string $msg
      * @param int $code
-     *
-     * @return \FLEA\Db\Exception\SqlQuery
      */
     public function __construct($sql, $msg = 0, $code = 0)
     {

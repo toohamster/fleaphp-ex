@@ -29,8 +29,6 @@ class Simple
      * 构造函数
      *
      * @param array $request
-     *
-     * @return \FLEA\Dispatcher\Simple
      */
     public function __construct(array &$request)
     {

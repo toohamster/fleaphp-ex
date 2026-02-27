@@ -47,8 +47,6 @@ class ExpectedClass extends \FLEA\Exception
      * @param string $className
      * @param string $file
      * @param boolean $fileExists
-     *
-     * @return \FLEA\Exception_ExpectedClass
      */
     public function __construct(string $className, ?string $file = null, bool $fileExists = false)
     {

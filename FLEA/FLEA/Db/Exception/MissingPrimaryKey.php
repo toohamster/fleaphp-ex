@@ -31,8 +31,6 @@ class MissingPrimaryKey extends \FLEA\Exception
      * 构造函数
      *
      * @param string $pk
-     *
-     * @return \FLEA\Db\Exception\MissingPrimaryKey
      */
     public function __construct($pk)
     {

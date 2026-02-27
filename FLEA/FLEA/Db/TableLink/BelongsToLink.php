@@ -28,8 +28,6 @@ class BelongsToLink extends TableLink
      * @param array $define
      * @param enum $type
      * @param \FLEA\Db\TableDataGateway $mainTDG
-     *
-     * @return \FLEA\Db\TableLink
      */
     public function __construct($define, $type, $mainTDG)
     {

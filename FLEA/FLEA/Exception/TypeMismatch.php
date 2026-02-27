@@ -22,8 +22,6 @@ class TypeMismatch extends \FLEA\Exception
      * @param string $arg
      * @param string $expected
      * @param string $actual
-     *
-     * @return TypeMismatch
      */
     public function __construct(string $arg, string $expected, string $actual)
     {

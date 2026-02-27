@@ -28,8 +28,6 @@ class NotImplemented extends \FLEA\Exception
      *
      * @param string $method
      * @param string $class
-     *
-     * @return \FLEA\Exception_NotImplemented
      */
     public function __construct(string $method, string $class = '')
     {

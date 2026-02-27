@@ -84,8 +84,6 @@ class Ajax
 
     /**
      * 构造函数
-     *
-     * @return FLEA_Ajax
      */
     public function __construct()
     {

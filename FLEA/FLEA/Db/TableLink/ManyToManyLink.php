@@ -83,8 +83,6 @@ class ManyToManyLink extends TableLink
      * @param array $define
      * @param enum $type
      * @param TableDataGateway $mainTDG
-     *
-     * @return TableLink
      */
     function __construct($define, $type, $mainTDG)
     {

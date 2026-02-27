@@ -31,8 +31,6 @@ class MissingLinkOption extends \FLEA\Exception
      * 构造函数
      *
      * @param string $option
-     *
-     * @return \FLEA\Db\Exception\MissingLinkOption
      */
     public function __construct($option)
     {

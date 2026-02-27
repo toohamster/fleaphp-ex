@@ -22,8 +22,6 @@ class MissingDSN extends \FLEA\Exception
 {
     /**
      * 构造函数
-     *
-     * @return \FLEA\Db\Exception\MissingDSN
      */
     function __construct()
     {

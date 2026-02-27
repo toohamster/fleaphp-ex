@@ -40,8 +40,6 @@ class File
      * @param array $struct
      * @param string $name
      * @param int $ix
-     *
-     * @return \FLEA\Helper\FileUploader_File
      */
     public function __construct($struct, $name, $ix = false)
     {

@@ -38,8 +38,6 @@ class Image
      * 静态方法创建一个 \FLEA\Helper\Image 类的实例。
      *
      * @param resource $handle
-     *
-     * @return \FLEA\Helper\Image
      */
     public function __construct($handle)
     {

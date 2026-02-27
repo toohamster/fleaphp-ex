@@ -22,8 +22,6 @@ class Auth extends \FLEA\Dispatcher\Simple
      * 构造函数
      *
      * @param array $request
-     *
-     * @return \FLEA\Dispatcher\Auth
      */
     public function __construct(array $request)
     {

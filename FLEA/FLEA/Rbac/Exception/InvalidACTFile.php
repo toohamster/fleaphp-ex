@@ -47,8 +47,6 @@ class InvalidACTFile extends \FLEA\Exception
      * @param string $actFilename
      * @param string $controllerName
      * @param mixed $act
-     *
-     * @return \FLEA\Rbac\Exception\InvalidACTFile
      */
     function __construct($actFilename, $act, $controllerName = null)
     {

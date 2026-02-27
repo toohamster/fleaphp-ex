@@ -26,8 +26,6 @@ class MissingLink extends \FLEA\Exception
      * 构造函数
      *
      * @param $name
-     *
-     * @return \FLEA\Db\Exception\MissingLink
      */
     public function __construct($name)
     {

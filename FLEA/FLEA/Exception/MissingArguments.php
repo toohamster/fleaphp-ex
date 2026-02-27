@@ -31,8 +31,6 @@ class MissingArguments extends \FLEA\Exception
      * 构造函数
      *
      * @param mixed $args
-     *
-     * @return \FLEA\Exception_MissingArguments
      */
     public function __construct($args)
     {

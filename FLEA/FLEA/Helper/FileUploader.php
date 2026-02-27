@@ -59,8 +59,6 @@ class FileUploader
      * 构造函数
      *
      * @param boolean $cascade
-     *
-     * @return \FLEA\Helper\FileUploader
      */
     public function __construct($cascade = false)
     {

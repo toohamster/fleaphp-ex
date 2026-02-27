@@ -32,8 +32,6 @@ class CheckFailed extends \FLEA\Exception
      * @param string $actionName
      * @param array $act
      * @param array $roles
-     *
-     * @return \FLEA\Dispatcher\Exception\CheckFailed
      */
     function __construct($controllerName, $actionName,
             $act = null, $roles = null)

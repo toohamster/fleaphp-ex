@@ -40,8 +40,6 @@ class WebControls
      * 构造函数
      *
      * @param string|array $extendsDir
-     *
-     * @return FLEA_WebControls
      */
     public function __construct($extendsDir = null)
     {

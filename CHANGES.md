@@ -6,6 +6,38 @@
 
 ## 2026-02-27
 
+### refactor: 移除构造函数中的 @return 注解
+
+构造函数不返回值，移除其 docblock 注释中的 `@return` 注解。
+
+**修改的文件:**
+- `FLEA/FLEA/Ajax.php`
+- `FLEA/FLEA/Controller/Action.php`
+- `FLEA/FLEA/Db/ActiveRecord.php`
+- `FLEA/FLEA/Db/TableDataGateway.php`
+- `FLEA/FLEA/Db/TableLink.php`
+- `FLEA/FLEA/Db/TableLink/BelongsToLink.php`
+- `FLEA/FLEA/Db/TableLink/ManyToManyLink.php`
+- `FLEA/FLEA/Dispatcher/Auth.php`
+- `FLEA/FLEA/Dispatcher/Simple.php`
+- `FLEA/FLEA/Session/Db.php`
+- `FLEA/FLEA/View/Simple.php`
+- `FLEA/FLEA/WebControls.php`
+- `FLEA/FLEA/Language.php`
+- `FLEA/FLEA/Rbac.php`
+- `FLEA/FLEA/Rbac/RolesManager.php`
+- `FLEA/FLEA/Db/Exception/*.php` (7 个异常类)
+- `FLEA/FLEA/Dispatcher/Exception/CheckFailed.php`
+- `FLEA/FLEA/Exception/*.php` (14 个异常类)
+- `FLEA/FLEA/Rbac/Exception/*.php` (2 个异常类)
+- `FLEA/FLEA/Helper/FileUploader.php`
+- `FLEA/FLEA/Helper/FileUploader/File.php`
+- `FLEA/FLEA/Helper/Image.php`
+
+---
+
+## 2026-02-27
+
 ### refactor: create() 方法返回类型改为 int
 
 将 `create()` 方法的返回类型从 `int|false` 改为 `: int`，失败时返回 `0` 而不是 `false`。

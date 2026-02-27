@@ -72,8 +72,6 @@ class ActiveRecord
      * 根据 $conditions 参数查询符合条件的记录作为对象属性。
      *
      * @param mixed $conditions
-     *
-     * @return \FLEA\Db\ActiveRecord
      */
     public function __construct($conditions = null)
     {
