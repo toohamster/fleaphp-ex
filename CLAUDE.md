@@ -5,8 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 操作规范
 
 - 操作语言：中文
-- FLEA/ 目录有重要改动后，更新 `CHANGES.md`
-- App/ 目录有重要改动后，更新 `APP_CHANGES.md`
+- `SPEC.md` 是框架的规格说明书，作为后续开发任务的参考基准
+- FLEA/ 目录有重要改动后，更新根目录下的 `CHANGES.md`
+- App/ 目录有重要改动后，更新根目录下的 `APP_CHANGES.md`
 - 每次代码改动完成后，将 git commit 说明追加到 `GIT_COMMIT.md`（最新记录在最前）
 - 代码改动完成后等待用户 review，用户确认后再执行 git commit
 - 明确需求后再操作，不确定先问，不猜测

@@ -31,8 +31,6 @@ class InvalidACT extends \FLEA\Exception
      * 构造函数
      *
      * @param mixed $act
-     *
-     * @return \FLEA\Rbac\Exception\InvalidACT
      */
     function __construct($act)
     {

@@ -180,18 +180,18 @@ class TableLink
      *
      * @var array
      */
-    public $_req = array(
+    public $_req = [
         'name',             // 关联的名字
         'tableClass',       // 关联的表数据入口对象名
         'mappingName',      // 字段映射名
-    );
+    ];
 
     /**
      * 可选的参数
      *
      * @var array
      */
-    public $_optional = array(
+    public $_optional = [
         'foreignKey',
         'sort',
         'conditions',
@@ -206,7 +206,7 @@ class TableLink
         'linkRemove',
         'linkRemoveFillValue',
         'saveAssocMethod',
-    );
+    ];
 
     /**
      * 外键字段的完全限定名
@@ -245,8 +245,6 @@ class TableLink
      * @param array $define
      * @param enum $type
      * @param \FLEA\Db\TableDataGateway $mainTDG
-     *
-     * @return \FLEA\Db\TableLink
      */
     public function __construct($define, $type, $mainTDG)
     {
@@ -298,12 +296,12 @@ class TableLink
      */
     public static function createLink(array $define, int $type, \FLEA\Db\TableDataGateway &$mainTDG): \FLEA\Db\TableLink
     {
-        static $typeMap = array(
-            HAS_ONE         => '\FLEA\Db\TableLink\HasOneLink',
-            BELONGS_TO      => '\FLEA\Db\TableLink\BelongsToLink',
-            HAS_MANY        => '\FLEA\Db\TableLink\HasManyLink',
-            MANY_TO_MANY    => '\FLEA\Db\TableLink\ManyToManyLink',
-        );
+        static $typeMap = [
+            HAS_ONE         => \FLEA\Db\TableLink\HasOneLink::class,
+            BELONGS_TO      => \FLEA\Db\TableLink\BelongsToLink::class,
+            HAS_MANY        => \FLEA\Db\TableLink\HasManyLink::class,
+            MANY_TO_MANY    => \FLEA\Db\TableLink\ManyToManyLink::class,
+        ];
         static $instances = [];
 
         // 检查 $type 参数
@@ -380,7 +378,7 @@ class TableLink
                 if (!class_exists($this->tableClass, true)) {
                     throw new \FLEA\Exception\ExpectedClass($this->tableClass);
                 }
-                $this->assocTDG = new $this->tableClass(array('dbo' => $this->dbo));
+                $this->assocTDG = new $this->tableClass(['dbo' => $this->dbo]);
                 \FLEA::register($this->assocTDG, $this->assocTDGObjectId);
             } else {
                 $this->assocTDG = \FLEA::getSingleton($this->tableClass);

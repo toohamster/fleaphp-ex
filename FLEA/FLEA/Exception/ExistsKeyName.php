@@ -18,8 +18,6 @@ class ExistsKeyName extends \FLEA\Exception
      * 构造函数
      *
      * @param string $keyname
-     *
-     * @return ExistsKeyName
      */
     public function __construct(string $keyname)
     {

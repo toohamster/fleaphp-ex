@@ -12,7 +12,7 @@ class Comment extends TableDataGateway
     /**
      * 数据表名
      */
-    public $tableName = 'comments';
+    public string $tableName = 'comments';
 
     /**
      * 主键字段
@@ -22,13 +22,13 @@ class Comment extends TableDataGateway
     /**
      * 定义从属关联：一个评论属于一个文章
      */
-    public $belongsTo = array(
-        array(
+    public ?array $belongsTo = [
+        [
             'tableClass' => Post::class,
             'foreignKey' => 'post_id',
             'mappingName' => 'post',
-        ),
-    );
+        ],
+    ];
 
     /**
      * 获取文章的评论
@@ -39,10 +39,10 @@ class Comment extends TableDataGateway
     public function getCommentsByPostId($postId)
     {
         return $this->findAll(
-            array(
+            [
                 'post_id' => $postId,
                 'status' => 1
-            ),
+            ],
             'created_at ASC'
         );
     }
@@ -51,7 +51,7 @@ class Comment extends TableDataGateway
      * 创建评论
      *
      * @param array $data 评论数据
-     * @return int|false
+     * @return int
      */
     public function createComment($data)
     {
@@ -78,9 +78,9 @@ class Comment extends TableDataGateway
      */
     public function getCommentCount($postId)
     {
-        return $this->findCount(array(
+        return $this->findCount([
             'post_id' => $postId,
             'status' => 1
-        ));
+        ]);
     }
 }

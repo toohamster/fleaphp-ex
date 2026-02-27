@@ -4,7 +4,7 @@ namespace FLEA\Acl\Table;
 
 
 /**
- * 定义 \FLEA\Acl_Table_UsersHasPermissions 类
+ * 定义 \FLEA\Acl\Table\UsersHasPermissions 类
  *
  * @author toohamster
  * @package Core
@@ -13,7 +13,7 @@ namespace FLEA\Acl\Table;
 
 
 /**
- * \FLEA\Acl_Table_UsersHasPermissions 用于关联用户和权限
+ * \FLEA\Acl\Table\UsersHasPermissions 用于关联用户和权限
  *
  * @package Core
  * @author toohamster
@@ -33,6 +33,6 @@ class UsersHasPermissions extends \FLEA\Db\TableDataGateway
      *
      * @var string
      */
-    public $tableName = 'users_has_permissions';
+    public string $tableName = 'users_has_permissions';
 
 }

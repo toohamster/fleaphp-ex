@@ -18,8 +18,6 @@ class NotExistsKeyName extends \FLEA\Exception
      * 构造函数
      *
      * @param string $keyname
-     *
-     * @return NotExistsKeyName
      */
     public function __construct(string $keyname)
     {

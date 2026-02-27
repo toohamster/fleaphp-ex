@@ -40,8 +40,6 @@ class WebControls
      * 构造函数
      *
      * @param string|array $extendsDir
-     *
-     * @return FLEA_WebControls
      */
     public function __construct($extendsDir = null)
     {
@@ -91,7 +89,7 @@ class WebControls
 
             if (isset($this->_extends[$type])) {
                 $__ctl_out = call_user_func_array($render,
-                        array('name' => $name, 'attribs' => $attribs));
+                        ['name' => $name, 'attribs' => $attribs]);
             }
         }
 
@@ -212,7 +210,7 @@ class WebControls
      */
     public function _ctlMemo(string $name, ?array $attribs = null): string
     {
-        extract($this->extractAttribs($attribs, array('id', 'value', 'disabled')));
+        extract($this->extractAttribs($attribs, ['id', 'value', 'disabled']));
         if (empty($id)) { $id = $name; }
 
         $__ctl_out = '<textarea ';
@@ -293,7 +291,7 @@ class WebControls
     public function _ctlListBox(string $name, ?array $attribs = null): string
     {
         extract($this->extractAttribs($attribs,
-                array('id', 'size', 'items', 'selected', 'multiple', 'disabled', 'key', 'caption')));
+                ['id', 'size', 'items', 'selected', 'multiple', 'disabled', 'key', 'caption']));
         if (empty($id)) { $id = $name; }
 
         if (!is_array($selected) && substr($selected, 0, 1) == ':') {
@@ -372,7 +370,7 @@ class WebControls
     public function _ctlDropdownList(string $name, ?array $attribs = null): string
     {
         extract($this->extractAttribs($attribs,
-                array('id', 'items', 'selected', 'disabled', 'key', 'caption')));
+                ['id', 'items', 'selected', 'disabled', 'key', 'caption']));
         if (empty($id)) { $id = $name; }
 
         if (substr($selected, 0, 1) == ':') {
@@ -448,7 +446,7 @@ class WebControls
      */
     public function _ctlButton(string $name, ?array $attribs = null, string $buttonType = 'button'): string
     {
-        extract($this->extractAttribs($attribs, array('caption')));
+        extract($this->extractAttribs($attribs, ['caption']));
         if ($caption != '') { $attribs['value'] = $caption; }
         return $this->__baseCtlInput($name, $attribs, $buttonType);
     }
@@ -489,7 +487,7 @@ class WebControls
      */
     public function _ctlLabel(string $name, ?array $attribs = null): string
     {
-        extract($this->extractAttribs($attribs, array('id', 'caption')));
+        extract($this->extractAttribs($attribs, ['id', 'caption']));
         if (empty($id)) { $id = $name; }
 
         $__ctl_out = '<label ';
@@ -515,7 +513,7 @@ class WebControls
      */
     public function _ctlStatic(string $name, ?array $attribs = null): string
     {
-        extract($this->extractAttribs($attribs, array('id', 'value')));
+        extract($this->extractAttribs($attribs, ['id', 'value']));
         if (empty($id)) { $id = $name; }
 
         $__ctl_out = '<div ';
@@ -554,7 +552,7 @@ class WebControls
      */
     protected function __baseCtlInput($name, $attribs, $type)
     {
-        extract($this->extractAttribs($attribs, array('id', 'value', 'disabled')));
+        extract($this->extractAttribs($attribs, ['id', 'value', 'disabled']));
         if (empty($id)) { $id = $name; }
 
         $__ctl_out = "<input type=\"{$type}\" ";
@@ -583,7 +581,7 @@ class WebControls
     protected function __baseCtlCheckboxOrRadio($name, $attribs, $type)
     {
         extract($this->extractAttribs($attribs,
-                array('id', 'value', 'checked', 'disabled', 'caption')));
+                ['id', 'value', 'checked', 'disabled', 'caption']));
         if (empty($id)) { $id = $name; }
 
         $__ctl_out = "<input type=\"{$type}\" ";
@@ -613,7 +611,7 @@ class WebControls
         }
         $__ctl_out .= '/>';
         if (strlen($caption)) {
-            $__ctl_out .= $this->_ctlLabel(null, array('for' => $id, 'caption' => $caption));
+            $__ctl_out .= $this->_ctlLabel(null, ['for' => $id, 'caption' => $caption]);
         }
         return $__ctl_out;
     }
@@ -632,9 +630,9 @@ class WebControls
     {
         static $idSuffix = 1;
 
-        extract($this->extractAttribs($attribs, array('items', 'selected', 'disabled',
+        extract($this->extractAttribs($attribs, ['items', 'selected', 'disabled',
                 'multirow', 'cols', 'key', 'caption', 'table', 'border', 'cellspacing',
-                'cellpadding', 'key2caption')));
+                'cellpadding', 'key2caption']));
 
         if (!is_array($selected) && substr($selected, 0, 1) == ':') {
             $selected = intval(substr($selected, 1));
@@ -703,9 +701,9 @@ class WebControls
             }
             $__ctl_out .= '/>';
             if ($caption) {
-                $__ctl_out .= $this->_ctlLabel(null, array(
+                $__ctl_out .= $this->_ctlLabel(null, [
                     'for' => "{$name}_{$idSuffix}", 'caption' => $caption
-                ));
+                ]);
             }
 
             if ($ix < $max) {

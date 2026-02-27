@@ -39,8 +39,6 @@ class ValidationFailed extends \FLEA\Exception
      *
      * @param array $result
      * @param mixed $data
-     *
-     * @return \FLEA\Exception_ValidationFailed
      */
     public function __construct(array $result, $data = null)
     {

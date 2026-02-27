@@ -102,8 +102,6 @@ class Language
 
     /**
      * 构造函数
-     *
-     * @return FLEA_Language
      */
     public function __construct()
     {

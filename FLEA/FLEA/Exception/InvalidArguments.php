@@ -28,8 +28,6 @@ class InvalidArguments extends \FLEA\Exception
      *
      * @param string $arg
      * @param mixed $value
-     *
-     * @return \FLEA\Exception_InvalidArguments
      */
     public function __construct(string $arg, $value = null)
     {

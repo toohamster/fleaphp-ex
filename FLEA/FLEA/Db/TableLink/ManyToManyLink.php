@@ -83,8 +83,6 @@ class ManyToManyLink extends TableLink
      * @param array $define
      * @param enum $type
      * @param TableDataGateway $mainTDG
-     *
-     * @return TableLink
      */
     function __construct($define, $type, $mainTDG)
     {
@@ -193,7 +191,7 @@ class ManyToManyLink extends TableLink
         } else {
             $sql = "INSERT INTO {$this->qjoinTable} ({$this->qforeignKey}, {$this->qassocForeignKey}) VALUES ({$qpkv}, ";
             foreach ($insertAssoc as $assocId) {
-                if (!$this->dbo->execute(sql_statement($sql . $this->dbo->qstr($assocId) . ')')) {
+                if (!$this->dbo->execute(sql_statement($sql . $this->dbo->qstr($assocId) . ')'))) {
                     return false;
                 }
             }
@@ -201,7 +199,7 @@ class ManyToManyLink extends TableLink
 
         // 最后删除不再需要的关联信息
         if ($this->joinTableIsEntity) {
-            $conditions = array($this->foreignKey => $pkv);
+            $conditions = [$this->foreignKey => $pkv];
             foreach ($removeAssoc as $assocId) {
                 $conditions[$this->assocForeignKey] = $assocId;
                 if ($this->joinTDG->removeByConditions($conditions) === false) {
@@ -211,7 +209,7 @@ class ManyToManyLink extends TableLink
         } else {
             $sql = "DELETE FROM {$this->qjoinTable} WHERE {$this->qforeignKey} = {$qpkv} AND {$this->qassocForeignKey} = ";
             foreach ($removeAssoc as $assocId) {
-                if (!$this->dbo->execute(sql_statement($sql . $this->dbo->qstr($assocId))) {
+                if (!$this->dbo->execute(sql_statement($sql . $this->dbo->qstr($assocId)))) {
                     return false;
                 }
             }

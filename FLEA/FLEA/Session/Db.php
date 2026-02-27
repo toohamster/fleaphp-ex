@@ -77,8 +77,6 @@ class Db
 
     /**
      * 构造函数
-     *
-     * @return \FLEA\Session\Db
      */
     public function __construct()
     {
@@ -89,12 +87,12 @@ class Db
         $this->lifeTime = (int)\FLEA::getAppInf('sessionDbLifeTime');
 
         session_set_save_handler(
-            array($this, 'sessionOpen'),
-            array($this, 'sessionClose'),
-            array($this, 'sessionRead'),
-            array($this, 'sessionWrite'),
-            array($this, 'sessionDestroy'),
-            array($this, 'sessionGc')
+            [$this, 'sessionOpen'],
+            [$this, 'sessionClose'],
+            [$this, 'sessionRead'],
+            [$this, 'sessionWrite'],
+            [$this, 'sessionDestroy'],
+            [$this, 'sessionGc']
         );
     }
 

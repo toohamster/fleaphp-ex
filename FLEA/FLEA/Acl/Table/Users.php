@@ -4,7 +4,7 @@ namespace FLEA\Acl\Table;
 
 
 /**
- * 定义 \FLEA\Acl_Table_Users 类
+ * 定义 \FLEA\Acl\Table\Users 类
  *
  * @author toohamster
  * @package Core
@@ -13,7 +13,7 @@ namespace FLEA\Acl\Table;
 
 
 /**
- * \FLEA\Acl_Table_Users 提供用户数据的存储服务
+ * \FLEA\Acl\Table\Users 提供用户数据的存储服务
  *
  * @package Core
  * @author toohamster
@@ -21,30 +21,30 @@ namespace FLEA\Acl\Table;
  */
 class Users extends \FLEA\Rbac\UsersManager
 {
-    public $belongsTo = array(
-        array(
-            'tableClass' => '\FLEA\Acl_Table_UserGroups',
+    public $belongsTo = [
+        [
+            'tableClass' => \FLEA\Acl\Table\UserGroups::class,
             'foreignKey' => 'user_group_id',
             'mappingName' => 'group',
-        ),
-    );
+        ],
+    ];
 
-    public $manyToMany = array(
-        array(
-            'tableClass' => '\FLEA\Acl_Table_Roles',
+    public $manyToMany = [
+        [
+            'tableClass' => \FLEA\Acl\Table\Roles::class,
             'foreignKey' => 'user_id',
             'assocForeignKey' => 'role_id',
-            'joinTableClass' => '\FLEA\Acl_Table_UsersHasRoles',
+            'joinTableClass' => \FLEA\Acl\Table\UsersHasRoles::class,
             'mappingName' => 'roles',
-        ),
-        array(
-            'tableClass' => '\FLEA\Acl_Table_Permissions',
+        ],
+        [
+            'tableClass' => \FLEA\Acl\Table\Permissions::class,
             'foreignKey' => 'user_id',
             'assocForeignKey' => 'permission_id',
-            'joinTableClass' => '\FLEA\Acl_Table_UsersHasPermissions',
+            'joinTableClass' => \FLEA\Acl\Table\UsersHasPermissions::class,
             'mappingName' => 'permissions',
-        ),
-    );
+        ],
+    ];
 
     /**
      * 构造函数

@@ -9,7 +9,7 @@
  * @version $Id: ErrorMessage.php 972 2007-10-09 20:56:54Z qeeyuan $
  */
 
-return array(
+return [
     // FLEA_Exception_ExpectedFile
     0x0102001 => 'Required file "%s" is missing.',
     // FLEA_Exception_ExpectedClass
@@ -77,5 +77,5 @@ return array(
     0x0202001 => 'Invalid table association type "%s".',
     // FLEA_Db_Exception_MissingLinkOption
     0x0202002 => 'Option "%s" is required when creating table association.',
-    
-);
+
+];

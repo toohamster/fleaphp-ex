@@ -54,8 +54,6 @@ class Action
      * 构造函数
      *
      * @param string $controllerName
-     *
-     * @return \FLEA\Controller\Action
      */
     public function __construct(string $controllerName)
     {
@@ -212,7 +210,7 @@ class Action
      */
     protected function _isAjax(): bool
     {
-        $r = isset($_SERVER['HTTP_X_REQUESTED_WITH']) ? strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) : '';
+        $r = strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '');
         return $r == 'xmlhttprequest';
     }
 

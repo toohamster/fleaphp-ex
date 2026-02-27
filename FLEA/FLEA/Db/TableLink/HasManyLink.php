@@ -72,7 +72,7 @@ class HasManyLink extends TableLink
                 continue;
             }
 
-            $apkv = isset($row[$this->assocTDG->primaryKey]) ? $row[$this->assocTDG->primaryKey] : null;
+            $apkv = $row[$this->assocTDG->primaryKey] ?? null;
             if ($apkv === null || !in_array($apkv, $existsAssoc)) {
                 $insertAssoc[] = $row;
             } else {
@@ -81,7 +81,7 @@ class HasManyLink extends TableLink
         }
 
         $removeAssoc = array_diff($existsAssoc, array_map(function($row) {
-            return isset($row[$this->assocTDG->primaryKey]) ? $row[$this->assocTDG->primaryKey] : null;
+            return $row[$this->assocTDG->primaryKey] ?? null;
         }, $rowset));
 
         // 插入新的关联记录

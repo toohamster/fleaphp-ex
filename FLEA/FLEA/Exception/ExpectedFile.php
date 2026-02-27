@@ -18,8 +18,6 @@ class ExpectedFile extends \FLEA\Exception
      * 构造函数
      *
      * @param string $filename
-     *
-     * @return ExpectedFile
      */
     public function __construct(string $filename)
     {

@@ -26,8 +26,6 @@ class MetaColumnsFailed extends \FLEA\Exception
      * 构造函数
      *
      * @param string $tableName
-     *
-     * @return \FLEA\Db\Exception\MetaColumnsFailed
      */
     public function __construct($tableName)
     {

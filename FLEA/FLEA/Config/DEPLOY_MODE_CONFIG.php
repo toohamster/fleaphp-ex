@@ -9,7 +9,7 @@
  * @version $Id: DEPLOY_MODE_CONFIG.php 1037 2008-04-19 21:19:55Z qeeyuan $
  */
 
-return array(
+return [
     // {{{ 核心配置
 
     /**
@@ -105,7 +105,7 @@ return array(
     /**
      * 指示要自动载入的文件
      */
-    'autoLoad'                  => array(),
+    'autoLoad'                  => [],
 
     /**
      * 指示是否载入 session 提供程序
@@ -120,7 +120,7 @@ return array(
     /**
      * 指示使用哪些过滤器对 HTTP 请求进行过滤
      */
-    'requestFilters'            => array(),
+    'requestFilters'            => [],
 
     // }}}
 
@@ -398,4 +398,4 @@ return array(
     'sessionDbLifeTime'         => 1440,
 
     // }}}
-);
+];

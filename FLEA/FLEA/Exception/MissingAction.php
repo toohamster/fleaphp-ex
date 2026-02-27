@@ -70,8 +70,6 @@ class MissingAction extends \FLEA\Exception
      * @param mixed $arguments
      * @param string $controllerClass
      * @param string $actionMethod
-     *
-     * @return \FLEA\Exception_MissingAction
      */
     public function __construct(string $controllerName, string $actionName, $arguments = null, ?string $controllerClass = null, ?string $actionMethod = null, ?string $controllerClassFilename = null)
     {

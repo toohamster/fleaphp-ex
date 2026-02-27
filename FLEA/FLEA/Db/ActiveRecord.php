@@ -72,8 +72,6 @@ class ActiveRecord
      * 根据 $conditions 参数查询符合条件的记录作为对象属性。
      *
      * @param mixed $conditions
-     *
-     * @return \FLEA\Db\ActiveRecord
      */
     public function __construct($conditions = null)
     {
@@ -92,7 +90,7 @@ class ActiveRecord
         $this->init = true;
 
         $myclass = get_class($this);
-        $options = call_user_func(array($myclass, 'define'));
+        $options = call_user_func([$myclass, 'define']);
         $tableClass = $options['tableClass'];
 
         $objid = "{$myclass}_tdg";
@@ -103,18 +101,18 @@ class ActiveRecord
             if (!class_exists($tableClass, true)) {
                 throw new \FLEA\Exception\ExpectedClass($tableClass);
             }
-            $this->_table = new $tableClass(array('skipCreateLinks' => true));
+            $this->_table = new $tableClass(['skipCreateLinks' => true]);
             \FLEA::register($this->_table, $objid);
         }
 
         if (!empty($options['propertiesMapping'])) {
-            $this->_mapping = array(
+            $this->_mapping = [
                 'p2f' => $options['propertiesMapping'],
                 'f2p' => array_flip($options['propertiesMapping']),
-            );
+            ];
             $this->_idname = $this->_mapping['f2p'][$this->_table->primaryKey];
         } else {
-            $this->_mapping = array('p2f' => array(), 'f2p' => array());
+            $this->_mapping = ['p2f' => [], 'f2p' => []];
             foreach ($this->_table->meta as $field) {
                 $this->_mapping['p2f'][$field['name']] = $field['name'];
                 $this->_mapping['f2p'][$field['name']] = $field['name'];
@@ -142,17 +140,17 @@ class ActiveRecord
             if (!class_exists($define['class'], true)) {
                 throw new \FLEA\Exception\ExpectedClass($define['class']);
             }
-            $options = call_user_func(array($define['class'], 'define'));
+            $options = call_user_func([$define['class'], 'define']);
 
-            $link = array(
+            $link = [
                 'tableClass' => $options['tableClass'],
                 'mappingName' => $define['mappingName'],
-                'foreignKey' => isset($define['foreignKey']) ? $define['foreignKey'] : null,
-            );
+                'foreignKey' => $define['foreignKey'] ?? null,
+            ];
 
             if ($define['mappingType'] == MANY_TO_MANY) {
-                $link['joinTable'] = isset($define['joinTable']) ? $define['joinTable'] : null;
-                $link['assocForeignKey'] = isset($define['assocForeignKey']) ? $define['assocForeignKey'] : null;
+                $link['joinTable'] = $define['joinTable'] ?? null;
+                $link['assocForeignKey'] = $define['assocForeignKey'] ?? null;
             }
 
             $this->_table->createLink($link, $define['mappingType']);

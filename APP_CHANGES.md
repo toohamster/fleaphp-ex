@@ -4,6 +4,58 @@
 
 ---
 
+## 2026-02-27
+
+### refactor: 更新 createPost() 和 createComment() 方法的 docblock
+
+由于 `TableDataGateway::create()` 方法的返回类型从 `int|false` 改为 `: int`（失败时返回 0），同步更新 App 模型中调用该方法的 docblock。
+
+**App/Model/Post.php**
+- `createPost()`: docblock 从 `@return int|false` 改为 `@return int`
+
+**App/Model/Comment.php**
+- `createComment()`: docblock 从 `@return int|false` 改为 `@return int`
+
+---
+
+## 2026-02-26
+
+### refactor: Model 类添加类型声明
+
+为 App/Model 下的类添加 PHP 类型声明，与 FLEA 基类保持一致。
+
+**App/Model/Post.php**
+- `$tableName`: `string`
+- `$hasMany`: `?array`
+
+**App/Model/Comment.php**
+- `$tableName`: `string`
+- `$belongsTo`: `?array`
+
+---
+
+## 2026-02-26
+
+### refactor: 将 array() 替换为短数组语法 []
+
+**App/Config.php**
+- 配置数组使用 [] 语法
+
+**App/Controller/PostController.php**
+- 1 处 `isset()` 三元表达式改为 `??` 运算符
+
+**App/Model/Post.php**
+- `$hasMany` 数组定义使用 [] 语法
+- `getPublishedPosts()` 查询条件使用 [] 语法
+- `getTotalCount()` 查询条件使用 [] 语法
+
+**App/Model/Comment.php**
+- `$belongsTo` 数组定义使用 [] 语法
+- `getCommentsByPostId()` 查询条件使用 [] 语法
+- `getCommentCount()` 查询条件使用 [] 语法
+
+---
+
 ## 2026-02-26
 
 ### feat: 建立 Post 和 Comment 模型关联关系并优化控制器查询

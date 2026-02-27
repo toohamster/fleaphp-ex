@@ -77,7 +77,7 @@ class PostController extends Action
         }
 
         // 从关联中获取评论数据
-        $comments = isset($post['comments']) ? $post['comments'] : array();
+        $comments = $post['comments'] ?? [];
         $commentCount = count($comments);
 
         $this->view->assign('post', $post);

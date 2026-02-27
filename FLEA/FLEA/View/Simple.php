@@ -72,8 +72,6 @@ class Simple
      * 构造函数
      *
      * @param string $path 模板文件所在路径
-     *
-     * @return \FLEA\View\Simple
      */
     public function __construct(?string $templateDir = null)
     {
@@ -85,9 +83,9 @@ class Simple
         $this->cacheDir = './cache';
 
         $viewConfig = (array)\FLEA::getAppInf('viewConfig');
-        $keys = array(
+        $keys = [
             'templateDir', 'cacheDir', 'cacheLifeTime', 'enableCache',
-        );
+        ];
         foreach ($keys as $key)
         {
             if (array_key_exists($key, $viewConfig))

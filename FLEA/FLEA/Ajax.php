@@ -55,7 +55,7 @@ class Ajax
      *
      * @var array
      */
-    public $paramsType = array(
+    public $paramsType = [
         'async'         => 'boolean',
         'beforeSend'    => 'function',
         'complete'      => 'function',
@@ -80,12 +80,10 @@ class Ajax
         'target'        => 'object',
         'targetValue'   => 'object',
         'clearTarget'   => 'boolean',
-    );
+    ];
 
     /**
      * 构造函数
-     *
-     * @return FLEA_Ajax
      */
     public function __construct()
     {
@@ -169,7 +167,7 @@ class Ajax
     {
         $control2 = preg_replace('/[^a-z0-9_]+/i', '', $control);
         $functionName = "ajax_{$control2}_on{$event}";
-        $this->_events[] = array($control, $event, $url, $attribs, $functionName);
+        $this->_events[] = [$control, $event, $url, $attribs, $functionName];
         return $functionName;
     }
 
@@ -274,7 +272,7 @@ EOT;
                 $beforeRequest[] = "    {$target}.{$targetType}(\"\");";
             }
 
-            $success = isset($attribs['success']) ? trim($attribs['success']) : '';
+            $success = trim($attribs['success'] ?? '');
             if ($success) {
                 $success = preg_replace('/function.+{/i', '{', $success);
                 if (substr($success, -1) != ';') { $success .= ';'; }

@@ -48,8 +48,6 @@ class Rbac
 
     /**
      * 构造函数
-     *
-     * @return \FLEA\Rbac
      */
     public function __construct()
     {
@@ -215,7 +213,7 @@ class Rbac
     public function prepareACT(array $ACT): array
     {
         $ret = [];
-        $arr = array('allow', 'deny');
+        $arr = ['allow', 'deny'];
         foreach ($arr as $key) {
             do {
                 if (!isset($ACT[$key])) {

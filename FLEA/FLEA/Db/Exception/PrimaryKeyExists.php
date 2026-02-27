@@ -39,8 +39,6 @@ class PrimaryKeyExists extends \FLEA\Exception
      *
      * @param string $pk
      * @param mixed $pkValue
-     *
-     * @return \FLEA\Db\Exception\PrimaryKeyExists
      */
     public function __construct($pk, $pkValue = null)
     {

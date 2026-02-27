@@ -26,8 +26,6 @@ class InvalidLinkType extends \FLEA\Exception
      * 构造函数
      *
      * @param $type
-     *
-     * @return \FLEA\Db\Exception\InvalidDSN
      */
     function __construct($type)
     {

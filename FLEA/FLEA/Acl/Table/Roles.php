@@ -4,7 +4,7 @@ namespace FLEA\Acl\Table;
 
 
 /**
- * 定义 \FLEA\Acl_Table_Roles 类
+ * 定义 \FLEA\Acl\Table\Roles 类
  *
  * @author toohamster
  * @package Core
@@ -13,7 +13,7 @@ namespace FLEA\Acl\Table;
 
 
 /**
- * \FLEA\Acl_Table_Roles 提供了角色数据的存储服务
+ * \FLEA\Acl\Table\Roles 提供了角色数据的存储服务
  *
  * @package Core
  */
@@ -31,22 +31,22 @@ class Roles extends \FLEA\Db\TableDataGateway
      *
      * @var string
      */
-    public $tableName = 'roles';
+    public string $tableName = 'roles';
 
     /**
      * 一个角色对应多个权限，一个权限可以指派给多个角色
      *
      * @var array
      */
-    public $manyToMany = array(
-        array(
-            'tableClass' => '\FLEA\Acl_Table_Permissions',
+    public ?array $manyToMany = [
+        [
+            'tableClass' => \FLEA\Acl\Table\Permissions::class,
             'foreignKey' => 'role_id',
             'assocForeignKey' => 'permission_id',
             'joinTable' => 'roles_has_permissions',
             'mappingName' => 'permissions',
-        ),
-    );
+        ],
+    ];
 
     /**
      * 构造函数

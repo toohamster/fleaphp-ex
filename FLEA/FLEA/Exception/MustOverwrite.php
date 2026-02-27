@@ -26,8 +26,6 @@ class MustOverwrite extends \FLEA\Exception
      * 构造函数
      *
      * @param string $prototypeMethod
-     *
-     * @return \FLEA\Exception_MustOverwrite
      */
     public function __construct($prototypeMethod)
     {

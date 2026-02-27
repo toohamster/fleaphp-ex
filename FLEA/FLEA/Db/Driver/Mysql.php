@@ -354,7 +354,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
          *  I 整数
          *  R 自动增量或计数器
          */
-        static $typeMap = array(
+        static $typeMap = [
             'BIT' => 'I',
             'TINYINT' => 'I',
             'BOOL' => 'L',
@@ -392,7 +392,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
             'LONGTEXT' => 'X',
             'ENUM' => 'C',
             'SET' => 'C',
-        );
+        ];
 
         $rs = $this->execute(\FLEA\Db\SqlStatement::create(sprintf($this->META_COLUMNS_SQL, $table)));
         $rs = $rs->getSql();
@@ -449,7 +449,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
                 }
             }
 
-            $field['description'] = isset($row['Comment']) ? $row['Comment'] : '';
+            $field['description'] = $row['Comment'] ?? '';
 
             $retarr[strtoupper($field['name'])] = $field;
         }

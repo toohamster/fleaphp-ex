@@ -73,7 +73,7 @@ class Config
      */
     public function getAppInf(string $option, $default = null)
     {
-        return isset($this->appInf[$option]) ? $this->appInf[$option] : $default;
+        return $this->appInf[$option] ?? $default;
     }
 
     /**
@@ -216,7 +216,7 @@ class Config
      */
     public function getDbo(string $dsnid): ?object
     {
-        return isset($this->dbo[$dsnid]) ? $this->dbo[$dsnid] : null;
+        return $this->dbo[$dsnid] ?? null;
     }
 
     /**

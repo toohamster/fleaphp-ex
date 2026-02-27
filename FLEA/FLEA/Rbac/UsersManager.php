@@ -45,7 +45,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
      *
      * @var string
      */
-    public $tableName = 'users';
+    public string $tableName = 'users';
 
     /**
      * 用户名字段的名字
@@ -94,13 +94,13 @@ class UsersManager extends \FLEA\Db\TableDataGateway
      *
      * @var array
      */
-    public $functionFields = array(
+    public $functionFields = [
         'registerIpField' => null,
         'lastLoginField' => null,
         'lastLoginIpField' => null,
         'loginCountField' => null,
         'isLockedField' => null,
-    );
+    ];
 
     /**
      * 构造函数
@@ -162,7 +162,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
      */
     public function existsUserId($id): bool
     {
-        return $this->findCount(array($this->primaryKey => $id)) > 0;
+        return $this->findCount([$this->primaryKey => $id]) > 0;
     }
 
     /**
@@ -174,7 +174,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
      */
     public function existsUsername(string $username): bool
     {
-        return $this->findCount(array($this->usernameField => $username)) > 0;
+        return $this->findCount([$this->usernameField => $username]) > 0;
     }
 
     /**
@@ -186,7 +186,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
      */
     public function existsEmail(string $email): bool
     {
-        return $this->findCount(array($this->emailField => $email)) > 0;
+        return $this->findCount([$this->emailField => $email]) > 0;
     }
 
     /**
@@ -194,16 +194,16 @@ class UsersManager extends \FLEA\Db\TableDataGateway
      *
      * @param array $row
      *
-     * @return mixed
+     * @return int
      */
-    public function create(array &$row)
+    public function create(array &$row, bool $saveLinks = true): int
     {
         if (isset($this->functionFields['registerIpField'])
             && $this->functionFields['registerIpField'] != '')
         {
-            $row[$this->functionFields['registerIpField']] = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1';
+            $row[$this->functionFields['registerIpField']] = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         }
-        return parent::create($row);
+        return parent::create($row, $saveLinks);
     }
 
     /**
@@ -222,7 +222,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
         if ($returnUserdata) {
             $user = $this->findByField($this->usernameField, $username);
         } else {
-            $fields = array($this->primaryKey, $this->passwordField);
+            $fields = [$this->primaryKey, $this->passwordField];
             if (isset($this->functionFields['loginCountField'])
                 && $this->functionFields['loginCountField'] != '')
             {
@@ -258,7 +258,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
         if (isset($this->functionFields['lastLoginIpField'])
             && $this->functionFields['lastLoginIpField'] != '')
         {
-            $update[$this->functionFields['lastLoginIpField']] = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1';
+            $update[$this->functionFields['lastLoginIpField']] = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         }
 
         if (isset($this->functionFields['loginCountField'])
@@ -291,7 +291,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
     {
         $user = $this->findByField(
             $this->usernameField, $username, null,
-            array($this->primaryKey, $this->passwordField)
+            [$this->primaryKey, $this->passwordField]
         );
         if (!$user) { return false; }
         if (!$this->checkPassword($oldPassword, $user[$this->passwordField])) {
@@ -411,12 +411,12 @@ class UsersManager extends \FLEA\Db\TableDataGateway
 
         if (!isset($user[$this->rolesField]) ||
             !is_array($user[$this->rolesField])) {
-            return array();
+            return [];
         }
         $roles = [];
         foreach ($user[$this->rolesField] as $role) {
             if (!is_array($role)) {
-                return array($user[$this->rolesField][$rolenameField]);
+                return [$user[$this->rolesField][$rolenameField]];
             }
             $roles[] = $role[$rolenameField];
         }
@@ -430,10 +430,10 @@ class UsersManager extends \FLEA\Db\TableDataGateway
      *
      * @return boolean
      */
-    public function update(array &$row): bool
+    public function update(array &$row, bool $saveLinks = true): bool
     {
         unset($row[$this->passwordField]);
-        return parent::update($row);
+        return parent::update($row, $saveLinks);
     }
 
     /**

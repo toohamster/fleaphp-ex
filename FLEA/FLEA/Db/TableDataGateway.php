@@ -53,56 +53,56 @@ class TableDataGateway
      *
      * @var string
      */
-    public $schema = '';
+    public string $schema = '';
 
     /**
      * 数据表名（没有添加前缀）
      *
      * @var string
      */
-    public $tableName = null;
+    public string $tableName = '';
 
     /**
      * 包含前缀的完整数据表名称
      *
-     * @var string
+     * @var string|null
      */
-    public $fullTableName = null;
+    public ?string $fullTableName = null;
 
     /**
      * 主键字段名，或者是包含多个主键字段名的数组
      *
-     * @var string|array
+     * @var string|array|null
      */
     public $primaryKey = null;
 
     /**
      * 定义一对一关联
      *
-     * @var array
+     * @var array|null
      */
-    public $hasOne = null;
+    public ?array $hasOne = null;
 
     /**
      * 定义从属关联
      *
-     * @var array
+     * @var array|null
      */
-    public $belongsTo = null;
+    public ?array $belongsTo = null;
 
     /**
      * 定义一对多关联
      *
-     * @var array
+     * @var array|null
      */
-    public $hasMany = null;
+    public ?array $hasMany = null;
 
     /**
      * 定义多对多关联
      *
-     * @var array
+     * @var array|null
      */
-    public $manyToMany = null;
+    public ?array $manyToMany = null;
 
     /**
      * 当前数据表的元数据
@@ -152,7 +152,7 @@ class TableDataGateway
      *
      * @var array
      */
-    public $createdTimeFields = array('CREATED', 'CREATED_ON', 'CREATED_AT');
+    public $createdTimeFields = ['CREATED', 'CREATED_ON', 'CREATED_AT'];
 
     /**
      * 创建和更新记录时，要自动填入当前时间的字段
@@ -162,7 +162,7 @@ class TableDataGateway
      *
      * @var array
      */
-    public $updatedTimeFields = array('UPDATED', 'UPDATED_ON', 'UPDATED_AT');
+    public $updatedTimeFields = ['UPDATED', 'UPDATED_ON', 'UPDATED_AT'];
 
     /**
      * 指示进行 CRUD 操作时是否处理关联
@@ -247,8 +247,6 @@ class TableDataGateway
      *   - skipCreateLinks: 指示初始化表数据入口时，是否不建立关联关系
      *
      * @param array $params
-     *
-     * @return \FLEA\Db\TableDataGateway
      */
     public function __construct(?array $params = null)
     {
@@ -411,7 +409,7 @@ class TableDataGateway
      */
     public function findAll($conditions = null, ?string $sort = null, $limit = null, $fields = '*', bool $queryLinks = true): ?array
     {
-        list($whereby, $distinct) = $this->getWhere($conditions);
+        [$whereby, $distinct] = $this->getWhere($conditions);
         // 处理排序
         $sortby = $sort != '' ? " ORDER BY {$sort}" : '';
         // 处理 $limit
@@ -519,7 +517,7 @@ class TableDataGateway
             case BELONGS_TO:
                 $pkv = $arow[$link->mainTDG->primaryKey];
                 $in[] = $pkv;
-                $assocRowset = array($pkv => & $arow);
+                $assocRowset = [$pkv => & $arow];
                 $arow[$link->mappingName] = null;
                 break;
             case HAS_MANY:
@@ -625,7 +623,7 @@ class TableDataGateway
      */
     public function findByField(string $field, $value, ?string $sort = null, $fields = '*'): ?array
     {
-        return $this->find(array($field => $value), $sort, $fields);
+        return $this->find([$field => $value], $sort, $fields);
     }
 
     /**
@@ -641,7 +639,7 @@ class TableDataGateway
      */
     public function findAllByField(string $field, $value, ?string $sort = null, $limit = null, $fields = '*'): ?array
     {
-        return $this->findAll(array($field => $value), $sort, $limit, $fields);
+        return $this->findAll([$field => $value], $sort, $limit, $fields);
     }
 
     /**
@@ -658,12 +656,12 @@ class TableDataGateway
      */
     public function findAllByPkvs($pkvs, $conditions = null, ?string $sort = null, $limit = null, $fields = '*', bool $queryLinks = true): ?array
     {
-        $in = array('in()' => $pkvs);
+        $in = ['in()' => $pkvs];
         if (empty($conditions)) {
             $conditions = $in;
         } else {
             if (!is_array($conditions)) {
-                $conditions = array($in, $conditions);
+                $conditions = [$in, $conditions];
             } else {
                 array_push($conditions, $in);
             }
@@ -684,7 +682,7 @@ class TableDataGateway
     {
         // 处理 $limit
         if (is_array($limit)) {
-            list($length, $offset) = $limit;
+            [$length, $offset] = $limit;
         } else {
             $length = $limit;
             $offset = null;
@@ -712,7 +710,7 @@ class TableDataGateway
      */
     public function findCount($conditions = null, $fields = null): int
     {
-        list($whereby, $distinct) = $this->getWhere($conditions);
+        [$whereby, $distinct] = $this->getWhere($conditions);
         if (is_null($fields)) {
             $fields = $this->qpk;
         } else {
@@ -731,9 +729,9 @@ class TableDataGateway
      * @param boolean $saveLinks
      * @param boolean $updateCounter
      *
-     * @return boolean
+     * @return int
      */
-    public function save(array &$row, bool $saveLinks = true, bool $updateCounter = true): bool
+    public function save(array &$row, bool $saveLinks = true, bool $updateCounter = true): int
     {
         if (empty($row[$this->primaryKey])) {
             return $this->create($row, $saveLinks, $updateCounter);
@@ -860,7 +858,7 @@ class TableDataGateway
         // 生成 SQL 语句
         $pkv = $row[$this->primaryKey];
         unset($row[$this->primaryKey]);
-        list($pairs, $values) = $this->dbo->getPlaceholderPair($row, $this->fields);
+        [$pairs, $values] = $this->dbo->getPlaceholderPair($row, $this->fields);
         $row[$this->primaryKey] = $pkv;
 
         if (!empty($pairs)) {
@@ -937,7 +935,7 @@ class TableDataGateway
         $whereby = $this->getWhere($conditions, false);
         $this->_setUpdatedTimeFields($row);
 
-        list($pairs, $values) = $this->dbo->getPlaceholderPair($row, $this->fields);
+        [$pairs, $values] = $this->dbo->getPlaceholderPair($row, $this->fields);
         $pairs = implode(',', $pairs);
         $sql = "UPDATE {$this->qtableName} SET {$pairs} {$whereby}";
         return $this->dbo->execute(sql_statement($sql), $values);
@@ -956,7 +954,7 @@ class TableDataGateway
      */
     public function updateField($conditions, string $field, $value): bool
     {
-        $row = array($field => $value);
+        $row = [$field => $value];
         return $this->updateByConditions($conditions, $row);
     }
 
@@ -978,7 +976,7 @@ class TableDataGateway
 
         $row = [];
         $this->_setUpdatedTimeFields($row);
-        list($pairs, $values) = $this->dbo->getPlaceholderPair($row, $this->fields);
+        [$pairs, $values] = $this->dbo->getPlaceholderPair($row, $this->fields);
         $pairs = implode(',', $pairs);
         if ($pairs) {
             $pairs = ', ' . $pairs;
@@ -1007,7 +1005,7 @@ class TableDataGateway
 
         $row = [];
         $this->_setUpdatedTimeFields($row);
-        list($pairs, $values) = $this->dbo->getPlaceholderPair($row, $this->fields);
+        [$pairs, $values] = $this->dbo->getPlaceholderPair($row, $this->fields);
         $pairs = implode(',', $pairs);
         if ($pairs) {
             $pairs = ', ' . $pairs;
@@ -1026,12 +1024,12 @@ class TableDataGateway
      * @param array $row
      * @param boolean $saveLinks
      *
-     * @return mixed
+     * @return int
      */
-    public function create(array &$row, bool $saveLinks = true): bool
+    public function create(array &$row, bool $saveLinks = true): int
     {
         if (!$this->_beforeCreate($row)) {
-            return false;
+            return 0;
         }
 
         // 自动设置日期字段
@@ -1077,11 +1075,11 @@ class TableDataGateway
         if (!$this->_beforeCreateDb($row)) {
             if ($unsetpk) { unset($row[$this->primaryKey]); }
             $this->dbo->completeTrans(false);
-            return false;
+            return 0;
         }
 
         // 生成 SQL 语句
-        list($holders, $values) = $this->dbo->getPlaceholder($row, $this->fields);
+        [$holders, $values] = $this->dbo->getPlaceholder($row, $this->fields);
         $holders = implode(',', $holders);
         $fields = $this->dbo->qfields(array_keys($values));
         $sql = "INSERT INTO {$this->qtableName} ({$fields}) VALUES ({$holders})";
@@ -1090,7 +1088,7 @@ class TableDataGateway
         if (!$this->dbo->execute(sql_statement($sql), $values, true)) {
             if ($unsetpk) { unset($row[$this->primaryKey]); }
             $this->dbo->completeTrans(false);
-            return false;
+            return 0;
         }
 
         // 如果提交的数据中没有主键字段值，则尝试获取新插入记录的主键值
@@ -1116,7 +1114,7 @@ class TableDataGateway
                 if (!$link->saveAssocData($row[$link->mappingName], $insertId)) {
                     if ($unsetpk) { unset($row[$this->primaryKey]); }
                     $this->dbo->completeTrans(false);
-                    return false;
+                    return 0;
                 }
             }
         }
@@ -1134,14 +1132,14 @@ class TableDataGateway
     }
 
     /**
-     * 插入多行记录，返回包含所有新记录主键值的数组，如果失败则返回 false
+     * 插入多行记录，返回包含所有新记录主键值的数组，如果失败则返回 0
      *
      * @param array $rowset
      * @param boolean $saveLinks
      *
-     * @return array
+     * @return array|int
      */
-    public function createRowset(array &$rowset, bool $saveLinks = true): bool
+    public function createRowset(array &$rowset, bool $saveLinks = true)
     {
         $insertids = [];
         $this->dbo->startTrans();
@@ -1149,7 +1147,7 @@ class TableDataGateway
             $insertid = $this->create($row, $saveLinks, false);
             if (!$insertid) {
                 $this->dbo->completeTrans(false);
-                return false;
+                return 0;
             }
             $insertids[] = $insertid;
         }
@@ -1245,7 +1243,7 @@ class TableDataGateway
 
         if (!empty($counterCacheLinks)) {
             $counterCacheLinks[] = $this->primaryKey;
-            $row = $this->find(array($this->primaryKey => $pkv), null, $counterCacheLinks, false);
+            $row = $this->find([$this->primaryKey => $pkv], null, $counterCacheLinks, false);
         }
 
         // 删除主表数据
@@ -1520,7 +1518,7 @@ class TableDataGateway
     {
         if (!is_array($defines)) { return; }
         if (!is_array(reset($defines))) {
-            $defines = array($defines);
+            $defines = [$defines];
         }
 
         // 创建关联对象
@@ -1677,7 +1675,7 @@ class TableDataGateway
          */
 
         $parts = [];
-        $callback = array($this->dbo, 'qstr');
+        $callback = [$this->dbo, 'qstr'];
         $next_op = '';
 
         foreach ($where as $key => $value) {
@@ -1692,7 +1690,7 @@ class TableDataGateway
                 if ($next_op != '') {
                     $parts[] = $next_op;
                 }
-                $field = $this->_parseWhereQfield(array('', $key));
+                $field = $this->_parseWhereQfield(['', $key]);
                 if (is_array($value)) {
                     $value = array_map($callback, $value);
                     $parts[] = $field . ' IN (' . implode(',', $value) . ')';
@@ -1729,7 +1727,7 @@ class TableDataGateway
         // 首先从查询条件中提取出可以识别的字段名
         if (strpos($where, '[') !== false) {
             // 提取字段名
-            $where = preg_replace_callback('/\[([a-z0-9_\-\.]+)\]/i', array($this, '_parseWhereQfield'), $where);
+            $where = preg_replace_callback('/\[([a-z0-9_\-\.]+)\]/i', [$this, '_parseWhereQfield'], $where);
         }
 
         return $this->qinto($where, $args);
@@ -1747,13 +1745,13 @@ class TableDataGateway
         $p = explode('.', $matches[1]);
         switch (count($p)) {
         case 3:
-            list($schema, $table, $field) = $p;
+            [$schema, $table, $field] = $p;
             if ($table == $this->tableName) {
                 $table = $this->fullTableName;
             }
             return $this->dbo->qfield($field, $table, $schema);
         case 2:
-            list($table, $field) = $p;
+            [$table, $field] = $p;
             if ($table == $this->tableName) {
                 $table = $this->fullTableName;
             }
@@ -1830,7 +1828,7 @@ class TableDataGateway
             }
 
             $arr = $where;
-            list($where, $linksWhere) = $arr;
+            [$where, $linksWhere] = $arr;
             unset($arr);
 
             if (!$this->autoLink || !$queryLinks) {
@@ -1871,7 +1869,7 @@ class TableDataGateway
                     $whereby = $where != '' ? " WHERE {$where} AND " : ' WHERE';
                 }
                 foreach ($lws as $lw) {
-                    list($field, $value, $op, $expr, $isCommand) = $lw;
+                    [$field, $value, $op, $expr, $isCommand] = $lw;
                     if (!$isCommand) {
                         $field = $link->assocTDG->qfield($field);
                         $value = $this->dbo->qstr($value);
@@ -1889,7 +1887,7 @@ class TableDataGateway
         } while (false);
 
         if ($queryLinks) {
-            return array($whereby, $distinct);
+            return [$whereby, $distinct];
         } else {
             return $whereby;
         }

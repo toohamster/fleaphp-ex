@@ -4,6 +4,292 @@
 
 ---
 
+## 2026-02-27
+
+### refactor: 移除构造函数中的 @return 注解
+
+构造函数不返回值，移除其 docblock 注释中的 `@return` 注解。
+
+**修改的文件:**
+- `FLEA/FLEA/Ajax.php`
+- `FLEA/FLEA/Controller/Action.php`
+- `FLEA/FLEA/Db/ActiveRecord.php`
+- `FLEA/FLEA/Db/TableDataGateway.php`
+- `FLEA/FLEA/Db/TableLink.php`
+- `FLEA/FLEA/Db/TableLink/BelongsToLink.php`
+- `FLEA/FLEA/Db/TableLink/ManyToManyLink.php`
+- `FLEA/FLEA/Dispatcher/Auth.php`
+- `FLEA/FLEA/Dispatcher/Simple.php`
+- `FLEA/FLEA/Session/Db.php`
+- `FLEA/FLEA/View/Simple.php`
+- `FLEA/FLEA/WebControls.php`
+- `FLEA/FLEA/Language.php`
+- `FLEA/FLEA/Rbac.php`
+- `FLEA/FLEA/Rbac/RolesManager.php`
+- `FLEA/FLEA/Db/Exception/*.php` (7 个异常类)
+- `FLEA/FLEA/Dispatcher/Exception/CheckFailed.php`
+- `FLEA/FLEA/Exception/*.php` (14 个异常类)
+- `FLEA/FLEA/Rbac/Exception/*.php` (2 个异常类)
+- `FLEA/FLEA/Helper/FileUploader.php`
+- `FLEA/FLEA/Helper/FileUploader/File.php`
+- `FLEA/FLEA/Helper/Image.php`
+
+---
+
+## 2026-02-27
+
+### refactor: create() 方法返回类型改为 int
+
+将 `create()` 方法的返回类型从 `int|false` 改为 `: int`，失败时返回 `0` 而不是 `false`。
+
+**FLEA/FLEA/Db/TableDataGateway.php (基类)**
+- `create()`: 返回类型改为 `: int`，所有 `return false` 改为 `return 0`
+- `save()`: 返回类型从 `: bool` 改为 `: int` (调用 `create()`)
+- `createRowset()`: 返回类型从 `: bool` 改为无类型声明，失败时返回 `0`
+
+**FLEA/FLEA/Rbac/UsersManager.php**
+- `create()`: 添加返回类型 `: int`
+
+**FLEA/FLEA/Acl/Table/UserGroups.php**
+- `create()`: 添加返回类型 `: int`，`return false` 改为 `return 0`
+
+**App/Model/Post.php**
+- `createPost()`: docblock 从 `@return int|false` 改为 `@return int`
+
+**App/Model/Comment.php**
+- `createComment()`: docblock 从 `@return int|false` 改为 `@return int`
+
+---
+
+## 2026-02-26
+
+### refactor: TableDataGateway 及子类添加类型声明
+
+为 TableDataGateway 基类和所有子类添加 PHP 类型声明，提高类型安全性和 IDE 支持。
+
+**FLEA/FLEA/Db/TableDataGateway.php (基类)**
+- `$tableName`: `string` (初始值改为 `''`)
+- `$fullTableName`: `?string`
+- `$primaryKey`: 无类型 (支持 string|array)
+- `$hasOne`: `?array`
+- `$belongsTo`: `?array`
+- `$hasMany`: `?array`
+- `$manyToMany`: `?array`
+- `$schema`: `string`
+
+**FLEA/FLEA/Rbac/RolesManager.php**
+- `$tableName`: `string`
+
+**FLEA/FLEA/Rbac/UsersManager.php**
+- `$tableName`: `string`
+- `create()` 方法：添加参数 `bool $saveLinks = true` 和返回类型 `: bool`
+- `update()` 方法：添加参数 `bool $saveLinks = true`
+
+**FLEA/FLEA/Acl/Table/Roles.php**
+- `$tableName`: `string`
+- `$manyToMany`: `?array`
+
+**FLEA/FLEA/Acl/Table/Permissions.php**
+- `$tableName`: `string`
+
+**FLEA/FLEA/Acl/Table/UserGroups.php**
+- `$tableName`: `string`
+- `$manyToMany`: `?array`
+
+**FLEA/FLEA/Acl/Table/UserGroupsHasRoles.php**
+- `$tableName`: `string`
+
+**FLEA/FLEA/Acl/Table/UserGroupsHasPermissions.php**
+- `$tableName`: `string`
+
+**FLEA/FLEA/Acl/Table/UsersHasRoles.php**
+- `$tableName`: `string`
+
+**FLEA/FLEA/Acl/Table/UsersHasPermissions.php**
+- `$tableName`: `string`
+
+**App/Model/Post.php**
+- `$tableName`: `string`
+- `$hasMany`: `?array`
+
+**App/Model/Comment.php**
+- `$tableName`: `string`
+- `$belongsTo`: `?array`
+
+---
+
+## 2026-02-26
+
+### fix: 修复 ManyToManyLink.php 中 DELETE 语句多余的括号
+
+**FLEA/FLEA/Db/TableLink/ManyToManyLink.php**
+- 第 214 行 DELETE 语句移除多余的 `.')'`
+
+问题分析:
+- 第 196 行 INSERT 语句：`VALUES (` 需要 `')'` 闭合 - 正确
+- 第 214 行 DELETE 语句：没有括号，不需要 `')'` - 多余，已删除
+
+---
+
+## 2026-02-26
+
+### fix: 修复数组语法错误，将 ); 改为 ];
+
+修复之前将 `array()` 批量替换为 `[]` 时遗留的括号不匹配问题
+
+**FLEA/FLEA/Config/DEBUG_MODE_CONFIG.php**
+- 结尾 `);` 改为 `];`
+
+**FLEA/FLEA/Config/DEPLOY_MODE_CONFIG.php**
+- 结尾 `);` 改为 `];`
+
+**FLEA/FLEA/_Errors/default/ErrorMessage.php**
+- 结尾 `);` 改为 `];`
+
+**FLEA/FLEA/_Errors/chinese-utf8/ErrorMessage.php**
+- 结尾 `);` 改为 `];`
+
+**FLEA/FLEA/Db/TableLink/ManyToManyLink.php**
+- 修复 `execute()` 调用中的括号匹配问题
+
+**FLEA/FLEA/Acl/testCreateData.php**
+- 多处数组闭合括号 `);` 改为 `];`
+
+---
+
+## 2026-02-26
+
+### refactor: Acl 目录使用 PSR-4 命名空间和 ::class 常量
+
+**FLEA/FLEA/Acl/Manager.php**
+- `$_tableClass` 数组中的 8 个类名从 `'\FLEA\Acl_Table_*'` 改为 `\FLEA\Acl\Table\*::class`
+
+**FLEA/FLEA/Acl/Table/UserGroups.php**
+- `$manyToMany` 数组中的类名改用 `::class` 常量
+
+**FLEA/FLEA/Acl/Table/Users.php**
+- `$belongsTo` 和 `$manyToMany` 数组中的类名改用 `::class` 常量
+
+**FLEA/FLEA/Acl/Table/Roles.php**
+- `$manyToMany` 数组中的 `tableClass` 改用 `::class` 常量
+- `joinTable` 保留为表名字符串（该表没有对应的实体类）
+
+**FLEA/FLEA/Acl/Table/Permissions.php**
+- 注释中的类名从 `\FLEA\Acl_Table_Permissions` 改为 `\FLEA\Acl\Table\Permissions`
+
+**FLEA/FLEA/Acl/Table/UserGroupsHasRoles.php**
+- 注释中的类名从 `\FLEA\Acl_Table_UserGroupsHasRoles` 改为 `\FLEA\Acl\Table\UserGroupsHasRoles`
+
+**FLEA/FLEA/Acl/Table/UserGroupsHasPermissions.php**
+- 注释中的类名从 `\FLEA\Acl_Table_UserGroupsHasPermissions` 改为 `\FLEA\Acl\Table\UserGroupsHasPermissions`
+
+**FLEA/FLEA/Acl/Table/UsersHasRoles.php**
+- 注释中的类名从 `\FLEA\Acl_Table_UsersHasRoles` 改为 `\FLEA\Acl\Table\UsersHasRoles`
+
+**FLEA/FLEA/Acl/Table/UsersHasPermissions.php**
+- 注释中的类名从 `\FLEA\Acl_Table_UsersHasPermissions` 改为 `\FLEA\Acl\Table\UsersHasPermissions`
+
+**FLEA/FLEA/Acl/Exception/UserGroupNotFound.php**
+- 注释中的类名从 `\FLEA\Acl_Exception_UserGroupNotFound` 改为 `\FLEA\Acl\Exception\UserGroupNotFound`
+
+**FLEA/FLEA/Acl/Manager.php**
+- 注释中的类名从 `\FLEA\Acl_Manager` 改为 `\FLEA\Acl\Manager`
+- `@var` 类型注释同步更新
+
+**FLEA/FLEA/Acl/Table/UserGroups.php**
+- 注释中的类名从 `\FLEA\Acl_Table_UserGroups` 改为 `\FLEA\Acl\Table\UserGroups`
+
+**FLEA/FLEA/Acl/Table/Users.php**
+- 注释中的类名从 `\FLEA\Acl_Table_Users` 改为 `\FLEA\Acl\Table\Users`
+
+**FLEA/FLEA/Acl/Table/Roles.php**
+- 注释中的类名从 `\FLEA\Acl_Table_Roles` 改为 `\FLEA\Acl\Table\Roles`
+
+优势:
+- 符合 PSR-4 命名空间规范
+- 使用 `::class` 常量提供类型安全
+- IDE 可以提供更好的自动完成和重构支持
+- 注释与实际的命名空间保持一致
+
+---
+
+## 2026-02-26
+
+### refactor: TableLink 类使用 ::class 常量代替字符串类名
+
+**FLEA/FLEA/Db/TableLink.php**
+- `createLink()` 方法中的 `$typeMap` 数组使用 `::class` 常量
+
+修改前:
+```php
+static $typeMap = [
+    HAS_ONE => '\FLEA\Db\TableLink\HasOneLink',
+    ...
+];
+```
+
+修改后:
+```php
+static $typeMap = [
+    HAS_ONE => \FLEA\Db\TableLink\HasOneLink::class,
+    ...
+];
+```
+
+优势:
+- 类型安全，IDE 可以提供更好的支持
+- 类名改变时 IDE 可自动重构
+- 符合现代 PHP 最佳实践
+
+---
+
+## 2026-02-26
+
+### refactor: 将 array() 替换为短数组语法 []
+
+批量将代码中的 array() 替换为 PHP 5.4+ 支持的短数组语法 []
+
+**修改的文件:**
+- `Ajax.php`: 数组定义使用 [] 语法
+- `Config/DEBUG_MODE_CONFIG.php`: 配置数组使用 [] 语法
+- `Config/DEPLOY_MODE_CONFIG.php`: 配置数组使用 [] 语法
+- `Db/ActiveRecord.php`: 数组定义和 call_user_func 参数使用 [] 语法
+- `Db/Driver/AbstractDriver.php`: 返回值使用 [] 语法
+- `Db/Driver/Mysql.php`: 静态数组使用 [] 语法
+- `Db/SqlHelper.php`: 数组定义和返回值使用 [] 语法
+- `Db/TableDataGateway.php`: 数组定义和返回值使用 [] 语法
+- `Db/TableLink.php`: 数组定义使用 [] 语法
+- `Db/TableLink/ManyToManyLink.php`: 数组定义使用 [] 语法
+- `Dispatcher/Auth.php`: 数组定义使用 [] 语法
+- `Dispatcher/Simple.php`: 数组定义和返回值使用 [] 语法
+- `Helper/FileUploader/File.php`: 数组定义使用 [] 语法
+- `Helper/Image.php`: 数组定义和返回值使用 [] 语法
+- `Helper/ImgCode.php`: 数组定义和返回值使用 [] 语法
+- `Helper/Pager.php`: 数组定义使用 [] 语法
+- `Helper/Verifier.php`: 数组定义使用 [] 语法
+- `Log.php`: 回调函数使用 [] 语法
+- `Rbac.php`: 数组定义使用 [] 语法
+- `Rbac/UsersManager.php`: 数组定义使用 [] 语法
+- `Session/Db.php`: session_set_save_handler 参数使用 [] 语法
+- `View/Simple.php`: 数组定义使用 [] 语法
+- `WebControls.php`: extractAttribs 调用使用 [] 语法
+- `_Errors/default/ErrorMessage.php`: 返回值使用 [] 语法
+- `_Errors/chinese-utf8/ErrorMessage.php`: 返回值使用 [] 语法
+
+### refactor: 使用 PHP 7.4 数组解构和 null 合并运算符简化代码
+
+**FLEA/FLEA/Ajax.php**
+- 1 处 `isset()` 三元表达式改为 `??` 运算符
+
+**FLEA/FLEA/Controller/Action.php**
+- `_isAjax()`：1 处 `isset()` 三元表达式改为 `??` 运算符
+
+**FLEA/FLEA/_Errors/_common/header.php**
+- 2 处 `isset()` 三元表达式改为 `??` 运算符
+- 1 处 `isset()` 三元表达式改为 `??` 条件表达式
+
+---
+
 ## 2026-02-26
 
 ### fix: 修复关联查询中 TableDataGateway 类型错误

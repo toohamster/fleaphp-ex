@@ -19,8 +19,6 @@ class InvalidDSN extends \FLEA\Exception
      * 构造函数
      *
      * @param $dsn
-     *
-     * @return InvalidDSN
      */
     function __construct($dsn)
     {

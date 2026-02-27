@@ -29,8 +29,6 @@ class CacheDisabled extends \FLEA\Exception
      * 构造函数
      *
      * @param string $cacheDir
-     *
-     * @return \FLEA\Exception_CacheDisabled
      */
     public function __construct(string $cacheDir)
     {

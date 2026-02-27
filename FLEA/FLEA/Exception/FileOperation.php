@@ -38,8 +38,6 @@ class FileOperation extends \FLEA\Exception
      * 构造函数
      *
      * @param string $opeation
-     *
-     * @return \FLEA\Exception_FileOperation
      */
     public function __construct(string $opeation)
     {

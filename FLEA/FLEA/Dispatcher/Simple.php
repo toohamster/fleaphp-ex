@@ -29,8 +29,6 @@ class Simple
      * 构造函数
      *
      * @param array $request
-     *
-     * @return \FLEA\Dispatcher\Simple
      */
     public function __construct(array &$request)
     {
@@ -40,7 +38,7 @@ class Simple
         $actionAccessor = strtolower(\FLEA::getAppInf('actionAccessor'));
 
         $r = array_change_key_case($request, CASE_LOWER);
-        $data = array('controller' => null, 'action' => null);
+        $data = ['controller' => null, 'action' => null];
         if (isset($r[$controllerAccessor])) {
             $data['controller'] = $r[$controllerAccessor];
         }
@@ -111,7 +109,7 @@ class Simple
 
         if ($callback) {
             // 检查是否调用应用程序设置的错误处理程序
-            $args = array($controllerName, $actionName, $controllerClass);
+            $args = [$controllerName, $actionName, $controllerClass];
             return call_user_func_array($callback, $args);
         }
 
@@ -222,7 +220,7 @@ class Simple
 
         unset($args[$controllerAccessor]);
         unset($args[$actionAccessor]);
-        return array($controllerName, $actionName, $args);
+        return [$controllerName, $actionName, $args];
     }
 
     /**

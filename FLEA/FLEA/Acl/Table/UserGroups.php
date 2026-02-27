@@ -4,7 +4,7 @@ namespace FLEA\Acl\Table;
 
 
 /**
- * 定义 \FLEA\Acl_Table_UserGroups 类
+ * 定义 \FLEA\Acl\Table\UserGroups 类
  *
  * @author toohamster
  * @package Core
@@ -13,7 +13,7 @@ namespace FLEA\Acl\Table;
 
 
 /**
- * \FLEA\Acl_Table_UserGroups 类提供了用户组数据的存储服务
+ * \FLEA\Acl\Table\UserGroups 类提供了用户组数据的存储服务
  *
  * @package Core
  * @author toohamster
@@ -33,29 +33,29 @@ class UserGroups extends \FLEA\Db\TableDataGateway
      *
      * @var string
      */
-    public $tableName = 'user_groups';
+    public string $tableName = 'user_groups';
 
     /**
      * 用户组关联多个角色和权限
      *
      * @var array
      */
-    public $manyToMany = array(
-        array(
-            'tableClass' => '\FLEA\Acl_Table_Roles',
+    public ?array $manyToMany = [
+        [
+            'tableClass' => \FLEA\Acl\Table\Roles::class,
             'foreignKey' => 'user_group_id',
             'assocForeignKey' => 'role_id',
-            'joinTableClass' => '\FLEA\Acl_Table_UserGroupsHasRoles',
+            'joinTableClass' => \FLEA\Acl\Table\UserGroupsHasRoles::class,
             'mappingName' => 'roles',
-        ),
-        array(
-            'tableClass' => '\FLEA\Acl_Table_Permissions',
+        ],
+        [
+            'tableClass' => \FLEA\Acl\Table\Permissions::class,
             'foreignKey' => 'user_group_id',
             'assocForeignKey' => 'permission_id',
-            'joinTableClass' => '\FLEA\Acl_Table_UserGroupsHasPermissions',
+            'joinTableClass' => \FLEA\Acl\Table\UserGroupsHasPermissions::class,
             'mappingName' => 'permissions',
-        ),
-    );
+        ],
+    ];
 
     /**
      * 根用户组名
@@ -72,7 +72,7 @@ class UserGroups extends \FLEA\Db\TableDataGateway
      *
      * @return int
      */
-    public function create($group, $parentId = 0) {
+    public function create($group, $parentId = 0): int {
         $parentId = (int)$parentId;
         if ($parentId) {
             $parent = parent::find($parentId);
@@ -82,18 +82,18 @@ class UserGroups extends \FLEA\Db\TableDataGateway
             }
         } else {
             // 如果未指定 $parentId 为 0 或 null，则创建一个顶级用户组
-            $parent = parent::find(array('name' => $this->_rootGroupName));
+            $parent = parent::find(['name' => $this->_rootGroupName]);
             if (!$parent) {
                 // 如果根用户组不存在，则自动创建
-                $parent = array(
+                $parent = [
                     'name' => $this->_rootGroupName,
                     'description' => '',
                     'left_value' => 1,
                     'right_value' => 2,
                     'parent_id' => -1,
-                );
+                ];
                 if (!parent::create($parent)) {
-                    return false;
+                    return 0;
                 }
             }
             // 确保所有 _#_ROOT_GROUP_#_ 的直接子用户组的 parent_id 都为 0

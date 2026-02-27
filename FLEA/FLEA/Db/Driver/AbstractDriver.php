@@ -534,7 +534,7 @@ abstract class AbstractDriver
         $res = $sql->isResource() ? $sql->getSql() : $this->execute($sql)->getSql();
         $row = $this->fetchRow($res);
         $this->freeRes($res);
-        return isset($row[0]) ? $row[0] : null;
+        return $row[0] ?? null;
     }
 
     /**
@@ -737,7 +737,7 @@ abstract class AbstractDriver
      */
     public function getInsertSQL(array &$row, string $table, ?string $schema = null): string
     {
-        list($holders, $values) = $this->getPlaceholder($row);
+        [$holders, $values] = $this->getPlaceholder($row);
         $holders = implode(',', $holders);
         $fields = $this->qfields(array_keys($values));
         $table = $this->qtable($table, $schema);
@@ -791,7 +791,7 @@ abstract class AbstractDriver
                 $values[$key] =& $inputarr[$key];
             }
         }
-        return array($holders, $values);
+        return [$holders, $values];
     }
 
     /**
@@ -829,6 +829,6 @@ abstract class AbstractDriver
                 $values[$key] =& $inputarr[$key];
             }
         }
-        return array($pairs, $values);
+        return [$pairs, $values];
     }
 }

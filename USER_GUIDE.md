@@ -1,2053 +1,717 @@
-# FleaPHP 开发者使用手册
+# FleaPHP 框架用户手册
 
 ## 目录
 
 1. [简介](#简介)
 2. [快速开始](#快速开始)
-3. [核心概念](#核心概念)
+3. [核心组件](#核心组件)
 4. [配置管理](#配置管理)
-5. [类加载与自动加载](#类加载与自动加载)
-6. [对象注册与单例模式](#对象注册与单例模式)
-7. [数据库操作](#数据库操作)
-8. [TableDataGateway - 表数据入口](#tabledatagateway---表数据入口)
-9. [MVC 模式](#mvc-模式)
-10. [缓存管理](#缓存管理)
-11. [RBAC 权限控制](#rbac-权限控制)
-12. [异常处理](#异常处理)
-13. [助手函数](#助手函数)
-14. [URL 生成](#url-生成)
-15. [最佳实践](#最佳实践)
+5. [控制器开发](#控制器开发)
+6. [模型开发](#模型开发)
+7. [视图开发](#视图开发)
+8. [数据库操作](#数据库操作)
+9. [关联关系](#关联关系)
+10. [异常处理](#异常处理)
+11. [开发最佳实践](#开发最佳实践)
 
 ---
 
 ## 简介
 
-FleaPHP 是一个轻量级的 PHP 框架，提供了完整的 MVC 开发支持、数据库抽象层、缓存管理等功能。本手册将帮助开发者快速上手并充分利用 FleaPHP 的功能。
+FleaPHP 是一个轻量级的 PHP MVC 框架，采用 PSR-4 命名空间标准和 Composer 自动加载机制。框架设计简洁，适合快速开发中小型 Web 应用。
 
-**重要说明**：FleaPHP 现已全面迁移到 PSR-4 命名空间标准和 Composer 自动加载。所有框架类都使用命名空间（例如 `\FLEA\Controller\Action`），并通过 Composer 的 PSR-4 自动加载器加载。本手册中的所有示例均已更新以反映这些变化。
+### 主要特性
 
-### 特性
-
-- **轻量级**：核心代码精简，性能高效
-- **MVC 架构**：支持模型-视图-控制器模式
-- **数据库抽象层**：支持多种数据库，统一的操作接口
-- **PSR-4 自动加载**：基于 Composer 的 PSR-4 标准自动加载
-- **对象容器**：单例模式管理对象实例
-- **缓存系统**：内置文件缓存支持
-- **灵活配置**：支持调试和生产两种模式
+- **MVC 架构**：清晰的模型 - 视图 - 控制器分离
+- **PSR-4 自动加载**：基于 Composer 的标准自动加载
+- **TableDataGateway 模式**：简洁的数据库 CRUD 操作
+- **简单视图引擎**：使用原生 PHP 作为模板语言
+- **事件回调**：支持控制器生命周期回调
+- **异常处理**：完善的异常处理机制
+- **日志服务**：实现 PSR-3 标准的日志接口
 
 ### 系统要求
 
-- PHP 7.0 或更高版本
-- Composer（用于依赖管理和自动加载）
-- 支持的数据库：MySQL, PostgreSQL, SQLite 等
+- **PHP**: 7.4+
+- **Composer**: 用于依赖管理
+- **数据库**: MySQL 5.0+ 或其他 PDO 支持的数据库
 
 ---
 
 ## 快速开始
 
-### 安装
-
-将 FleaPHP 框架文件复制到你的项目目录中：
-
-```
-your-project/
-├── FLEA/
-│   ├── FLEA.php
-│   └── FLEA/
-│       ├── Config.php
-│       └── ...
-├── composer.json
-├── index.php
-└── ...
-```
-
-确保你的项目包含 `composer.json` 文件，并已运行 `composer install` 生成 `vendor/autoload.php`：
+### 1. 项目初始化
 
 ```bash
+# 安装依赖
 composer install
+
+# 启动开发服务器
+php74 -S 127.0.0.1:8081
+
+# 访问应用
+http://127.0.0.1:8081/index.php
 ```
 
-### 基础配置
+### 2. 项目结构
 
-创建配置文件 `config.php`：
+```
+project/
+├── App/
+│   ├── Config.php          # 应用配置文件
+│   ├── Controller/         # 控制器目录
+│   │   └── PostController.php
+│   ├── Model/              # 模型目录
+│   │   ├── Post.php
+│   │   └── Comment.php
+│   └── View/               # 视图模板目录
+│       └── post/
+│           ├── index.php
+│           └── view.php
+├── FLEA/                   # 框架核心目录
+│   ├── FLEA.php           # 框架入口
+│   └── FLEA/              # 框架组件
+├── cache/                  # 缓存目录
+├── vendor/                 # Composer 依赖
+├── composer.json           # Composer 配置
+└── index.php               # 应用入口
+```
+
+### 3. 入口文件
 
 ```php
 <?php
-return [
-    // 数据库配置
-    'dbDSN' => [
-        'driver'   => 'mysql',
-        'host'     => 'localhost',
-        'login'    => 'username',
-        'password' => 'password',
-        'database' => 'your_database',
-        'charset'  => 'utf8',
-    ],
-    'dbTablePrefix' => 'tbl_',
+// index.php
 
-    // URL 配置
-    'urlMode' => URL_PATHINFO, // 或 URL_STANDARD, URL_REWRITE
-    'urlLowerChar' => false,
-    'defaultController' => 'Index',
-    'defaultAction' => 'index',
+require_once 'vendor/autoload.php';
 
-    // 字符集配置
-    'defaultLanguage' => 'chinese-utf8',
-    'responseCharset' => 'UTF-8',
-    'databaseCharset' => 'UTF-8',
+// 注册 App 命名空间
+class_loader()->addPsr4('App\\', __DIR__ . '/App/');
 
-    // 缓存配置
-    'internalCacheDir' => dirname(__FILE__) . '/Cache',
-];
-```
-
-### 初始化框架
-
-在入口文件 `index.php` 中初始化框架：
-
-```php
-<?php
-require('vendor/autoload.php');
-
-// 加载应用程序配置
-FLEA::loadAppInf('config.php');
+// 加载应用配置
+\FLEA::loadAppInf('App/Config.php');
 
 // 运行 MVC 应用
-FLEA::runMVC();
+\FLEA::runMVC();
 ```
 
-**注意**：使用 Composer 后，框架会通过 `vendor/autoload.php` 自动加载，无需手动 `require('FLEA/FLEA.php')`。
+### 4. URL 访问格式
+
+```
+标准模式：index.php?controller=Post&action=index
+PATHINFO 模式：index.php/Post/index
+URL 重写：/Post/index
+```
 
 ---
 
-## 核心概念
+## 核心组件
 
-### 配置管理
+### FLEA 类
 
-FleaPHP 使用 `\FLEA\Config` 单例类管理所有配置。框架在加载时会自动初始化配置管理器。
+框架的主入口，提供静态方法：
 
-### 对象容器
+```php
+// 加载配置
+\FLEA::loadAppInf('config.php');
 
-框架维护一个对象容器，用于存储和管理单例对象实例。通过 `FLEA::register()` 和 `FLEA::registry()` 方法可以注册和获取对象。
+// 获取配置值
+$dbConfig = \FLEA::getAppInf('dbDSN');
 
-### 类文件搜索路径
+// 设置配置值
+\FLEA::setAppInf('siteName', '我的博客');
 
-框架完全使用 Composer PSR-4 自动加载器来加载类文件，无需手动配置类搜索路径。所有类通过命名空间自动定位到对应的文件。
-
-**PSR-4 命名空间映射：**
-
-```json
-{
-    "autoload": {
-        "psr-4": {
-            "FLEA\\": "FLEA/FLEA/"
-        }
-    }
-}
+// 获取数据库对象
+$dbo = \FLEA::getDBO();
 ```
 
-类名与文件路径的对应关系：
-- `\FLEA\Config` → `FLEA/FLEA/Config.php`
-- `\FLEA\Db\TableDataGateway` → `FLEA/FLEA/Db/TableDataGateway.php`
-- `\FLEA\Controller\Action` → `FLEA/FLEA/Controller/Action.php`
+### 调度器 (Dispatcher)
 
-### 数据库连接池
+```php
+// 配置中设置
+'dispatcher' => \FLEA\Dispatcher\Simple::class,
+'controllerAccessor' => 'controller',
+'actionAccessor' => 'action',
+```
 
-框架维护一个数据库连接池，相同的 DSN 会返回同一个数据库连接对象。
+调度器解析 URL 参数，实例化控制器并执行相应的动作方法。
 
 ---
 
 ## 配置管理
 
-### 获取配置项
-
-使用 `FLEA::getAppInf()` 获取配置项：
-
-```php
-$charset = FLEA::getAppInf('responseCharset'); // 获取响应字符集
-$controller = FLEA::getAppInf('defaultController'); // 获取默认控制器
-```
-
-可以指定默认值，当配置项不存在时返回该默认值：
-
-```php
-$timeout = FLEA::getAppInf('requestTimeout', 30);
-```
-
-### 设置配置项
-
-使用 `FLEA::setAppInf()` 设置配置项：
-
-```php
-FLEA::setAppInf('siteTitle', '我的网站');
-
-// 批量设置
-FLEA::setAppInf([
-    'siteTitle' => '我的网站',
-    'siteUrl' => 'https://example.com',
-]);
-```
-
-### 加载配置文件
-
-使用 `FLEA::loadAppInf()` 加载配置文件：
-
-```php
-FLEA::loadAppInf('./config/database.php');
-```
-
-配置文件应该返回一个数组：
+### 配置文件结构
 
 ```php
 <?php
+// App/Config.php
+
 return [
+    // 数据库配置
     'dbDSN' => [
         'driver' => 'mysql',
-        'host' => 'localhost',
-        // ...
+        'host' => '127.0.0.1',
+        'port' => '3306',
+        'login' => 'root',
+        'password' => 'password',
+        'database' => 'blog',
+        'charset' => 'utf8mb4',
     ],
+
+    // 控制器配置
+    'controllerAccessor' => 'controller',
+    'actionAccessor' => 'action',
+    'defaultController' => 'Post',
+    'defaultAction' => 'index',
+
+    // URL 配置
+    'urlMode' => URL_STANDARD,  // URL_STANDARD, URL_PATHINFO, URL_REWRITE
+    'urlBootstrap' => 'index.php',
+
+    // 视图配置
+    'view' => \FLEA\View\Simple::class,
+    'viewConfig' => [
+        'templateDir' => __DIR__ . '/View',
+        'cacheDir' => __DIR__ . '/../cache',
+        'cacheLifeTime' => 900,
+        'enableCache' => false,
+    ],
+
+    // 日志配置
+    'logEnabled' => false,
+    'logFileDir' => __DIR__ . '/../logs',
+    'logErrorLevel' => [\Psr\Log\LogLevel::ERROR, \Psr\Log\LogLevel::WARNING],
+
+    // 错误显示（开发环境）
+    'displayErrors' => true,
+    'displaySource' => true,
 ];
 ```
 
-### 数组配置项操作
-
-获取数组配置项中的特定键值：
+### 调试模式与生产模式
 
 ```php
-// 获取数组配置项的值
-$maxSize = FLEA::getAppInfValue('upload', 'maxSize', 1048576);
-
-// 设置数组配置项的值
-FLEA::setAppInfValue('upload', 'allowedTypes', ['jpg', 'png', 'gif']);
+// 在 index.php 中定义
+define('DEPLOY_MODE', true);  // 生产模式
+// 或不定义（默认调试模式）
 ```
-
-### 配置常量
-
-框架预定义了一些常量：
-
-| 常量 | 说明 |
-|------|------|
-| `FLEA_VERSION` | FleaPHP 版本号 |
-| `PHP5` | PHP 版本标识（true） |
-| `PHP4` | PHP 版本标识（false） |
-| `DS` | 目录分隔符简写 |
-| `FLEA_DIR` | FLEA 框架目录 |
-| `DEBUG_MODE` | 调试模式标识 |
-
-URL 模式常量：
-
-| 常量 | 值 | 说明 |
-|------|-----|------|
-| `URL_STANDARD` | URL_STANDARD | 标准 URL 模式 (?controller=...) |
-| `URL_PATHINFO` | URL_PATHINFO | PATHINFO 模式 (/controller/action/) |
-| `URL_REWRITE` | URL_REWRITE | URL 重写模式 (/controller/action/) |
 
 ---
 
-## 类加载与自动加载
+## 控制器开发
 
-### Composer PSR-4 自动加载
-
-FleaPHP 现在使用 Composer 的 PSR-4 自动加载器来加载所有类文件。这是现代 PHP 开发的标准做法，提供了更好的性能和可维护性。
-
-#### 类命名空间
-
-所有框架类都使用 PSR-4 命名空间规范：
+### 基本结构
 
 ```php
-// 使用完整的命名空间
-$config = new \FLEA\Config();
-$userTable = new \FLEA\Db\TableDataGateway();
-$dispatcher = new \FLEA\Dispatcher\Auth();
-```
+<?php
+namespace App\Controller;
 
-#### 自动加载机制
+use \FLEA\Controller\Action;
+use App\Model\Post;
 
-Composer 会根据命名空间自动加载类文件，无需手动 include/require：
-
-```php
-// 使用类时，Composer 会自动加载对应的文件
-$userTable = FLEA::getSingleton(\FLEA\Db\TableDataGateway::class);
-
-// 等价于
-use FLEA\Db\TableDataGateway;
-$userTable = FLEA::getSingleton(TableDataGateway::class);
-```
-
-#### 类名与文件路径对应关系
-
-| 类名 | 文件路径 |
-|------|----------|
-| `\FLEA\Config` | `FLEA/FLEA/Config.php` |
-| `\FLEA\Db\TableDataGateway` | `FLEA/FLEA/Db/TableDataGateway.php` |
-| `\FLEA\Db\ActiveRecord` | `FLEA/FLEA/Db/ActiveRecord.php` |
-| `\FLEA\Controller\Action` | `FLEA/FLEA/Controller/Action.php` |
-| `\FLEA\Dispatcher\Auth` | `FLEA/FLEA/Dispatcher/Auth.php` |
-| `\FLEA\Exception\MissingController` | `FLEA/FLEA/Exception/MissingController.php` |
-
-### 加载非类文件
-
-对于不包含类定义的文件（如函数库、配置文件），使用 `require_once()` 手动加载：
-
-```php
-// 加载函数库
-require_once dirname(__FILE__) . '/lib/functions.php';
-
-// 加载配置文件
-require_once dirname(__FILE__) . '/config/routes.php';
-```
-
-### 自动加载配置文件
-
-通过 `composer.json` 的 `files` 配置自动加载文件：
-
-```json
+class PostController extends Action
 {
-    "autoload": {
-        "psr-4": {
-            "FLEA\\": "FLEA/FLEA/"
-        },
-        "files": [
-            "FLEA/FLEA.php",
-            "FLEA/Functions.php"
-        ]
+    protected $postModel;
+    public $view;
+
+    public function __construct()
+    {
+        parent::__construct('Post');
+        $this->postModel = new Post();
+        $this->view = $this->_getView();
+    }
+
+    /**
+     * 列表页
+     */
+    public function actionIndex()
+    {
+        $posts = $this->postModel->findAll(['status' => 1]);
+        $this->view->assign('posts', $posts);
+        $this->view->display('post/index.php');
+    }
+
+    /**
+     * 详情页
+     */
+    public function actionView()
+    {
+        $id = intval($_GET['id'] ?? 0);
+        if (!$id) {
+            throw new \FLEA\Exception\InvalidArguments('ID 不能为空');
+        }
+
+        $post = $this->postModel->find($id);
+        if (!$post) {
+            throw new \FLEA\Exception\InvalidArguments('记录不存在');
+        }
+
+        $this->view->assign('post', $post);
+        $this->view->display('post/view.php');
+    }
+
+    /**
+     * 创建
+     */
+    public function actionCreate()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'title' => $_POST['title'] ?? '',
+                'content' => $_POST['content'] ?? '',
+            ];
+
+            $this->postModel->create($data);
+            header('Location: ?controller=Post&action=index');
+        } else {
+            $this->view->display('post/create.php');
+        }
     }
 }
 ```
 
-### 重新生成自动加载文件
+### 控制器生命周期方法
 
-修改 `composer.json` 后，需要重新生成自动加载文件：
+```php
+class MyController extends Action
+{
+    // 调度前回调
+    public function __setController($controllerName, $actionName): void
+    {
+        $this->_controllerName = $controllerName;
+        $this->_actionName = $actionName;
+    }
 
-```bash
-composer dump-autoload
+    // 动作执行前
+    public function _beforeExecute($actionMethod): void
+    {
+        // 权限检查等
+    }
+
+    // 动作执行后
+    public function _afterExecute($actionMethod): void
+    {
+        // 日志记录等
+    }
+}
 ```
 
 ---
 
-## 对象注册与单例模式
+## 模型开发
 
-### 注册对象
-
-使用 `FLEA::register()` 注册对象到对象容器：
+### 基本模型
 
 ```php
-$cache = new Cache();
-FLEA::register($cache, 'Cache');
+<?php
+namespace App\Model;
 
-// 不指定名称时，使用类名
-$cache = new Cache();
-FLEA::register($cache);
-// 等同于：FLEA::register($cache, 'Cache');
-```
+use \FLEA\Db\TableDataGateway;
 
-### 获取对象
+class Post extends TableDataGateway
+{
+    public string $tableName = 'posts';
+    public $primaryKey = 'id';
 
-使用 `FLEA::registry()` 获取已注册的对象：
+    // 自定义查询方法
+    public function getPublishedPosts($limit = 10, $offset = 0)
+    {
+        return $this->findAll(
+            ['status' => 1],
+            'created_at DESC',
+            [$limit, $offset]
+        );
+    }
 
-```php
-// 根据名称获取对象
-$cache = FLEA::registry('Cache');
+    // 创建记录
+    public function createPost($data)
+    {
+        return $this->create($data);
+    }
 
-// 不指定名称时，返回所有对象
-$objects = FLEA::registry();
-```
+    // 更新记录
+    public function updatePost($id, $data)
+    {
+        return $this->updateByConditions([$this->primaryKey => $id], $data);
+    }
 
-### 检查对象是否注册
-
-使用 `FLEA::isRegistered()` 检查对象是否已注册：
-
-```php
-if (FLEA::isRegistered('Cache')) {
-    $cache = FLEA::registry('Cache');
+    // 删除记录
+    public function deletePost($id)
+    {
+        return $this->removeByPkv($id);
+    }
 }
 ```
 
-### 获取单例对象
+### 模型方法返回类型
 
-使用 `FLEA::getSingleton()` 获取类的单例实例：
+| 方法 | 返回类型 | 说明 |
+|------|----------|------|
+| `find()` | `?array` | 查询单条记录 |
+| `findAll()` | `array` | 查询多条记录 |
+| `create()` | `int` | 创建记录，返回插入 ID |
+| `update()` | `bool` | 更新记录 |
+| `remove()` | `bool` | 删除记录 |
+| `findCount()` | `int` | 统计记录数 |
+
+---
+
+## 视图开发
+
+### Simple 视图引擎
 
 ```php
-// 第一次调用会创建并注册实例
-$userModel = FLEA::getSingleton('Table_Users');
+// 控制器中
+$this->view->assign('title', '文章标题');
+$this->view->assign('content', '文章内容');
+$this->view->display('post/view.php');
+```
 
-// 后续调用返回同一个实例
-$userModel2 = FLEA::getSingleton('Table_Users');
+### 模板文件
 
-// $userModel 和 $userModel2 是同一个对象
-var_dump($userModel === $userModel2); // bool(true)
+```php
+<!-- App/View/post/view.php -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title><?php echo htmlspecialchars($title); ?></title>
+</head>
+<body>
+    <h1><?php echo htmlspecialchars($title); ?></h1>
+    <div><?php echo $content; ?></div>
+</body>
+</html>
+```
+
+### 视图配置
+
+```php
+'view' => \FLEA\View\Simple::class,
+'viewConfig' => [
+    'templateDir' => __DIR__ . '/View',  // 模板目录
+    'cacheDir' => __DIR__ . '/../cache', // 缓存目录
+    'cacheLifeTime' => 900,              // 缓存时间（秒）
+    'enableCache' => false,              // 是否启用缓存
+],
 ```
 
 ---
 
 ## 数据库操作
 
-### 获取数据库连接
-
-使用 `FLEA::getDBO()` 获取数据库连接对象：
+### 查询方法
 
 ```php
-// 使用配置中的默认 DSN
-$dbo = FLEA::getDBO();
+// 查询单条记录
+$post = $this->postModel->find($id);
+$post = $this->postModel->findByField('status', 1);
+$post = $this->postModel->findByPkv($id);
 
-// 使用指定的 DSN
-$dsn = [
-    'driver' => 'mysql',
-    'host' => 'localhost',
-    'login' => 'username',
-    'password' => 'password',
-    'database' => 'test',
-];
-$dbo = FLEA::getDBO($dsn);
+// 查询多条记录
+$posts = $this->postModel->findAll();
+$posts = $this->postModel->findAll(['status' => 1], 'created_at DESC');
+$posts = $this->postModel->findAll(null, null, [10, 0]); // 分页
 
-// 使用 DSN 字符串
-$dbo = FLEA::getDBO('mysql://username:password@localhost/database');
+// 统计
+$count = $this->postModel->findCount(['status' => 1]);
+
+// 查询指定字段
+$post = $this->postModel->find($id, null, 'id,title,content');
 ```
 
-### DSN 格式
-
-DSN（Data Source Name）用于描述数据库连接信息。
-
-**数组格式：**
+### 条件查询
 
 ```php
-$dsn = [
-    'driver'   => 'mysql',        // 数据库驱动
-    'host'     => 'localhost',    // 主机地址
-    'port'     => 3306,          // 端口号
-    'login'    => 'username',    // 用户名
-    'password' => 'password',     // 密码
-    'database' => 'test_db',      // 数据库名
-    'charset'  => 'utf8',         // 字符集
-    'prefix'   => 'tbl_',        // 表前缀
-    'schema'   => '',            // 模式（PostgreSQL）
-    'options'  => '',            // 额外选项
-];
+// 数组条件
+$posts = $this->postModel->findAll(['status' => 1, 'author' => 'admin']);
+
+// SQL 条件
+$posts = $this->postModel->findAll('status = 1 AND author = "admin"');
+
+// LIKE 查询
+$posts = $this->postModel->findAll(['title LIKE' => '%关键词%']);
+
+// IN 查询
+$posts = $this->postModel->findAll(['id IN' => [1, 2, 3]]);
 ```
 
-**字符串格式：**
-
-```
-mysql://username:password@host:port/database?options
-```
-
-示例：
+### 操作方法
 
 ```php
-$dsn = 'mysql://root:123456@localhost:3306/mydb';
-$dsn = 'mysql://root:123456@localhost/mydb?charset=utf8';
-```
+// 创建
+$data = ['title' => '标题', 'content' => '内容'];
+$id = $this->postModel->create($data);
 
-### 连接池
+// 更新
+$data = ['title' => '新标题'];
+$this->postModel->update(['id' => $id, ...$data]);
+$this->postModel->updateByConditions(['id' => $id], $data);
 
-相同的 DSN 会返回同一个数据库连接对象：
-
-```php
-// 第一次调用创建连接
-$dbo1 = FLEA::getDBO();
-
-// 第二次调用返回相同的连接
-$dbo2 = FLEA::getDBO();
-
-var_dump($dbo1 === $dbo2); // bool(true)
+// 删除
+$this->postModel->remove($row);
+$this->postModel->removeByPkv($id);
+$this->postModel->removeByConditions(['status' => 0]);
 ```
 
 ---
 
-## TableDataGateway - 表数据入口
+## 关联关系
 
-FleaPHP 提供了 `FLEA_Db_TableDataGateway` 类（表数据入口），用于封装数据表的 CRUD（创建、读取、更新、删除）操作。开发者应该从该类派生自己的数据访问类。
-
-### 定义数据表入口类
-
-创建数据表入口类，继承自 `\FLEA\Db\TableDataGateway`：
+### 定义关联
 
 ```php
-class Table_Users extends \FLEA\Db\TableDataGateway
+class Post extends TableDataGateway
 {
-    /**
-     * 数据表名（不包含前缀）
-     */
-    public $tableName = 'users';
+    public string $tableName = 'posts';
+    public $primaryKey = 'id';
 
-    /**
-     * 主键字段名
-     */
-    public $primaryKey = 'user_id';
+    // 一对多：一篇文章有多个评论
+    public ?array $hasMany = [
+        [
+            'tableClass' => Comment::class,
+            'foreignKey' => 'post_id',
+            'mappingName' => 'comments',
+        ],
+    ];
 }
-```
 
-使用该类：
-
-```php
-$userTable = FLEA::getSingleton(\FLEA\Db\TableDataGateway::class);
-
-// 或者
-use FLEA\Db\TableDataGateway;
-$userTable = FLEA::getSingleton(TableDataGateway::class);
-```
-
-### 表关系定义
-
-FleaPHP 支持四种表关系类型：
-
-| 关系类型 | 常量 | 说明 |
-|---------|------|------|
-| 一对一 | `HAS_ONE` | 一个记录拥有另一个关联的记录 |
-| 一对多 | `HAS_MANY` | 一个记录拥有多个关联的记录 |
-| 从属 | `BELONGS_TO` | 一个记录属于另一个记录 |
-| 多对多 | `MANY_TO_MANY` | 两个数据表的数据互相引用 |
-
-#### 一对一关系（HAS_ONE）
-
-一个用户对应一个详细资料：
-
-```php
-class Table_Users extends \FLEA\Db\TableDataGateway
+class Comment extends TableDataGateway
 {
-    public $tableName = 'users';
-    public $primaryKey = 'user_id';
+    public string $tableName = 'comments';
+    public $primaryKey = 'id';
 
-    /**
-     * 定义一对一关系
-     */
-    public $hasOne = [
-        'Profile' => [
-            'tableClass' => 'Table_UserProfiles',
-            'foreignKey' => 'user_id',
-            'mappingName' => 'profile',
+    // 从属：评论属于一篇文章
+    public ?array $belongsTo = [
+        [
+            'tableClass' => Post::class,
+            'foreignKey' => 'post_id',
+            'mappingName' => 'post',
         ],
     ];
 }
 ```
 
-使用示例：
+### 使用关联查询
 
 ```php
-$userTable = FLEA::getSingleton('Table_Users');
-$user = $userTable->find(1);
+// 查询文章及评论
+$post = $this->postModel->find($id, null, '*', true); // true 启用关联
+$comments = $post['comments'];
 
-// 访问关联的数据
-$profile = $user['profile'];
-```
+// 查询评论及文章
+$comment = $this->commentModel->find($id, null, '*', true);
+$post = $comment['post'];
 
-#### 一对多关系（HAS_MANY）
-
-一个部门拥有多个员工：
-
-```php
-class Table_Departments extends \FLEA\Db\TableDataGateway
-{
-    public $tableName = 'departments';
-    public $primaryKey = 'dept_id';
-
-    /**
-     * 定义一对多关系
-     */
-    public $hasMany = [
-        'Employees' => [
-            'tableClass' => 'Table_Employees',
-            'foreignKey' => 'dept_id',
-            'mappingName' => 'employees',
-            'sort' => 'employee_id DESC',
-        ],
-    ];
-}
-```
-
-使用示例：
-
-```php
-$deptTable = FLEA::getSingleton('Table_Departments');
-$dept = $deptTable->find(1);
-
-// 访问关联的员工列表
-$employees = $dept['employees'];
-```
-
-#### 从属关系（BELONGS_TO）
-
-一个用户属于一个角色：
-
-```php
-class Table_Users extends \FLEA\Db\TableDataGateway
-{
-    public $tableName = 'users';
-    public $primaryKey = 'user_id';
-
-    /**
-     * 定义从属关系
-     */
-    public $belongsTo = [
-        'Role' => [
-            'tableClass' => 'Table_Roles',
-            'foreignKey' => 'role_id',
-            'mappingName' => 'role',
-        ],
-    ];
-}
-```
-
-使用示例：
-
-```php
-$userTable = FLEA::getSingleton('Table_Users');
-$user = $userTable->find(1);
-
-// 访问所属的角色
-$role = $user['role'];
-```
-
-#### 多对多关系（MANY_TO_MANY）
-
-学生与课程是多对多关系，通过中间表关联：
-
-```php
-class Table_Students extends \FLEA\Db\TableDataGateway
-{
-    public $tableName = 'students';
-    public $primaryKey = 'student_id';
-
-    /**
-     * 定义多对多关系
-     */
-    public $manyToMany = [
-        'Courses' => [
-            'tableClass' => 'Table_Courses',
-            'joinTable' => 'student_courses', // 中间表
-            'foreignKey' => 'student_id',    // 中间表中指向本表的字段
-            'assocForeignKey' => 'course_id', // 中间表中指向关联表的字段
-            'mappingName' => 'courses',
-        ],
-    ];
-}
-```
-
-使用示例：
-
-```php
-$studentTable = FLEA::getSingleton('Table_Students');
-$student = $studentTable->find(1);
-
-// 访问选修的课程列表
-$courses = $student['courses'];
-```
-
-### 查询数据
-
-#### 查找单条记录（find）
-
-```php
-// 根据主键查找
-$user = $userTable->find(1);
-
-// 根据条件查找
-$user = $userTable->find(['username' => 'john']);
-
-// 指定排序
-$user = $userTable->find(['status' => 'active'], 'user_id DESC');
-
-// 指定查询字段
-$user = $userTable->find(1, null, 'user_id, username, email');
-
-// 不查询关联数据
-$user = $userTable->find(1, null, '*', false);
-```
-
-#### 查找多条记录（findAll）
-
-```php
-// 查询所有记录
-$users = $userTable->findAll();
-
-// 根据条件查询
-$users = $userTable->findAll(['status' => 'active']);
-
-// 指定排序和分页
-$users = $userTable->findAll(
-    ['status' => 'active'],
-    'user_id DESC',
-    10,    // 限制 10 条
-    0       // 从第 0 条开始
+// 禁用关联（提高性能）
+$posts = $this->postModel->findAll(
+    ['status' => 1],
+    'created_at DESC',
+    [10, 0],
+    '*',
+    false  // false 禁用关联
 );
-
-// 使用数组形式指定分页
-$users = $userTable->findAll(
-    null,
-    null,
-    [10, 0], // array(length, offset)
-);
-
-// 指定查询字段
-$users = $userTable->findAll(null, null, null, 'user_id, username');
-```
-
-#### 根据字段查找（findByField / findAllByField）
-
-```php
-// 查找单条记录
-$user = $userTable->findByField('username', 'john');
-
-// 查找多条记录
-$users = $userTable->findAllByField('status', 'active', 'user_id DESC');
-
-// 带分页
-$users = $userTable->findAllByField('status', 'active', null, [10, 0]);
-```
-
-#### 根据多个主键查找（findAllByPkvs）
-
-```php
-// 根据多个主键值查找
-$users = $userTable->findAllByPkvs([1, 2, 3, 4]);
-
-// 带条件查询
-$users = $userTable->findAllByPkvs([1, 2, 3], ['status' => 'active']);
-```
-
-#### 使用 SQL 查询（findBySql）
-
-```php
-// 使用自定义 SQL 查询
-$sql = "SELECT * FROM users WHERE status = 'active'";
-$users = $userTable->findBySql($sql);
-
-// 带分页
-$users = $userTable->findBySql($sql, 10); // 前 10 条
-$users = $userTable->findBySql($sql, [10, 0]); // 第 0-10 条
-```
-
-### 条件表达式
-
-#### 简单条件
-
-```php
-// 字段 = 值
-$users = $userTable->findAll(['username' => 'john']);
-
-// 多个条件（AND 关系）
-$users = $userTable->findAll([
-    'status' => 'active',
-    'age' => 25,
-]);
-```
-
-#### OR 条件
-
-```php
-$users = $userTable->findAll([
-    'or',
-    'status' => 'active',
-    'status' => 'pending',
-]);
-```
-
-#### IN 条件
-
-```php
-$users = $userTable->findAll([
-    'user_id' => ['in()' => [1, 2, 3, 4]],
-]);
-
-// 等价于 SQL: WHERE user_id IN (1, 2, 3, 4)
-```
-
-#### LIKE 条件
-
-```php
-$users = $userTable->findAll([
-    'username' => ['like' => 'john%'],
-]);
-
-// 等价于 SQL: WHERE username LIKE 'john%'
-```
-
-#### 比较条件
-
-```php
-$users = $userTable->findAll([
-    'age' => ['>' => 18],
-    'created_at' => ['<=' => '2024-01-01'],
-]);
-
-// 等价于 SQL: WHERE age > 18 AND created_at <= '2024-01-01'
-```
-
-#### 复杂条件
-
-```php
-$users = $userTable->findAll([
-    'or',
-    [
-        'and',
-        'status' => 'active',
-        'age' => ['>' => 18],
-    ],
-    [
-        'and',
-        'status' => 'vip',
-        'age' => ['>' => 25],
-    ],
-]);
-
-// 等价于 SQL: WHERE (status = 'active' AND age > 18) OR (status = 'vip' AND age > 25)
-```
-
-### 创建记录（create）
-
-```php
-// 创建单条记录
-$row = [
-    'username' => 'john',
-    'email' => 'john@example.com',
-    'status' => 'active',
-];
-
-$newUserId = $userTable->create($row);
-
-// $newUserId 包含新插入记录的主键值
-echo "新用户 ID: " . $newUserId;
-
-// 创建时自动填充时间字段
-// 如果数据表有 CREATED, CREATED_ON, CREATED_AT 字段
-// 会自动填充当前时间
-```
-
-#### 创建多条记录（createRowset）
-
-```php
-$rows = [
-    [
-        'username' => 'user1',
-        'email' => 'user1@example.com',
-    ],
-    [
-        'username' => 'user2',
-        'email' => 'user2@example.com',
-    ],
-];
-
-$userTable->createRowset($rows);
-```
-
-#### 不处理关联创建
-
-```php
-// 创建记录时处理关联数据
-$userTable->create($row, true);  // 处理关联（默认）
-
-// 不处理关联
-$userTable->create($row, false);
-```
-
-### 更新记录（update）
-
-```php
-// 根据主键更新
-$row = [
-    'user_id' => 1,
-    'email' => 'newemail@example.com',
-    'status' => 'active',
-];
-
-$userTable->update($row);
-```
-
-#### 根据条件更新（updateByConditions）
-
-```php
-$conditions = ['status' => 'pending'];
-$row = ['status' => 'active'];
-
-$userTable->updateByConditions($conditions, $row);
-
-// 等价于 SQL: UPDATE users SET status = 'active' WHERE status = 'pending'
-```
-
-#### 更新单个字段（updateField）
-
-```php
-$conditions = ['user_id' => 1];
-$userTable->updateField($conditions, 'email', 'newemail@example.com');
-
-// 等价于 SQL: UPDATE users SET email = 'newemail@example.com' WHERE user_id = 1
-```
-
-#### 更新多条记录（updateRowset）
-
-```php
-$rows = [
-    ['user_id' => 1, 'status' => 'active'],
-    ['user_id' => 2, 'status' => 'active'],
-];
-
-$userTable->updateRowset($rows);
-```
-
-### 删除记录（remove）
-
-```php
-// 根据主键删除
-$row = $userTable->find(1);
-$userTable->remove($row);
-
-// 或者直接根据主键值删除
-$userTable->removeByPkv(1);
-```
-
-#### 根据条件删除（removeByConditions）
-
-```php
-$conditions = ['status' => 'deleted'];
-$userTable->removeByConditions($conditions);
-
-// 等价于 SQL: DELETE FROM users WHERE status = 'deleted'
-```
-
-#### 根据多个主键删除（removeByPkvs）
-
-```php
-$userTable->removeByPkvs([1, 2, 3, 4]);
-
-// 等价于 SQL: DELETE FROM users WHERE user_id IN (1, 2, 3, 4)
-```
-
-#### 删除所有记录（removeAll / removeAllWithLinks）
-
-```php
-// 删除所有记录（不处理关联）
-$userTable->removeAll();
-
-// 删除所有记录（处理关联）
-$userTable->removeAllWithLinks();
-```
-
-#### 删除时处理关联
-
-```php
-// 删除记录时处理关联数据
-$userTable->remove($row, true);  // 处理关联（默认）
-
-// 不处理关联
-$userTable->remove($row, false);
-```
-
-### 保存记录（save）
-
-`save()` 方法自动判断是创建新记录还是更新现有记录：
-
-```php
-$row = [
-    'username' => 'john',
-    'email' => 'john@example.com',
-];
-
-// 第一次调用会创建记录
-$userTable->save($row);
-// $row 现在包含主键值
-echo "用户 ID: " . $row['user_id'];
-
-// 修改后再保存会更新记录
-$row['email'] = 'newemail@example.com';
-$userTable->save($row);
-```
-
-#### 保存多条记录（saveRowset）
-
-```php
-$rows = [
-    [
-        'username' => 'user1',
-        'email' => 'user1@example.com',
-    ],
-    [
-        'username' => 'user2',
-        'email' => 'user2@example.com',
-    ],
-];
-
-$userTable->saveRowset($rows);
-```
-
-### 关联操作
-
-#### 启用/禁用关联
-
-```php
-// 禁用所有关联
-$userTable->disableLinks();
-
-// 启用所有关联
-$userTable->enableLinks();
-
-// 启用指定的关联
-$userTable->enableLinks(['profile', 'role']);
-
-// 禁用指定的关联
-$userTable->disableLinks(['profile', 'role']);
-```
-
-#### 动态创建关联
-
-```php
-// 创建关联
-$defines = [
-    'tableClass' => 'Table_UserProfiles',
-    'foreignKey' => 'user_id',
-    'mappingName' => 'profile',
-];
-
-$userTable->createLink($defines, HAS_ONE);
-
-// 删除关联
-$userTable->removeLink('profile');
-```
-
-### 数据验证
-
-#### 启用自动验证
-
-```php
-class Table_Users extends \FLEA\Db\TableDataGateway
-{
-    public $tableName = 'users';
-    public $primaryKey = 'user_id';
-
-    /**
-     * 启用自动验证
-     */
-    public $autoValidating = true;
-
-    /**
-     * 验证规则
-     */
-    public $validateRules = [
-        'username' => [
-            'required' => true,
-            'minLength' => 3,
-            'maxLength' => 20,
-        ],
-        'email' => [
-            'required' => true,
-            'email' => true,
-        ],
-    ];
-}
-```
-
-#### 验证数据
-
-```php
-$row = [
-    'username' => 'john',
-    'email' => 'invalid-email',
-];
-
-$result = $userTable->create($row);
-
-if (!$result) {
-    // 获取验证错误
-    $errors = $userTable->lastValidationResult;
-    print_r($errors);
-}
-```
-
-### 自动填充时间字段
-
-如果数据表包含以下字段，会自动填充当前时间：
-
-```php
-class Table_Users extends \FLEA\Db\TableDataGateway
-{
-    public $tableName = 'users';
-    public $primaryKey = 'user_id';
-
-    /**
-     * 创建记录时自动填充的字段
-     */
-    public $createdTimeFields = ['CREATED', 'CREATED_ON', 'CREATED_AT'];
-
-    /**
-     * 创建和更新记录时自动填充的字段
-     */
-    public $updatedTimeFields = ['UPDATED', 'UPDATED_ON', 'UPDATED_AT'];
-}
-```
-
-使用示例：
-
-```php
-// 创建记录时，CREATED 字段会自动填充
-$row = ['username' => 'john'];
-$userTable->create($row);
-
-// 更新记录时，UPDATED 字段会自动填充
-$row['email'] = 'newemail@example.com';
-$userTable->update($row);
-```
-
----
-
-## MVC 模式
-
-### 运行 MVC 应用
-
-使用 `FLEA::runMVC()` 启动 MVC 应用：
-
-```php
-require('vendor/autoload.php');
-FLEA::loadAppInf('config.php');
-
-// 运行 MVC 应用
-FLEA::runMVC();
-```
-
-### 控制器
-
-控制器类应该继承自 `\FLEA\Controller\Action`：
-
-```php
-class Controller_Index extends \FLEA\Controller\Action
-{
-    public function actionIndex()
-    {
-        echo 'Hello, World!';
-    }
-
-    public function actionLogin()
-    {
-        // 处理登录逻辑
-    }
-}
-```
-
-### URL 路由
-
-框架支持三种 URL 模式：
-
-#### 1. 标准 URL 模式 (URL_STANDARD)
-
-```
-http://example.com/index.php?controller=Index&action=login
-```
-
-#### 2. PATHINFO 模式 (URL_PATHINFO)
-
-```
-http://example.com/index.php/Index/login
-```
-
-#### 3. URL 重写模式 (URL_REWRITE)
-
-需要配置 Web 服务器的 URL 重写规则：
-
-```
-http://example.com/Index/login
 ```
 
-### 初始化环境
-
-使用 `FLEA::init()` 初始化运行环境：
-
-```php
-FLEA::init();
-
-// 或者
-FLEA::init(true); // 同时加载 MVC 相关文件
-```
-
-初始化过程包括：
-- 设置时区
-- 安装异常处理例程
-- 载入日志服务
-- 设置缓存目录
-- 载入 URL 分析过滤器
-- 载入 requestFilters
-- 载入 autoLoad 文件
-- 载入 session 服务提供程序
-- 启动 session
-- 设置响应字符集
-- 载入多语言支持
-
----
-
-## 缓存管理
-
-### 写入缓存
-
-使用 `FLEA::writeCache()` 写入缓存：
-
-```php
-$data = ['name' => 'John', 'age' => 30];
-$cacheId = 'user_info_' . $userId;
-
-FLEA::writeCache($cacheId, $data);
-```
-
-### 读取缓存
-
-使用 `FLEA::getCache()` 读取缓存：
-
-```php
-$cacheId = 'user_info_' . $userId;
-
-// 默认缓存时间 900 秒（15 分钟）
-$data = FLEA::getCache($cacheId);
-
-if ($data === false) {
-    // 缓存不存在或已过期
-    $data = fetchDataFromDatabase();
-    FLEA::writeCache($cacheId, $data);
-}
-```
-
-指定缓存时间：
-
-```php
-// 缓存时间 3600 秒（1 小时）
-$data = FLEA::getCache($cacheId, 3600);
-
-// 缓存不过期
-$data = FLEA::getCache($cacheId, -1);
-```
-
-### 删除缓存
-
-使用 `FLEA::purgeCache()` 删除缓存：
-
-```php
-$cacheId = 'user_info_' . $userId;
-FLEA::purgeCache($cacheId);
-```
-
-### 缓存配置
-
-在配置文件中设置缓存目录：
-
-```php
-return [
-    'internalCacheDir' => dirname(__FILE__) . '/Cache',
-];
-```
-
-如果未设置缓存目录，缓存功能将不可用。
-
----
-
-## RBAC 权限控制
-
-FleaPHP 提供了完整的 RBAC（基于角色的访问控制）支持，通过 `FLEA_Rbac` 类实现权限检查功能。
-
-### RBAC 常量
-
-框架预定义了几个 RBAC 相关的常量：
-
-| 常量 | 说明 |
-|------|------|
-| `RBAC_EVERYONE` | 任何用户（不管该用户是否具有角色信息） |
-| `RBAC_HAS_ROLE` | 具有任何角色的用户 |
-| `RBAC_NO_ROLE` | 不具有任何角色的用户 |
-| `RBAC_NULL` | 该设置没有值 |
-| `ACTION_ALL` | 控制器中的所有动作 |
-
-### 初始化 RBAC
-
-创建 RBAC 实例：
-
-```php
-$rbac = new \FLEA\Rbac\Rbac();
-```
-
-或者在控制器中使用：
-
-```php
-$rbac = FLEA::getSingleton(\FLEA\Rbac\Rbac::class);
-```
-
-### 配置 RBAC
-
-在配置文件中设置 RBAC 相关选项：
-
-```php
-return [
-    // RBAC Session 键名
-    'RBACSessionKey' => 'MY_APP_RBAC_USER',
-];
-```
-
-### 用户管理
-
-#### 设置用户信息
-
-使用 `setUser()` 方法将用户信息保存到 session 中：
-
-```php
-$rbac = new \FLEA\Rbac\Rbac();
-
-// 设置用户信息
-$userData = [
-    'user_id' => 1,
-    'username' => 'john',
-    'email' => 'john@example.com',
-];
-
-// 设置角色数据
-$rolesData = ['ADMIN', 'EDITOR'];
-
-$rbac->setUser($userData, $rolesData);
-```
-
-只设置用户信息，不设置角色：
-
-```php
-$rbac->setUser($userData);
-```
-
-#### 获取用户信息
-
-使用 `getUser()` 方法获取 session 中的用户信息：
-
-```php
-$user = $rbac->getUser();
-
-if ($user) {
-    echo "当前用户: " . $user['username'];
-}
-```
-
-#### 获取用户角色
-
-使用 `getRoles()` 方法获取用户的角色：
-
-```php
-$roles = $rbac->getRoles();
-
-// 返回可能是一个字符串（如 "ADMIN,EDITOR"）
-// 或者是一个数组
-```
-
-使用 `getRolesArray()` 方法确保返回数组：
-
-```php
-$roles = $rbac->getRolesArray();
-
-print_r($roles);
-// 输出: Array ( [0] => ADMIN [1] => EDITOR )
-```
-
-#### 清除用户信息
-
-使用 `clearUser()` 方法清除 session 中的用户信息（通常用于登出）：
-
-```php
-$rbac->clearUser();
-
-// 用户已登出
-```
-
-### 权限检查
-
-#### 访问控制表（ACT）
-
-ACT（Access Control Table）是一个数组，包含以下键：
-
-- `allow`: 允许访问的角色列表或特殊常量
-- `deny`: 拒绝访问的角色列表或特殊常量
-
-ACT 示例：
-
-```php
-// 允许所有用户访问
-$ACT = [
-    'allow' => RBAC_EVERYONE,
-    'deny' => RBAC_NULL,
-];
-
-// 只允许管理员访问
-$ACT = [
-    'allow' => ['ADMIN'],
-    'deny' => RBAC_NULL,
-];
-
-// 允许管理员和编辑器，但拒绝普通用户
-$ACT = [
-    'allow' => ['ADMIN', 'EDITOR'],
-    'deny' => ['USER'],
-];
-
-// 要求用户必须有角色
-$ACT = [
-    'allow' => RBAC_HAS_ROLE,
-    'deny' => RBAC_NULL,
-];
-
-// 要求用户不能有任何角色
-$ACT = [
-    'allow' => RBAC_NO_ROLE,
-    'deny' => RBAC_NULL,
-];
-```
-
-#### 检查权限
-
-使用 `check()` 方法检查访问权限：
-
-```php
-$rbac = new \FLEA\Rbac\Rbac();
-
-// 设置用户及其角色
-$userData = ['user_id' => 1, 'username' => 'john'];
-$rolesData = ['ADMIN', 'EDITOR'];
-$rbac->setUser($userData, $rolesData);
-
-// 定义访问控制表
-$ACT = [
-    'allow' => ['ADMIN', 'EDITOR'],
-    'deny' => RBAC_NULL,
-];
-
-// 检查权限
-$roles = $rbac->getRolesArray();
-if ($rbac->check($roles, $ACT)) {
-    echo "允许访问";
-} else {
-    echo "拒绝访问";
-}
-```
-
-#### 准备 ACT
-
-使用 `prepareACT()` 方法对原始 ACT 进行分析和整理：
-
-```php
-// 原始 ACT（可能包含字符串格式的角色列表）
-$rawACT = [
-    'allow' => 'ADMIN,EDITOR',
-    'deny' => 'USER,BLOCKED',
-];
-
-// 准备 ACT
-$ACT = $rbac->prepareACT($rawACT);
-
-// 输出整理后的 ACT
-print_r($ACT);
-// 输出:
-// Array (
-//     [allow] => Array ( [0] => ADMIN [1] => EDITOR )
-//     [deny] => Array ( [0] => USER [1] => BLOCKED )
-// )
-```
-
-### 权限检查示例
-
-#### 示例 1：简单角色检查
-
-```php
-$ACT = [
-    'allow' => ['ADMIN'],
-    'deny' => RBAC_NULL,
-];
-
-// 检查用户是否为管理员
-if ($rbac->check($roles, $ACT)) {
-    // 用户是管理员
-    // 执行管理员操作
-}
-```
-
-#### 示例 2：多角色支持
-
-```php
-$ACT = [
-    'allow' => ['ADMIN', 'EDITOR', 'MODERATOR'],
-    'deny' => RBAC_NULL,
-];
-
-// 用户具有 ADMIN, EDITOR, MODERATOR 其中任一角色即可访问
-if ($rbac->check($roles, $ACT)) {
-    // 用户有权限
-}
-```
-
-#### 示例 3：拒绝特定角色
-
-```php
-$ACT = [
-    'allow' => RBAC_EVERYONE,
-    'deny' => ['BLOCKED', 'BANNED'],
-];
-
-// 所有用户都可以访问，除了被阻止或被封禁的用户
-if ($rbac->check($roles, $ACT)) {
-    // 用户未被阻止
-}
-```
-
-#### 示例 4：必须具有角色
-
-```php
-$ACT = [
-    'allow' => RBAC_HAS_ROLE,
-    'deny' => RBAC_NULL,
-];
-
-// 用户必须至少有一个角色才能访问
-if ($rbac->check($roles, $ACT)) {
-    // 用户有角色
-}
-```
-
-#### 示例 5：必须没有角色
-
-```php
-$ACT = [
-    'allow' => RBAC_NO_ROLE,
-    'deny' => RBAC_NULL,
-];
-
-// 用户必须没有任何角色才能访问
-if ($rbac->check($roles, $ACT)) {
-    // 用户没有角色
-}
-```
-
-### 在控制器中使用 RBAC
-
-#### 登录时设置用户和角色
-
-```php
-class Controller_Login extends \FLEA\Controller\Action
-{
-    public function actionLogin()
-    {
-        $username = $_POST['username'];
-        $password = $_POST['password'];
-
-        // 验证用户
-        $userTable = FLEA::getSingleton('Table_Users');
-        $user = $userTable->findByField('username', $username);
-
-        if ($user && $user['password'] === md5($password)) {
-            // 获取用户角色
-            $roleTable = FLEA::getSingleton('Table_UserRoles');
-            $roles = $roleTable->getUserRoles($user['user_id']);
-
-            // 设置用户和角色
-            $rbac = new \FLEA\Rbac\Rbac();
-            $rbac->setUser($user, $roles);
-
-            // 跳转到首页
-            redirect(url('Index', 'index'));
-        } else {
-            echo "用户名或密码错误";
-        }
-    }
-
-    public function actionLogout()
-    {
-        $rbac = new \FLEA\Rbac\Rbac();
-        $rbac->clearUser();
-
-        redirect(url('Login', 'index'));
-    }
-}
-```
-
-#### 在控制器中检查权限
-
-```php
-class Controller_Admin extends \FLEA\Controller\Action
-{
-    public function actionIndex()
-    {
-        $rbac = new \FLEA\Rbac\Rbac();
-        $roles = $rbac->getRolesArray();
-
-        // 定义访问控制表
-        $ACT = [
-            'allow' => ['ADMIN'],
-            'deny' => RBAC_NULL,
-        ];
-
-        // 检查权限
-        if (!$rbac->check($roles, $ACT)) {
-            echo "无权访问";
-            return;
-        }
-
-        // 执行管理员操作
-        echo "欢迎，管理员";
-    }
-}
-```
-
-#### 使用 RBAC 中间件
-
-创建 RBAC 检查中间件：
-
-```php
-function checkPermission($requiredRoles)
-{
-    $rbac = new \FLEA\Rbac\Rbac();
-    $roles = $rbac->getRolesArray();
-
-    $ACT = [
-        'allow' => $requiredRoles,
-        'deny' => RBAC_NULL,
-    ];
-
-    if (!$rbac->check($roles, $ACT)) {
-        js_alert('无权访问', '', url('Index', 'index'));
-        exit;
-    }
-}
-```
-
-在控制器中使用中间件：
-
-```php
-class Controller_Admin extends \FLEA\Controller\Action
-{
-    public function actionIndex()
-    {
-        // 检查管理员权限
-        checkPermission(['ADMIN']);
-
-        // 执行操作
-    }
-
-    public function actionEdit()
-    {
-        // 检查编辑权限
-        checkPermission(['ADMIN', 'EDITOR']);
-
-        // 执行操作
-    }
-}
-```
-
-### RBAC 最佳实践
-
-1. **集中管理 ACT**：将访问控制表定义在配置文件或常量中，便于维护
-
-```php
-// config/permissions.php
-return [
-    'ACT_ADMIN' => [
-        'allow' => ['ADMIN'],
-        'deny' => RBAC_NULL,
-    ],
-    'ACT_EDITOR' => [
-        'allow' => ['ADMIN', 'EDITOR'],
-        'deny' => RBAC_NULL,
-    ],
-];
-```
-
-2. **角色命名规范**：使用大写字母，便于识别
-
-3. **权限继承**：通过组合多个角色实现更复杂的权限控制
-
-4. **日志记录**：记录权限检查失败的情况，便于审计
-
-```php
-if (!$rbac->check($roles, $ACT)) {
-    log_message("权限检查失败: 用户 " . $user['username'] . " 试图访问受保护的资源");
-    js_alert('无权访问');
-}
-```
+### 关联类型
 
-5. **最小权限原则**：只赋予用户所需的最小权限
+| 类型 | 常量 | 说明 |
+|------|------|------|
+| HAS_ONE | `HAS_ONE` | 一对一关联 |
+| HAS_MANY | `HAS_MANY` | 一对多关联 |
+| BELONGS_TO | `BELONGS_TO` | 从属关联 |
+| MANY_TO_MANY | `MANY_TO_MANY` | 多对多关联 |
 
 ---
 
 ## 异常处理
 
-### 框架异常
-
-FleaPHP 提供了多个异常类，都继承自 `\FLEA\Exception`：
-
-- `\FLEA\Exception\ExpectedFile` - 文件不存在
-- `\FLEA\Exception\ExpectedClass` - 类不存在
-- `\FLEA\Exception\TypeMismatch` - 类型不匹配
-- `\FLEA\Exception\ExistsKeyName` - 对象名称已存在
-- `\FLEA\Exception\NotExistsKeyName` - 对象名称不存在
-- `\FLEA\Exception\CacheDisabled` - 缓存功能未启用
-- `\FLEA\Exception\MissingController` - 控制器不存在
-- `\FLEA\Exception\MissingAction` - 动作不存在
-- `\FLEA\Db\Exception\InvalidDSN` - 无效的 DSN
-
-#### 使用异常
+### 框架异常类
 
 ```php
-try {
-    $userTable = FLEA::getSingleton(\FLEA\Db\TableDataGateway::class);
-    $user = $userTable->find(1);
-} catch (\FLEA\Exception\ExpectedClass $e) {
-    echo '类不存在: ' . $e->getMessage();
-} catch (\FLEA\Db\Exception\InvalidDSN $e) {
-    echo '数据库连接失败: ' . $e->getMessage();
-}
+// 参数异常
+throw new \FLEA\Exception\InvalidArguments('参数不能为空');
+throw new \FLEA\Exception\MissingArguments('缺少必要参数');
+
+// 控制器/动作异常
+throw new \FLEA\Exception\MissingController('控制器不存在');
+throw new \FLEA\Exception\MissingAction('动作不存在');
+
+// 数据库异常
+throw new \FLEA\Db\Exception\MissingPrimaryKey('缺少主键');
+throw new \FLEA\Db\Exception\SqlQuery('SQL 查询错误');
 ```
 
-### 设置异常处理器
-
-使用 `set_exception_handler()` 设置异常处理器：
+### 异常处理示例
 
 ```php
-set_exception_handler(FLEA::getAppInf('exceptionHandler'));
-```
-
----
-
-## 助手函数
-
-### 加载助手
-
-使用 `FLEA::loadHelper()` 加载助手：
-
-```php
-// 加载助手
-FLEA::loadHelper('array');
-FLEA::loadHelper('image');
-
-// 使用助手类（通过 Composer 自动加载）
-use FLEA\Helper\Array;
-$arrayHelper = new Array();
-```
-
-助手配置在应用程序配置中，以 `helper.` 开头：
-
-```php
-return [
-    'helper.array' => 'FLEA\Helper\Array',
-    'helper.image' => 'FLEA\Helper\Image',
-    // ...
-];
-```
-
-**注意**：FleaPHP 的全局辅助函数（如 `dump()`, `redirect()`, `url()` 等）已集中到 `FLEA/Functions.php` 文件中，通过 Composer 自动加载，无需手动加载。
-
-### 初始化 WebControls
-
-使用 `FLEA::initWebControls()` 初始化 WebControls：
-
-```php
-$webControls = FLEA::initWebControls();
-```
-
-可以自定义 WebControls 类：
-
-```php
-return [
-    'webControlsClassName' => 'MyApp\Controls\WebControls',
-];
-```
-
-### 初始化 Ajax
-
-使用 `FLEA::initAjax()` 初始化 Ajax：
-
-```php
-$ajax = FLEA::initAjax();
-```
-
-可以自定义 Ajax 类：
-
-```php
-return [
-    'ajaxClassName' => 'MyApp\Ajax\Ajax',
-];
-```
-
----
-
-## URL 生成
-
-### 生成 URL
-
-使用 `url()` 函数生成 URL：
-
-```php
-// 生成标准 URL
-$url = url('Index', 'login');
-// 输出: ?controller=Index&action=login
-
-// 带参数
-$url = url('Article', 'view', ['id' => 1]);
-// 输出: ?controller=Article&action=view&id=1
-
-// 带 anchor
-$url = url('Article', 'view', ['id' => 1], '#comments');
-// 输出: ?controller=Article&action=view&id=1#comments
-
-// 使用默认控制器和动作
-$url = url();
-// 输出: ?controller=Index&action=index (使用配置中的默认值)
-```
-
-### URL 模式
-
-根据配置中的 `urlMode` 生成不同格式的 URL：
-
-**标准模式：**
-
-```php
-$url = url('User', 'profile', ['id' => 1]);
-// 输出: /index.php?controller=User&action=profile&id=1
-```
-
-**PATHINFO 模式：**
-
-```php
-$url = url('User', 'profile', ['id' => 1]);
-// 输出: /index.php/User/profile/id/1
-```
-
-**URL 重写模式：**
-
-```php
-$url = url('User', 'profile', ['id' => 1]);
-// 输出: /User/profile/id/1
-```
-
-### URL 选项
-
-```php
-$url = url('User', 'profile', ['id' => 1], null, [
-    'mode' => URL_REWRITE,        // 指定 URL 模式
-    'lowerChar' => true,          // 转换为小写
-    'bootstrap' => 'admin.php',   // 指定入口文件
-    'parameterPairStyle' => '-',  // 参数分隔符
-]);
-```
-
-### URL 回调
-
-可以在配置中设置 URL 生成回调函数：
-
-```php
-return [
-    'urlCallback' => function(&$controller, &$action, &$params, &$anchor, &$options) {
-        // 修改 URL 生成参数
-        $controller = strtolower($controller);
-        $action = strtolower($action);
-    },
-];
-```
-
----
-
-## 最佳实践
-
-### 1. 配置管理
-
-- 将敏感信息（如数据库密码）存储在单独的配置文件中
-- 使用环境变量覆盖配置项，便于不同环境的部署
-- 在开发环境启用调试模式，在生产环境禁用
-
-### 2. 类文件组织
-
-- 使用 PSR-4 命名空间规范组织类文件
-- 命名空间与目录结构对应
-- 在 `composer.json` 中配置 PSR-4 自动加载规则
-- 所有类通过 Composer 自动加载，无需手动管理搜索路径
-
-**示例目录结构：**
-```
-your-project/
-├── vendor/
-│   └── composer/
-│       └── autoload_*.php
-├── src/
-│   ├── Controller/
-│   │   └── Index.php
-│   ├── Model/
-│   │   └── User.php
-│   └── View/
-├── composer.json
-└── index.php
-```
-
-**composer.json 配置：**
-```json
+public function actionView()
 {
-    "autoload": {
-        "psr-4": {
-            "MyApp\\": "src/"
-        }
+    $id = intval($_GET['id'] ?? 0);
+
+    if (!$id) {
+        throw new \FLEA\Exception\InvalidArguments('文章 ID 不能为空');
     }
+
+    $post = $this->postModel->find($id);
+
+    if (!$post) {
+        throw new \FLEA\Exception\InvalidArguments('文章不存在');
+    }
+
+    $this->view->display('post/view.php');
 }
 ```
-
-### 3. 对象管理
-
-- 对于需要多次使用的对象，使用 `FLEA::getSingleton()` 获取单例
-- 对于服务类，在应用启动时注册到对象容器
-- 避免在循环中创建不必要的对象
-- 使用完整的命名空间或 `use` 语句引用类
-
-```php
-// 使用完整命名空间
-$userTable = FLEA::getSingleton(\FLEA\Db\TableDataGateway::class);
-
-// 或者使用 use 语句
-use FLEA\Db\TableDataGateway;
-$userTable = FLEA::getSingleton(TableDataGateway::class);
-```
-
-### 4. 数据库操作
-
-- 合理使用数据库连接池，避免重复创建连接
-- 使用表前缀避免表名冲突
-- 使用 DSN 字符串或数组格式指定数据库连接信息
-
-### 5. 缓存使用
-
-- 对频繁访问但不常变化的数据使用缓存
-- 为缓存设置合理的过期时间
-- 及时清理不再使用的缓存
-
-### 6. 异常处理
-
-- 使用框架提供的异常类
-- 设置自定义异常处理器
-- 使用异常捕获点处理需要特殊处理的异常
-
-### 7. URL 生成
-
-- 始终使用 `url()` 函数生成 URL，而不是硬编码
-- 合理配置 URL 模式，选择最适合项目的模式
-- 使用 URL 选项自定义 URL 生成行为
-
-### 8. 性能优化
-
-- 合理配置类搜索路径，避免不必要的文件查找
-- 使用缓存减少数据库查询
-- 在生产环境禁用调试模式以提高性能
 
 ---
 
-## 常见问题
+## 开发最佳实践
 
-### Q: 如何切换调试模式和生产模式？
-
-A: 定义 `DEPLOY_MODE` 常量为 true 即可启用生产模式：
+### 1. 命名规范
 
 ```php
-define('DEPLOY_MODE', true);
-require('vendor/autoload.php');
+// 控制器：XxxController
+class PostController extends Action {}
+
+// 模型：表名单数形式
+class Post extends TableDataGateway {}
+
+// 动作方法：actionXxx
+public function actionIndex() {}
+public function actionCreate() {}
+
+// 视图文件：{controller}/{action}.php
+App/View/post/index.php
 ```
 
-### Q: 如何自定义类文件搜索路径？
+### 2. 数据库字段约定
 
-A: 使用 Composer 的 PSR-4 自动加载配置，无需手动配置搜索路径：
+```php
+// 主键
+id
 
-```json
+// 时间戳
+created_at   // 创建时间（自动填充）
+updated_at   // 更新时间（自动填充）
+
+// 外键
+{table}_id   // 如：post_id, user_id
+```
+
+### 3. 代码组织
+
+```php
+<?php
+namespace App\Controller;
+
+// 1. 使用声明
+use \FLEA\Controller\Action;
+use App\Model\Post;
+
+// 2. 类定义
+class PostController extends Action
 {
-    "autoload": {
-        "psr-4": {
-            "MyApp\\": "src/",
-            "MyApp\\Lib\\": "lib/"
-        }
+    // 3. 属性声明
+    protected $postModel;
+    public $view;
+
+    // 4. 构造函数
+    public function __construct()
+    {
+        parent::__construct('Post');
+        $this->postModel = new Post();
     }
+
+    // 5. 动作方法（public）
+    public function actionIndex() {}
+
+    // 6. 辅助方法（protected/private）
+    protected function validateData() {}
 }
 ```
 
-然后运行：
-```bash
-composer dump-autoload
-```
-
-### Q: 如何处理数据库连接失败？
-
-A: 使用 try-catch 捕获异常：
+### 4. 安全实践
 
 ```php
-try {
-    $dbo = FLEA::getDBO();
-} catch (\FLEA\Db\Exception\InvalidDSN $e) {
-    echo '数据库连接失败: ' . $e->getMessage();
+// 转义输出
+echo htmlspecialchars($post['title']);
+
+// 参数验证
+$id = intval($_GET['id'] ?? 0);
+if (!$id) {
+    throw new \FLEA\Exception\InvalidArguments('ID 无效');
+}
+
+// CSRF 保护（表单）
+session_start();
+$token = bin2hex(random_bytes(32));
+$_SESSION['csrf_token'] = $token;
+
+// 验证
+if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+    throw new \FLEA\Exception\InvalidArguments('CSRF 验证失败');
 }
 ```
 
-### Q: 如何清除所有缓存？
-
-A: 遍历缓存目录删除所有文件：
+### 5. 性能优化
 
 ```php
-$cacheDir = FLEA::getAppInf('internalCacheDir');
-$files = glob($cacheDir . '/*.php');
-foreach ($files as $file) {
-    unlink($file);
-}
+// 禁用不需要的关联
+$posts = $this->postModel->findAll(
+    ['status' => 1],
+    null,
+    [10, 0],
+    '*',
+    false  // 禁用关联查询
+);
+
+// 只查询需要的字段
+$posts = $this->postModel->findAll(
+    ['status' => 1],
+    'created_at DESC',
+    null,
+    'id,title,created_at'  // 只查询需要的字段
+);
+
+// 使用缓存
+'viewConfig' => [
+    'enableCache' => true,
+    'cacheLifeTime' => 3600,
+],
 ```
-
-### Q: 如何重置对象容器？
-
-A: 无法直接重置，需要重新加载框架。
 
 ---
 
 ## 附录
 
-### 配置项参考
+### A. 辅助函数
 
-| 配置项 | 说明 | 默认值 |
-|--------|------|--------|
-| `dbDSN` | 数据库连接信息 | null |
-| `dbTablePrefix` | 数据库表前缀 | '' |
-| `urlMode` | URL 模式 | URL_STANDARD |
-| `urlLowerChar` | URL 是否转换为小写 | false |
-| `urlBootstrap` | 默认入口文件 | index.php |
-| `urlAlwaysUseAccessor` | URL 始终使用参数名 | false |
-| `urlParameterPairStyle` | URL 参数分隔符 | = |
-| `controllerAccessor` | 控制器参数名 | controller |
-| `actionAccessor` | 动作参数名 | action |
-| `defaultController` | 默认控制器 | Default |
-| `defaultAction` | 默认动作 | index |
-| `defaultLanguage` | 默认语言 | chinese-utf8 |
-| `responseCharset` | 响应字符集 | UTF-8 |
-| `databaseCharset` | 数据库字符集 | UTF-8 |
-| `internalCacheDir` | 缓存目录 | null |
-| `logEnabled` | 是否启用日志 | false |
-| `logProvider` | 日志服务提供程序 | null |
-| `exceptionHandler` | 异常处理器 | __FLEA_EXCEPTION_HANDLER |
-| `webControlsClassName` | WebControls 类名 | FLEA_WebControls |
-| `ajaxClassName` | Ajax 类名 | FLEA_Ajax |
-| `sessionProvider` | Session 服务提供程序 | null |
-| `autoSessionStart` | 是否自动启动 session | false |
-| `multiLanguageSupport` | 是否启用多语言支持 | false |
-| `languageSupportProvider` | 多语言支持提供程序 | null |
-| `languageFilesDir` | 语言文件目录 | null |
-| `displayErrors` | 是否显示错误 | true |
-| `friendlyErrorsMessage` | 是否显示友好错误信息 | false |
-| `autoResponseHeader` | 是否自动输出响应头 | true |
-| `autoLoad` | 自动加载的文件数组 | [] |
-| `requestFilters` | 请求过滤器数组 | [] |
-| `MVCPackageFilename` | MVC 包文件名 | '' |
-| `defaultTimezone` | 默认时区 | Asia/Shanghai |
-| `dispatcher` | 调度器类名 | \FLEA\Dispatcher\Auth |
-| `urlCallback` | URL 生成回调函数 | null |
+```php
+// 日志记录
+log_message('调试信息', \Psr\Log\LogLevel::DEBUG);
+log_message('错误信息', \Psr\Log\LogLevel::ERROR);
 
-### 内置助手
+// 加载辅助文件
+\FLEA::loadHelper('array');
+\FLEA::loadHelper('string');
+```
 
-| 助手名称 | 类名 |
-|----------|------|
-| array | \FLEA\Helper\Array |
-| pager | \FLEA\Helper\Pager |
-| image | \FLEA\Helper\Image |
-| uploader | \FLEA\Helper\Uploader |
+### B. 常量定义
 
-**注意**：这些助手类已重构为使用命名空间，请使用新的类名。
+```php
+// URL 模式
+URL_STANDARD    // 标准模式
+URL_PATHINFO    // PATHINFO 模式
+URL_REWRITE     // URL 重写模式
 
-### 相关资源
+// 关联类型
+HAS_ONE         // 一对一
+HAS_MANY        // 一对多
+BELONGS_TO      // 从属
+MANY_TO_MANY    // 多对多
+```
 
-- FleaPHP 官方文档: [链接]
-- 示例代码: [链接]
-- 社区论坛: [链接]
+### C. 相关文档
 
----
-
-*本文档最后更新于 2026-02-12*
+- [SPEC.md](SPEC.md) - 框架规格说明书
+- [CHANGES.md](CHANGES.md) - 框架修改记录
+- [README.md](README.md) - 项目说明
