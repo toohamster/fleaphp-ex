@@ -25,33 +25,33 @@ class ActiveRecord
      *
      * @var array
      */
-    public $_aggregation = [];
+    public array $_aggregation = [];
 
     /**
      * 用于完成数据库操作的 TableDataGateway 继承类
      *
-     * @var \FLEA\Db\TableDataGateway
+     * @var \FLEA\Db\TableDataGateway|null
      */
-    public $_table;
+    public ?\FLEA\Db\TableDataGateway $_table = null;
 
     /**
      * 该对象的主键属性名
      *
-     * @var string
+     * @var string|null
      */
-    public $_idname;
+    public ?string $_idname = null;
 
     /**
      * 指示该对象是否已经初始化
      *
      * @var boolean
      */
-    public $init = false;
+    public bool $init = false;
 
     /**
      * 字段和对象属性之间的映射关系
      *
-     * @var array
+     * @var array|false
      */
     public $_mapping = false;
 

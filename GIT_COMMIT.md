@@ -4,6 +4,18 @@
 
 ---
 
+### refactor: Db 目录 PSR-1/PSR-12 合规性修复
+
+移除 Db 目录下所有类的方法下划线前缀，为属性添加 PHP 7.4 兼容的类型声明。
+
+**修改的文件:**
+- `FLEA/FLEA/Db/Driver/Mysqlt.php`: `_startTrans()` → `startTrans()`, `_completeTrans()` → `completeTrans()`
+- `FLEA/FLEA/Db/Driver/Mysql.php`: `_insertId()` → `insertId()`, `_affectedRows()` → `affectedRows()`
+- `FLEA/FLEA/Db/TableLink.php`: `_getFindSQLBase()` → `getFindSQLBase()`, `_saveAssocDataBase()` → `saveAssocDataBase()`, 移除多余的 `&` 引用，为属性添加类型声明
+- `FLEA/FLEA/Db/ActiveRecord.php`: 为属性添加类型声明 (`$_aggregation` → `array`, `$_table` → `?\FLEA\Db\TableDataGateway`, `$_idname` → `?string`, `$init` → `bool`)
+
+---
+
 ### docs: 更新 TableDataGateway.php 方法注释中的事件方法名
 
 更新方法注释中的旧事件方法名（移除下划线前缀），与新的方法名保持一致。
