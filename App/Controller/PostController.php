@@ -34,7 +34,7 @@ class PostController extends Action
         parent::__construct('Post');
         $this->postModel = new Post();
         $this->commentModel = new Comment();
-        $this->view = $this->_getView();
+        $this->view = $this->getView();
     }
 
     /**

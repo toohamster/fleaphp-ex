@@ -4,6 +4,75 @@
 
 ---
 
+### fix: 修复 UsersManager.php 中多余的 & 引用
+
+移除 `fetchRoles()` 方法中多余的 `&` 引用符号。
+
+**修改的文件:**
+- `FLEA/FLEA/Rbac/UsersManager.php`: 第 406 行 `$link =& $this->getLink(...)` → `$link = $this->getLink(...)`
+
+---
+
+## 2026-02-27
+
+### refactor: 移除 Dispatcher 目录中的下划线命名前缀
+
+移除 `FLEA\Dispatcher\Simple` 和 `FLEA\Dispatcher\Auth` 类中属性和方法的单下划线 `_` 前缀，改用 `protected` 访问修饰符并添加类型声明和默认值，采用现代 PHP 命名规范和 PSR-12 编码规范。
+
+**修改的文件:**
+- `FLEA/FLEA/Dispatcher/Simple.php`
+- `FLEA/FLEA/Dispatcher/Auth.php`
+
+**Simple.php 改动:**
+- 属性 `public $_request` → `protected array $request = []`
+- 属性 `public $_requestBackup` → `protected array $requestBackup = []`
+- 方法 `_executeAction()` → `executeAction()`
+- 方法 `_loadController()` → `loadController()`
+
+**Auth.php 改动:**
+- 属性 `public $_auth` → `protected ?\FLEA\Rbac $auth = null`
+- 方法 `_executeAction()` → `executeAction()` (调用父类)
+- 方法 `_loadController()` → `loadController()` (调用父类)
+- 方法 `_loadACTFile()` → `loadACTFile(string): array`
+- 方法 `clearUser()` → `clearUser(): void`
+- 方法 `check()` → `check(string, ?string, ?string): bool`
+- 方法 `getControllerACT()` → `getControllerACT(string, string): ?array`
+- 方法 `getControllerACTFromDefaultFile()` → `getControllerACTFromDefaultFile(string): ?array`
+
+---
+
+### refactor: 移除 Controller\Action 中的下划线命名前缀
+
+移除 `FLEA\Controller\Action` 类中属性和方法的单下划线 `_` 前缀，改用 `protected` 访问修饰符并添加类型声明和默认值，采用现代 PHP 命名规范和 PSR-12 编码规范。
+
+**修改的文件:**
+- `FLEA/FLEA/Controller/Action.php`
+- `App/Controller/PostController.php`
+
+**Action.php 改动:**
+- 属性 `public $_controllerName` → `protected string $controllerName = ''`
+- 属性 `public $_actionName` → `protected string $actionName = ''`
+- 属性 `public $_dispatcher` → `protected ?\FLEA\Dispatcher\Auth $dispatcher = null`
+- 属性 `public $_renderCallbacks` → `protected array $renderCallbacks = []`
+- 方法 `_getComponent()` → `getComponent()`
+- 方法 `_getDispatcher()` → `getDispatcher()`
+- 方法 `_url()` → `url()`
+- 方法 `_forward()` → `forward()`
+- 方法 `_getView()` → `getView()`
+- 方法 `_executeView()` → `executeView()`
+- 方法 `_isPOST()` → `isPost()`
+- 方法 `_isAjax()` → `isAjax()`
+- 方法 `_registerEvent()` → `registerEvent()`
+- 方法 `_registerRenderCallback()` → `registerRenderCallback()`
+
+**PostController.php 改动:**
+- `$this->_getView()` → `$this->getView()`
+
+**ImgCode.php 改动:**
+- 文档注释更新：`$this->_url('imgcode')` → `$this->url('imgcode')`
+
+---
+
 ## 2026-02-27
 
 ### refactor: 移除构造函数中的 @return 注解

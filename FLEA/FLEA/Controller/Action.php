@@ -20,21 +20,21 @@ class Action
      *
      * @var string
      */
-    public $_controllerName = null;
+    protected string $controllerName = '';
 
     /**
      * 当前调用的动作名
      *
      * @var string
      */
-    public $_actionName = null;
+    protected string $actionName = '';
 
     /**
      * 当前使用的调度器的名字
      *
-     * @var \FLEA\Dispatcher\Auth
+     * @var \FLEA\Dispatcher\Auth|null
      */
-    public $_dispatcher = null;
+    protected ?\FLEA\Dispatcher\Auth $dispatcher = null;
 
     /**
      * 要使用的控制器部件
@@ -48,7 +48,7 @@ class Action
      *
      * @var array
      */
-    public $_renderCallbacks = [];
+    protected array $renderCallbacks = [];
 
     /**
      * 构造函数
@@ -57,10 +57,10 @@ class Action
      */
     public function __construct(string $controllerName)
     {
-        $this->_controllerName = $controllerName;
+        $this->controllerName = $controllerName;
 
         foreach ((array)$this->components as $componentName) {
-            $this->{$componentName} = $this->_getComponent($componentName);
+            $this->{$componentName} = $this->getComponent($componentName);
         }
     }
 
@@ -71,7 +71,7 @@ class Action
      *
      * @return object
      */
-    protected function _getComponent(string $componentName): object
+    protected function getComponent(string $componentName): object
     {
         static $instances = [];
 
@@ -94,8 +94,8 @@ class Action
      */
     public function __setController(string $controllerName, string $actionName): void
     {
-        $this->_controllerName = $controllerName;
-        $this->_actionName = $actionName;
+        $this->controllerName = $controllerName;
+        $this->actionName = $actionName;
     }
 
     /**
@@ -105,7 +105,7 @@ class Action
      */
     public function __setDispatcher(\FLEA\Dispatcher\Simple $dispatcher): void
     {
-        $this->_dispatcher = $dispatcher;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -113,39 +113,39 @@ class Action
      *
      * @return \FLEA\Dispatcher\Auth
      */
-    protected function _getDispatcher(): \FLEA\Dispatcher\Auth
+    protected function getDispatcher(): \FLEA\Dispatcher\Auth
     {
-        if (!is_object($this->_dispatcher)) {
-            $this->_dispatcher = \FLEA::getSingleton(\FLEA::getAppInf('dispatcher'));
+        if (!is_object($this->dispatcher)) {
+            $this->dispatcher = \FLEA::getSingleton(\FLEA::getAppInf('dispatcher'));
         }
-        return $this->_dispatcher;
+        return $this->dispatcher;
     }
 
     /**
      * 构造当前控制器的 url 地址
      *
-     * @param string $actionName
-     * @param array $args
-     * @param string $anchor
+     * @param string|null $actionName
+     * @param array|null $args
+     * @param string|null $anchor
      *
      * @return string
      */
-    protected function _url(?string $actionName = null, ?array $args = null, ?string $anchor = null): string
+    protected function url(?string $actionName = null, ?array $args = null, ?string $anchor = null): string
     {
-        return url($this->_controllerName, $actionName, $args, $anchor);
+        return url($this->controllerName, $actionName, $args, $anchor);
     }
 
     /**
      * 转发请求到另一个控制器方法
      *
-     * @param string $controllerName
-     * @param string $actionName
+     * @param string|null $controllerName
+     * @param string|null $actionName
      */
-    protected function _forward(?string $controllerName = null, ?string $actionName = null): void
+    protected function forward(?string $controllerName = null, ?string $actionName = null): void
     {
-        $this->_dispatcher->setControllerName($controllerName);
-        $this->_dispatcher->setActionName($actionName);
-        $this->_dispatcher->dispatching();
+        $this->dispatcher->setControllerName($controllerName);
+        $this->dispatcher->setActionName($actionName);
+        $this->dispatcher->dispatching();
     }
 
     /**
@@ -153,7 +153,7 @@ class Action
      *
      * @return object
      */
-    protected function _getView(): object
+    protected function getView(): object
     {
         $viewClass = \FLEA::getAppInf('view');
         if ($viewClass != 'PHP') {
@@ -168,9 +168,9 @@ class Action
      * 执行指定的视图
      *
      * @param string $__flea_internal_viewName
-     * @param array $data
+     * @param array|null $data
      */
-    protected function _executeView(string $__flea_internal_viewName, ?array $data = null): void
+    protected function executeView(string $__flea_internal_viewName, ?array $data = null): void
     {
         $viewClass = \FLEA::getAppInf('view');
         if ($viewClass == 'PHP') {
@@ -178,14 +178,14 @@ class Action
                 $__flea_internal_viewName .= '.php';
             }
             $view = null;
-            foreach ((array)$this->_renderCallbacks as $callback) {
+            foreach ((array)$this->renderCallbacks as $callback) {
                 call_user_func_array($callback, array(& $data, & $view));
             }
             if (is_array($data)) { extract($data); }
             include($__flea_internal_viewName);
         } else {
-            $view = $this->_getView();
-            foreach ((array)$this->_renderCallbacks as $callback) {
+            $view = $this->getView();
+            foreach ((array)$this->renderCallbacks as $callback) {
                 call_user_func_array($callback, array(& $data, & $view));
             }
             if (is_array($data)) { $view->assign($data); }
@@ -196,9 +196,9 @@ class Action
     /**
      * 判断 HTTP 请求是否是 POST 方法
      *
-     * @return boolean
+     * @return bool
      */
-    protected function _isPOST(): bool
+    protected function isPost(): bool
     {
         return strtolower($_SERVER['REQUEST_METHOD']) == 'post';
     }
@@ -206,9 +206,9 @@ class Action
     /**
      * 判断 HTTP 请求是否是通过 XMLHttp 发起的
      *
-     * @return boolean
+     * @return bool
      */
-    protected function _isAjax(): bool
+    protected function isAjax(): bool
     {
         $r = strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '');
         return $r == 'xmlhttprequest';
@@ -220,24 +220,24 @@ class Action
      * @param string $controlName
      * @param string $event
      * @param string $action
-     * @param array $attribs
+     * @param array|null $attribs
      *
      * @return string
      */
-    protected function _registerEvent(string $controlName, string $event, string $action, ?array $attribs = null): string
+    protected function registerEvent(string $controlName, string $event, string $action, ?array $attribs = null): string
     {
         $ajax = \FLEA::initAjax();
         return $ajax->registerEvent($controlName, $event,
-                url($this->_controllerName, $action), $attribs);
+                url($this->controllerName, $action), $attribs);
     }
 
     /**
      * 注册一个视图渲染 callback 方法
      *
-     * @param callback $callback
+     * @param callable $callback
      */
-    protected function _registerRenderCallback($callback): void
+    protected function registerRenderCallback($callback): void
     {
-        $this->_renderCallbacks[] = $callback;
+        $this->renderCallbacks[] = $callback;
     }
 }

@@ -403,7 +403,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
     public function fetchRoles(array $user): array
     {
         if ($this->existsLink($this->rolesField)) {
-            $link =& $this->getLink($this->rolesField);
+            $link = $this->getLink($this->rolesField);
             $rolenameField = $link->assocTDG->rolesNameField;
         } else {
             $rolenameField = 'rolename';

@@ -4,6 +4,38 @@
 
 ---
 
+### fix: 修复 UsersManager.php 中多余的 & 引用
+
+移除 `fetchRoles()` 方法中多余的 `&` 引用符号。
+
+**修改的文件:**
+- `FLEA/FLEA/Rbac/UsersManager.php`: 第 406 行 `$link =& $this->getLink(...)` → `$link = $this->getLink(...)`
+
+---
+
+### refactor: 移除 Controller\Action 中的下划线命名前缀
+
+移除 `FLEA\Controller\Action` 类中属性和方法的单下划线 `_` 前缀，改用 `protected` 访问修饰符并添加类型声明和默认值，采用现代 PHP 命名规范和 PSR-12 编码规范。
+
+**修改的文件:**
+- `FLEA/FLEA/Controller/Action.php`: 属性和方法移除下划线前缀，添加类型声明 (`public $_controllerName` → `protected string $controllerName = ''`, `public $_actionName` → `protected string $actionName = ''`, `public $_dispatcher` → `protected ?\FLEA\Dispatcher\Auth $dispatcher = null`, `public $_renderCallbacks` → `protected array $renderCallbacks = []`, `_getComponent()` → `getComponent()`, `_getDispatcher()` → `getDispatcher()`, `_url()` → `url()`, `_forward()` → `forward()`, `_getView()` → `getView()`, `_executeView()` → `executeView()`, `_isPOST()` → `isPost()`, `_isAjax()` → `isAjax()`, `_registerEvent()` → `registerEvent()`, `_registerRenderCallback()` → `registerRenderCallback()`)
+- `App/Controller/PostController.php`: 方法调用更新 (`$this->_getView()` → `$this->getView()`)
+- `FLEA/FLEA/Helper/ImgCode.php`: 文档注释更新 (`$this->_url('imgcode')` → `$this->url('imgcode')`)
+
+---
+
+## 2026-02-27
+
+### refactor: 移除 Dispatcher 目录中的下划线命名前缀
+
+移除 `FLEA\Dispatcher\Simple` 和 `FLEA\Dispatcher\Auth` 类中属性和方法的单下划线 `_` 前缀，改用 `protected` 访问修饰符并添加类型声明和默认值，采用现代 PHP 命名规范和 PSR-12 编码规范。
+
+**修改的文件:**
+- `FLEA/FLEA/Dispatcher/Simple.php`: 属性和方法移除下划线前缀，添加类型声明 (`public $_request` → `protected array $request = []`, `public $_requestBackup` → `protected array $requestBackup = []`, `_executeAction()` → `executeAction()`, `_loadController()` → `loadController()`)
+- `FLEA/FLEA/Dispatcher/Auth.php`: 属性和方法移除下划线前缀，添加类型声明 (`public $_auth` → `protected ?\FLEA\Rbac $auth = null`, `_loadACTFile()` → `loadACTFile(string): array`), 方法调用更新，其他方法添加类型声明 (`clearUser(): void`, `check(string, ?string, ?string): bool`, `getControllerACT(string, string): ?array`, `getControllerACTFromDefaultFile(string): ?array`)
+
+---
+
 ## 2026-02-27
 
 ### docs: 完善 USER_GUIDE.md 用户手册
