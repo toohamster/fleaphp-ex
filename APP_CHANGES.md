@@ -4,6 +4,20 @@
 
 ---
 
+## 2026-02-27
+
+### refactor: 更新 createPost() 和 createComment() 方法的 docblock
+
+由于 `TableDataGateway::create()` 方法的返回类型从 `int|false` 改为 `: int`（失败时返回 0），同步更新 App 模型中调用该方法的 docblock。
+
+**App/Model/Post.php**
+- `createPost()`: docblock 从 `@return int|false` 改为 `@return int`
+
+**App/Model/Comment.php**
+- `createComment()`: docblock 从 `@return int|false` 改为 `@return int`
+
+---
+
 ## 2026-02-26
 
 ### refactor: Model 类添加类型声明
