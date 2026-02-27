@@ -491,7 +491,7 @@ class TableDataGateway
 
         $assoclink->init();
         $tdg = $assoclink->assocTDG;
-        $arow =& $row[$mappingName];
+        $arow = &$row[$mappingName];
 
         if (!is_array($enabledLinks)) {
             if ($enabledLinks == null) {
@@ -557,7 +557,7 @@ class TableDataGateway
         $tdg = $assoclink->assocTDG;
         $arowset = [];
         foreach (array_keys($rowset) as $offset) {
-            $arowset[] =& $rowset[$offset][$mappingName];
+            $arowset[] = &$rowset[$offset][$mappingName];
         }
         $keys = array_keys($arowset);
 
@@ -586,7 +586,7 @@ class TableDataGateway
                 foreach ($keys as $key) {
                     $pkv = $arowset[$key][$link->mainTDG->primaryKey];
                     $in[] = $pkv;
-                    $assocRowset[$pkv] =& $arowset[$key];
+                    $assocRowset[$pkv] = &$arowset[$key];
                     $arowset[$key][$link->mappingName] = null;
                 }
                 break;
@@ -596,7 +596,7 @@ class TableDataGateway
                     foreach (array_keys($arowset[$key]) as $offset) {
                         $pkv = $arowset[$key][$offset][$link->mainTDG->primaryKey];
                         $in[] = $pkv;
-                        $assocRowset[$pkv] = & $arowset[$key][$offset];
+                        $assocRowset[$pkv] = &$arowset[$key][$offset];
                         $arow[$key][$offset][$link->mappingName] = null;
                     }
                 }
@@ -874,7 +874,7 @@ class TableDataGateway
         // 处理对关联数据的更新
         if ($this->autoLink && $saveLinks) {
             foreach (array_keys($this->links) as $linkKey) {
-                $link =& $this->links[$linkKey];
+                $link = $this->links[$linkKey];
                 /* @var $link \FLEA\Db\TableLink */
                 // 跳过不需要处理的关联
                 if (!$link->enabled || !$link->linkUpdate || !isset($row[$link->mappingName]) || !is_array($row[$link->mappingName])) {
@@ -1103,7 +1103,7 @@ class TableDataGateway
         // 处理关联数据表
         if ($this->autoLink && $saveLinks) {
             foreach (array_keys($this->links) as $linkKey) {
-                $link =& $this->links[$linkKey];
+                $link = $this->links[$linkKey];
                 /* @var $link \FLEA\Db\TableLink */
                 if (!$link->enabled || !$link->linkCreate || !isset($row[$link->mappingName]) || !is_array($row[$link->mappingName])) {
                     // 跳过没有关联数据的关联和不需要处理的关联
@@ -1207,7 +1207,7 @@ class TableDataGateway
         $counterCacheLinks = [];
         if ($this->autoLink && $removeLink) {
             foreach (array_keys($this->links) as $linkKey) {
-                $link =& $this->links[$linkKey];
+                $link = $this->links[$linkKey];
                 /* @var $link \FLEA\Db\TableLink */
                 if (!$link->enabled) { continue; }
                 switch ($link->type) {
@@ -1331,7 +1331,7 @@ class TableDataGateway
         // 处理关联数据表
         if ($this->autoLink) {
             foreach (array_keys($this->links) as $linkKey) {
-                $link =& $this->links[$linkKey];
+                $link = $this->links[$linkKey];
                 /* @var $link \FLEA\Db\TableLink */
                 switch ($link->type) {
                 case MANY_TO_MANY:
@@ -1525,7 +1525,7 @@ class TableDataGateway
             if (!is_array($define)) { continue; }
             // 构造连接对象实例
             $link = \FLEA\Db\TableLink::createLink($define, $type, $this);
-            $this->links[strtoupper($link->name)] =& $link;
+            $this->links[strtoupper($link->name)] = $link;
         }
     }
 
@@ -2122,7 +2122,7 @@ class TableDataGateway
     protected function updateCounterCache(array &$row): void
     {
         foreach (array_keys($this->links) as $linkKey) {
-            $link =& $this->links[$linkKey];
+            $link = $this->links[$linkKey];
             /* @var $link \FLEA\Db\TableLink */
             if ($link->type != BELONGS_TO || !$link->enabled || !$link->counterCache) { continue; }
             $link->init();
@@ -2143,7 +2143,7 @@ class TableDataGateway
                         $conditions = $conditions[0];
                     }
                 } else {
-                    $conditions =& $link->conditions;
+                    $conditions = $link->conditions;
                 }
                 if ($conditions) {
                     $conditions = "{$link->qforeignKey} = {$fkv} AND {$conditions}";

@@ -26,6 +26,19 @@
 
 ---
 
+### refactor: 移除 TableDataGateway.php 中多余的 & 引用符号
+
+移除 PHP 5+ 中不再需要的 `=&` 引用赋值，对象在 PHP 5+ 中已经默认通过引用传递。
+
+**修改的文件:**
+- `FLEA/FLEA/Db/TableDataGateway.php`:
+  - 移除 6 处对象引用的 `=&` (`$link =& $this->links[$linkKey]` → `$link = $this->links[$linkKey]`)
+  - 移除 1 处变量引用 (`$conditions =& $link->conditions` → `$conditions = $link->conditions`)
+  - 移除 1 处对象赋值引用 (`$this->links[...] =& $link` → `$this->links[...] = $link`)
+  - 保留 4 处数组元素引用（改为 `= &` 格式），因为数组仍然需要引用语义
+
+---
+
 ### fix: 修复 UsersManager.php 中多余的 & 引用
 
 移除 `fetchRoles()` 方法中多余的 `&` 引用符号。
