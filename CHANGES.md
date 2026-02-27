@@ -4,6 +4,21 @@
 
 ---
 
+### refactor: ActiveRecord.php PSR-1/PSR-12 合规性修复及移除多余引用
+
+移除属性和方法的下划线前缀，添加类型声明和访问修饰符，符合 PSR-12 编码规范。
+
+**修改的文件:**
+- `FLEA/FLEA/Db/ActiveRecord.php`:
+  - 属性重命名：`$_aggregation` → `$aggregation`, `$_table` → `$table`, `$_idname` → `$idname`, `$_mapping` → `$mapping`
+  - 属性添加类型声明和访问修饰符（`protected array`, `protected ?string`, `protected ?\FLEA\Db\TableDataGateway`）
+  - `static function define()` → `public static function define()`
+  - `load($conditions)` → `load($conditions = null): void`
+  - 移除第 157 行和第 178 行多余的 `&` 引用赋值
+  - 修复 `setId()` 和 `getId()` 方法，正确返回主键字段值
+
+---
+
 ### fix: 修复 UsersManager.php 中多余的 & 引用
 
 移除 `fetchRoles()` 方法中多余的 `&` 引用符号。
