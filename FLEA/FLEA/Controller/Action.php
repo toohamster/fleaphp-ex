@@ -92,7 +92,7 @@ class Action
      * @param string $controllerName
      * @param string $actionName
      */
-    public function __setController(string $controllerName, string $actionName): void
+    public function setController(string $controllerName, string $actionName): void
     {
         $this->controllerName = $controllerName;
         $this->actionName = $actionName;
@@ -103,7 +103,7 @@ class Action
      *
      * @param \FLEA\Dispatcher\Simple $dispatcher
      */
-    public function __setDispatcher(\FLEA\Dispatcher\Simple $dispatcher): void
+    public function setDispatcher(\FLEA\Dispatcher\Simple $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }

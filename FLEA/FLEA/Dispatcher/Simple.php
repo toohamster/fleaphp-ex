@@ -87,22 +87,22 @@ class Simple
             \FLEA::setAppInf('FLEA.internal.currentActionName', $actionName);
             $controller = new $controllerClass($controllerName);
             if (!method_exists($controller, $actionMethod)) { break; }
-            if (method_exists($controller, '__setController')) {
-                $controller->__setController($controllerName, $actionName);
+            if (method_exists($controller, 'setController')) {
+                $controller->setController($controllerName, $actionName);
             }
-            if (method_exists($controller, '__setDispatcher')) {
-                $controller->__setDispatcher($this);
+            if (method_exists($controller, 'setDispatcher')) {
+                $controller->setDispatcher($this);
             }
 
-            // 调用 _beforeExecute() 方法
-            if (method_exists($controller, '_beforeExecute')) {
-                $controller->_beforeExecute($actionMethod);
+            // 调用 beforeExecute() 方法
+            if (method_exists($controller, 'beforeExecute')) {
+                $controller->beforeExecute($actionMethod);
             }
             // 执行 action 方法
             $ret = $controller->{$actionMethod}();
-            // 调用 _afterExecute() 方法
-            if (method_exists($controller, '_afterExecute')) {
-                $controller->_afterExecute($actionMethod);
+            // 调用 afterExecute() 方法
+            if (method_exists($controller, 'afterExecute')) {
+                $controller->afterExecute($actionMethod);
             }
             return $ret;
         } while (false);
