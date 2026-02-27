@@ -32,9 +32,9 @@ class Action
     /**
      * 当前使用的调度器的名字
      *
-     * @var \FLEA\Dispatcher\Auth|null
+     * @var \FLEA\Dispatcher\Simple|null
      */
-    protected ?\FLEA\Dispatcher\Auth $dispatcher = null;
+    protected ?\FLEA\Dispatcher\Simple $dispatcher = null;
 
     /**
      * 要使用的控制器部件
@@ -111,9 +111,9 @@ class Action
     /**
      * 获得当前使用的 Dispatcher
      *
-     * @return \FLEA\Dispatcher\Auth
+     * @return \FLEA\Dispatcher\Simple|null
      */
-    protected function getDispatcher(): \FLEA\Dispatcher\Auth
+    protected function getDispatcher(): ?\FLEA\Dispatcher\Simple
     {
         if (!is_object($this->dispatcher)) {
             $this->dispatcher = \FLEA::getSingleton(\FLEA::getAppInf('dispatcher'));
