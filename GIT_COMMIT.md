@@ -4,6 +4,19 @@
 
 ---
 
+### refactor: 修复 TableDataGateway.php 中 PSR-12 和 PSR-1 不合规问题
+
+移除方法名下划线前缀，为属性和方法添加 PHP 7.4 兼容的类型声明，符合 PSR-12 编码规范。
+
+**修改的文件:**
+- `FLEA/FLEA/Db/TableDataGateway.php`:
+  - 移除 17 个方法的下划线前缀 (`_parseWhereArray()` → `parseWhereArray()`, `_parseWhereString()` → `parseWhereString()`, `_parseWhereQfield()` → `parseWhereQfield()`, `_setUpdatedTimeFields()` → `setUpdatedTimeFields()`, `_setCreatedTimeFields()` → `setCreatedTimeFields()`, `_prepareMeta()` → `prepareMeta()`, `_beforeCreate()` → `beforeCreate()`, `_beforeCreateDb()` → `beforeCreateDb()`, `_afterCreateDb()` → `afterCreateDb()`, `_beforeUpdate()` → `beforeUpdate()`, `_beforeUpdateDb()` → `beforeUpdateDb()`, `_afterUpdateDb()` → `afterUpdateDb()`, `_beforeRemove()` → `beforeRemove()`, `_afterRemoveDb()` → `afterRemoveDb()`, `_beforeRemoveDbByPkv()` → `beforeRemoveDbByPkv()`, `_afterRemoveDbByPkv()` → `afterRemoveDbByPkv()`, `_updateCounterCache()` → `updateCounterCache()`)
+  - 为 12 个属性添加类型声明 (`$meta` → `array`, `$fields` → `array`, `$autoValidating` → `bool`, `$verifier` → `?\FLEA\Helper\Verifier`, `$validateRules` → `?array`, `$createdTimeFields` → `array`, `$updatedTimeFields` → `array`, `$autoLink` → `bool`, `$dbo` → `?\FLEA\Db\Driver\AbstractDriver`, `$links` → `array`, `$qtableName` → `string`, `$lastValidationResult` → `?array`)
+  - 为 2 个方法添加返回类型声明 (`getLink()` → `: \FLEA\Db\TableLink`, `createLink()` → `: void`, `parseWhereQfield()` → `: string`)
+  - 注意：联合类型 (`string|array`) 和 `mixed` 类型是 PHP 8.0+ 特性，已保持原样使用 docblock 注解
+
+---
+
 ### docs: 更新 SPEC.md 控制器规格说明
 
 更新控制器 (Controller) 部分的方法签名和类型声明，与实际代码保持一致。
