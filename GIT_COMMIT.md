@@ -4,6 +4,16 @@
 
 ---
 
+### refactor: 更新子类中重写的 TableDataGateway 事件方法
+
+更新子类中重写的事件方法名，与父类 TableDataGateway 的新方法名保持一致。
+
+**修改的文件:**
+- `FLEA/FLEA/Rbac/UsersManager.php`: `_beforeUpdateDb()` → `beforeUpdateDb()`, `_beforeCreateDb()` → `beforeCreateDb()`
+- `FLEA/FLEA/Session/Db.php`: `_beforeWrite()` → `beforeWrite()`
+
+---
+
 ### refactor: 修复 TableDataGateway.php 中 PSR-12 和 PSR-1 不合规问题
 
 移除方法名下划线前缀，为属性和方法添加 PHP 7.4 兼容的类型声明，符合 PSR-12 编码规范。
