@@ -6,6 +6,45 @@
 
 ## 2026-02-26
 
+### fix: 修复 ManyToManyLink.php 中 DELETE 语句多余的括号
+
+**FLEA/FLEA/Db/TableLink/ManyToManyLink.php**
+- 第 214 行 DELETE 语句移除多余的 `.')'`
+
+问题分析:
+- 第 196 行 INSERT 语句：`VALUES (` 需要 `')'` 闭合 - 正确
+- 第 214 行 DELETE 语句：没有括号，不需要 `')'` - 多余，已删除
+
+---
+
+## 2026-02-26
+
+### fix: 修复数组语法错误，将 ); 改为 ];
+
+修复之前将 `array()` 批量替换为 `[]` 时遗留的括号不匹配问题
+
+**FLEA/FLEA/Config/DEBUG_MODE_CONFIG.php**
+- 结尾 `);` 改为 `];`
+
+**FLEA/FLEA/Config/DEPLOY_MODE_CONFIG.php**
+- 结尾 `);` 改为 `];`
+
+**FLEA/FLEA/_Errors/default/ErrorMessage.php**
+- 结尾 `);` 改为 `];`
+
+**FLEA/FLEA/_Errors/chinese-utf8/ErrorMessage.php**
+- 结尾 `);` 改为 `];`
+
+**FLEA/FLEA/Db/TableLink/ManyToManyLink.php**
+- 修复 `execute()` 调用中的括号匹配问题
+
+**FLEA/FLEA/Acl/testCreateData.php**
+- 多处数组闭合括号 `);` 改为 `];`
+
+---
+
+## 2026-02-26
+
 ### refactor: Acl 目录使用 PSR-4 命名空间和 ::class 常量
 
 **FLEA/FLEA/Acl/Manager.php**
