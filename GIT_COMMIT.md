@@ -16,6 +16,15 @@
 
 ---
 
+### fix: 补充 TableLink.php 遗漏的属性类型声明
+
+为 TableLink.php 中遗漏的属性添加类型声明。
+
+**修改的文件:**
+- `FLEA/FLEA/Db/TableLink.php`: `$_req` → `array`, `$_optional` → `array`, `$qforeignKey` → `?string`, `$dbo` → `?\FLEA\Db\Driver\AbstractDriver`, `$assocTDGObjectId` → `?string`, `$init` → `bool`
+
+---
+
 ### docs: 更新 TableDataGateway.php 方法注释中的事件方法名
 
 更新方法注释中的旧事件方法名（移除下划线前缀），与新的方法名保持一致。

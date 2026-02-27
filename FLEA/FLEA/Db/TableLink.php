@@ -180,7 +180,7 @@ class TableLink
      *
      * @var array
      */
-    public $_req = [
+    public array $_req = [
         'name',             // 关联的名字
         'tableClass',       // 关联的表数据入口对象名
         'mappingName',      // 字段映射名
@@ -191,7 +191,7 @@ class TableLink
      *
      * @var array
      */
-    public $_optional = [
+    public array $_optional = [
         'foreignKey',
         'sort',
         'conditions',
@@ -211,30 +211,30 @@ class TableLink
     /**
      * 外键字段的完全限定名
      *
-     * @var string
+     * @var string|null
      */
-    public $qforeignKey;
+    public ?string $qforeignKey = null;
 
     /**
      * 数据访问对象
      *
-     * @var \FLEA\Db\Driver\Abstract
+     * @var \FLEA\Db\Driver\AbstractDriver|null
      */
-    public $dbo;
+    public ?\FLEA\Db\Driver\AbstractDriver $dbo = null;
 
     /**
      * 关联表数据入口的对象名
      *
-     * @var string
+     * @var string|null
      */
-    public $assocTDGObjectId;
+    public ?string $assocTDGObjectId = null;
 
     /**
      * 指示关联的表数据入口是否已经初始化
      *
      * @var boolean
      */
-    public $init = false;
+    public bool $init = false;
 
     /**
      * 构造函数
