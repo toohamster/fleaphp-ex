@@ -4,6 +4,15 @@
 
 ---
 
+### docs: 更新 SPEC.md 控制器规格说明
+
+更新控制器 (Controller) 部分的方法签名和类型声明，与实际代码保持一致。
+
+**修改的文件:**
+- `SPEC.md`: 更新 3.3 MVC 架构中的控制器方法，`_beforeExecute()` → `beforeExecute()`、`_afterExecute()` → `afterExecute()`，`getView()` 返回类型改为 `\FLEA\View\ViewInterface`，`getDispatcher()` 返回类型改为 `?\FLEA\Dispatcher\Simple`
+
+---
+
 ### fix: 修复 UsersManager.php 中多余的 & 引用
 
 移除 `fetchRoles()` 方法中多余的 `&` 引用符号。
