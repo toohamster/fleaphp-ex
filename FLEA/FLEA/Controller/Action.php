@@ -179,14 +179,14 @@ class Action
             }
             $view = null;
             foreach ((array)$this->renderCallbacks as $callback) {
-                call_user_func_array($callback, array(& $data, & $view));
+                call_user_func_array($callback, array(& $data, $view));
             }
             if (is_array($data)) { extract($data); }
             include($__flea_internal_viewName);
         } else {
             $view = $this->getView();
             foreach ((array)$this->renderCallbacks as $callback) {
-                call_user_func_array($callback, array(& $data, & $view));
+                call_user_func_array($callback, array(& $data, $view));
             }
             if (is_array($data)) { $view->assign($data); }
             $view->display($__flea_internal_viewName);
