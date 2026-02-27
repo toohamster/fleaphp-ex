@@ -100,20 +100,22 @@ class Action
 {
     protected string $controllerName = '';    // 当前控制器名
     protected string $actionName = '';        // 当前动作名
-    protected ?\FLEA\Dispatcher\Auth $dispatcher = null;  // 调度器
+    protected ?\FLEA\Dispatcher\Simple $dispatcher = null;  // 调度器
     public $components = [];                  // 组件列表
     protected array $renderCallbacks = [];    // 渲染回调
 
     // 生命周期方法
-    public function __setController($controllerName, $actionName): void
-    public function __setDispatcher($dispatcher): void
+    public function setController($controllerName, $actionName): void
+    public function setDispatcher(\FLEA\Dispatcher\Simple $dispatcher): void
+    public function beforeExecute($actionMethod): void
+    public function afterExecute($actionMethod): void
 
     // 辅助方法
     protected function getComponent(string $componentName): object
-    protected function getDispatcher(): \FLEA\Dispatcher\Auth
+    protected function getDispatcher(): ?\FLEA\Dispatcher\Simple
     protected function url(?string $actionName = null, ?array $args = null, ?string $anchor = null): string
     protected function forward(?string $controllerName = null, ?string $actionName = null): void
-    protected function getView(): object
+    protected function getView(): \FLEA\View\ViewInterface
     protected function executeView(string $__flea_internal_viewName, ?array $data = null): void
     protected function isPost(): bool
     protected function isAjax(): bool
