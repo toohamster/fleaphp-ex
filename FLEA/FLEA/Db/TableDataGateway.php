@@ -53,56 +53,56 @@ class TableDataGateway
      *
      * @var string
      */
-    public $schema = '';
+    public string $schema = '';
 
     /**
      * 数据表名（没有添加前缀）
      *
      * @var string
      */
-    public $tableName = null;
+    public string $tableName = '';
 
     /**
      * 包含前缀的完整数据表名称
      *
-     * @var string
+     * @var string|null
      */
-    public $fullTableName = null;
+    public ?string $fullTableName = null;
 
     /**
      * 主键字段名，或者是包含多个主键字段名的数组
      *
-     * @var string|array
+     * @var string|array|null
      */
     public $primaryKey = null;
 
     /**
      * 定义一对一关联
      *
-     * @var array
+     * @var array|null
      */
-    public $hasOne = null;
+    public ?array $hasOne = null;
 
     /**
      * 定义从属关联
      *
-     * @var array
+     * @var array|null
      */
-    public $belongsTo = null;
+    public ?array $belongsTo = null;
 
     /**
      * 定义一对多关联
      *
-     * @var array
+     * @var array|null
      */
-    public $hasMany = null;
+    public ?array $hasMany = null;
 
     /**
      * 定义多对多关联
      *
-     * @var array
+     * @var array|null
      */
-    public $manyToMany = null;
+    public ?array $manyToMany = null;
 
     /**
      * 当前数据表的元数据

@@ -6,6 +6,63 @@
 
 ## 2026-02-26
 
+### refactor: TableDataGateway 及子类添加类型声明
+
+为 TableDataGateway 基类和所有子类添加 PHP 类型声明，提高类型安全性和 IDE 支持。
+
+**FLEA/FLEA/Db/TableDataGateway.php (基类)**
+- `$tableName`: `string` (初始值改为 `''`)
+- `$fullTableName`: `?string`
+- `$primaryKey`: 无类型 (支持 string|array)
+- `$hasOne`: `?array`
+- `$belongsTo`: `?array`
+- `$hasMany`: `?array`
+- `$manyToMany`: `?array`
+- `$schema`: `string`
+
+**FLEA/FLEA/Rbac/RolesManager.php**
+- `$tableName`: `string`
+
+**FLEA/FLEA/Rbac/UsersManager.php**
+- `$tableName`: `string`
+- `create()` 方法：添加参数 `bool $saveLinks = true` 和返回类型 `: bool`
+- `update()` 方法：添加参数 `bool $saveLinks = true`
+
+**FLEA/FLEA/Acl/Table/Roles.php**
+- `$tableName`: `string`
+- `$manyToMany`: `?array`
+
+**FLEA/FLEA/Acl/Table/Permissions.php**
+- `$tableName`: `string`
+
+**FLEA/FLEA/Acl/Table/UserGroups.php**
+- `$tableName`: `string`
+- `$manyToMany`: `?array`
+
+**FLEA/FLEA/Acl/Table/UserGroupsHasRoles.php**
+- `$tableName`: `string`
+
+**FLEA/FLEA/Acl/Table/UserGroupsHasPermissions.php**
+- `$tableName`: `string`
+
+**FLEA/FLEA/Acl/Table/UsersHasRoles.php**
+- `$tableName`: `string`
+
+**FLEA/FLEA/Acl/Table/UsersHasPermissions.php**
+- `$tableName`: `string`
+
+**App/Model/Post.php**
+- `$tableName`: `string`
+- `$hasMany`: `?array`
+
+**App/Model/Comment.php**
+- `$tableName`: `string`
+- `$belongsTo`: `?array`
+
+---
+
+## 2026-02-26
+
 ### fix: 修复 ManyToManyLink.php 中 DELETE 语句多余的括号
 
 **FLEA/FLEA/Db/TableLink/ManyToManyLink.php**

@@ -6,6 +6,22 @@
 
 ## 2026-02-26
 
+### refactor: Model 类添加类型声明
+
+为 App/Model 下的类添加 PHP 类型声明，与 FLEA 基类保持一致。
+
+**App/Model/Post.php**
+- `$tableName`: `string`
+- `$hasMany`: `?array`
+
+**App/Model/Comment.php**
+- `$tableName`: `string`
+- `$belongsTo`: `?array`
+
+---
+
+## 2026-02-26
+
 ### refactor: 将 array() 替换为短数组语法 []
 
 **App/Config.php**

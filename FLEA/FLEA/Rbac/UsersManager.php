@@ -45,7 +45,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
      *
      * @var string
      */
-    public $tableName = 'users';
+    public string $tableName = 'users';
 
     /**
      * 用户名字段的名字
@@ -196,14 +196,14 @@ class UsersManager extends \FLEA\Db\TableDataGateway
      *
      * @return mixed
      */
-    public function create(array &$row)
+    public function create(array &$row, bool $saveLinks = true): bool
     {
         if (isset($this->functionFields['registerIpField'])
             && $this->functionFields['registerIpField'] != '')
         {
             $row[$this->functionFields['registerIpField']] = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         }
-        return parent::create($row);
+        return parent::create($row, $saveLinks);
     }
 
     /**
@@ -430,10 +430,10 @@ class UsersManager extends \FLEA\Db\TableDataGateway
      *
      * @return boolean
      */
-    public function update(array &$row): bool
+    public function update(array &$row, bool $saveLinks = true): bool
     {
         unset($row[$this->passwordField]);
-        return parent::update($row);
+        return parent::update($row, $saveLinks);
     }
 
     /**

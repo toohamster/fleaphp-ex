@@ -33,6 +33,6 @@ class UserGroupsHasPermissions extends \FLEA\Db\TableDataGateway
      *
      * @var string
      */
-    public $tableName = 'user_groups_has_permissions';
+    public string $tableName = 'user_groups_has_permissions';
 
 }

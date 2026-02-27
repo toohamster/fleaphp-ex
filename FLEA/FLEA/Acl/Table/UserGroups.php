@@ -33,14 +33,14 @@ class UserGroups extends \FLEA\Db\TableDataGateway
      *
      * @var string
      */
-    public $tableName = 'user_groups';
+    public string $tableName = 'user_groups';
 
     /**
      * 用户组关联多个角色和权限
      *
      * @var array
      */
-    public $manyToMany = [
+    public ?array $manyToMany = [
         [
             'tableClass' => \FLEA\Acl\Table\Roles::class,
             'foreignKey' => 'user_group_id',

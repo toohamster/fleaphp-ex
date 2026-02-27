@@ -31,7 +31,7 @@ class Permissions extends \FLEA\Db\TableDataGateway
      *
      * @var string
      */
-    public $tableName = 'permissions';
+    public string $tableName = 'permissions';
 
     /**
      * 构造函数

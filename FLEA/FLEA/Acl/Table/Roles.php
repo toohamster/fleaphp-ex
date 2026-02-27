@@ -31,14 +31,14 @@ class Roles extends \FLEA\Db\TableDataGateway
      *
      * @var string
      */
-    public $tableName = 'roles';
+    public string $tableName = 'roles';
 
     /**
      * 一个角色对应多个权限，一个权限可以指派给多个角色
      *
      * @var array
      */
-    public $manyToMany = [
+    public ?array $manyToMany = [
         [
             'tableClass' => \FLEA\Acl\Table\Permissions::class,
             'foreignKey' => 'role_id',

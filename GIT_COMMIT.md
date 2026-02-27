@@ -6,6 +6,36 @@
 
 ## 2026-02-26
 
+### refactor: TableDataGateway 及子类添加类型声明
+
+为 TableDataGateway 基类和所有子类添加 PHP 类型声明，提高类型安全性和 IDE 支持。
+
+**基类修改 (FLEA/FLEA/Db/TableDataGateway.php):**
+- `$tableName`: `string` (初始值改为 `''`)
+- `$fullTableName`: `?string`
+- `$primaryKey`: 无类型 (支持 string|array)
+- `$hasOne`, `$belongsTo`, `$hasMany`, `$manyToMany`: `?array`
+- `$schema`: `string`
+
+**FLEA 子类修改:**
+- `Rbac/RolesManager.php`: `$tableName` 添加 `string`
+- `Rbac/UsersManager.php`: `$tableName` 添加 `string`，`create()` 和 `update()` 方法签名与父类对齐
+- `Acl/Table/Roles.php`: `$tableName` 添加 `string`, `$manyToMany` 添加 `?array`
+- `Acl/Table/Permissions.php`: `$tableName` 添加 `string`
+- `Acl/Table/UserGroups.php`: `$tableName` 添加 `string`, `$manyToMany` 添加 `?array`
+- `Acl/Table/UserGroupsHasRoles.php`: `$tableName` 添加 `string`
+- `Acl/Table/UserGroupsHasPermissions.php`: `$tableName` 添加 `string`
+- `Acl/Table/UsersHasRoles.php`: `$tableName` 添加 `string`
+- `Acl/Table/UsersHasPermissions.php`: `$tableName` 添加 `string`
+
+**App 子类修改:**
+- `App/Model/Post.php`: `$tableName` 添加 `string`, `$hasMany` 添加 `?array`
+- `App/Model/Comment.php`: `$tableName` 添加 `string`, `$belongsTo` 添加 `?array`
+
+---
+
+## 2026-02-26
+
 ### fix: 修复 ManyToManyLink.php 中 DELETE 语句多余的括号
 
 第 214 行 DELETE 语句不需要闭合括号，移除多余的 . ')'

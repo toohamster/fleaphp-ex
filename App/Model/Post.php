@@ -17,12 +17,12 @@ class Post extends TableDataGateway
     /**
      * 主键字段
      */
-    public string $primaryKey = 'id';
+    public $primaryKey = 'id';
 
     /**
      * 定义一对多关联：一个文章有多个评论
      */
-    public array $hasMany = [
+    public ?array $hasMany = [
         [
             'tableClass' => Comment::class,
             'foreignKey' => 'post_id',

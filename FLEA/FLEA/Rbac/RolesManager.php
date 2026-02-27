@@ -35,7 +35,7 @@ class RolesManager extends \FLEA\Db\TableDataGateway
      *
      * @var string
      */
-    public $tableName = 'roles';
+    public string $tableName = 'roles';
 
     /**
      * 角色名字段

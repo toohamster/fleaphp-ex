@@ -19,8 +19,8 @@ $dbo->startTrans();
 /**
  * 建立全部需要的权限
  */
-$tablePermissions = FLEA::getSingleton('FLEA_Acl_Table_Permissions');
-/* @var $tablePermissions FLEA_Acl_Table_Permissions */
+$tablePermissions = FLEA::getSingleton(\FLEA\Acl\Table\Permissions::class);
+/* @var $tablePermissions \FLEA\Acl\Table\Permissions */
 $permissions = [
     ['name' => '/Project/Create'],
     ['name' => '/Project/View'],
@@ -42,8 +42,8 @@ $permissions = array_to_hashmap($permissions, 'name');
 /**
  * 建立角色，并将权限绑定到角色上
  */
-$tableRoles = FLEA::getSingleton('FLEA_Acl_Table_Roles');
-/* @var $tableRoles FLEA_Acl_Table_Roles */
+$tableRoles = FLEA::getSingleton(\FLEA\Acl\Table\Roles::class);
+/* @var $tableRoles \FLEA\Acl\Table\Roles */
 $role = [
     'name' => 'ProjectManager',
     'permissions' => [
