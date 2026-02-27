@@ -194,9 +194,9 @@ class UsersManager extends \FLEA\Db\TableDataGateway
      *
      * @param array $row
      *
-     * @return mixed
+     * @return int
      */
-    public function create(array &$row, bool $saveLinks = true): bool
+    public function create(array &$row, bool $saveLinks = true): int
     {
         if (isset($this->functionFields['registerIpField'])
             && $this->functionFields['registerIpField'] != '')

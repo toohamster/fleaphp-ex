@@ -72,7 +72,7 @@ class UserGroups extends \FLEA\Db\TableDataGateway
      *
      * @return int
      */
-    public function create($group, $parentId = 0) {
+    public function create($group, $parentId = 0): int {
         $parentId = (int)$parentId;
         if ($parentId) {
             $parent = parent::find($parentId);
@@ -93,7 +93,7 @@ class UserGroups extends \FLEA\Db\TableDataGateway
                     'parent_id' => -1,
                 ];
                 if (!parent::create($parent)) {
-                    return false;
+                    return 0;
                 }
             }
             // 确保所有 _#_ROOT_GROUP_#_ 的直接子用户组的 parent_id 都为 0

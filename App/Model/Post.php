@@ -63,7 +63,7 @@ class Post extends TableDataGateway
      * 创建文章
      *
      * @param array $data 文章数据
-     * @return int|false
+     * @return int
      */
     public function createPost($data)
     {

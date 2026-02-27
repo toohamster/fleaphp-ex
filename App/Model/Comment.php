@@ -51,7 +51,7 @@ class Comment extends TableDataGateway
      * 创建评论
      *
      * @param array $data 评论数据
-     * @return int|false
+     * @return int
      */
     public function createComment($data)
     {

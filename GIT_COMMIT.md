@@ -4,6 +4,21 @@
 
 ---
 
+## 2026-02-27
+
+### refactor: create() 方法返回类型改为 int
+
+将 `create()` 方法的返回类型从 `int|false` 改为 `: int`，失败时返回 `0` 而不是 `false`。
+
+**修改的文件:**
+- `FLEA/FLEA/Db/TableDataGateway.php`: `create()` 返回类型改为 `: int`，4 处 `return false` 改为 `return 0`；`save()` 返回类型从 `: bool` 改为 `: int`；`createRowset()` 返回类型从 `: bool` 改为无类型声明，失败时返回 `0`
+- `FLEA/FLEA/Rbac/UsersManager.php`: `create()` 添加返回类型 `: int`
+- `FLEA/FLEA/Acl/Table/UserGroups.php`: `create()` 添加返回类型 `: int`，`return false` 改为 `return 0`
+- `App/Model/Post.php`: `createPost()` docblock 从 `@return int|false` 改为 `@return int`
+- `App/Model/Comment.php`: `createComment()` docblock 从 `@return int|false` 改为 `@return int`
+
+---
+
 ## 2026-02-26
 
 ### refactor: TableDataGateway 及子类添加类型声明

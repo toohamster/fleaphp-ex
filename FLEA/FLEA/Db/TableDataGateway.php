@@ -731,9 +731,9 @@ class TableDataGateway
      * @param boolean $saveLinks
      * @param boolean $updateCounter
      *
-     * @return boolean
+     * @return int
      */
-    public function save(array &$row, bool $saveLinks = true, bool $updateCounter = true): bool
+    public function save(array &$row, bool $saveLinks = true, bool $updateCounter = true): int
     {
         if (empty($row[$this->primaryKey])) {
             return $this->create($row, $saveLinks, $updateCounter);
@@ -1026,12 +1026,12 @@ class TableDataGateway
      * @param array $row
      * @param boolean $saveLinks
      *
-     * @return mixed
+     * @return int
      */
-    public function create(array &$row, bool $saveLinks = true): bool
+    public function create(array &$row, bool $saveLinks = true): int
     {
         if (!$this->_beforeCreate($row)) {
-            return false;
+            return 0;
         }
 
         // 自动设置日期字段
@@ -1077,7 +1077,7 @@ class TableDataGateway
         if (!$this->_beforeCreateDb($row)) {
             if ($unsetpk) { unset($row[$this->primaryKey]); }
             $this->dbo->completeTrans(false);
-            return false;
+            return 0;
         }
 
         // 生成 SQL 语句
@@ -1090,7 +1090,7 @@ class TableDataGateway
         if (!$this->dbo->execute(sql_statement($sql), $values, true)) {
             if ($unsetpk) { unset($row[$this->primaryKey]); }
             $this->dbo->completeTrans(false);
-            return false;
+            return 0;
         }
 
         // 如果提交的数据中没有主键字段值，则尝试获取新插入记录的主键值
@@ -1116,7 +1116,7 @@ class TableDataGateway
                 if (!$link->saveAssocData($row[$link->mappingName], $insertId)) {
                     if ($unsetpk) { unset($row[$this->primaryKey]); }
                     $this->dbo->completeTrans(false);
-                    return false;
+                    return 0;
                 }
             }
         }
@@ -1134,14 +1134,14 @@ class TableDataGateway
     }
 
     /**
-     * 插入多行记录，返回包含所有新记录主键值的数组，如果失败则返回 false
+     * 插入多行记录，返回包含所有新记录主键值的数组，如果失败则返回 0
      *
      * @param array $rowset
      * @param boolean $saveLinks
      *
-     * @return array
+     * @return array|int
      */
-    public function createRowset(array &$rowset, bool $saveLinks = true): bool
+    public function createRowset(array &$rowset, bool $saveLinks = true)
     {
         $insertids = [];
         $this->dbo->startTrans();
@@ -1149,7 +1149,7 @@ class TableDataGateway
             $insertid = $this->create($row, $saveLinks, false);
             if (!$insertid) {
                 $this->dbo->completeTrans(false);
-                return false;
+                return 0;
             }
             $insertids[] = $insertid;
         }
