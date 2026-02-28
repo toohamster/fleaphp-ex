@@ -6,6 +6,28 @@
 
 ## 2026-02-28
 
+### refactor: Driver 层 PARAM_STYLE 改为 protected const，?array 属性改为 array = []
+
+**Driver/AbstractDriver.php:**
+- `$PARAM_STYLE` 从 `public` 实例属性改为 `protected const PARAM_STYLE = '?'`（字面量）
+- `getPlaceholder()`、`getPlaceholderPair()` 中通过局部变量 `$paramStyle = static::PARAM_STYLE` 承接
+
+**Driver/Mysql.php:**
+- 删除冗余的 `$PARAM_STYLE = DBO_PARAM_QM` 声明（值与父类相同）
+
+**TableDataGateway.php:**
+- 6 个属性从 `?array = null` 改为 `array = []`：`$hasOne`、`$belongsTo`、`$hasMany`、`$manyToMany`、`$validateRules`、`$lastValidationResult`
+- `is_array($this->validateRules)` 简化为 `!empty($this->validateRules)`
+- `createLink()` 入口增加 `empty()` 守卫，防止空数组触发 MissingLinkOption 异常
+
+**App/Model/Post.php、Comment.php:**
+- `?array` → `array` 同步父类类型
+
+**FLEA/Acl/Table/Roles.php、Users.php、UserGroups.php:**
+- `?array` / 无类型 → `array` 同步父类类型
+
+---
+
 ### refactor: FLEA/Db 目录 PSR-1/PSR-12 合规性修复及 PHP 7.4 风格优化
 
 对 `FLEA/FLEA/Db/` 目录下所有 PHP 文件进行 PSR-1/PSR-12 合规性修复及 PHP 7.4 风格优化。

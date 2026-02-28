@@ -59,10 +59,8 @@ abstract class AbstractDriver
 
     /**
      * 指示使用何种样式的参数占位符
-     *
-     * @var string
      */
-    public $PARAM_STYLE = DBO_PARAM_QM;
+    protected const PARAM_STYLE = '?';
 
     /**
      * 指示数据库是否有自增字段功能
@@ -767,25 +765,26 @@ abstract class AbstractDriver
      */
     public function getPlaceholder(array &$inputarr, $fields = null): array
     {
+        $paramStyle = static::PARAM_STYLE;
         $holders = [];
         $values = [];
         if (is_array($fields)) {
             $fields = array_change_key_case(array_flip($fields), CASE_LOWER);
             foreach (array_keys($inputarr) as $key) {
                 if (!isset($fields[strtolower($key)])) { continue; }
-                if ($this->PARAM_STYLE == DBO_PARAM_QM) {
-                    $holders[] = $this->PARAM_STYLE;
+                if ($paramStyle == DBO_PARAM_QM) {
+                    $holders[] = $paramStyle;
                 } else {
-                    $holders[] = $this->PARAM_STYLE . $key;
+                    $holders[] = $paramStyle . $key;
                 }
                 $values[$key] =& $inputarr[$key];
             }
         } else {
             foreach (array_keys($inputarr) as $key) {
-                if ($this->PARAM_STYLE == DBO_PARAM_QM) {
-                    $holders[] = $this->PARAM_STYLE;
+                if ($paramStyle == DBO_PARAM_QM) {
+                    $holders[] = $paramStyle;
                 } else {
-                    $holders[] = $this->PARAM_STYLE . $key;
+                    $holders[] = $paramStyle . $key;
                 }
                 $values[$key] =& $inputarr[$key];
             }
@@ -803,6 +802,7 @@ abstract class AbstractDriver
      */
     public function getPlaceholderPair(array &$inputarr, $fields = null): array
     {
+        $paramStyle = static::PARAM_STYLE;
         $pairs = [];
         $values = [];
         if (is_array($fields)) {
@@ -810,20 +810,20 @@ abstract class AbstractDriver
             foreach (array_keys($inputarr) as $key) {
                 if (!isset($fields[strtolower($key)])) { continue; }
                 $qkey = $this->qfield($key);
-                if ($this->PARAM_STYLE == DBO_PARAM_QM) {
-                    $pairs[] = "{$qkey}={$this->PARAM_STYLE}";
+                if ($paramStyle == DBO_PARAM_QM) {
+                    $pairs[] = "{$qkey}={$paramStyle}";
                 } else {
-                    $pairs[] = "{$qkey}={$this->PARAM_STYLE}{$key}";
+                    $pairs[] = "{$qkey}={$paramStyle}{$key}";
                 }
                 $values[$key] =& $inputarr[$key];
             }
         } else {
             foreach (array_keys($inputarr) as $key) {
                 $qkey = $this->qfield($key);
-                if ($this->PARAM_STYLE == DBO_PARAM_QM) {
-                    $pairs[] = "{$qkey}={$this->PARAM_STYLE}";
+                if ($paramStyle == DBO_PARAM_QM) {
+                    $pairs[] = "{$qkey}={$paramStyle}";
                 } else {
-                    $pairs[] = "{$qkey}={$this->PARAM_STYLE}{$key}";
+                    $pairs[] = "{$qkey}={$paramStyle}{$key}";
                 }
                 $values[$key] =& $inputarr[$key];
             }

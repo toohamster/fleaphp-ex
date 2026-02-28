@@ -4,6 +4,22 @@
 
 ---
 
+### refactor: Driver 层 PARAM_STYLE 改为 protected const，?array 属性改为 array = []
+
+Driver 层最后一个实例属性 `$PARAM_STYLE` 改为 `protected const`；TableDataGateway 6 个 `?array = null` 属性改为 `array = []`，同步更新子类类型声明及 `createLink()` 空数组守卫。
+
+**修改的文件:**
+- `FLEA/FLEA/Db/Driver/AbstractDriver.php`
+- `FLEA/FLEA/Db/Driver/Mysql.php`
+- `FLEA/FLEA/Db/TableDataGateway.php`
+- `App/Model/Post.php`
+- `App/Model/Comment.php`
+- `FLEA/FLEA/Acl/Table/Roles.php`
+- `FLEA/FLEA/Acl/Table/Users.php`
+- `FLEA/FLEA/Acl/Table/UserGroups.php`
+
+---
+
 ### refactor: FLEA/Db 目录 PSR-1/PSR-12 合规性修复及 PHP 7.4 风格优化
 
 对 `FLEA/FLEA/Db/` 目录下所有 PHP 文件进行 PSR-1/PSR-12 合规性修复及 PHP 7.4 风格优化，包括：去掉属性/方法的 `_` 前缀、补全可见性声明、添加类型声明、移除对象参数多余的 `&` 引用、替换旧式回调语法、修正 `_setCreatedTimeFields`/`_setUpdatedTimeFields` 错误调用、Driver 层 13 个大写配置属性从实例属性改为 `protected const`。

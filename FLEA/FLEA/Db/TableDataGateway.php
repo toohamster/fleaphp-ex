@@ -81,28 +81,28 @@ class TableDataGateway
      *
      * @var array|null
      */
-    public ?array $hasOne = null;
+    public array $hasOne = [];
 
     /**
      * 定义从属关联
      *
      * @var array|null
      */
-    public ?array $belongsTo = null;
+    public array $belongsTo = [];
 
     /**
      * 定义一对多关联
      *
      * @var array|null
      */
-    public ?array $hasMany = null;
+    public array $hasMany = [];
 
     /**
      * 定义多对多关联
      *
      * @var array|null
      */
-    public ?array $manyToMany = null;
+    public array $manyToMany = [];
 
     /**
      * 当前数据表的元数据
@@ -142,7 +142,7 @@ class TableDataGateway
      *
      * @var array|null
      */
-    public ?array $validateRules = null;
+    public array $validateRules = [];
 
     /**
      * 创建记录时，要自动填入当前时间的字段
@@ -228,7 +228,7 @@ class TableDataGateway
      *
      * @var array|null
      */
-    public ?array $lastValidationResult = null;
+    public array $lastValidationResult = [];
 
     /**
      * 构造 \FLEA\Db\TableDataGateway 实例
@@ -322,7 +322,7 @@ class TableDataGateway
         }
         $this->fields = array_keys($this->meta);
 
-        if (is_array($this->validateRules)) {
+        if (!empty($this->validateRules)) {
             foreach ($this->validateRules as $fieldName => $rules) {
                 $fieldName = strtoupper($fieldName);
                 if (!isset($this->meta[$fieldName])) { continue; }
@@ -1515,7 +1515,7 @@ class TableDataGateway
      */
     public function createLink($defines, int $type): void
     {
-        if (!is_array($defines)) { return; }
+        if (!is_array($defines) || empty($defines)) { return; }
         if (!is_array(reset($defines))) {
             $defines = [$defines];
         }

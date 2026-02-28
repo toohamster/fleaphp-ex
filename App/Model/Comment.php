@@ -22,7 +22,7 @@ class Comment extends TableDataGateway
     /**
      * 定义从属关联：一个评论属于一个文章
      */
-    public ?array $belongsTo = [
+    public array $belongsTo = [
         [
             'tableClass' => Post::class,
             'foreignKey' => 'post_id',

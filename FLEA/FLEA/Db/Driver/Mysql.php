@@ -30,7 +30,6 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
     protected const INIT_SEQ_SQL = 'INSERT INTO %s VALUES (%s)';
     protected const DROP_SEQ_SQL = 'DROP TABLE %s';
     protected const META_COLUMNS_SQL = 'SHOW FULL COLUMNS FROM %s';
-    public $PARAM_STYLE = DBO_PARAM_QM;
     protected const HAS_INSERT_ID = true;
     protected const HAS_AFFECTED_ROWS = true;
     /**
