@@ -25,35 +25,35 @@ class ActiveRecord
      *
      * @var array
      */
-    protected array $aggregation = [];
+    public $_aggregation = [];
 
     /**
      * 用于完成数据库操作的 TableDataGateway 继承类
      *
-     * @var \FLEA\Db\TableDataGateway|null
+     * @var \FLEA\Db\TableDataGateway
      */
-    protected ?\FLEA\Db\TableDataGateway $table = null;
+    public $_table;
 
     /**
      * 该对象的主键属性名
      *
-     * @var string|null
+     * @var string
      */
-    protected ?string $idname = null;
+    public $_idname;
 
     /**
      * 指示该对象是否已经初始化
      *
      * @var boolean
      */
-    public bool $init = false;
+    public $init = false;
 
     /**
      * 字段和对象属性之间的映射关系
      *
      * @var array
      */
-    protected array $mapping = [];
+    public $_mapping = false;
 
     /**
      * 继承类必须覆盖此静态函数
@@ -62,7 +62,7 @@ class ActiveRecord
      *
      * @return array
      */
-    public static function define(): array
+    static function define(): array
     {
     }
 
@@ -95,29 +95,29 @@ class ActiveRecord
 
         $objid = "{$myclass}_tdg";
         if (\FLEA::isRegistered($objid)) {
-            $this->table = \FLEA::registry($objid);
+            $this->_table = \FLEA::registry($objid);
         } else {
             // 使用 Composer PSR-4 自动加载
             if (!class_exists($tableClass, true)) {
                 throw new \FLEA\Exception\ExpectedClass($tableClass);
             }
-            $this->table = new $tableClass(['skipCreateLinks' => true]);
-            \FLEA::register($this->table, $objid);
+            $this->_table = new $tableClass(['skipCreateLinks' => true]);
+            \FLEA::register($this->_table, $objid);
         }
 
         if (!empty($options['propertiesMapping'])) {
-            $this->mapping = [
+            $this->_mapping = [
                 'p2f' => $options['propertiesMapping'],
                 'f2p' => array_flip($options['propertiesMapping']),
             ];
-            $this->idname = $this->mapping['f2p'][$this->table->primaryKey];
+            $this->_idname = $this->_mapping['f2p'][$this->_table->primaryKey];
         } else {
-            $this->mapping = ['p2f' => [], 'f2p' => []];
-            foreach ($this->table->meta as $field) {
-                $this->mapping['p2f'][$field['name']] = $field['name'];
-                $this->mapping['f2p'][$field['name']] = $field['name'];
+            $this->_mapping = ['p2f' => [], 'f2p' => []];
+            foreach ($this->_table->meta as $field) {
+                $this->_mapping['p2f'][$field['name']] = $field['name'];
+                $this->_mapping['f2p'][$field['name']] = $field['name'];
             }
-            $this->idname = $this->table->primaryKey;
+            $this->_idname = $this->_table->primaryKey;
         }
 
         if (!isset($options['aggregation']) || !is_array($options['aggregation'])) {
@@ -153,10 +153,9 @@ class ActiveRecord
                 $link['assocForeignKey'] = $define['assocForeignKey'] ?? null;
             }
 
-            $this->table->createLink($link, $define['mappingType']);
-            $link = $this->table->getLink($link['mappingName']);
-            $define['link'] = $link;
-            $this->aggregation[$offset] = $define;
+            $this->_table->createLink($link, $define['mappingType']);
+            $define['link'] =& $this->_table->getLink($link['mappingName']);
+            $this->_aggregation[$offset] = $define;
         }
     }
 
@@ -165,9 +164,9 @@ class ActiveRecord
      *
      * @param mixed $conditions
      */
-    public function load($conditions = null): void
+    public function load($conditions): void
     {
-        $row = $this->table->find($conditions);
+        $row = $this->_table->find($conditions);
         if (is_array($row)) { $this->attach($row); }
     }
 
@@ -176,8 +175,8 @@ class ActiveRecord
      */
     public function save(): void
     {
-        $row = $this->toArray();
-        $this->table->save($row);
+        $row =& $this->toArray();
+        $this->_table->save($row);
     }
 
     /**
@@ -185,7 +184,7 @@ class ActiveRecord
      */
     public function delete(): void
     {
-        $this->table->removeByPkv($this->getId());
+        $this->_table->removeByPkv($this->getId());
     }
 
     /**
@@ -195,7 +194,7 @@ class ActiveRecord
      */
     public function setId($id): void
     {
-        $this->{$this->idname} = $id;
+        $this->{$this->_idname} = $id;
     }
 
     /**
@@ -205,7 +204,7 @@ class ActiveRecord
      */
     public function getId()
     {
-        return $this->{$this->idname};
+        return $this->{$this->_idname};
     }
 
     /**
@@ -216,7 +215,7 @@ class ActiveRecord
     public function toArray(): array
     {
         $arr = [];
-        foreach ($this->mapping['p2f'] as $prop => $field) {
+        foreach ($this->_mapping['p2f'] as $prop => $field) {
             $arr[$field] = $this->{$prop};
         }
         return $arr;
@@ -229,13 +228,13 @@ class ActiveRecord
      */
     public function attach(array &$row): void
     {
-        foreach ($this->mapping['f2p'] as $field => $prop) {
+        foreach ($this->_mapping['f2p'] as $field => $prop) {
             if (isset($row[$field])) {
                 $this->{$prop} = $row[$field];
             }
         }
 
-        foreach ($this->aggregation as $define) {
+        foreach ($this->_aggregation as $define) {
             $mn = $define['link']->mappingName;
             if (!isset($row[$mn])) { continue; }
             if ($define['link']->oneToOne) {

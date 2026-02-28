@@ -33,7 +33,7 @@ class Mysqlt extends \FLEA\Db\Driver\Mysql
      *
      * @return bool
      */
-    protected function startTrans(): bool
+    protected function _startTrans(): bool
     {
         try {
             return $this->pdo->beginTransaction() !== false;
@@ -48,7 +48,7 @@ class Mysqlt extends \FLEA\Db\Driver\Mysql
      * @param bool $commitOnNoErrors
      * @return bool
      */
-    protected function completeTrans(bool $commitOnNoErrors = true): bool
+    protected function _completeTrans(bool $commitOnNoErrors = true): bool
     {
         try {
             if ($this->_hasFailedQuery == false && $commitOnNoErrors) {

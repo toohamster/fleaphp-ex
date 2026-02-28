@@ -31,56 +31,56 @@ class TableLink
      *
      * @var string
      */
-    public string $name;
+    public $name;
 
     /**
      * 该关联所使用的表数据入口对象名
      *
      * @var string
      */
-    public string $tableClass;
+    public $tableClass;
 
     /**
      * 外键字段名
      *
-     * @var string|null
+     * @var string
      */
-    public ?string $foreignKey = null;
+    public $foreignKey;
 
     /**
      * 关联数据表结果映射到主表结果中的字段名
      *
      * @var string
      */
-    public string $mappingName;
+    public $mappingName;
 
     /**
      * 指示连接两个数据集的行时，是一对一连接还是一对多连接
      *
      * @var boolean
      */
-    public bool $oneToOne;
+    public $oneToOne;
 
     /**
      * 关联的类型
      *
-     * @var int
+     * @var enum
      */
-    public int $type;
+    public $type;
 
     /**
      * 对关联表进行查询时使用的排序参数
      *
-     * @var string|null
+     * @var string
      */
-    public ?string $sort = null;
+    public $sort;
 
     /**
      * 对关联表进行查询时使用的条件参数
      *
-     * @var string|array|null
+     * @var string
      */
-    public $conditions = null;
+    public $conditions;
 
     /**
      * 对关联表进行查询时要获取的关联表字段
@@ -92,9 +92,9 @@ class TableLink
     /**
      * 对关联表进行查询时限制查出的记录数
      *
-     * @var int|null
+     * @var int
      */
-    public ?int $limit = null;
+    public $limit = null;
 
     /**
      * 当 enabled 为 false 时，表数据入口的任何操作都不会处理该关联
@@ -103,49 +103,49 @@ class TableLink
      *
      * @var boolean
      */
-    public bool $enabled = true;
+    public $enabled = true;
 
     /**
      * 指示在查询关联表时是否仅仅统计记录数，而不实际查询数据
      *
      * @var boolean
      */
-    public bool $countOnly = false;
+    public $countOnly = false;
 
     /**
      * 将关联记录总数缓存到指定的字段
      *
-     * @var string|null
+     * @var string
      */
-    public ?string $counterCache = null;
+    public $counterCache = null;
 
     /**
      * 指示是否在主表读取记录时也读取该关联对应的关联表的记录
      *
      * @var boolean
      */
-    public bool $linkRead = true;
+    public $linkRead = true;
 
     /**
      * 指示是否在主表创建记录时也创建该关联对应的关联表的记录
      *
      * @var boolean
      */
-    public bool $linkCreate = true;
+    public $linkCreate = true;
 
     /**
      * 指示是否在主表更新记录时也更新该关联对应的关联表的记录
      *
      * @var boolean
      */
-    public bool $linkUpdate = true;
+    public $linkUpdate = true;
 
     /**
      * 指示是否在主表删除记录时也删除该关联对应的关联表的记录
      *
      * @var boolean
      */
-    public bool $linkRemove = true;
+    public $linkRemove = true;
 
     /**
      * 当删除主表记录而不删除关联表记录时，用什么值填充关联表记录的外键字段
@@ -159,28 +159,28 @@ class TableLink
      *
      * @var string
      */
-    public string $saveAssocMethod = 'save';
+    public $saveAssocMethod = 'save';
 
     /**
      * 主表的表数据入口对象
      *
      * @var \FLEA\Db\TableDataGateway
      */
-    public \FLEA\Db\TableDataGateway $mainTDG;
+    public $mainTDG;
 
     /**
      * 关联表的表数据入口对象
      *
-     * @var \FLEA\Db\TableDataGateway|null
+     * @var \FLEA\Db\TableDataGateway
      */
-    public ?\FLEA\Db\TableDataGateway $assocTDG = null;
+    public $assocTDG = null;
 
     /**
      * 必须设置的对象属性
      *
      * @var array
      */
-    public array $_req = [
+    public $_req = [
         'name',             // 关联的名字
         'tableClass',       // 关联的表数据入口对象名
         'mappingName',      // 字段映射名
@@ -191,7 +191,7 @@ class TableLink
      *
      * @var array
      */
-    public array $_optional = [
+    public $_optional = [
         'foreignKey',
         'sort',
         'conditions',
@@ -211,30 +211,30 @@ class TableLink
     /**
      * 外键字段的完全限定名
      *
-     * @var string|null
+     * @var string
      */
-    public ?string $qforeignKey = null;
+    public $qforeignKey;
 
     /**
      * 数据访问对象
      *
-     * @var \FLEA\Db\Driver\AbstractDriver|null
+     * @var \FLEA\Db\Driver\Abstract
      */
-    public ?\FLEA\Db\Driver\AbstractDriver $dbo = null;
+    public $dbo;
 
     /**
      * 关联表数据入口的对象名
      *
-     * @var string|null
+     * @var string
      */
-    public ?string $assocTDGObjectId = null;
+    public $assocTDGObjectId;
 
     /**
      * 指示关联的表数据入口是否已经初始化
      *
      * @var boolean
      */
-    public bool $init = false;
+    public $init = false;
 
     /**
      * 构造函数
@@ -409,7 +409,7 @@ class TableLink
      *
      * @return string
      */
-    protected function getFindSQLBase(string $sql, string $in): string
+    protected function _getFindSQLBase(string $sql, string $in): string
     {
         if ($in) {
             $sql .= " WHERE {$this->qforeignKey} {$in}";
@@ -421,7 +421,7 @@ class TableLink
                     $conditions = $conditions[0];
                 }
             } else {
-                $conditions = $this->conditions;
+                $conditions =& $this->conditions;
             }
             if ($conditions) {
                 $sql .= " AND {$conditions}";
@@ -441,7 +441,7 @@ class TableLink
      *
      * @return boolean
      */
-    protected function saveAssocDataBase(array &$row): bool
+    protected function _saveAssocDataBase(array &$row): bool
     {
         switch (strtolower($this->saveAssocMethod)) {
         case 'create':

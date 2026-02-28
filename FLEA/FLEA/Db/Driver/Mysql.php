@@ -259,7 +259,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
      *
      * @return string|int
      */
-    protected function insertId()
+    protected function _insertId()
     {
         return $this->pdo->lastInsertId();
     }
@@ -269,7 +269,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
      *
      * @return int
      */
-    protected function affectedRows(): int
+    protected function _affectedRows(): int
     {
         if ($this->lastStmt) {
             return $this->lastStmt->rowCount();
