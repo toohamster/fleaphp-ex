@@ -14,7 +14,7 @@ class Mysqlt extends \FLEA\Db\Driver\Mysql
     /**
      * @var bool
      */
-    public $HAS_TRANSACTION = true;
+    protected const HAS_TRANSACTION = true;
 
     /**
      * Connect and enable savepoint support
@@ -33,7 +33,7 @@ class Mysqlt extends \FLEA\Db\Driver\Mysql
      *
      * @return bool
      */
-    protected function _startTrans(): bool
+    protected function doStartTrans(): bool
     {
         try {
             return $this->pdo->beginTransaction() !== false;
@@ -48,10 +48,10 @@ class Mysqlt extends \FLEA\Db\Driver\Mysql
      * @param bool $commitOnNoErrors
      * @return bool
      */
-    protected function _completeTrans(bool $commitOnNoErrors = true): bool
+    protected function doCompleteTrans(bool $commitOnNoErrors = true): bool
     {
         try {
-            if ($this->_hasFailedQuery == false && $commitOnNoErrors) {
+            if ($this->hasFailedQuery == false && $commitOnNoErrors) {
                 return $this->pdo->commit() !== false;
             } else {
                 return $this->pdo->rollBack() !== false;

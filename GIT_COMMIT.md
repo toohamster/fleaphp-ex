@@ -4,6 +4,26 @@
 
 ---
 
+### refactor: FLEA/Db 目录 PSR-1/PSR-12 合规性修复及 PHP 7.4 风格优化
+
+对 `FLEA/FLEA/Db/` 目录下所有 PHP 文件进行 PSR-1/PSR-12 合规性修复及 PHP 7.4 风格优化，包括：去掉属性/方法的 `_` 前缀、补全可见性声明、添加类型声明、移除对象参数多余的 `&` 引用、替换旧式回调语法、修正 `_setCreatedTimeFields`/`_setUpdatedTimeFields` 错误调用、Driver 层 13 个大写配置属性从实例属性改为 `protected const`。
+
+**修改的文件:**
+- `FLEA/FLEA/Db/Driver/AbstractDriver.php`
+- `FLEA/FLEA/Db/Driver/Mysql.php`
+- `FLEA/FLEA/Db/Driver/Mysqlt.php`
+- `FLEA/FLEA/Db/TableLink.php`
+- `FLEA/FLEA/Db/TableLink/BelongsToLink.php`
+- `FLEA/FLEA/Db/TableLink/HasOneLink.php`
+- `FLEA/FLEA/Db/TableLink/HasManyLink.php`
+- `FLEA/FLEA/Db/TableLink/ManyToManyLink.php`
+- `FLEA/FLEA/Db/TableDataGateway.php`
+- `FLEA/FLEA/Db/SqlHelper.php`
+- `FLEA/FLEA/Db/ActiveRecord.php`
+- `FLEA/FLEA/Db/Exception/*.php`（10 个异常类）
+
+---
+
 ### docs: 更新 TableDataGateway.php 方法注释中的事件方法名
 
 更新方法注释中的旧事件方法名（移除下划线前缀），与新的方法名保持一致。

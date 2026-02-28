@@ -25,7 +25,7 @@ class MissingPrimaryKey extends \FLEA\Exception
      *
      * @var string
      */
-    public $primaryKey;
+    public string $primaryKey;
 
     /**
      * 构造函数

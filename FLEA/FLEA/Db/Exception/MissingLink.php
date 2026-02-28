@@ -20,7 +20,7 @@ namespace FLEA\Db\Exception;
  */
 class MissingLink extends \FLEA\Exception
 {
-    public $name;
+    public string $name;
 
     /**
      * 构造函数

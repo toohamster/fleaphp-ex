@@ -4,6 +4,69 @@
 
 ---
 
+## 2026-02-28
+
+### refactor: FLEA/Db 目录 PSR-1/PSR-12 合规性修复及 PHP 7.4 风格优化
+
+对 `FLEA/FLEA/Db/` 目录下所有 PHP 文件进行 PSR-1/PSR-12 合规性修复及 PHP 7.4 风格优化。
+
+**Driver/AbstractDriver.php:**
+- 属性去 `_` 前缀：`$_insertId` → `$insertId`、`$_transCount` → `$transCount`、`$_hasFailedQuery` → `$hasFailedQuery`、`$_savepointStack` → `$savepointStack`
+- 内部钩子方法加 `do` 前缀：`_insertId()` → `doInsertId()`、`_affectedRows()` → `doAffectedRows()`、`_startTrans()` → `doStartTrans()`、`_completeTrans()` → `doCompleteTrans()`
+- SQL 模板属性从 `?string = null` 改为 `string = ''`，`nextId()`/`createSeq()`/`dropSeq()` 入口增加空值校验，为空时抛 `NotImplemented` 异常
+- 13 个大写属性（`TRUE_VALUE`、`FALSE_VALUE`、`NULL_VALUE`、5 个 SQL 模板、5 个 `HAS_*` 开关）从 `public` 实例属性改为 `protected const`，所有引用从 `$this->PROP` 改为 `static::PROP`
+- 补属性类型声明：`int`、`string`、`bool`、`?array`、`array` 等
+
+**Driver/Mysql.php:**
+- 属性去 `_` 前缀：`$_mysqlVersion` → `$mysqlVersion`
+- 钩子方法重命名：`_insertId()` → `doInsertId()`、`_affectedRows()` → `doAffectedRows()`
+- 7 个大写属性覆盖改为 `protected const`，引用改为 `static::PROP`
+- 补属性类型声明：`string`、`bool`、`?\PDO`、`?\PDOStatement`
+
+**Driver/Mysqlt.php:**
+- 方法重命名：`_startTrans()` → `doStartTrans()`、`_completeTrans()` → `doCompleteTrans()`
+- 属性引用更新：`$this->_hasFailedQuery` → `$this->hasFailedQuery`
+- `$HAS_TRANSACTION` 改为 `protected const`
+
+**TableLink.php:**
+- 属性去 `_` 前缀：`$_req` → `$req`、`$_optional` → `$optional`
+- 方法去 `_` 前缀：`_getFindSQLBase()` → `getFindSQLBase()`、`_saveAssocDataBase()` → `saveAssocDataBase()`
+- 补 `public` 可见性：`saveAssocData()`、`calcCount()`
+- 移除对象参数 `&`：`createLink(..., &$mainTDG)` → `createLink(..., $mainTDG)`
+- 补构造函数参数类型：`(array $define, int $type, TableDataGateway $mainTDG)`
+- 补属性类型声明：`bool`、`string`、`array` 等
+
+**TableLink/BelongsToLink.php、HasOneLink.php、HasManyLink.php:**
+- 补属性类型声明：`bool $oneToOne`
+- 补构造函数参数类型（BelongsToLink）
+- `getFindSQL()` 补参数和返回类型
+- 补 `public` 可见性：`saveAssocData()`
+- 更新父类方法调用：`parent::getFindSQLBase()`、`$this->saveAssocDataBase()`
+
+**TableLink/ManyToManyLink.php:**
+- 补所有属性类型声明：`bool`、`?TableDataGateway`、`?string` 等
+- 5 个方法补 `public` 可见性
+- 补构造函数参数类型
+- `getFindSQL()`、`saveAssocData()` 补参数类型
+- 更新 `$this->optional` 引用和 `parent::getFindSQLBase()` 调用
+
+**TableDataGateway.php（Bug 修复 + 回调替换）:**
+- 修正错误调用：`$this->_setCreatedTimeFields()` → `$this->setCreatedTimeFields()`、`$this->_setUpdatedTimeFields()` → `$this->setUpdatedTimeFields()`
+- 替换旧式回调：`array(& $this->dbo, 'qstr')` → `[$this->dbo, 'qstr']`
+
+**SqlHelper.php:**
+- 替换旧式回调：`array($table->dbo, 'qstr')` → `[$table->dbo, 'qstr']`
+
+**ActiveRecord.php:**
+- 属性去 `_` 前缀：`$_aggregation` → `$aggregation`、`$_table` → `$table`、`$_idname` → `$idname`、`$_mapping` → `$mapping`
+- 补 `public` 可见性：`static function define()` → `public static function define()`
+
+**Exception/ 全部文件（10 个）:**
+- 4 个文件补 `public` 可见性：InvalidDSN、InvalidInsertID、InvalidLinkType、MissingDSN 的 `__construct`
+- 补属性类型声明：`string $tableName`、`string $name`、`string $option`、`string $sql`、`string $primaryKey`
+
+---
+
 ### fix: 修复 UsersManager.php 中多余的 & 引用
 
 移除 `fetchRoles()` 方法中多余的 `&` 引用符号。

@@ -40,71 +40,61 @@ abstract class AbstractDriver
     /**
      * 用于描绘 true、false 和 null 的数据库值
      */
-    public $TRUE_VALUE  = 1;
-    public $FALSE_VALUE = 0;
-    public $NULL_VALUE = 'NULL';
+    protected const TRUE_VALUE  = 1;
+    protected const FALSE_VALUE = 0;
+    protected const NULL_VALUE = 'NULL';
 
     /**
      * 用于 genSeq()、dropSeq() 和 nextId() 的 SQL 查询语句
      */
-    public $NEXT_ID_SQL    = null;
-    public $CREATE_SEQ_SQL = null;
-    public $INIT_SEQ_SQL   = null;
-    public $DROP_SEQ_SQL   = null;
+    protected const NEXT_ID_SQL    = '';
+    protected const CREATE_SEQ_SQL = '';
+    protected const INIT_SEQ_SQL   = '';
+    protected const DROP_SEQ_SQL   = '';
 
     /**
      * 用于获取元数据的 SQL 查询语句
      */
-    public $META_COLUMNS_SQL = null;
+    protected const META_COLUMNS_SQL = '';
 
     /**
      * 指示使用何种样式的参数占位符
      *
-     * @var int
+     * @var string
      */
     public $PARAM_STYLE = DBO_PARAM_QM;
 
     /**
      * 指示数据库是否有自增字段功能
-     *
-     * @var boolean
      */
-    public $HAS_INSERT_ID  = false;
+    protected const HAS_INSERT_ID  = false;
 
     /**
      * 指示数据库是否能获得更新、删除操作影响的记录行数量
-     *
-     * @var boolean
      */
-    public $HAS_AFFECTED_ROWS = false;
+    protected const HAS_AFFECTED_ROWS = false;
 
     /**
      * 指示数据库是否支持事务
-     *
-     * @var boolean
      */
-    public $HAS_TRANSACTION = false;
+    protected const HAS_TRANSACTION = false;
 
     /**
      * 指示数据库是否支持事务中的 SAVEPOINT 功能
-     *
-     * @var boolean
      */
-    public $HAS_SAVEPOINT = false;
+    protected const HAS_SAVEPOINT = false;
 
     /**
      * 指示是否将查询结果中的字段名转换为全小写
-     *
-     * @var boolean
      */
-    public $RESULT_FIELD_NAME_LOWER = false;
+    protected const RESULT_FIELD_NAME_LOWER = false;
 
     /**
      * 数据库连接信息
      *
      * @var array
      */
-    public $dsn = null;
+    public ?array $dsn = null;
 
     /**
      * 数据库连接句柄
@@ -118,14 +108,14 @@ abstract class AbstractDriver
      *
      * @var array
      */
-    public $log = [];
+    public array $log = [];
 
     /**
      * 执行的查询计数
      *
      * @var int
      */
-    public $querycount = 0;
+    public int $querycount = 0;
 
     /**
      * 最后一次数据库操作的错误信息
@@ -146,28 +136,28 @@ abstract class AbstractDriver
      *
      * @var mixed
      */
-    protected $_insertId = null;
+    protected $insertId = null;
 
     /**
      * 指示事务启动次数
      *
      * @var int
      */
-    protected $_transCount = 0;
+    protected int $transCount = 0;
 
     /**
      * 指示事务执行期间是否发生了错误
      *
      * @var boolean
      */
-    protected $_hasFailedQuery = false;
+    protected bool $hasFailedQuery = false;
 
     /**
      * SAVEPOINT 堆栈
      *
      * @var array
      */
-    protected $_savepointStack = [];
+    protected array $savepointStack = [];
 
     /**
      * 构造函数
@@ -199,8 +189,8 @@ abstract class AbstractDriver
         $this->conn = null;
         $this->lasterr = null;
         $this->lasterrcode = null;
-        $this->_insertId = null;
-        $this->_transCount = 0;
+        $this->insertId = null;
+        $this->transCount = 0;
         $this->_transCommit = true;
     }
 
@@ -320,7 +310,10 @@ abstract class AbstractDriver
      */
     public function nextId(string $seqName = 'sdbo_seq', int $startValue = 1)
     {
-        $getNextIdSql = sprintf($this->NEXT_ID_SQL, $seqName);
+        if (static::NEXT_ID_SQL === '') {
+            throw new \FLEA\Exception\NotImplemented('nextId()', static::class);
+        }
+        $getNextIdSql = sprintf(static::NEXT_ID_SQL, $seqName);
         $result = $this->execute(\FLEA\Db\SqlStatement::create($getNextIdSql), null, false);
         $result = $result->getSql();
         if (!$result) {
@@ -330,13 +323,13 @@ abstract class AbstractDriver
             if (!$result) { return false; }
         }
 
-        if ($this->HAS_INSERT_ID) {
-            return $this->_insertId();
+        if (static::HAS_INSERT_ID) {
+            return $this->doInsertId();
         } else {
             $row = $this->fetchRow($result);
             $this->freeRes($result);
             $nextId = reset($row);
-            $this->_insertId = $nextId;
+            $this->insertId = $nextId;
             return $nextId;
         }
     }
@@ -351,8 +344,11 @@ abstract class AbstractDriver
      */
     public function createSeq(string $seqName = 'sdbo_seq', int $startValue = 1): bool
     {
-        if ($this->execute(\FLEA\Db\SqlStatement::create(sprintf($this->CREATE_SEQ_SQL, $seqName)))) {
-            return $this->execute(\FLEA\Db\SqlStatement::create(sprintf($this->INIT_SEQ_SQL, $seqName, $startValue - 1)));
+        if (static::CREATE_SEQ_SQL === '' || static::INIT_SEQ_SQL === '') {
+            throw new \FLEA\Exception\NotImplemented('createSeq()', static::class);
+        }
+        if ($this->execute(\FLEA\Db\SqlStatement::create(sprintf(static::CREATE_SEQ_SQL, $seqName)))) {
+            return $this->execute(\FLEA\Db\SqlStatement::create(sprintf(static::INIT_SEQ_SQL, $seqName, $startValue - 1)));
         } else {
             return false;
         }
@@ -367,7 +363,10 @@ abstract class AbstractDriver
      */
     public function dropSeq(string $seqName = 'sdbo_seq'): bool
     {
-        return $this->execute(\FLEA\Db\SqlStatement::create(sprintf($this->DROP_SEQ_SQL, $seqName)));
+        if (static::DROP_SEQ_SQL === '') {
+            throw new \FLEA\Exception\NotImplemented('dropSeq()', static::class);
+        }
+        return $this->execute(\FLEA\Db\SqlStatement::create(sprintf(static::DROP_SEQ_SQL, $seqName)));
     }
 
     /**
@@ -377,7 +376,7 @@ abstract class AbstractDriver
      */
     public function insertId()
     {
-        return $this->HAS_INSERT_ID ? $this->_insertId() : $this->_insertId;
+        return static::HAS_INSERT_ID ? $this->doInsertId() : $this->insertId;
     }
 
     /**
@@ -387,7 +386,7 @@ abstract class AbstractDriver
      */
     public function affectedRows(): int
     {
-        return $this->HAS_AFFECTED_ROWS ? $this->_affectedRows() : 0;
+        return static::HAS_AFFECTED_ROWS ? $this->doAffectedRows() : 0;
     }
 
     /**
@@ -652,16 +651,16 @@ abstract class AbstractDriver
      */
     public function startTrans(): bool
     {
-        if (!$this->HAS_TRANSACTION) { return false; }
-        if ($this->_transCount == 0) {
-            $this->_startTrans();
-            $this->_hasFailedQuery = false;
+        if (!static::HAS_TRANSACTION) { return false; }
+        if ($this->transCount == 0) {
+            $this->doStartTrans();
+            $this->hasFailedQuery = false;
         }
-        $this->_transCount++;
-        if ($this->_transCount > 1 && $this->HAS_SAVEPOINT) {
-            $savepoint = 'savepoint_' . $this->_transCount;
+        $this->transCount++;
+        if ($this->transCount > 1 && static::HAS_SAVEPOINT) {
+            $savepoint = 'savepoint_' . $this->transCount;
             $this->execute(\FLEA\Db\SqlStatement::create("SAVEPOINT {$savepoint}"));
-            array_push($this->_savepointStack, $savepoint);
+            array_push($this->savepointStack, $savepoint);
         }
         return true;
     }
@@ -676,16 +675,16 @@ abstract class AbstractDriver
      */
     public function completeTrans(bool $commitOnNoErrors = true): bool
     {
-        if (!$this->HAS_TRANSACTION) { return false; }
-        if ($this->_transCount == 0) { return true; }
-        $this->_transCount--;
-        if ($this->_transCount > 0 && $this->HAS_SAVEPOINT) {
-            $savepoint = array_pop($this->_savepointStack);
-            if ($this->_hasFailedQuery || $commitOnNoErrors == false) {
+        if (!static::HAS_TRANSACTION) { return false; }
+        if ($this->transCount == 0) { return true; }
+        $this->transCount--;
+        if ($this->transCount > 0 && static::HAS_SAVEPOINT) {
+            $savepoint = array_pop($this->savepointStack);
+            if ($this->hasFailedQuery || $commitOnNoErrors == false) {
                 $this->execute(\FLEA\Db\SqlStatement::create("ROLLBACK TO SAVEPOINT {$savepoint}"));
             }
         } else {
-            $this->_completeTrans($commitOnNoErrors);
+            $this->doCompleteTrans($commitOnNoErrors);
         }
         return true;
     }
@@ -695,7 +694,7 @@ abstract class AbstractDriver
      */
     public function failTrans(): void
     {
-        $this->_hasFailedQuery = true;
+        $this->hasFailedQuery = true;
     }
 
     /**
@@ -703,7 +702,7 @@ abstract class AbstractDriver
      */
     public function hasFailedTrans(): bool
     {
-        return $this->HAS_TRANSACTION ? $this->_hasFailedQuery : false;
+        return static::HAS_TRANSACTION ? $this->hasFailedQuery : false;
     }
 
     /**

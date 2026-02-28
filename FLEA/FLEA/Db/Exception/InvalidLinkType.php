@@ -27,7 +27,7 @@ class InvalidLinkType extends \FLEA\Exception
      *
      * @param $type
      */
-    function __construct($type)
+    public function __construct($type)
     {
         $this->type = $type;
         $code = 0x0202001;

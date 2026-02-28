@@ -20,7 +20,7 @@ class InvalidDSN extends \FLEA\Exception
      *
      * @param $dsn
      */
-    function __construct($dsn)
+    public function __construct($dsn)
     {
         unset($this->dsn['password']);
         $this->dsn = $dsn;

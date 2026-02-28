@@ -25,7 +25,7 @@ class PrimaryKeyExists extends \FLEA\Exception
      *
      * @var string
      */
-    public $primaryKey;
+    public string $primaryKey;
 
     /**
      * 主键字段值

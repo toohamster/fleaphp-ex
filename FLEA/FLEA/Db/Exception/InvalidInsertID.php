@@ -23,7 +23,7 @@ class InvalidInsertID extends \FLEA\Exception
     /**
      * 构造函数
      */
-    function __construct()
+    public function __construct()
     {
         $code = 0x06ff008;
         parent::__construct(_ET($code), $code);

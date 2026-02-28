@@ -64,9 +64,9 @@ class SqlHelper
                 } else {
                     if (strtolower($offset) == 'in()') {
                         if (count($cond) == 1 && is_array(reset($cond)) && is_string(key($cond))) {
-                            $tmp = $table->qfield(key($cond)) . ' IN (' . implode(',', array_map(array($table->dbo, 'qstr'), reset($cond))). ')';
+                            $tmp = $table->qfield(key($cond)) . ' IN (' . implode(',', array_map([$table->dbo, 'qstr'], reset($cond))). ')';
                         } else {
-                            $tmp = $table->qpk . ' IN (' . implode(',', array_map(array($table->dbo, 'qstr'), $cond)). ')';
+                            $tmp = $table->qpk . ' IN (' . implode(',', array_map([$table->dbo, 'qstr'], $cond)). ')';
                         }
                         $cond = ['', $tmp, '', $expr, true];
                     } else {

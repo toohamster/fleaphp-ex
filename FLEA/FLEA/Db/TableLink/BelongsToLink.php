@@ -20,7 +20,7 @@ use FLEA\Db\TableLink;
  */
 class BelongsToLink extends TableLink
 {
-    public $oneToOne = true;
+    public bool $oneToOne = true;
 
     /**
      * 构造函数
@@ -29,7 +29,7 @@ class BelongsToLink extends TableLink
      * @param enum $type
      * @param \FLEA\Db\TableDataGateway $mainTDG
      */
-    public function __construct($define, $type, $mainTDG)
+    public function __construct(array $define, int $type, \FLEA\Db\TableDataGateway $mainTDG)
     {
         $this->linkUpdate = $this->linkCreate = $this->linkRemove = false;
         parent::__construct($define, $type, $mainTDG);
@@ -42,14 +42,14 @@ class BelongsToLink extends TableLink
      *
      * @return string
      */
-    public function getFindSQL($in)
+    public function getFindSQL(string $in): string
     {
         if (!$this->init) { $this->init(); }
         $fields = $this->mainTDG->qpk . ' AS ' . $this->mainTDG->pka . ', ' . $this->dbo->qfields($this->fields, $this->assocTDG->fullTableName, $this->assocTDG->schema);
 
         $sql = "SELECT {$fields} FROM {$this->assocTDG->qtableName} LEFT JOIN {$this->mainTDG->qtableName} ON {$this->mainTDG->qpk} {$in} WHERE {$this->qforeignKey} = {$this->assocTDG->qpk} ";
         $in = '';
-        return parent::_getFindSQLBase($sql, $in);
+        return parent::getFindSQLBase($sql, $in);
     }
 
     /**
@@ -60,11 +60,11 @@ class BelongsToLink extends TableLink
      *
      * @return boolean
      */
-    function saveAssocData(array &$row, $pkv): bool
+    public function saveAssocData(array &$row, $pkv): bool
     {
         if (empty($row)) { return true; }
         if (!$this->init) { $this->init(); }
-        return $this->_saveAssocDataBase($row);
+        return $this->saveAssocDataBase($row);
     }
 
     /**

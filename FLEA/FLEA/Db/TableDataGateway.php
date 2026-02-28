@@ -444,7 +444,7 @@ class TableDataGateway
             $pkvs = [];
             $assocRowset = [];
             $rowset = $this->dbo->getAllWithFieldRefs($result, $this->pka, $pkvs, $assocRowset);
-            $in = 'IN (' . implode(',', array_map(array(& $this->dbo, 'qstr'), $pkvs)) . ')';
+            $in = 'IN (' . implode(',', array_map([$this->dbo, 'qstr'], $pkvs)) . ')';
         } else {
             $rowset = $this->dbo->getAll($result);
         }
@@ -531,7 +531,7 @@ class TableDataGateway
             }
             if (empty($in)) { continue; }
 
-            $in = 'IN (' . implode(',', array_map(array(& $this->dbo, 'qstr'), $in)) . ')';
+            $in = 'IN (' . implode(',', array_map([$this->dbo, 'qstr'], $in)) . ')';
 
             $sql = $link->getFindSQL($in);
             $this->dbo->assemble(sql_statement($sql), $assocRowset, $link->mappingName, $link->oneToOne, $link->mainTDG->pka, $link->limit);
@@ -601,7 +601,7 @@ class TableDataGateway
                     }
                 }
             }
-            $in = 'IN (' . implode(',', array_map(array(& $this->dbo, 'qstr'), $in)) . ')';
+            $in = 'IN (' . implode(',', array_map([$this->dbo, 'qstr'], $in)) . ')';
 
             $sql = $link->getFindSQL($in);
             $this->dbo->assemble(sql_statement($sql), $assocRowset, $link->mappingName, $link->oneToOne, $link->mainTDG->pka, $link->limit);
@@ -769,7 +769,7 @@ class TableDataGateway
      */
     public function replace(array &$row): bool
     {
-        $this->_setCreatedTimeFields($row);
+        $this->setCreatedTimeFields($row);
         $fields = '';
         $values = '';
         foreach ($row as $field => $value) {
@@ -974,7 +974,7 @@ class TableDataGateway
         $incr = (int)$incr;
 
         $row = [];
-        $this->_setUpdatedTimeFields($row);
+        $this->setUpdatedTimeFields($row);
         [$pairs, $values] = $this->dbo->getPlaceholderPair($row, $this->fields);
         $pairs = implode(',', $pairs);
         if ($pairs) {
