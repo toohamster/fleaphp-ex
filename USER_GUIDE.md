@@ -1099,7 +1099,7 @@ class Post extends TableDataGateway
     /**
      * 一对多：一篇文章有多个评论
      */
-    public ?array $hasMany = [
+    public array $hasMany = [
         [
             'tableClass' => Comment::class,
             'foreignKey' => 'post_id',
@@ -1119,7 +1119,7 @@ class Comment extends TableDataGateway
     /**
      * 从属：评论属于一篇文章
      */
-    public ?array $belongsTo = [
+    public array $belongsTo = [
         [
             'tableClass' => Post::class,
             'foreignKey' => 'post_id',
@@ -1169,7 +1169,7 @@ $posts = $postModel->findAll(
 #### HAS_ONE（一对一）
 
 ```php
-public ?array $hasOne = [
+public array $hasOne = [
     [
         'tableClass' => UserProfile::class,
         'foreignKey' => 'user_id',
@@ -1181,7 +1181,7 @@ public ?array $hasOne = [
 #### HAS_MANY（一对多）
 
 ```php
-public ?array $hasMany = [
+public array $hasMany = [
     [
         'tableClass' => Comment::class,
         'foreignKey' => 'post_id',
@@ -1194,7 +1194,7 @@ public ?array $hasMany = [
 #### BELONGS_TO（从属）
 
 ```php
-public ?array $belongsTo = [
+public array $belongsTo = [
     [
         'tableClass' => Author::class,
         'foreignKey' => 'author_id',
@@ -1206,7 +1206,7 @@ public ?array $belongsTo = [
 #### MANY_TO_MANY（多对多）
 
 ```php
-public ?array $manyToMany = [
+public array $manyToMany = [
     [
         'tableClass' => Tag::class,
         'foreignKey' => 'post_id',
