@@ -6,6 +6,25 @@
 
 ## 2026-02-28
 
+### refactor: TableDataGateway/AbstractDriver 返回类型修正及代码质量优化
+
+**TableDataGateway.php:**
+- `find()`：`is_array()` + `false` 改为 `!empty()` + `return null`，消除 `false` 与 `?array` 返回类型不匹配
+- `findBySql()`：移除死代码 `if ($result->getSql())` 分支，直接 return
+- `findAll()`、`findBySql()`：返回类型 `?array` → `array`（实际永远返回数组）
+- `$fullTableName`：`?string = null` → `string = ''`
+- 6 个属性的 `@var` 注释从 `array|null` → `array`（与实际类型声明 `array = []` 同步）
+
+**Driver/AbstractDriver.php:**
+- `getAll()`、`getAllWithFieldRefs()`：返回类型 `?array` → `array`（内部始终返回数组）
+
+**Db/SqlStatement.php:**
+- `$isResource` 属性添加 `bool` 类型声明
+
+---
+
+## 2026-02-28
+
 ### refactor: Driver 层 PARAM_STYLE 改为 protected const，?array 属性改为 array = []
 
 **Driver/AbstractDriver.php:**

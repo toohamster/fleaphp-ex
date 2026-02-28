@@ -4,6 +4,17 @@
 
 ---
 
+### refactor: TableDataGateway/AbstractDriver 返回类型修正及代码质量优化
+
+修正 `find()`/`findBySql()` 中 `false` 与 `?array` 返回类型不匹配问题，移除 `findBySql()` 死代码分支；`findAll()`/`findBySql()`/`getAll()`/`getAllWithFieldRefs()` 返回类型收窄为 `array`；`$fullTableName` 改为 `string = ''`；同步 `@var` 注释；SqlStatement `$isResource` 添加 `bool` 类型。
+
+**修改的文件:**
+- `FLEA/FLEA/Db/TableDataGateway.php`
+- `FLEA/FLEA/Db/Driver/AbstractDriver.php`
+- `FLEA/FLEA/Db/SqlStatement.php`
+
+---
+
 ### refactor: Driver 层 PARAM_STYLE 改为 protected const，?array 属性改为 array = []
 
 Driver 层最后一个实例属性 `$PARAM_STYLE` 改为 `protected const`；TableDataGateway 6 个 `?array = null` 属性改为 `array = []`，同步更新子类类型声明及 `createLink()` 空数组守卫。

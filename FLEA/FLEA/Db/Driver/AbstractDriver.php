@@ -435,7 +435,7 @@ abstract class AbstractDriver
      *
      * @return array
      */
-    public function getAllWithFieldRefs(\FLEA\Db\SqlStatement $sql, string $field, array &$fieldValues, array &$reference): ?array
+    public function getAllWithFieldRefs(\FLEA\Db\SqlStatement $sql, string $field, array &$fieldValues, array &$reference): array
     {
         $res = $sql->isResource() ? $sql->getSql() : $this->execute($sql)->getSql();
         $fieldValues = [];
@@ -508,7 +508,7 @@ abstract class AbstractDriver
      *
      * @return array
      */
-    public function getAll(\FLEA\Db\SqlStatement $sql): ?array
+    public function getAll(\FLEA\Db\SqlStatement $sql): array
     {
         $res = $sql->isResource() ? $sql->getSql() : $this->execute($sql)->getSql();
         $rowset = [];

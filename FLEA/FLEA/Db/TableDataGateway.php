@@ -65,9 +65,9 @@ class TableDataGateway
     /**
      * 包含前缀的完整数据表名称
      *
-     * @var string|null
+     * @var string
      */
-    public ?string $fullTableName = null;
+    public string $fullTableName = '';
 
     /**
      * 主键字段名，或者是包含多个主键字段名的数组
@@ -79,28 +79,28 @@ class TableDataGateway
     /**
      * 定义一对一关联
      *
-     * @var array|null
+     * @var array
      */
     public array $hasOne = [];
 
     /**
      * 定义从属关联
      *
-     * @var array|null
+     * @var array
      */
     public array $belongsTo = [];
 
     /**
      * 定义一对多关联
      *
-     * @var array|null
+     * @var array
      */
     public array $hasMany = [];
 
     /**
      * 定义多对多关联
      *
-     * @var array|null
+     * @var array
      */
     public array $manyToMany = [];
 
@@ -140,7 +140,7 @@ class TableDataGateway
     /**
      * 附加的验证规则
      *
-     * @var array|null
+     * @var array
      */
     public array $validateRules = [];
 
@@ -226,7 +226,7 @@ class TableDataGateway
      *
      * 调用 getLastValidation() 方法可以获得最后一次数据验证的结果。
      *
-     * @var array|null
+     * @var array
      */
     public array $lastValidationResult = [];
 
@@ -385,13 +385,10 @@ class TableDataGateway
     public function find($conditions, ?string $sort = null, $fields = '*', bool $queryLinks = true): ?array
     {
         $rowset = $this->findAll($conditions, $sort, 1, $fields, $queryLinks);
-        if (is_array($rowset)) {
-            $row = reset($rowset);
-        } else {
-            $row = false;
+        if (!empty($rowset)) {
+            return reset($rowset);
         }
-        unset($rowset);
-        return $row;
+        return null;
     }
 
     /**
@@ -406,7 +403,7 @@ class TableDataGateway
      * @return array
      * @throws \FLEA\Exception\NotImplemented
      */
-    public function findAll($conditions = null, ?string $sort = null, $limit = null, $fields = '*', bool $queryLinks = true): ?array
+    public function findAll($conditions = null, ?string $sort = null, $limit = null, $fields = '*', bool $queryLinks = true): array
     {
         [$whereby, $distinct] = $this->getWhere($conditions);
         // 处理排序
@@ -677,7 +674,7 @@ class TableDataGateway
      *
      * @return array
      */
-    public function findBySql(string $sql, $limit = null): ?array
+    public function findBySql(string $sql, $limit = null): array
     {
         // 处理 $limit
         if (is_array($limit)) {
@@ -691,12 +688,7 @@ class TableDataGateway
         }
 
         $result = $this->dbo->selectLimit(sql_statement($sql), $length, $offset);
-        if ($result->getSql()) {
-            $rowset = $this->dbo->getAll($result);
-        } else {
-            $rowset = false;
-        }
-        return $rowset;
+        return $this->dbo->getAll($result);
     }
 
     /**
