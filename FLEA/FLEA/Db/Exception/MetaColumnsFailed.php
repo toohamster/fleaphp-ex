@@ -20,7 +20,7 @@ namespace FLEA\Db\Exception;
  */
 class MetaColumnsFailed extends \FLEA\Exception
 {
-    public $tableName;
+    public string $tableName;
 
     /**
      * 构造函数

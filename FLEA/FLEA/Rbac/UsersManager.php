@@ -403,7 +403,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
     public function fetchRoles(array $user): array
     {
         if ($this->existsLink($this->rolesField)) {
-            $link =& $this->getLink($this->rolesField);
+            $link = $this->getLink($this->rolesField);
             $rolenameField = $link->assocTDG->rolesNameField;
         } else {
             $rolenameField = 'rolename';
@@ -439,7 +439,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
     /**
      * 在更新到数据库之前加密密码
      */
-    protected function _beforeUpdateDb(array &$row): bool
+    protected function beforeUpdateDb(array &$row): bool
     {
         $this->_encodeRecordPassword($row);
         return true;
@@ -448,7 +448,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
     /**
      * 在更新到数据库之前加密密码
      */
-    protected function _beforeCreateDb(array &$row): bool
+    protected function beforeCreateDb(array &$row): bool
     {
         $this->_encodeRecordPassword($row);
         return true;

@@ -20,7 +20,7 @@ class SqlStatement
      *
      * @var bool
      */
-    private $isResource;
+    private bool $isResource;
 
     /**
      * 构造函数

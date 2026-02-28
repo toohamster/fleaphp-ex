@@ -14,9 +14,9 @@ class Auth extends \FLEA\Dispatcher\Simple
     /**
      * 用于提供验证服务的对象实例
      *
-     * @var \FLEA\Rbac
+     * @var \FLEA\Rbac|null
      */
-    public $_auth;
+    protected ?\FLEA\Rbac $auth = null;
 
     /**
      * 构造函数
@@ -26,7 +26,7 @@ class Auth extends \FLEA\Dispatcher\Simple
     public function __construct(array $request)
     {
         parent::__construct($request);
-        $this->_auth = \FLEA::getSingleton(\FLEA::getAppInf('dispatcherAuthProvider'));
+        $this->auth = \FLEA::getSingleton(\FLEA::getAppInf('dispatcherAuthProvider'));
     }
 
     /**
@@ -36,7 +36,7 @@ class Auth extends \FLEA\Dispatcher\Simple
      */
     public function getAuthProvider(): \FLEA\Rbac
     {
-        return $this->_auth;
+        return $this->auth;
     }
 
     /**
@@ -46,7 +46,7 @@ class Auth extends \FLEA\Dispatcher\Simple
      */
     public function setAuthProvider(\FLEA\Rbac $auth): void
     {
-        $this->_auth = $auth;
+        $this->auth = $auth;
     }
 
     /**
@@ -57,7 +57,7 @@ class Auth extends \FLEA\Dispatcher\Simple
      */
     public function setUser(array $userData, $rolesData = null): void
     {
-        $this->_auth->setUser($userData, $rolesData);
+        $this->auth->setUser($userData, $rolesData);
     }
 
     /**
@@ -67,7 +67,7 @@ class Auth extends \FLEA\Dispatcher\Simple
      */
     public function getUser(): array
     {
-        return $this->_auth->getUser();
+        return $this->auth->getUser();
     }
 
     /**
@@ -77,17 +77,17 @@ class Auth extends \FLEA\Dispatcher\Simple
      */
     public function getUserRoles(): array
     {
-        return $this->_auth->getRolesArray();
+        return $this->auth->getRolesArray();
     }
 
     /**
      * 通过验证服务对象的 getUser 方法清理保存在 session 中的用户数据
      *
-     * @return array
+     * @return void
      */
-    public function clearUser()
+    public function clearUser(): void
     {
-        $this->_auth->clearUser();
+        $this->auth->clearUser();
     }
 
     /**
@@ -103,19 +103,19 @@ class Auth extends \FLEA\Dispatcher\Simple
 
         if ($this->check($controllerName, $actionName, $controllerClass)) {
             // 检查通过，执行控制器方法
-            return $this->_executeAction($controllerName, $actionName, $controllerClass);
+            return $this->executeAction($controllerName, $actionName, $controllerClass);
         } else {
             // 检查失败
             $callback = \FLEA::getAppInf('dispatcherAuthFailedCallback');
 
             $rawACT = $this->getControllerACT($controllerName, $controllerClass);
             if (is_null($rawACT) || empty($rawACT)) { return true; }
-            $ACT = $this->_auth->prepareACT($rawACT);
-            $roles = $this->_auth->getRolesArray();
+            $ACT = $this->auth->prepareACT($rawACT);
+            $roles = $this->auth->getRolesArray();
             $args = [$controllerName, $actionName, $controllerClass, $ACT, $roles];
 
             // 如果控制器定义了的 _onAuthFailed 静态方法，则调用该方法
-            if ($this->_loadController($controllerClass)) {
+            if ($this->loadController($controllerClass)) {
                 $methods = get_class_methods($controllerClass);
                 if (in_array('_onAuthFailed', $methods, true)) {
                     if (call_user_func_array(array($controllerClass, '_onAuthFailed'), $args) !== false) {
@@ -142,12 +142,12 @@ class Auth extends \FLEA\Dispatcher\Simple
      * 3、根据 ACT 对用户角色进行检查，通过则返回 true，否则返回 false。
      *
      * @param string $controllerName
-     * @param string $actionName
-     * @param string $controllerClass
+     * @param string|null $actionName
+     * @param string|null $controllerClass
      *
-     * @return boolean
+     * @return bool
      */
-    public function check($controllerName, $actionName = null, $controllerClass = null)
+    public function check(string $controllerName, ?string $actionName = null, ?string $controllerClass = null): bool
     {
         if (is_null($controllerClass)) {
             $controllerClass = $this->getControllerClass($controllerName);
@@ -159,30 +159,30 @@ class Auth extends \FLEA\Dispatcher\Simple
         $rawACT = $this->getControllerACT($controllerName, $controllerClass);
         if (is_null($rawACT) || empty($rawACT)) { return true; }
 
-        $ACT = $this->_auth->prepareACT($rawACT);
+        $ACT = $this->auth->prepareACT($rawACT);
         $ACT['actions'] = [];
         if (isset($rawACT['actions']) && is_array($rawACT['actions'])) {
             foreach ($rawACT['actions'] as $rawActionName => $rawActionACT) {
                 if ($rawActionName !== ACTION_ALL) {
                     $rawActionName = strtolower($rawActionName);
                 }
-                $ACT['actions'][$rawActionName] = $this->_auth->prepareACT($rawActionACT);
+                $ACT['actions'][$rawActionName] = $this->auth->prepareACT($rawActionACT);
             }
         }
         // 取出用户角色信息
-        $roles = $this->_auth->getRolesArray();
+        $roles = $this->auth->getRolesArray();
         // 首先检查用户是否可以访问该控制器
-        if (!$this->_auth->check($roles, $ACT)) { return false; }
+        if (!$this->auth->check($roles, $ACT)) { return false; }
 
         // 接下来验证用户是否可以访问指定的控制器方法
         $actionName = strtolower($actionName);
         if (isset($ACT['actions'][$actionName])) {
-            return $this->_auth->check($roles, $ACT['actions'][$actionName]);
+            return $this->auth->check($roles, $ACT['actions'][$actionName]);
         }
 
         // 如果当前要访问的控制器方法没有在 act 中指定，则检查 act 中是否提供了 ACTION_ALL
         if (!isset($ACT['actions'][ACTION_ALL])) { return true; }
-        return $this->_auth->check($roles, $ACT['actions'][ACTION_ALL]);
+        return $this->auth->check($roles, $ACT['actions'][ACTION_ALL]);
     }
 
     /**
@@ -191,9 +191,9 @@ class Auth extends \FLEA\Dispatcher\Simple
      * @param string $controllerName
      * @param string $controllerClass
      *
-     * @return array
+     * @return array|null
      */
-    public function getControllerACT($controllerName, $controllerClass)
+    public function getControllerACT(string $controllerName, string $controllerClass): ?array
     {
         // 首先尝试从全局 ACT 查询控制器的 ACT
         $ACT = \FLEA::getAppInfValue('globalACT', $controllerName);
@@ -214,15 +214,17 @@ class Auth extends \FLEA\Dispatcher\Simple
             return \FLEA::getAppInf('defaultControllerACT');
         }
 
-        return $this->_loadACTFile($actFilename);
+        return $this->loadACTFile($actFilename);
     }
 
     /**
      * 从默认 ACT 文件中载入指定控制器的 ACT
      *
      * @param string $controllerName
+     *
+     * @return array|null
      */
-    public function getControllerACTFromDefaultFile($controllerName)
+    public function getControllerACTFromDefaultFile(string $controllerName): ?array
     {
         $actFilename = realpath(\FLEA::getAppInf('defaultControllerACTFile'));
         if (!$actFilename) {
@@ -232,7 +234,7 @@ class Auth extends \FLEA\Dispatcher\Simple
             return \FLEA::getAppInf('defaultControllerACT');
         }
 
-        $ACT = $this->_loadACTFile($actFilename);
+        $ACT = $this->loadACTFile($actFilename);
         if ($ACT === false) { return false; }
 
         $ACT = array_change_key_case($ACT, CASE_UPPER);
@@ -247,9 +249,9 @@ class Auth extends \FLEA\Dispatcher\Simple
      *
      * @param string $actFilename
      *
-     * @return mixed
+     * @return array
      */
-    protected function _loadACTFile($actFilename)
+    protected function loadACTFile(string $actFilename): array
     {
         static $files = [];
 

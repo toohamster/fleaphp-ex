@@ -4,6 +4,139 @@
 
 ---
 
+### refactor: TableDataGateway/AbstractDriver 返回类型修正及代码质量优化
+
+修正 `find()`/`findBySql()` 中 `false` 与 `?array` 返回类型不匹配问题，移除 `findBySql()` 死代码分支；`findAll()`/`findBySql()`/`getAll()`/`getAllWithFieldRefs()` 返回类型收窄为 `array`；`$fullTableName` 改为 `string = ''`；同步 `@var` 注释；SqlStatement `$isResource` 添加 `bool` 类型。
+
+**修改的文件:**
+- `FLEA/FLEA/Db/TableDataGateway.php`
+- `FLEA/FLEA/Db/Driver/AbstractDriver.php`
+- `FLEA/FLEA/Db/SqlStatement.php`
+
+---
+
+### refactor: Driver 层 PARAM_STYLE 改为 protected const，?array 属性改为 array = []
+
+Driver 层最后一个实例属性 `$PARAM_STYLE` 改为 `protected const`；TableDataGateway 6 个 `?array = null` 属性改为 `array = []`，同步更新子类类型声明及 `createLink()` 空数组守卫。
+
+**修改的文件:**
+- `FLEA/FLEA/Db/Driver/AbstractDriver.php`
+- `FLEA/FLEA/Db/Driver/Mysql.php`
+- `FLEA/FLEA/Db/TableDataGateway.php`
+- `App/Model/Post.php`
+- `App/Model/Comment.php`
+- `FLEA/FLEA/Acl/Table/Roles.php`
+- `FLEA/FLEA/Acl/Table/Users.php`
+- `FLEA/FLEA/Acl/Table/UserGroups.php`
+
+---
+
+### refactor: FLEA/Db 目录 PSR-1/PSR-12 合规性修复及 PHP 7.4 风格优化
+
+对 `FLEA/FLEA/Db/` 目录下所有 PHP 文件进行 PSR-1/PSR-12 合规性修复及 PHP 7.4 风格优化，包括：去掉属性/方法的 `_` 前缀、补全可见性声明、添加类型声明、移除对象参数多余的 `&` 引用、替换旧式回调语法、修正 `_setCreatedTimeFields`/`_setUpdatedTimeFields` 错误调用、Driver 层 13 个大写配置属性从实例属性改为 `protected const`。
+
+**修改的文件:**
+- `FLEA/FLEA/Db/Driver/AbstractDriver.php`
+- `FLEA/FLEA/Db/Driver/Mysql.php`
+- `FLEA/FLEA/Db/Driver/Mysqlt.php`
+- `FLEA/FLEA/Db/TableLink.php`
+- `FLEA/FLEA/Db/TableLink/BelongsToLink.php`
+- `FLEA/FLEA/Db/TableLink/HasOneLink.php`
+- `FLEA/FLEA/Db/TableLink/HasManyLink.php`
+- `FLEA/FLEA/Db/TableLink/ManyToManyLink.php`
+- `FLEA/FLEA/Db/TableDataGateway.php`
+- `FLEA/FLEA/Db/SqlHelper.php`
+- `FLEA/FLEA/Db/ActiveRecord.php`
+- `FLEA/FLEA/Db/Exception/*.php`（10 个异常类）
+
+---
+
+### docs: 更新 TableDataGateway.php 方法注释中的事件方法名
+
+更新方法注释中的旧事件方法名（移除下划线前缀），与新的方法名保持一致。
+
+**修改的文件:**
+- `FLEA/FLEA/Db/TableDataGateway.php`: 更新注释中的 `_beforeCreate` → `beforeCreate`, `_beforeCreateDb` → `beforeCreateDb`, `_afterCreateDb` → `afterCreateDb`, `_beforeUpdate` → `beforeUpdate`, `_beforeUpdateDb` → `beforeUpdateDb`, `_afterUpdateDb` → `afterUpdateDb`, `_beforeRemove` → `beforeRemove`, `_afterRemoveDb` → `afterRemoveDb`, `_beforeRemoveDbByPkv` → `beforeRemoveDbByPkv`, `_afterRemoveDbByPkv` → `afterRemoveDbByPkv`
+
+---
+
+### refactor: 更新子类中重写的 TableDataGateway 事件方法
+
+更新子类中重写的事件方法名，与父类 TableDataGateway 的新方法名保持一致。
+
+**修改的文件:**
+- `FLEA/FLEA/Rbac/UsersManager.php`: `_beforeUpdateDb()` → `beforeUpdateDb()`, `_beforeCreateDb()` → `beforeCreateDb()`
+- `FLEA/FLEA/Session/Db.php`: `_beforeWrite()` → `beforeWrite()`
+
+---
+
+### refactor: 修复 TableDataGateway.php 中 PSR-12 和 PSR-1 不合规问题
+
+移除方法名下划线前缀，为属性和方法添加 PHP 7.4 兼容的类型声明，符合 PSR-12 编码规范。
+
+**修改的文件:**
+- `FLEA/FLEA/Db/TableDataGateway.php`:
+  - 移除 17 个方法的下划线前缀 (`_parseWhereArray()` → `parseWhereArray()`, `_parseWhereString()` → `parseWhereString()`, `_parseWhereQfield()` → `parseWhereQfield()`, `_setUpdatedTimeFields()` → `setUpdatedTimeFields()`, `_setCreatedTimeFields()` → `setCreatedTimeFields()`, `_prepareMeta()` → `prepareMeta()`, `_beforeCreate()` → `beforeCreate()`, `_beforeCreateDb()` → `beforeCreateDb()`, `_afterCreateDb()` → `afterCreateDb()`, `_beforeUpdate()` → `beforeUpdate()`, `_beforeUpdateDb()` → `beforeUpdateDb()`, `_afterUpdateDb()` → `afterUpdateDb()`, `_beforeRemove()` → `beforeRemove()`, `_afterRemoveDb()` → `afterRemoveDb()`, `_beforeRemoveDbByPkv()` → `beforeRemoveDbByPkv()`, `_afterRemoveDbByPkv()` → `afterRemoveDbByPkv()`, `_updateCounterCache()` → `updateCounterCache()`)
+  - 为 12 个属性添加类型声明 (`$meta` → `array`, `$fields` → `array`, `$autoValidating` → `bool`, `$verifier` → `?\FLEA\Helper\Verifier`, `$validateRules` → `?array`, `$createdTimeFields` → `array`, `$updatedTimeFields` → `array`, `$autoLink` → `bool`, `$dbo` → `?\FLEA\Db\Driver\AbstractDriver`, `$links` → `array`, `$qtableName` → `string`, `$lastValidationResult` → `?array`)
+  - 为 2 个方法添加返回类型声明 (`getLink()` → `: \FLEA\Db\TableLink`, `createLink()` → `: void`, `parseWhereQfield()` → `: string`)
+  - 注意：联合类型 (`string|array`) 和 `mixed` 类型是 PHP 8.0+ 特性，已保持原样使用 docblock 注解
+
+---
+
+### docs: 更新 SPEC.md 控制器规格说明
+
+更新控制器 (Controller) 部分的方法签名和类型声明，与实际代码保持一致。
+
+**修改的文件:**
+- `SPEC.md`: 更新 3.3 MVC 架构中的控制器方法，`_beforeExecute()` → `beforeExecute()`、`_afterExecute()` → `afterExecute()`，`getView()` 返回类型改为 `\FLEA\View\ViewInterface`，`getDispatcher()` 返回类型改为 `?\FLEA\Dispatcher\Simple`
+
+---
+
+### refactor: 移除 TableDataGateway.php 中多余的 & 引用符号
+
+移除 PHP 5+ 中不再需要的 `=&` 引用赋值，对象在 PHP 5+ 中已经默认通过引用传递。
+
+**修改的文件:**
+- `FLEA/FLEA/Db/TableDataGateway.php`:
+  - 移除 6 处对象引用的 `=&` (`$link =& $this->links[$linkKey]` → `$link = $this->links[$linkKey]`)
+  - 移除 1 处变量引用 (`$conditions =& $link->conditions` → `$conditions = $link->conditions`)
+  - 移除 1 处对象赋值引用 (`$this->links[...] =& $link` → `$this->links[...] = $link`)
+  - 保留 4 处数组元素引用（改为 `= &` 格式），因为数组仍然需要引用语义
+
+---
+
+### fix: 修复 UsersManager.php 中多余的 & 引用
+
+移除 `fetchRoles()` 方法中多余的 `&` 引用符号。
+
+**修改的文件:**
+- `FLEA/FLEA/Rbac/UsersManager.php`: 第 406 行 `$link =& $this->getLink(...)` → `$link = $this->getLink(...)`
+
+---
+
+### refactor: 移除 Controller\Action 中的下划线命名前缀
+
+移除 `FLEA\Controller\Action` 类中属性和方法的单下划线 `_` 前缀，改用 `protected` 访问修饰符并添加类型声明和默认值，采用现代 PHP 命名规范和 PSR-12 编码规范。
+
+**修改的文件:**
+- `FLEA/FLEA/Controller/Action.php`: 属性和方法移除下划线前缀，添加类型声明 (`public $_controllerName` → `protected string $controllerName = ''`, `public $_actionName` → `protected string $actionName = ''`, `public $_dispatcher` → `protected ?\FLEA\Dispatcher\Auth $dispatcher = null`, `public $_renderCallbacks` → `protected array $renderCallbacks = []`, `_getComponent()` → `getComponent()`, `_getDispatcher()` → `getDispatcher()`, `_url()` → `url()`, `_forward()` → `forward()`, `_getView()` → `getView()`, `_executeView()` → `executeView()`, `_isPOST()` → `isPost()`, `_isAjax()` → `isAjax()`, `_registerEvent()` → `registerEvent()`, `_registerRenderCallback()` → `registerRenderCallback()`)
+- `App/Controller/PostController.php`: 方法调用更新 (`$this->_getView()` → `$this->getView()`)
+- `FLEA/FLEA/Helper/ImgCode.php`: 文档注释更新 (`$this->_url('imgcode')` → `$this->url('imgcode')`)
+
+---
+
+## 2026-02-27
+
+### refactor: 移除 Dispatcher 目录中的下划线命名前缀
+
+移除 `FLEA\Dispatcher\Simple` 和 `FLEA\Dispatcher\Auth` 类中属性和方法的单下划线 `_` 前缀，改用 `protected` 访问修饰符并添加类型声明和默认值，采用现代 PHP 命名规范和 PSR-12 编码规范。
+
+**修改的文件:**
+- `FLEA/FLEA/Dispatcher/Simple.php`: 属性和方法移除下划线前缀，添加类型声明 (`public $_request` → `protected array $request = []`, `public $_requestBackup` → `protected array $requestBackup = []`, `_executeAction()` → `executeAction()`, `_loadController()` → `loadController()`)
+- `FLEA/FLEA/Dispatcher/Auth.php`: 属性和方法移除下划线前缀，添加类型声明 (`public $_auth` → `protected ?\FLEA\Rbac $auth = null`, `_loadACTFile()` → `loadACTFile(string): array`), 方法调用更新，其他方法添加类型声明 (`clearUser(): void`, `check(string, ?string, ?string): bool`, `getControllerACT(string, string): ?array`, `getControllerACTFromDefaultFile(string): ?array`)
+
+---
+
 ## 2026-02-27
 
 ### docs: 完善 USER_GUIDE.md 用户手册

@@ -176,7 +176,7 @@ class Db
         $data = $this->dbo->qstr($data);
         $activity = time();
 
-        $fields = (array)$this->_beforeWrite($sessid);
+        $fields = (array)$this->beforeWrite($sessid);
         if ((int)$this->dbo->getOne(sql_statement($sql)) > 0) {
             $sql = "UPDATE {$this->tableName} SET {$this->fieldData} = {$data}, {$this->fieldActivity} = {$activity}";
             if (!empty($fields)) {
@@ -273,7 +273,7 @@ class Db
      *
      * @return array
      */
-    protected function _beforeWrite(string $sessid): array
+    protected function beforeWrite(string $sessid): array
     {
         return [];
     }

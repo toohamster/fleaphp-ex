@@ -4,6 +4,179 @@
 
 ---
 
+## 2026-02-28
+
+### refactor: TableDataGateway/AbstractDriver 返回类型修正及代码质量优化
+
+**TableDataGateway.php:**
+- `find()`：`is_array()` + `false` 改为 `!empty()` + `return null`，消除 `false` 与 `?array` 返回类型不匹配
+- `findBySql()`：移除死代码 `if ($result->getSql())` 分支，直接 return
+- `findAll()`、`findBySql()`：返回类型 `?array` → `array`（实际永远返回数组）
+- `$fullTableName`：`?string = null` → `string = ''`
+- 6 个属性的 `@var` 注释从 `array|null` → `array`（与实际类型声明 `array = []` 同步）
+
+**Driver/AbstractDriver.php:**
+- `getAll()`、`getAllWithFieldRefs()`：返回类型 `?array` → `array`（内部始终返回数组）
+
+**Db/SqlStatement.php:**
+- `$isResource` 属性添加 `bool` 类型声明
+
+---
+
+## 2026-02-28
+
+### refactor: Driver 层 PARAM_STYLE 改为 protected const，?array 属性改为 array = []
+
+**Driver/AbstractDriver.php:**
+- `$PARAM_STYLE` 从 `public` 实例属性改为 `protected const PARAM_STYLE = '?'`（字面量）
+- `getPlaceholder()`、`getPlaceholderPair()` 中通过局部变量 `$paramStyle = static::PARAM_STYLE` 承接
+
+**Driver/Mysql.php:**
+- 删除冗余的 `$PARAM_STYLE = DBO_PARAM_QM` 声明（值与父类相同）
+
+**TableDataGateway.php:**
+- 6 个属性从 `?array = null` 改为 `array = []`：`$hasOne`、`$belongsTo`、`$hasMany`、`$manyToMany`、`$validateRules`、`$lastValidationResult`
+- `is_array($this->validateRules)` 简化为 `!empty($this->validateRules)`
+- `createLink()` 入口增加 `empty()` 守卫，防止空数组触发 MissingLinkOption 异常
+
+**App/Model/Post.php、Comment.php:**
+- `?array` → `array` 同步父类类型
+
+**FLEA/Acl/Table/Roles.php、Users.php、UserGroups.php:**
+- `?array` / 无类型 → `array` 同步父类类型
+
+---
+
+### refactor: FLEA/Db 目录 PSR-1/PSR-12 合规性修复及 PHP 7.4 风格优化
+
+对 `FLEA/FLEA/Db/` 目录下所有 PHP 文件进行 PSR-1/PSR-12 合规性修复及 PHP 7.4 风格优化。
+
+**Driver/AbstractDriver.php:**
+- 属性去 `_` 前缀：`$_insertId` → `$insertId`、`$_transCount` → `$transCount`、`$_hasFailedQuery` → `$hasFailedQuery`、`$_savepointStack` → `$savepointStack`
+- 内部钩子方法加 `do` 前缀：`_insertId()` → `doInsertId()`、`_affectedRows()` → `doAffectedRows()`、`_startTrans()` → `doStartTrans()`、`_completeTrans()` → `doCompleteTrans()`
+- SQL 模板属性从 `?string = null` 改为 `string = ''`，`nextId()`/`createSeq()`/`dropSeq()` 入口增加空值校验，为空时抛 `NotImplemented` 异常
+- 13 个大写属性（`TRUE_VALUE`、`FALSE_VALUE`、`NULL_VALUE`、5 个 SQL 模板、5 个 `HAS_*` 开关）从 `public` 实例属性改为 `protected const`，所有引用从 `$this->PROP` 改为 `static::PROP`
+- 补属性类型声明：`int`、`string`、`bool`、`?array`、`array` 等
+
+**Driver/Mysql.php:**
+- 属性去 `_` 前缀：`$_mysqlVersion` → `$mysqlVersion`
+- 钩子方法重命名：`_insertId()` → `doInsertId()`、`_affectedRows()` → `doAffectedRows()`
+- 7 个大写属性覆盖改为 `protected const`，引用改为 `static::PROP`
+- 补属性类型声明：`string`、`bool`、`?\PDO`、`?\PDOStatement`
+
+**Driver/Mysqlt.php:**
+- 方法重命名：`_startTrans()` → `doStartTrans()`、`_completeTrans()` → `doCompleteTrans()`
+- 属性引用更新：`$this->_hasFailedQuery` → `$this->hasFailedQuery`
+- `$HAS_TRANSACTION` 改为 `protected const`
+
+**TableLink.php:**
+- 属性去 `_` 前缀：`$_req` → `$req`、`$_optional` → `$optional`
+- 方法去 `_` 前缀：`_getFindSQLBase()` → `getFindSQLBase()`、`_saveAssocDataBase()` → `saveAssocDataBase()`
+- 补 `public` 可见性：`saveAssocData()`、`calcCount()`
+- 移除对象参数 `&`：`createLink(..., &$mainTDG)` → `createLink(..., $mainTDG)`
+- 补构造函数参数类型：`(array $define, int $type, TableDataGateway $mainTDG)`
+- 补属性类型声明：`bool`、`string`、`array` 等
+
+**TableLink/BelongsToLink.php、HasOneLink.php、HasManyLink.php:**
+- 补属性类型声明：`bool $oneToOne`
+- 补构造函数参数类型（BelongsToLink）
+- `getFindSQL()` 补参数和返回类型
+- 补 `public` 可见性：`saveAssocData()`
+- 更新父类方法调用：`parent::getFindSQLBase()`、`$this->saveAssocDataBase()`
+
+**TableLink/ManyToManyLink.php:**
+- 补所有属性类型声明：`bool`、`?TableDataGateway`、`?string` 等
+- 5 个方法补 `public` 可见性
+- 补构造函数参数类型
+- `getFindSQL()`、`saveAssocData()` 补参数类型
+- 更新 `$this->optional` 引用和 `parent::getFindSQLBase()` 调用
+
+**TableDataGateway.php（Bug 修复 + 回调替换）:**
+- 修正错误调用：`$this->_setCreatedTimeFields()` → `$this->setCreatedTimeFields()`、`$this->_setUpdatedTimeFields()` → `$this->setUpdatedTimeFields()`
+- 替换旧式回调：`array(& $this->dbo, 'qstr')` → `[$this->dbo, 'qstr']`
+
+**SqlHelper.php:**
+- 替换旧式回调：`array($table->dbo, 'qstr')` → `[$table->dbo, 'qstr']`
+
+**ActiveRecord.php:**
+- 属性去 `_` 前缀：`$_aggregation` → `$aggregation`、`$_table` → `$table`、`$_idname` → `$idname`、`$_mapping` → `$mapping`
+- 补 `public` 可见性：`static function define()` → `public static function define()`
+
+**Exception/ 全部文件（10 个）:**
+- 4 个文件补 `public` 可见性：InvalidDSN、InvalidInsertID、InvalidLinkType、MissingDSN 的 `__construct`
+- 补属性类型声明：`string $tableName`、`string $name`、`string $option`、`string $sql`、`string $primaryKey`
+
+---
+
+### fix: 修复 UsersManager.php 中多余的 & 引用
+
+移除 `fetchRoles()` 方法中多余的 `&` 引用符号。
+
+**修改的文件:**
+- `FLEA/FLEA/Rbac/UsersManager.php`: 第 406 行 `$link =& $this->getLink(...)` → `$link = $this->getLink(...)`
+
+---
+
+## 2026-02-27
+
+### refactor: 移除 Dispatcher 目录中的下划线命名前缀
+
+移除 `FLEA\Dispatcher\Simple` 和 `FLEA\Dispatcher\Auth` 类中属性和方法的单下划线 `_` 前缀，改用 `protected` 访问修饰符并添加类型声明和默认值，采用现代 PHP 命名规范和 PSR-12 编码规范。
+
+**修改的文件:**
+- `FLEA/FLEA/Dispatcher/Simple.php`
+- `FLEA/FLEA/Dispatcher/Auth.php`
+
+**Simple.php 改动:**
+- 属性 `public $_request` → `protected array $request = []`
+- 属性 `public $_requestBackup` → `protected array $requestBackup = []`
+- 方法 `_executeAction()` → `executeAction()`
+- 方法 `_loadController()` → `loadController()`
+
+**Auth.php 改动:**
+- 属性 `public $_auth` → `protected ?\FLEA\Rbac $auth = null`
+- 方法 `_executeAction()` → `executeAction()` (调用父类)
+- 方法 `_loadController()` → `loadController()` (调用父类)
+- 方法 `_loadACTFile()` → `loadACTFile(string): array`
+- 方法 `clearUser()` → `clearUser(): void`
+- 方法 `check()` → `check(string, ?string, ?string): bool`
+- 方法 `getControllerACT()` → `getControllerACT(string, string): ?array`
+- 方法 `getControllerACTFromDefaultFile()` → `getControllerACTFromDefaultFile(string): ?array`
+
+---
+
+### refactor: 移除 Controller\Action 中的下划线命名前缀
+
+移除 `FLEA\Controller\Action` 类中属性和方法的单下划线 `_` 前缀，改用 `protected` 访问修饰符并添加类型声明和默认值，采用现代 PHP 命名规范和 PSR-12 编码规范。
+
+**修改的文件:**
+- `FLEA/FLEA/Controller/Action.php`
+- `App/Controller/PostController.php`
+
+**Action.php 改动:**
+- 属性 `public $_controllerName` → `protected string $controllerName = ''`
+- 属性 `public $_actionName` → `protected string $actionName = ''`
+- 属性 `public $_dispatcher` → `protected ?\FLEA\Dispatcher\Auth $dispatcher = null`
+- 属性 `public $_renderCallbacks` → `protected array $renderCallbacks = []`
+- 方法 `_getComponent()` → `getComponent()`
+- 方法 `_getDispatcher()` → `getDispatcher()`
+- 方法 `_url()` → `url()`
+- 方法 `_forward()` → `forward()`
+- 方法 `_getView()` → `getView()`
+- 方法 `_executeView()` → `executeView()`
+- 方法 `_isPOST()` → `isPost()`
+- 方法 `_isAjax()` → `isAjax()`
+- 方法 `_registerEvent()` → `registerEvent()`
+- 方法 `_registerRenderCallback()` → `registerRenderCallback()`
+
+**PostController.php 改动:**
+- `$this->_getView()` → `$this->getView()`
+
+**ImgCode.php 改动:**
+- 文档注释更新：`$this->_url('imgcode')` → `$this->url('imgcode')`
+
+---
+
 ## 2026-02-27
 
 ### refactor: 移除构造函数中的 @return 注解

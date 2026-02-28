@@ -65,9 +65,9 @@ class TableDataGateway
     /**
      * 包含前缀的完整数据表名称
      *
-     * @var string|null
+     * @var string
      */
-    public ?string $fullTableName = null;
+    public string $fullTableName = '';
 
     /**
      * 主键字段名，或者是包含多个主键字段名的数组
@@ -79,30 +79,30 @@ class TableDataGateway
     /**
      * 定义一对一关联
      *
-     * @var array|null
+     * @var array
      */
-    public ?array $hasOne = null;
+    public array $hasOne = [];
 
     /**
      * 定义从属关联
      *
-     * @var array|null
+     * @var array
      */
-    public ?array $belongsTo = null;
+    public array $belongsTo = [];
 
     /**
      * 定义一对多关联
      *
-     * @var array|null
+     * @var array
      */
-    public ?array $hasMany = null;
+    public array $hasMany = [];
 
     /**
      * 定义多对多关联
      *
-     * @var array|null
+     * @var array
      */
-    public ?array $manyToMany = null;
+    public array $manyToMany = [];
 
     /**
      * 当前数据表的元数据
@@ -112,14 +112,14 @@ class TableDataGateway
      *
      * @var array
      */
-    public $meta = null;
+    public array $meta = [];
 
     /**
      * 当前数据表的所有字段名
      *
      * @var array
      */
-    public $fields = null;
+    public array $fields = [];
 
     /**
      * 指示是否对数据进行自动验证
@@ -128,21 +128,21 @@ class TableDataGateway
      *
      * @var boolean
      */
-    public $autoValidating = false;
+    public bool $autoValidating = false;
 
     /**
      * 用于数据验证的对象
      *
-     * @var \FLEA\Helper\Verifier
+     * @var \FLEA\Helper\Verifier|null
      */
-    public $verifier = null;
+    public ?\FLEA\Helper\Verifier $verifier = null;
 
     /**
      * 附加的验证规则
      *
      * @var array
      */
-    public $validateRules = null;
+    public array $validateRules = [];
 
     /**
      * 创建记录时，要自动填入当前时间的字段
@@ -152,7 +152,7 @@ class TableDataGateway
      *
      * @var array
      */
-    public $createdTimeFields = ['CREATED', 'CREATED_ON', 'CREATED_AT'];
+    public array $createdTimeFields = ['CREATED', 'CREATED_ON', 'CREATED_AT'];
 
     /**
      * 创建和更新记录时，要自动填入当前时间的字段
@@ -162,7 +162,7 @@ class TableDataGateway
      *
      * @var array
      */
-    public $updatedTimeFields = ['UPDATED', 'UPDATED_ON', 'UPDATED_AT'];
+    public array $updatedTimeFields = ['UPDATED', 'UPDATED_ON', 'UPDATED_AT'];
 
     /**
      * 指示进行 CRUD 操作时是否处理关联
@@ -171,7 +171,7 @@ class TableDataGateway
      *
      * @var boolean
      */
-    public $autoLink = true;
+    public bool $autoLink = true;
 
     /**
      * 数据库访问对象
@@ -179,9 +179,9 @@ class TableDataGateway
      * 开发者不应该直接访问该成员变量，而是通过 setDBO() 和 getDBO() 方法
      * 来访问表数据入口使用数据访问对象。
      *
-     * @var \FLEA\Db\Driver\AbstractDriver
+     * @var \FLEA\Db\Driver\AbstractDriver|null
      */
-    public $dbo = null;
+    public ?\FLEA\Db\Driver\AbstractDriver $dbo = null;
 
     /**
      * 存储关联信息
@@ -191,34 +191,33 @@ class TableDataGateway
      *
      * @var array
      */
-    public $links = [];
+    public array $links = [];
 
     /**
      * 包含前缀的数据表完全限定名
      *
      * @var string
-     * @access private
      */
-    public $qtableName;
+    public string $qtableName = '';
 
     /**
      * 主键字段完全限定名
      *
-     * @var string
-     * @access protected
+     * @var string|array
      */
     public $qpk;
 
     /**
      * 用于关联查询时的主键字段别名
+     *
+     * @var string|array
      */
     public $pka;
 
     /**
      * 用于关联查询时的主键字段完全限定名
      *
-     * @var string
-     * @access private
+     * @var string|array
      */
     private $qpka;
 
@@ -229,7 +228,7 @@ class TableDataGateway
      *
      * @var array
      */
-    public $lastValidationResult;
+    public array $lastValidationResult = [];
 
     /**
      * 构造 \FLEA\Db\TableDataGateway 实例
@@ -318,12 +317,12 @@ class TableDataGateway
         }
         $this->qtableName = $dbo->qtable($this->fullTableName, $this->schema);
 
-        if (!$this->_prepareMeta()) {
+        if (!$this->prepareMeta()) {
             return false;
         }
         $this->fields = array_keys($this->meta);
 
-        if (is_array($this->validateRules)) {
+        if (!empty($this->validateRules)) {
             foreach ($this->validateRules as $fieldName => $rules) {
                 $fieldName = strtoupper($fieldName);
                 if (!isset($this->meta[$fieldName])) { continue; }
@@ -386,13 +385,10 @@ class TableDataGateway
     public function find($conditions, ?string $sort = null, $fields = '*', bool $queryLinks = true): ?array
     {
         $rowset = $this->findAll($conditions, $sort, 1, $fields, $queryLinks);
-        if (is_array($rowset)) {
-            $row = reset($rowset);
-        } else {
-            $row = false;
+        if (!empty($rowset)) {
+            return reset($rowset);
         }
-        unset($rowset);
-        return $row;
+        return null;
     }
 
     /**
@@ -407,7 +403,7 @@ class TableDataGateway
      * @return array
      * @throws \FLEA\Exception\NotImplemented
      */
-    public function findAll($conditions = null, ?string $sort = null, $limit = null, $fields = '*', bool $queryLinks = true): ?array
+    public function findAll($conditions = null, ?string $sort = null, $limit = null, $fields = '*', bool $queryLinks = true): array
     {
         [$whereby, $distinct] = $this->getWhere($conditions);
         // 处理排序
@@ -445,7 +441,7 @@ class TableDataGateway
             $pkvs = [];
             $assocRowset = [];
             $rowset = $this->dbo->getAllWithFieldRefs($result, $this->pka, $pkvs, $assocRowset);
-            $in = 'IN (' . implode(',', array_map(array(& $this->dbo, 'qstr'), $pkvs)) . ')';
+            $in = 'IN (' . implode(',', array_map([$this->dbo, 'qstr'], $pkvs)) . ')';
         } else {
             $rowset = $this->dbo->getAll($result);
         }
@@ -492,7 +488,7 @@ class TableDataGateway
 
         $assoclink->init();
         $tdg = $assoclink->assocTDG;
-        $arow =& $row[$mappingName];
+        $arow = &$row[$mappingName];
 
         if (!is_array($enabledLinks)) {
             if ($enabledLinks == null) {
@@ -532,7 +528,7 @@ class TableDataGateway
             }
             if (empty($in)) { continue; }
 
-            $in = 'IN (' . implode(',', array_map(array(& $this->dbo, 'qstr'), $in)) . ')';
+            $in = 'IN (' . implode(',', array_map([$this->dbo, 'qstr'], $in)) . ')';
 
             $sql = $link->getFindSQL($in);
             $this->dbo->assemble(sql_statement($sql), $assocRowset, $link->mappingName, $link->oneToOne, $link->mainTDG->pka, $link->limit);
@@ -558,7 +554,7 @@ class TableDataGateway
         $tdg = $assoclink->assocTDG;
         $arowset = [];
         foreach (array_keys($rowset) as $offset) {
-            $arowset[] =& $rowset[$offset][$mappingName];
+            $arowset[] = &$rowset[$offset][$mappingName];
         }
         $keys = array_keys($arowset);
 
@@ -587,7 +583,7 @@ class TableDataGateway
                 foreach ($keys as $key) {
                     $pkv = $arowset[$key][$link->mainTDG->primaryKey];
                     $in[] = $pkv;
-                    $assocRowset[$pkv] =& $arowset[$key];
+                    $assocRowset[$pkv] = &$arowset[$key];
                     $arowset[$key][$link->mappingName] = null;
                 }
                 break;
@@ -597,12 +593,12 @@ class TableDataGateway
                     foreach (array_keys($arowset[$key]) as $offset) {
                         $pkv = $arowset[$key][$offset][$link->mainTDG->primaryKey];
                         $in[] = $pkv;
-                        $assocRowset[$pkv] = & $arowset[$key][$offset];
+                        $assocRowset[$pkv] = &$arowset[$key][$offset];
                         $arow[$key][$offset][$link->mappingName] = null;
                     }
                 }
             }
-            $in = 'IN (' . implode(',', array_map(array(& $this->dbo, 'qstr'), $in)) . ')';
+            $in = 'IN (' . implode(',', array_map([$this->dbo, 'qstr'], $in)) . ')';
 
             $sql = $link->getFindSQL($in);
             $this->dbo->assemble(sql_statement($sql), $assocRowset, $link->mappingName, $link->oneToOne, $link->mainTDG->pka, $link->limit);
@@ -678,7 +674,7 @@ class TableDataGateway
      *
      * @return array
      */
-    public function findBySql(string $sql, $limit = null): ?array
+    public function findBySql(string $sql, $limit = null): array
     {
         // 处理 $limit
         if (is_array($limit)) {
@@ -692,12 +688,7 @@ class TableDataGateway
         }
 
         $result = $this->dbo->selectLimit(sql_statement($sql), $length, $offset);
-        if ($result->getSql()) {
-            $rowset = $this->dbo->getAll($result);
-        } else {
-            $rowset = false;
-        }
-        return $rowset;
+        return $this->dbo->getAll($result);
     }
 
     /**
@@ -770,7 +761,7 @@ class TableDataGateway
      */
     public function replace(array &$row): bool
     {
-        $this->_setCreatedTimeFields($row);
+        $this->setCreatedTimeFields($row);
         $fields = '';
         $values = '';
         foreach ($row as $field => $value) {
@@ -817,7 +808,7 @@ class TableDataGateway
     /**
      * 更新一条现有的记录，成功返回 true，失败返回 false
      *
-     * 该操作会引发 _beforeUpdate()、_beforeUpdateDb() 和 _afterUpdateDb() 事件。
+     * 该操作会引发 beforeUpdate()、beforeUpdateDb() 和 afterUpdateDb() 事件。
      *
      * @param array $row
      * @param boolean $saveLinks
@@ -826,7 +817,7 @@ class TableDataGateway
      */
     public function update(array &$row, bool $saveLinks = true): bool
     {
-        if (!$this->_beforeUpdate($row)) {
+        if (!$this->beforeUpdate($row)) {
             return false;
         }
 
@@ -836,7 +827,7 @@ class TableDataGateway
         }
 
         // 自动填写记录的最后更新时间字段
-        $this->_setUpdatedTimeFields($row);
+        $this->setUpdatedTimeFields($row);
 
         // 如果提供了验证器，则进行数据验证
         if ($this->autoValidating && !is_null($this->verifier)) {
@@ -849,8 +840,8 @@ class TableDataGateway
         // 开始事务
         $this->dbo->startTrans();
 
-        // 调用 _beforeUpdateDb() 事件
-        if (!$this->_beforeUpdateDb($row)) {
+        // 调用 beforeUpdateDb() 事件
+        if (!$this->beforeUpdateDb($row)) {
             $this->dbo->completeTrans(false);
             return false;
         }
@@ -875,7 +866,7 @@ class TableDataGateway
         // 处理对关联数据的更新
         if ($this->autoLink && $saveLinks) {
             foreach (array_keys($this->links) as $linkKey) {
-                $link =& $this->links[$linkKey];
+                $link = $this->links[$linkKey];
                 /* @var $link \FLEA\Db\TableLink */
                 // 跳过不需要处理的关联
                 if (!$link->enabled || !$link->linkUpdate || !isset($row[$link->mappingName]) || !is_array($row[$link->mappingName])) {
@@ -889,12 +880,12 @@ class TableDataGateway
             }
         }
 
-        $this->_updateCounterCache($row);
+        $this->updateCounterCache($row);
 
         // 提交事务
         $this->dbo->completeTrans();
 
-        $this->_afterUpdateDb($row);
+        $this->afterUpdateDb($row);
 
         return true;
     }
@@ -933,7 +924,7 @@ class TableDataGateway
     public function updateByConditions($conditions, array &$row): bool
     {
         $whereby = $this->getWhere($conditions, false);
-        $this->_setUpdatedTimeFields($row);
+        $this->setUpdatedTimeFields($row);
 
         [$pairs, $values] = $this->dbo->getPlaceholderPair($row, $this->fields);
         $pairs = implode(',', $pairs);
@@ -975,7 +966,7 @@ class TableDataGateway
         $incr = (int)$incr;
 
         $row = [];
-        $this->_setUpdatedTimeFields($row);
+        $this->setUpdatedTimeFields($row);
         [$pairs, $values] = $this->dbo->getPlaceholderPair($row, $this->fields);
         $pairs = implode(',', $pairs);
         if ($pairs) {
@@ -1004,7 +995,7 @@ class TableDataGateway
         $decr = (int)$decr;
 
         $row = [];
-        $this->_setUpdatedTimeFields($row);
+        $this->setUpdatedTimeFields($row);
         [$pairs, $values] = $this->dbo->getPlaceholderPair($row, $this->fields);
         $pairs = implode(',', $pairs);
         if ($pairs) {
@@ -1019,7 +1010,7 @@ class TableDataGateway
     /**
      * 插入一条新记录，返回新记录的主键值
      *
-     * create() 操作会引发 _beforeCreate()、_beforeCreateDb() 和 _afterCreateDb() 事件。
+     * create() 操作会引发 beforeCreate()、beforeCreateDb() 和 afterCreateDb() 事件。
      *
      * @param array $row
      * @param boolean $saveLinks
@@ -1028,12 +1019,12 @@ class TableDataGateway
      */
     public function create(array &$row, bool $saveLinks = true): int
     {
-        if (!$this->_beforeCreate($row)) {
+        if (!$this->beforeCreate($row)) {
             return 0;
         }
 
         // 自动设置日期字段
-        $this->_setCreatedTimeFields($row);
+        $this->setCreatedTimeFields($row);
 
         // 处理主键
         $mpk = strtoupper($this->primaryKey);
@@ -1069,10 +1060,10 @@ class TableDataGateway
             }
         }
 
-        // 调用 _beforeCreateDb() 事件
+        // 调用 beforeCreateDb() 事件
         $this->dbo->startTrans();
 
-        if (!$this->_beforeCreateDb($row)) {
+        if (!$this->beforeCreateDb($row)) {
             if ($unsetpk) { unset($row[$this->primaryKey]); }
             $this->dbo->completeTrans(false);
             return 0;
@@ -1104,7 +1095,7 @@ class TableDataGateway
         // 处理关联数据表
         if ($this->autoLink && $saveLinks) {
             foreach (array_keys($this->links) as $linkKey) {
-                $link =& $this->links[$linkKey];
+                $link = $this->links[$linkKey];
                 /* @var $link \FLEA\Db\TableLink */
                 if (!$link->enabled || !$link->linkCreate || !isset($row[$link->mappingName]) || !is_array($row[$link->mappingName])) {
                     // 跳过没有关联数据的关联和不需要处理的关联
@@ -1120,12 +1111,12 @@ class TableDataGateway
         }
 
         $row[$this->primaryKey] = $insertId;
-        $this->_updateCounterCache($row);
+        $this->updateCounterCache($row);
 
         // 提交事务
         $this->dbo->CompleteTrans();
 
-        $this->_afterCreateDb($row);
+        $this->afterCreateDb($row);
         if ($unsetpk) { unset($row[$this->primaryKey]); }
 
         return $insertId;
@@ -1158,7 +1149,7 @@ class TableDataGateway
     /**
      * 删除记录
      *
-     * remove() 操作会引发 _beforeRemove()、_beforeRemoveDbByPkv()、_afterRemoveDbByPkv 和 _afterRemoveDb() 事件。
+     * remove() 操作会引发 beforeRemove()、beforeRemoveDbByPkv()、afterRemoveDbByPkv 和 afterRemoveDb() 事件。
      *
      * @param array $row
      *
@@ -1166,7 +1157,7 @@ class TableDataGateway
      */
     public function remove(array &$row, bool $removeLink = true): bool
     {
-        if (!$this->_beforeRemove($row)) {
+        if (!$this->beforeRemove($row)) {
             return false;
         }
 
@@ -1175,7 +1166,7 @@ class TableDataGateway
         }
         $ret = $this->removeByPkv($row[$this->primaryKey], $removeLink);
         if ($ret) {
-            $this->_afterRemoveDb($row);
+            $this->afterRemoveDb($row);
         }
         return $ret;
     }
@@ -1183,7 +1174,7 @@ class TableDataGateway
     /**
      * 根据主键值删除记录
      *
-     * removeByPkv() 引发 _beforeRemoveDbByPkv() 和 _afterRemoveDbByPkv() 事件。
+     * removeByPkv() 引发 beforeRemoveDbByPkv() 和 afterRemoveDbByPkv() 事件。
      *
      * @param mixed $pkv
      * @param boolean $removeLink
@@ -1194,7 +1185,7 @@ class TableDataGateway
     {
         $this->dbo->startTrans();
 
-        if (!$this->_beforeRemoveDbByPkv($pkv)) {
+        if (!$this->beforeRemoveDbByPkv($pkv)) {
             $this->dbo->completeTrans(false);
             return false;
         }
@@ -1208,7 +1199,7 @@ class TableDataGateway
         $counterCacheLinks = [];
         if ($this->autoLink && $removeLink) {
             foreach (array_keys($this->links) as $linkKey) {
-                $link =& $this->links[$linkKey];
+                $link = $this->links[$linkKey];
                 /* @var $link \FLEA\Db\TableLink */
                 if (!$link->enabled) { continue; }
                 switch ($link->type) {
@@ -1254,13 +1245,13 @@ class TableDataGateway
         }
 
         if (!empty($counterCacheLinks)) {
-            $this->_updateCounterCache($row);
+            $this->updateCounterCache($row);
         }
 
         // 提交事务
         $this->dbo->completeTrans();
 
-        $this->_afterRemoveDbByPkv($pkv);
+        $this->afterRemoveDbByPkv($pkv);
 
         return true;
     }
@@ -1332,7 +1323,7 @@ class TableDataGateway
         // 处理关联数据表
         if ($this->autoLink) {
             foreach (array_keys($this->links) as $linkKey) {
-                $link =& $this->links[$linkKey];
+                $link = $this->links[$linkKey];
                 /* @var $link \FLEA\Db\TableLink */
                 switch ($link->type) {
                 case MANY_TO_MANY:
@@ -1470,7 +1461,7 @@ class TableDataGateway
      *
      * @return \FLEA\Db\TableLink
      */
-    public function getLink(string $linkName)
+    public function getLink(string $linkName): \FLEA\Db\TableLink
     {
         $linkName = strtoupper($linkName);
         if (isset($this->links[$linkName])) {
@@ -1514,9 +1505,9 @@ class TableDataGateway
      *
      * @return \FLEA\Db\TableLink
      */
-    public function createLink($defines, int $type)
+    public function createLink($defines, int $type): void
     {
-        if (!is_array($defines)) { return; }
+        if (!is_array($defines) || empty($defines)) { return; }
         if (!is_array(reset($defines))) {
             $defines = [$defines];
         }
@@ -1526,7 +1517,7 @@ class TableDataGateway
             if (!is_array($define)) { continue; }
             // 构造连接对象实例
             $link = \FLEA\Db\TableLink::createLink($define, $type, $this);
-            $this->links[strtoupper($link->name)] =& $link;
+            $this->links[strtoupper($link->name)] = $link;
         }
     }
 
@@ -1651,9 +1642,9 @@ class TableDataGateway
             $args = [];
         }
         if (is_array($where)) {
-            return $this->_parseWhereArray($where);
+            return $this->parseWhereArray($where);
         } else {
-            return $this->_parseWhereString($where, $args);
+            return $this->parseWhereString($where, $args);
         }
     }
 
@@ -1664,7 +1655,7 @@ class TableDataGateway
      *
      * @return array|string
      */
-    protected function _parseWhereArray(array $where): string
+    protected function parseWhereArray(array $where): string
     {
         /**
          * 模式2：
@@ -1690,7 +1681,7 @@ class TableDataGateway
                 if ($next_op != '') {
                     $parts[] = $next_op;
                 }
-                $field = $this->_parseWhereQfield(['', $key]);
+                $field = $this->parseWhereQfield(['', $key]);
                 if (is_array($value)) {
                     $value = array_map($callback, $value);
                     $parts[] = $field . ' IN (' . implode(',', $value) . ')';
@@ -1713,7 +1704,7 @@ class TableDataGateway
      *
      * @return array|string
      */
-    protected function _parseWhereString(string $where, ?array $args = null): string
+    protected function parseWhereString(string $where, ?array $args = null): string
     {
         /**
          * 模式1：
@@ -1727,7 +1718,7 @@ class TableDataGateway
         // 首先从查询条件中提取出可以识别的字段名
         if (strpos($where, '[') !== false) {
             // 提取字段名
-            $where = preg_replace_callback('/\[([a-z0-9_\-\.]+)\]/i', [$this, '_parseWhereQfield'], $where);
+            $where = preg_replace_callback('/\[([a-z0-9_\-\.]+)\]/i', [$this, 'parseWhereQfield'], $where);
         }
 
         return $this->qinto($where, $args);
@@ -1740,7 +1731,7 @@ class TableDataGateway
      *
      * @return string
      */
-    protected function _parseWhereQfield(array $matches): string
+    protected function parseWhereQfield(array $matches): string
     {
         $p = explode('.', $matches[1]);
         switch (count($p)) {
@@ -1898,7 +1889,7 @@ class TableDataGateway
      */
     public function flushMeta(): void
     {
-        $this->_prepareMeta(true);
+        $this->prepareMeta(true);
     }
 
     /**
@@ -1906,7 +1897,7 @@ class TableDataGateway
      *
      * @param array $row
      */
-    protected function _setUpdatedTimeFields(array &$row): void
+    protected function setUpdatedTimeFields(array &$row): void
     {
         foreach ($this->updatedTimeFields as $af) {
             $af = strtoupper($af);
@@ -1929,7 +1920,7 @@ class TableDataGateway
      *
      * @param array $row
      */
-    protected function _setCreatedTimeFields(array &$row): void
+    protected function setCreatedTimeFields(array &$row): void
     {
         $currentTime = time();
         $currentTimeStamp = $this->dbo->dbTimeStamp($currentTime);
@@ -1959,7 +1950,7 @@ class TableDataGateway
      *
      * @return boolean
      */
-    protected function _prepareMeta(bool $flushCache = false): bool
+    protected function prepareMeta(bool $flushCache = false): bool
     {
         $cached = \FLEA::getAppInf('dbMetaCached');
         $cacheId = $this->dbo->dsn['id'] . '/' . $this->fullTableName;
@@ -1992,7 +1983,7 @@ class TableDataGateway
     }
 
     /**
-     * 调用 create() 方法后立即引发 _beforeCreate 事件
+     * 调用 create() 方法后立即引发 beforeCreate 事件
      *
      * 如果要阻止 create() 创建记录，该方法应该返回 false，否则返回 true。
      *
@@ -2000,13 +1991,13 @@ class TableDataGateway
      *
      * @return boolean
      */
-    protected function _beforeCreate(array &$row): bool
+    protected function beforeCreate(array &$row): bool
     {
         return true;
     }
 
     /**
-     * 调用 create() 方法后，表数据入口对数据进行处理后存入数据库前引发 _beforeCreateDb 事件
+     * 调用 create() 方法后，表数据入口对数据进行处理后存入数据库前引发 beforeCreateDb 事件
      *
      * 如果要阻止 create() 创建记录，该方法应该返回 false，否则返回 true。
      *
@@ -2014,23 +2005,23 @@ class TableDataGateway
      *
      * @return boolean
      */
-    protected function _beforeCreateDb(array &$row): bool
+    protected function beforeCreateDb(array &$row): bool
     {
         return true;
     }
 
     /**
-     * 调用 create() 方法并且成功将数据存入数据库后引发 _afterCreateDb 事件
+     * 调用 create() 方法并且成功将数据存入数据库后引发 afterCreateDb 事件
      *
      * @param array $row
      */
-    protected function _afterCreateDb(array &$row): void
+    protected function afterCreateDb(array &$row): void
     {
     }
 
 
     /**
-     * 调用 update() 方法后立即引发 _beforeUpdate 事件
+     * 调用 update() 方法后立即引发 beforeUpdate 事件
      *
      * 如果要阻止 update() 更新记录，该方法应该返回 false，否则返回 true。
      *
@@ -2038,13 +2029,13 @@ class TableDataGateway
      *
      * @return boolean
      */
-    protected function _beforeUpdate(array &$row): bool
+    protected function beforeUpdate(array &$row): bool
     {
         return true;
     }
 
     /**
-     * 调用 update() 方法后，表数据入口对数据进行处理后存入数据库前引发 _beforeUpdateDb 事件
+     * 调用 update() 方法后，表数据入口对数据进行处理后存入数据库前引发 beforeUpdateDb 事件
      *
      * 如果要阻止 update() 更新记录，该方法应该返回 false，否则返回 true。
      *
@@ -2052,22 +2043,22 @@ class TableDataGateway
      *
      * @return boolean
      */
-    protected function _beforeUpdateDb(array &$row): bool
+    protected function beforeUpdateDb(array &$row): bool
     {
         return true;
     }
 
     /**
-     * 调用 update() 方法并且成功将数据更新到数据库后引发 _afterUpdateDb 事件
+     * 调用 update() 方法并且成功将数据更新到数据库后引发 afterUpdateDb 事件
      *
      * @param array $row
      */
-    protected function _afterUpdateDb(array &$row): void
+    protected function afterUpdateDb(array &$row): void
     {
     }
 
     /**
-     * 调用 remove() 方法后立即引发 _beforeRemove 事件
+     * 调用 remove() 方法后立即引发 beforeRemove 事件
      *
      * 如果要阻止 remove() 删除记录，该方法应该返回 false，否则返回 true。
      *
@@ -2075,24 +2066,24 @@ class TableDataGateway
      *
      * @return boolean
      */
-    protected function _beforeRemove(array &$row): bool
+    protected function beforeRemove(array &$row): bool
     {
         return true;
     }
 
     /**
-     * 调用 remove() 方法并且成功删除记录后引发 _afterRemoveDb 事件
+     * 调用 remove() 方法并且成功删除记录后引发 afterRemoveDb 事件
      *
      * @param array $row
      */
-    protected function _afterRemoveDb($row): void
+    protected function afterRemoveDb($row): void
     {
     }
 
     /**
-     * 调用 remove() 或 removeByPkv() 方法后立即引发 _beforeRemoveDbByPkv 事件
+     * 调用 remove() 或 removeByPkv() 方法后立即引发 beforeRemoveDbByPkv 事件
      *
-     * 调用 remove() 方法时，_beforeRemoveDbByPkv 事件出现在 _beforeRemove 事件之后。
+     * 调用 remove() 方法时，beforeRemoveDbByPkv 事件出现在 beforeRemove 事件之后。
      *
      * 如果要阻止 remove() 或 removeByPkv() 删除记录，
      * 该方法应该返回 false，否则返回 true。
@@ -2101,17 +2092,17 @@ class TableDataGateway
      *
      * @return boolean
      */
-    protected function _beforeRemoveDbByPkv($pkv): bool
+    protected function beforeRemoveDbByPkv($pkv): bool
     {
         return true;
     }
 
     /**
-     * 调用 remove() 或 removeByPkv() 方法并且成功删除记录后引发 _afterRemoveDbByPkv 事件
+     * 调用 remove() 或 removeByPkv() 方法并且成功删除记录后引发 afterRemoveDbByPkv 事件
      *
-     * @param array $row
+     * @param mixed $pkv
      */
-    protected function _afterRemoveDbByPkv($pkv): void
+    protected function afterRemoveDbByPkv($pkv): void
     {
     }
 
@@ -2120,10 +2111,10 @@ class TableDataGateway
      *
      * @param array $row
      */
-    protected function _updateCounterCache(array &$row): void
+    protected function updateCounterCache(array &$row): void
     {
         foreach (array_keys($this->links) as $linkKey) {
-            $link =& $this->links[$linkKey];
+            $link = $this->links[$linkKey];
             /* @var $link \FLEA\Db\TableLink */
             if ($link->type != BELONGS_TO || !$link->enabled || !$link->counterCache) { continue; }
             $link->init();
@@ -2144,7 +2135,7 @@ class TableDataGateway
                         $conditions = $conditions[0];
                     }
                 } else {
-                    $conditions =& $link->conditions;
+                    $conditions = $link->conditions;
                 }
                 if ($conditions) {
                     $conditions = "{$link->qforeignKey} = {$fkv} AND {$conditions}";

@@ -161,16 +161,15 @@ class WebControls
     /**
      * 返回视图对象
      *
-     * @return object
+     * @return \FLEA\View\ViewInterface
      */
-    protected function _getView()
+    protected function getView(): \FLEA\View\ViewInterface
     {
         $viewClass = \FLEA::getAppInf('view');
         if ($viewClass != 'PHP') {
             return \FLEA::getSingleton($viewClass);
         } else {
-            $view = false;
-            return $view;
+            return new \FLEA\View\NullView();
         }
     }
 

@@ -16,14 +16,14 @@ class Simple
      *
      * @var array
      */
-    public $_request;
+    protected array $request = [];
 
     /**
      * 原始的请求信息数组
      *
      * @var array
      */
-    public $_requestBackup;
+    protected array $requestBackup = [];
 
     /**
      * 构造函数
@@ -32,7 +32,7 @@ class Simple
      */
     public function __construct(array &$request)
     {
-        $this->_requestBackup =& $request;
+        $this->requestBackup =& $request;
 
         $controllerAccessor = strtolower(\FLEA::getAppInf('controllerAccessor'));
         $actionAccessor = strtolower(\FLEA::getAppInf('actionAccessor'));
@@ -45,7 +45,7 @@ class Simple
         if (isset($r[$actionAccessor])) {
             $data['action'] = $r[$actionAccessor];
         }
-        $this->_request = $data;
+        $this->request = $data;
     }
 
     /**
@@ -57,7 +57,7 @@ class Simple
     {
         $controllerName = $this->getControllerName();
         $actionName = $this->getActionName();
-        return $this->_executeAction($controllerName, $actionName, $this->getControllerClass($controllerName));
+        return $this->executeAction($controllerName, $actionName, $this->getControllerClass($controllerName));
     }
 
     /**
@@ -69,7 +69,7 @@ class Simple
      *
      * @return mixed
      */
-    protected function _executeAction(string $controllerName, string $actionName, string $controllerClass)
+    protected function executeAction(string $controllerName, string $actionName, string $controllerClass)
     {
         $callback = \FLEA::getAppInf('dispatcherFailedCallback');
 
@@ -80,29 +80,29 @@ class Simple
         $controller = null;
         do {
             // 使用 Composer PSR-4 自动加载器加载控制器类
-            if (!$this->_loadController($controllerClass)) { break; }
+            if (!$this->loadController($controllerClass)) { break; }
 
             // 构造控制器对象
             \FLEA::setAppInf('FLEA.internal.currentControllerName', $controllerName);
             \FLEA::setAppInf('FLEA.internal.currentActionName', $actionName);
             $controller = new $controllerClass($controllerName);
             if (!method_exists($controller, $actionMethod)) { break; }
-            if (method_exists($controller, '__setController')) {
-                $controller->__setController($controllerName, $actionName);
+            if (method_exists($controller, 'setController')) {
+                $controller->setController($controllerName, $actionName);
             }
-            if (method_exists($controller, '__setDispatcher')) {
-                $controller->__setDispatcher($this);
+            if (method_exists($controller, 'setDispatcher')) {
+                $controller->setDispatcher($this);
             }
 
-            // 调用 _beforeExecute() 方法
-            if (method_exists($controller, '_beforeExecute')) {
-                $controller->_beforeExecute($actionMethod);
+            // 调用 beforeExecute() 方法
+            if (method_exists($controller, 'beforeExecute')) {
+                $controller->beforeExecute($actionMethod);
             }
             // 执行 action 方法
             $ret = $controller->{$actionMethod}();
-            // 调用 _afterExecute() 方法
-            if (method_exists($controller, '_afterExecute')) {
-                $controller->_afterExecute($actionMethod);
+            // 调用 afterExecute() 方法
+            if (method_exists($controller, 'afterExecute')) {
+                $controller->afterExecute($actionMethod);
             }
             return $ret;
         } while (false);
@@ -115,12 +115,12 @@ class Simple
 
         if (is_null($controller)) {
             throw new \FLEA\Exception\MissingController(
-                    $controllerName, $actionName, $this->_requestBackup,
+                    $controllerName, $actionName, $this->requestBackup,
                     $controllerClass, $actionMethod, null);
         }
 
         throw new \FLEA\Exception\MissingAction(
-                $controllerName, $actionName, $this->_requestBackup,
+                $controllerName, $actionName, $this->requestBackup,
                 $controllerClass, $actionMethod, null);
     }
 
@@ -133,7 +133,7 @@ class Simple
      */
     public function getControllerName(): string
     {
-        $controllerName = preg_replace('/[^a-z0-9_]+/i', '', $this->_request['controller']);
+        $controllerName = preg_replace('/[^a-z0-9_]+/i', '', $this->request['controller']);
         if ($controllerName == '') {
             $controllerName = \FLEA::getAppInf('defaultController');
         }
@@ -150,7 +150,7 @@ class Simple
      */
     public function setControllerName(string $controllerName): void
     {
-        $this->_request['controller'] = $controllerName;
+        $this->request['controller'] = $controllerName;
     }
 
     /**
@@ -162,7 +162,7 @@ class Simple
      */
     public function getActionName(): string
     {
-        $actionName = preg_replace('/[^a-z0-9]+/i', '', $this->_request['action']);
+        $actionName = preg_replace('/[^a-z0-9]+/i', '', $this->request['action']);
         if ($actionName == '') {
             $actionName = \FLEA::getAppInf('defaultAction');
         }
@@ -176,7 +176,7 @@ class Simple
      */
     public function setActionName(string $actionName): void
     {
-        $this->_request['action'] = $actionName;
+        $this->request['action'] = $actionName;
     }
 
     /**
@@ -232,7 +232,7 @@ class Simple
      *
      * @return boolean
      */
-    protected function _loadController(string $controllerClass): bool
+    protected function loadController(string $controllerClass): bool
     {
         // 使用 Composer PSR-4 自动加载器加载类
         if (!class_exists($controllerClass, true)) {

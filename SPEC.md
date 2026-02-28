@@ -98,16 +98,29 @@ namespace FLEA\Controller;
 
 class Action
 {
-    public $_controllerName;   // 当前控制器名
-    public $_actionName;       // 当前动作名
-    public $_dispatcher;       // 调度器
-    public $components = [];   // 组件列表
+    protected string $controllerName = '';    // 当前控制器名
+    protected string $actionName = '';        // 当前动作名
+    protected ?\FLEA\Dispatcher\Simple $dispatcher = null;  // 调度器
+    public $components = [];                  // 组件列表
+    protected array $renderCallbacks = [];    // 渲染回调
 
     // 生命周期方法
-    public function __setController($controllerName, $actionName): void
-    public function __setDispatcher($dispatcher): void
-    public function _beforeExecute($actionMethod): void
-    public function _afterExecute($actionMethod): void
+    public function setController($controllerName, $actionName): void
+    public function setDispatcher(\FLEA\Dispatcher\Simple $dispatcher): void
+    public function beforeExecute($actionMethod): void
+    public function afterExecute($actionMethod): void
+
+    // 辅助方法
+    protected function getComponent(string $componentName): object
+    protected function getDispatcher(): ?\FLEA\Dispatcher\Simple
+    protected function url(?string $actionName = null, ?array $args = null, ?string $anchor = null): string
+    protected function forward(?string $controllerName = null, ?string $actionName = null): void
+    protected function getView(): \FLEA\View\ViewInterface
+    protected function executeView(string $__flea_internal_viewName, ?array $data = null): void
+    protected function isPost(): bool
+    protected function isAjax(): bool
+    protected function registerEvent(string $controlName, string $event, string $action, ?array $attribs = null): string
+    protected function registerRenderCallback($callback): void
 }
 ```
 
@@ -160,13 +173,45 @@ namespace FLEA\Dispatcher;
 
 class Simple
 {
-    public $_request;          // 请求信息
-    public $_requestBackup;    // 原始请求
+    protected array $request = [];           // 请求信息
+    protected array $requestBackup = [];     // 原始请求
 
     public function __construct(array &$request)
     public function dispatching()              // 执行调度
     public function getControllerName(): string
     public function getActionName(): string
+    public function setControllerName(string $controllerName): void
+    public function setActionName(string $actionName): void
+    public function parseUrl(string $url): array
+    public function getControllerClass(string $controllerName): string
+
+    protected function executeAction(string $controllerName, string $actionName, string $controllerClass)
+    protected function loadController(string $controllerClass): bool
+}
+```
+
+#### Auth (认证调度器)
+
+```php
+namespace FLEA\Dispatcher;
+
+class Auth extends Simple
+{
+    protected ?\FLEA\Rbac $auth = null;       // 验证服务对象
+
+    public function __construct(array $request)
+    public function dispatching()
+    public function getAuthProvider(): \FLEA\Rbac
+    public function setAuthProvider(\FLEA\Rbac $auth): void
+    public function setUser(array $userData, $rolesData = null): void
+    public function getUser(): array
+    public function getUserRoles(): array
+    public function clearUser(): void
+    public function check(string $controllerName, ?string $actionName = null, ?string $controllerClass = null): bool
+    public function getControllerACT(string $controllerName, string $controllerClass): ?array
+    public function getControllerACTFromDefaultFile(string $controllerName): ?array
+
+    protected function loadACTFile(string $actFilename): array
 }
 ```
 

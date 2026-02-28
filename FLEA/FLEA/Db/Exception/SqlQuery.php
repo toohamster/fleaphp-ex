@@ -25,7 +25,7 @@ class SqlQuery extends \FLEA\Exception
      *
      * @var string
      */
-    public $sql;
+    public string $sql;
 
     /**
      * 构造函数

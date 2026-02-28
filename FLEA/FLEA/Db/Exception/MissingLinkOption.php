@@ -25,7 +25,7 @@ class MissingLinkOption extends \FLEA\Exception
      *
      * @var string
      */
-    public $option;
+    public string $option;
 
     /**
      * 构造函数

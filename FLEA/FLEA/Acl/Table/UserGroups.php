@@ -40,7 +40,7 @@ class UserGroups extends \FLEA\Db\TableDataGateway
      *
      * @var array
      */
-    public ?array $manyToMany = [
+    public array $manyToMany = [
         [
             'tableClass' => \FLEA\Acl\Table\Roles::class,
             'foreignKey' => 'user_group_id',

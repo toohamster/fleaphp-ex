@@ -38,7 +38,7 @@ class Roles extends \FLEA\Db\TableDataGateway
      *
      * @var array
      */
-    public ?array $manyToMany = [
+    public array $manyToMany = [
         [
             'tableClass' => \FLEA\Acl\Table\Permissions::class,
             'foreignKey' => 'role_id',

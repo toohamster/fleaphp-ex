@@ -25,26 +25,25 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
     /**
      * @var string
      */
-    public $NEXT_ID_SQL = 'UPDATE %s SET id = LAST_INSERT_ID(id + 1)';
-    public $CREATE_SEQ_SQL = 'CREATE TABLE %s (id INT NOT NULL)';
-    public $INIT_SEQ_SQL = 'INSERT INTO %s VALUES (%s)';
-    public $DROP_SEQ_SQL = 'DROP TABLE %s';
-    public $META_COLUMNS_SQL = 'SHOW FULL COLUMNS FROM %s';
-    public $PARAM_STYLE = DBO_PARAM_QM;
-    public $HAS_INSERT_ID = true;
-    public $HAS_AFFECTED_ROWS = true;
+    protected const NEXT_ID_SQL = 'UPDATE %s SET id = LAST_INSERT_ID(id + 1)';
+    protected const CREATE_SEQ_SQL = 'CREATE TABLE %s (id INT NOT NULL)';
+    protected const INIT_SEQ_SQL = 'INSERT INTO %s VALUES (%s)';
+    protected const DROP_SEQ_SQL = 'DROP TABLE %s';
+    protected const META_COLUMNS_SQL = 'SHOW FULL COLUMNS FROM %s';
+    protected const HAS_INSERT_ID = true;
+    protected const HAS_AFFECTED_ROWS = true;
     /**
      * @var \PDO
      */
-    protected $pdo = null;
+    protected ?\PDO $pdo = null;
     /**
      * @var \PDOStatement
      */
-    protected $lastStmt = null;
+    protected ?\PDOStatement $lastStmt = null;
     /**
      * @var string
      */
-    protected $_mysqlVersion = null;
+    protected ?string $mysqlVersion = null;
 
     /**
      * Connect to database using PDO
@@ -110,7 +109,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
             // Store connection in conn for compatibility
             $this->conn = $this->pdo;
 
-            $this->_mysqlVersion = $this->getOne(sql_statement('SELECT VERSION()'));
+            $this->mysqlVersion = $this->getOne(sql_statement('SELECT VERSION()'));
 
         } catch (\PDOException $e) {
             $this->lasterr = $e->getMessage();
@@ -220,10 +219,10 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
             return $value;
         }
         if (is_bool($value)) {
-            return $value ? $this->TRUE_VALUE : $this->FALSE_VALUE;
+            return $value ? static::TRUE_VALUE : static::FALSE_VALUE;
         }
         if (is_null($value)) {
-            return $this->NULL_VALUE;
+            return static::NULL_VALUE;
         }
         return $this->pdo->quote($value);
     }
@@ -259,7 +258,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
      *
      * @return string|int
      */
-    protected function _insertId()
+    protected function doInsertId()
     {
         return $this->pdo->lastInsertId();
     }
@@ -269,7 +268,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
      *
      * @return int
      */
-    protected function _affectedRows(): int
+    protected function doAffectedRows(): int
     {
         if ($this->lastStmt) {
             return $this->lastStmt->rowCount();
@@ -394,7 +393,7 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
             'SET' => 'C',
         ];
 
-        $rs = $this->execute(\FLEA\Db\SqlStatement::create(sprintf($this->META_COLUMNS_SQL, $table)));
+        $rs = $this->execute(\FLEA\Db\SqlStatement::create(sprintf(static::META_COLUMNS_SQL, $table)));
         $rs = $rs->getSql();
         if (!$rs) {
             return false;

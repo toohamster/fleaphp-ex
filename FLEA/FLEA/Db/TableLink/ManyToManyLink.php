@@ -26,35 +26,35 @@ class ManyToManyLink extends TableLink
      *
      * @var boolean
      */
-    public $oneToOne = false;
+    public bool $oneToOne = false;
 
     /**
      * 在处理中间表时，是否要将中间表当做实体
      *
      * @var boolean
      */
-    public $joinTableIsEntity = false;
+    public bool $joinTableIsEntity = false;
 
     /**
      * 中间表是实体时对应的表数据入口
      *
      * @var TableDataGateway
      */
-    public $joinTDG = null;
+    public ?TableDataGateway $joinTDG = null;
 
     /**
      * 中间表的名字
      *
      * @var string
      */
-    public $joinTable = null;
+    public string $joinTable = '';
 
     /**
      * 中间表的完全限定名
      *
      * @var string
      */
-    public $qjoinTable = null;
+    public string $qjoinTable = '';
 
     /**
      * 中间表中保存关联表主键值的字段
@@ -68,7 +68,7 @@ class ManyToManyLink extends TableLink
      *
      * @var string
      */
-    public $qassocForeignKey = null;
+    public string $qassocForeignKey = '';
 
     /**
      * 中间表对应的表数据入口
@@ -84,11 +84,11 @@ class ManyToManyLink extends TableLink
      * @param enum $type
      * @param TableDataGateway $mainTDG
      */
-    function __construct($define, $type, $mainTDG)
+    public function __construct(array $define, int $type, TableDataGateway $mainTDG)
     {
-        $this->_optional[] = 'joinTable';
-        $this->_optional[] = 'joinTableClass';
-        $this->_optional[] = 'assocForeignKey';
+        $this->optional[] = 'joinTable';
+        $this->optional[] = 'joinTableClass';
+        $this->optional[] = 'assocForeignKey';
         parent::__construct($define, $type, $mainTDG);
 
         if ($this->joinTableClass != '') {
@@ -103,7 +103,7 @@ class ManyToManyLink extends TableLink
      *
      * @return string
      */
-    function getFindSQL($in)
+    public function getFindSQL(string $in): string
     {
         static $joinFields = [];
 
@@ -126,7 +126,7 @@ class ManyToManyLink extends TableLink
             $sql = "SELECT {$fields} FROM {$this->qjoinTable} INNER JOIN {$this->assocTDG->qtableName} ON {$this->assocTDG->qpk} = {$this->qassocForeignKey} ";
         }
 
-        return parent::_getFindSQLBase($sql, $in);
+        return parent::getFindSQLBase($sql, $in);
     }
 
     /**
@@ -137,7 +137,7 @@ class ManyToManyLink extends TableLink
      *
      * @return boolean
      */
-    function saveAssocData(array &$row, $pkv): bool
+    public function saveAssocData(array &$row, $pkv): bool
     {
         if (!$this->init) { $this->init(); }
         $apkvs = [];
@@ -230,7 +230,7 @@ class ManyToManyLink extends TableLink
      *
      * @return boolean
      */
-    function deleteMiddleTableDataByMainForeignKey($qpkv)
+    public function deleteMiddleTableDataByMainForeignKey($qpkv)
     {
         if (!$this->init) { $this->init(); }
         $sql = "DELETE FROM {$this->qjoinTable} WHERE {$this->qforeignKey} = {$qpkv} ";
@@ -244,7 +244,7 @@ class ManyToManyLink extends TableLink
      *
      * @return boolean
      */
-    function deleteMiddleTableDataByAssocForeignKey($pkv)
+    public function deleteMiddleTableDataByAssocForeignKey($pkv)
     {
         if (!$this->init) { $this->init(); }
         $qpkv = $this->dbo->qstr($pkv);
@@ -265,7 +265,7 @@ class ManyToManyLink extends TableLink
         } else {
             $joinSchema = $this->mainTDG->schema;
         }
-        if (is_null($this->joinTable)) {
+        if ($this->joinTable === '') {
             $this->joinTable = $this->getMiddleTableName($this->mainTDG->tableName, $this->assocTableName);
         }
         if (is_null($this->foreignKey)) {

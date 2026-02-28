@@ -25,7 +25,7 @@ class HasManyLink extends TableLink
      *
      * @var boolean
      */
-    public $oneToOne = false;
+    public bool $oneToOne = false;
 
     /**
      * 返回用于查询关联表数据的SQL语句
@@ -34,14 +34,14 @@ class HasManyLink extends TableLink
      *
      * @return string
      */
-    public function getFindSQL($in)
+    public function getFindSQL(string $in): string
     {
         if (!$this->init) { $this->init(); }
         $fields = $this->qforeignKey . ' AS ' . $this->mainTDG->pka . ', ' . $this->assocTDG->qfields($this->fields);
 
         $sql = "SELECT {$fields} FROM {$this->assocTDG->qtableName} ";
 
-        return parent::_getFindSQLBase($sql, $in);
+        return parent::getFindSQLBase($sql, $in);
     }
 
     /**
@@ -52,7 +52,7 @@ class HasManyLink extends TableLink
      *
      * @return boolean
      */
-    function saveAssocData(array &$rowset, $pkv): bool
+    public function saveAssocData(array &$rowset, $pkv): bool
     {
         if (!$this->init) { $this->init(); }
 

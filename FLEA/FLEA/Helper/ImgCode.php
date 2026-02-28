@@ -18,7 +18,7 @@ namespace FLEA\Helper;
  *
  * 模版页面中，在需要显示验证码的地方使用
  * <code>
- * <img src="<?php echo $this->_url('imgcode'); ?>" />
+ * <img src="<?php echo $this->url('imgcode'); ?>" />
  * </code>
  *
  * 接下来为显示验证码的控制器编写 imgcode 方法：

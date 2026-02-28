@@ -21,7 +21,7 @@ namespace FLEA\Acl\Table;
  */
 class Users extends \FLEA\Rbac\UsersManager
 {
-    public $belongsTo = [
+    public array $belongsTo = [
         [
             'tableClass' => \FLEA\Acl\Table\UserGroups::class,
             'foreignKey' => 'user_group_id',
@@ -29,7 +29,7 @@ class Users extends \FLEA\Rbac\UsersManager
         ],
     ];
 
-    public $manyToMany = [
+    public array $manyToMany = [
         [
             'tableClass' => \FLEA\Acl\Table\Roles::class,
             'foreignKey' => 'user_id',
