@@ -32,7 +32,7 @@ class InvalidACT extends \FLEA\Exception
      *
      * @param mixed $act
      */
-    function __construct($act)
+    public function __construct($act)
     {
         $this->act = $act;
         $code = 0x0701001;

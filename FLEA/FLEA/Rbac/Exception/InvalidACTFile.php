@@ -48,7 +48,7 @@ class InvalidACTFile extends \FLEA\Exception
      * @param string $controllerName
      * @param mixed $act
      */
-    function __construct($actFilename, $act, $controllerName = null)
+    public function __construct($actFilename, $act, $controllerName = null)
     {
         $this->actFilename = $actFilename;
         $this->act = $act;
