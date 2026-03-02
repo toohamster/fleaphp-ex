@@ -52,49 +52,49 @@ class UsersManager extends \FLEA\Db\TableDataGateway
      *
      * @var string
      */
-    public $usernameField = 'username';
+    public string $usernameField = 'username';
 
     /**
      * 电子邮件字段的名字
      *
      * @var string
      */
-    public $emailField = 'email';
+    public string $emailField = 'email';
 
     /**
      * 密码字段的名字
      *
      * @var string
      */
-    public $passwordField = 'password';
+    public string $passwordField = 'password';
 
     /**
      * 角色字段的名字
      *
      * @var string
      */
-    public $rolesField = 'roles';
+    public string $rolesField = 'roles';
 
     /**
      * 密码加密方式
      *
      * @var int
      */
-    public $encodeMethod = PWD_CRYPT;
+    public int $encodeMethod = PWD_CRYPT;
 
     /**
      * 对数据进行自动验证
      *
      * @var boolean
      */
-    public $autoValidating = true;
+    public bool $autoValidating = true;
 
     /**
      * 指定其他具有特殊意义的字段
      *
      * @var array
      */
-    public $functionFields = [
+    public array $functionFields = [
         'registerIpField' => null,
         'lastLoginField' => null,
         'lastLoginIpField' => null,
@@ -389,7 +389,7 @@ class UsersManager extends \FLEA\Db\TableDataGateway
             return hash('sha512', $cleartext);
 
         default:
-            return false;
+            return null;
         }
     }
 
