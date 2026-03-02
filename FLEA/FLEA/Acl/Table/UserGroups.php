@@ -62,7 +62,7 @@ class UserGroups extends \FLEA\Db\TableDataGateway
      *
      * @var string
      */
-    public $_rootGroupName = '_#_ROOT_GROUP_#_';
+    public string $rootGroupName = '_#_ROOT_GROUP_#_';
 
     /**
      * 添加一个用户组，返回该用户组的 ID
@@ -72,7 +72,8 @@ class UserGroups extends \FLEA\Db\TableDataGateway
      *
      * @return int
      */
-    public function create($group, $parentId = 0): int {
+    public function create(array &$group, int $parentId = 0, bool $saveLinks = true): int
+    {
         $parentId = (int)$parentId;
         if ($parentId) {
             $parent = parent::find($parentId);
@@ -82,11 +83,11 @@ class UserGroups extends \FLEA\Db\TableDataGateway
             }
         } else {
             // 如果未指定 $parentId 为 0 或 null，则创建一个顶级用户组
-            $parent = parent::find(['name' => $this->_rootGroupName]);
+            $parent = parent::find(['name' => $this->rootGroupName]);
             if (!$parent) {
                 // 如果根用户组不存在，则自动创建
                 $parent = [
-                    'name' => $this->_rootGroupName,
+                    'name' => $this->rootGroupName,
                     'description' => '',
                     'left_value' => 1,
                     'right_value' => 2,
@@ -132,7 +133,8 @@ class UserGroups extends \FLEA\Db\TableDataGateway
      *
      * @return boolean
      */
-    public function update($group) {
+    public function update(array &$group, bool $saveLinks = true): bool
+    {
         unset($group['left_value']);
         unset($group['right_value']);
         unset($group['parent_id']);
@@ -146,7 +148,8 @@ class UserGroups extends \FLEA\Db\TableDataGateway
      *
      * @return boolean
      */
-    public function removeByPkv($groupId) {
+    public function removeByPkv($groupId, bool $removeLink = true): bool
+    {
         $group = parent::find((int)$groupId);
         if (!$group) {
             throw new \FLEA\Acl_Exception_UserGroupNotFound($groupId);
@@ -202,16 +205,15 @@ class UserGroups extends \FLEA\Db\TableDataGateway
      *
      * @return array
      */
-    public function getPath($group) {
+    public function getPath(array $group): array
+    {
         $group['left_value'] = (int)$group['left_value'];
         $group['right_value'] = (int)$group['right_value'];
 
         $conditions = "left_value <= {$group['left_value']} AND right_value >= {$group['right_value']}";
         $sort = 'left_value ASC';
         $rowset = $this->findAll($conditions, $sort);
-        if (is_array($rowset)) {
-            array_shift($rowset);
-        }
+        array_shift($rowset);
         return $rowset;
     }
 
@@ -222,7 +224,8 @@ class UserGroups extends \FLEA\Db\TableDataGateway
      *
      * @return array
      */
-    public function getSubGroups($group) {
+    public function getSubGroups(array $group): array
+    {
         $conditions = "parent_id = {$group[$this->primaryKey]}";
         $sort = 'left_value ASC';
         return $this->findAll($conditions, $sort);
@@ -235,7 +238,8 @@ class UserGroups extends \FLEA\Db\TableDataGateway
      *
      * @return array
      */
-    public function getSubTree($group) {
+    public function getSubTree(array $group): array
+    {
         $group['left_value'] = (int)$group['left_value'];
         $group['right_value'] = (int)$group['right_value'];
 
@@ -251,7 +255,8 @@ class UserGroups extends \FLEA\Db\TableDataGateway
      *
      * @return array
      */
-    public function getCurrentLevelGroups($group) {
+    public function getCurrentLevelGroups(array $group): array
+    {
         $group['parent_id'] = (int)$group['parent_id'];
         $conditions = "parent_id = {$group['parent_id']}";
         $sort = 'left_value ASC';
@@ -263,7 +268,8 @@ class UserGroups extends \FLEA\Db\TableDataGateway
      *
      * @return array
      */
-    public function getAllGroups() {
+    public function getAllGroups(): array
+    {
         return parent::findAll('left_value > 1', 'left_value ASC');
     }
 
@@ -272,7 +278,8 @@ class UserGroups extends \FLEA\Db\TableDataGateway
      *
      * @return array
      */
-    public function getAllTopGroups() {
+    public function getAllTopGroups(): array
+    {
         $conditions = "parent_id = 0";
         $sort = 'left_value ASC';
         return $this->findAll($conditions, $sort);
@@ -285,7 +292,8 @@ class UserGroups extends \FLEA\Db\TableDataGateway
      *
      * @return int
      */
-    public function calcAllChildCount($group) {
+    public function calcAllChildCount(array $group): int
+    {
         return intval(($group['right_value'] - $group['left_value'] - 1) / 2);
     }
 

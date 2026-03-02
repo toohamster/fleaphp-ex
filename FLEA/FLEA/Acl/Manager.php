@@ -25,7 +25,7 @@ class Manager
      *
      * @var array
      */
-    public $_tableClass = [
+    public array $tableClass = [
         'users' =>                  \FLEA\Acl\Table\Users::class,
         'roles' =>                  \FLEA\Acl\Table\Roles::class,
         'userGroups' =>             \FLEA\Acl\Table\UserGroups::class,
@@ -36,9 +36,9 @@ class Manager
         'userHasPermissions' =>     \FLEA\Acl\Table\UsersHasPermissions::class,
     ];
 
-    function __construct(array $tableClass = [])
+    public function __construct(array $tableClass = [])
     {
-        $this->_tableClass = array_merge($this->_tableClass, (array)$tableClass);
+        $this->tableClass = array_merge($this->tableClass, (array)$tableClass);
     }
 
     /**
@@ -48,13 +48,13 @@ class Manager
      */
     public function getUserWithPermissions($conditions): ?array
     {
-        $tableUsers = FLEA::getSingleton($this->_tableClass['users']);
+        $tableUsers = FLEA::getSingleton($this->tableClass['users']);
         /* @var $tableUsers \FLEA\Acl\Table\Users */
         $user = $tableUsers->find($conditions);
-        if (empty($user)) { return false; }
+        if (empty($user)) { return null; }
 
         // 取得用户所在用户组的层次数据
-        $tableUserGroups = FLEA::getSingleton($this->_tableClass['userGroups']);
+        $tableUserGroups = FLEA::getSingleton($this->tableClass['userGroups']);
         /* @var $tableUserGroups \FLEA\Acl\Table\UserGroups */
         $rowset = $tableUserGroups->getPath($user['group']);
 

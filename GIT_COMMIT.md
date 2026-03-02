@@ -4,6 +4,19 @@
 
 ---
 
+### refactor: FLEA/Acl 目录 PSR-1/PSR-12 合规性修复及 PHP 7.4 风格优化
+
+补全可见性声明、添加类型声明、去除 `_` 前缀属性名、修正返回值类型不匹配、覆盖方法签名对齐父类。
+
+**修改的文件:**
+- `FLEA/FLEA/Acl/Manager.php`
+- `FLEA/FLEA/Acl/Exception/UserGroupNotFound.php`
+- `FLEA/FLEA/Acl/Table/UserGroups.php`
+- `CHANGES.md`
+- `GIT_COMMIT.md`
+
+---
+
 ### docs: 同步更新 SPEC.md 和 USER_GUIDE.md 中的类型声明
 
 与代码改动保持一致：关联属性 `?array` → `array`，`$fullTableName` `?string` → `string`，可空类型示例更新。

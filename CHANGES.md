@@ -4,6 +4,28 @@
 
 ---
 
+## 2026-03-02
+
+### refactor: FLEA/Acl 目录 PSR-1/PSR-12 合规性修复及 PHP 7.4 风格优化
+
+**Manager.php:**
+- `$_tableClass` → `$tableClass`，去除 `_` 前缀，添加 `array` 类型声明
+- `__construct()` 添加 `public` 可见性修饰符
+- `return false` → `return null`，与 `?array` 返回类型一致
+
+**Exception/UserGroupNotFound.php:**
+- `__construct()` 添加 `public` 可见性修饰符
+
+**Table/UserGroups.php:**
+- `$_rootGroupName` → `$rootGroupName`，去除 `_` 前缀，添加 `string` 类型声明
+- `create()` 签名对齐父类：`create(array &$group, int $parentId = 0, bool $saveLinks = true): int`
+- `update()` 签名对齐父类：`update(array &$group, bool $saveLinks = true): bool`
+- `removeByPkv()` 签名对齐父类：`removeByPkv($groupId, bool $removeLink = true): bool`
+- 7 个独立方法添加参数和返回类型声明
+- `getPath()` 移除冗余 `is_array()` 检查（`findAll()` 已保证返回 `array`）
+
+---
+
 ## 2026-02-28
 
 ### refactor: TableDataGateway/AbstractDriver 返回类型修正及代码质量优化
