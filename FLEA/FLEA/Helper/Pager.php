@@ -45,21 +45,21 @@ class Pager
      *
      * @var mixed
      */
-    public $_conditions;
+    public $conditions;
 
     /**
      * 排序
      *
      * @var string
      */
-    public ?string $_sortby = null;
+    public ?string $sortby = null;
 
     /**
      * 计算实际页码时的基数
      *
      * @var int
      */
-    public int $_basePageIndex = 0;
+    public int $basePageIndex = 0;
 
     /**
      * 每页记录数
@@ -157,7 +157,7 @@ class Pager
      *
      * @var int
      */
-    public int $_currentPage = -1;
+    public int $currentPageRaw = -1;
 
     /**
      * 当前页的页码
@@ -189,14 +189,14 @@ class Pager
      */
     public function __construct($source, $currentPage, $pageSize = 20, $conditions = null, $sortby = null, $basePageIndex = 0)
     {
-        $this->_basePageIndex = $basePageIndex;
-        $this->_currentPage = $this->currentPage = $currentPage;
+        $this->basePageIndex = $basePageIndex;
+        $this->currentPageRaw = $this->currentPage = $currentPage;
         $this->pageSize = $pageSize;
 
         if (is_object($source)) {
             $this->source = $source;
-            $this->_conditions = $conditions;
-            $this->_sortby = $sortby;
+            $this->conditions = $conditions;
+            $this->sortby = $sortby;
             $this->totalCount = $this->count = (int)$this->source->findCount($conditions);
             $this->computingPage();
         } elseif (!empty($source)) {
@@ -213,10 +213,10 @@ class Pager
      *
      * @param int $index
      */
-    public function setBasePageIndex($index)
+    public function setBasePageIndex(int $index): void
     {
-        $this->_basePageIndex = $index;
-        $this->currentPage = $this->_currentPage;
+        $this->basePageIndex = $index;
+        $this->currentPage = $this->currentPageRaw;
         $this->computingPage();
     }
 
@@ -225,9 +225,9 @@ class Pager
      *
      * @param int $page
      */
-    public function setPage($page)
+    public function setPage(int $page): void
     {
-        $this->_currentPage = $page;
+        $this->currentPageRaw = $page;
         $this->currentPage = $page;
         $this->computingPage();
     }
@@ -237,7 +237,7 @@ class Pager
      *
      * @param int $count
      */
-    public function setCount($count)
+    public function setCount(int $count): void
     {
         $this->count = $count;
         $this->computingPage();
@@ -248,7 +248,7 @@ class Pager
      *
      * @param \FLEA\Db\Driver\AbstractDriver $dbo
      */
-    public function setDBO($dbo)
+    public function setDBO(\FLEA\Db\Driver\AbstractDriver $dbo): void
     {
         $this->dbo = $dbo;
     }
@@ -261,16 +261,16 @@ class Pager
      *
      * @return array
      */
-    public function findAll($fields = '*', $queryLinks = true)
+    public function findAll($fields = '*', bool $queryLinks = true): array
     {
         if ($this->count == -1) {
             $this->count = 20;
         }
 
-        $offset = ($this->currentPage - $this->_basePageIndex) * $this->pageSize;
+        $offset = ($this->currentPage - $this->basePageIndex) * $this->pageSize;
         if (is_object($this->source)) {
             $limit = [$this->pageSize, $offset];
-            $rowset = $this->source->findAll($this->_conditions, $this->_sortby, $limit, $fields, $queryLinks);
+            $rowset = $this->source->findAll($this->conditions, $this->sortby, $limit, $fields, $queryLinks);
         } else {
             if (is_null($this->dbo)) {
                 $this->dbo = FLEA::getDBO(false);
@@ -288,7 +288,7 @@ class Pager
      *
      * @return array
      */
-    public function getPagerData($returnPageNumbers = true)
+    public function getPagerData(bool $returnPageNumbers = true): array
     {
         $data = [
             'pageSize' => $this->pageSize,
@@ -325,7 +325,7 @@ class Pager
      *
      * @return array
      */
-    public function getNavbarIndexs($currentPage = 0, $navbarLen = 8)
+    public function getNavbarIndexs(int $currentPage = 0, int $navbarLen = 8): array
     {
         $mid = intval($navbarLen / 2);
         if ($currentPage < $this->firstPage) {
@@ -346,7 +346,7 @@ class Pager
 
         $data = [];
         for ($i = $begin; $i <= $end; $i++) {
-            $data[] = ['index' => $i, 'number' => ($i + 1 - $this->_basePageIndex)];
+            $data[] = ['index' => $i, 'number' => ($i + 1 - $this->basePageIndex)];
         }
         return $data;
     }
@@ -357,7 +357,7 @@ class Pager
      * @param string $caption
      * @param string $jsfunc
      */
-    public function renderPageJumper($caption = '%u', $jsfunc = 'fnOnPageChanged')
+    public function renderPageJumper(string $caption = '%u', string $jsfunc = 'fnOnPageChanged'): void
     {
         $out = "<select name=\"PageJumper\" onchange=\"{$jsfunc}(this.value);\">\n";
         for ($i = $this->firstPage; $i <= $this->lastPage; $i++) {
@@ -366,7 +366,7 @@ class Pager
                 $out .= " selected";
             }
             $out .=">";
-            $out .= sprintf($caption, $i + 1 - $this->_basePageIndex);
+            $out .= sprintf($caption, $i + 1 - $this->basePageIndex);
             $out .= "</option>\n";
         }
         $out .= "</select>\n";
@@ -376,22 +376,22 @@ class Pager
     /**
      * 计算各项分页参数
      */
-    protected function computingPage()
+    protected function computingPage(): void
     {
         $this->pageCount = ceil($this->count / $this->pageSize);
-        $this->firstPage = $this->_basePageIndex;
-        $this->lastPage = $this->pageCount + $this->_basePageIndex - 1;
+        $this->firstPage = $this->basePageIndex;
+        $this->lastPage = $this->pageCount + $this->basePageIndex - 1;
         if ($this->lastPage < $this->firstPage) { $this->lastPage = $this->firstPage; }
 
-        if ($this->lastPage < $this->_basePageIndex) {
-            $this->lastPage = $this->_basePageIndex;
+        if ($this->lastPage < $this->basePageIndex) {
+            $this->lastPage = $this->basePageIndex;
         }
 
-        if ($this->currentPage >= $this->pageCount + $this->_basePageIndex) {
+        if ($this->currentPage >= $this->pageCount + $this->basePageIndex) {
             $this->currentPage = $this->lastPage;
         }
 
-        if ($this->currentPage < $this->_basePageIndex) {
+        if ($this->currentPage < $this->basePageIndex) {
             $this->currentPage = $this->firstPage;
         }
 
@@ -401,16 +401,16 @@ class Pager
             $this->nextPage = $this->lastPage;
         }
 
-        if ($this->currentPage > $this->_basePageIndex) {
+        if ($this->currentPage > $this->basePageIndex) {
             $this->prevPage = $this->currentPage - 1;
         } else {
-            $this->prevPage = $this->_basePageIndex;
+            $this->prevPage = $this->basePageIndex;
         }
 
-        $this->firstPageNumber = $this->firstPage + 1 - $this->_basePageIndex;
-        $this->lastPageNumber = $this->lastPage + 1 - $this->_basePageIndex;
-        $this->nextPageNumber = $this->nextPage + 1 - $this->_basePageIndex;
-        $this->prevPageNumber = $this->prevPage + 1 - $this->_basePageIndex;
-        $this->currentPageNumber = $this->currentPage + 1 - $this->_basePageIndex;
+        $this->firstPageNumber = $this->firstPage + 1 - $this->basePageIndex;
+        $this->lastPageNumber = $this->lastPage + 1 - $this->basePageIndex;
+        $this->nextPageNumber = $this->nextPage + 1 - $this->basePageIndex;
+        $this->prevPageNumber = $this->prevPage + 1 - $this->basePageIndex;
+        $this->currentPageNumber = $this->currentPage + 1 - $this->basePageIndex;
     }
 }

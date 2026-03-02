@@ -51,14 +51,14 @@ class ImgCode
      *
      * @var string
      */
-    public $_code;
+    public string $code = '';
 
     /**
      * 验证码过期时间
      *
      * @var string
      */
-    public $_expired;
+    public int $expired = 0;
 
     /**
      * 验证码图片的类型（默认为 jpeg）
@@ -84,10 +84,8 @@ class ImgCode
     {
         @session_start();
 
-        $this->_code = isset($_SESSION['IMGCODE']) ?
-                $_SESSION['IMGCODE'] : '';
-        $this->_expired = isset($_SESSION['IMGCODE_EXPIRED']) ?
-                $_SESSION['IMGCODE_EXPIRED'] : 0;
+        $this->code = $_SESSION['IMGCODE'] ?? '';
+        $this->expired = $_SESSION['IMGCODE_EXPIRED'] ?? 0;
     }
 
     /**
@@ -97,10 +95,10 @@ class ImgCode
      *
      * @return boolean
      */
-    public function check($code)
+    public function check(string $code): bool
     {
         $time = time();
-        if ($time >= $this->_expired || strtoupper($code) != strtoupper($this->_code)) {
+        if ($time >= $this->expired || strtoupper($code) != strtoupper($this->code)) {
             return false;
         }
         return true;
@@ -113,10 +111,10 @@ class ImgCode
      *
      * @return boolean
      */
-    public function checkCaseSensitive($code)
+    public function checkCaseSensitive(string $code): bool
     {
         $time = time();
-        if ($time >= $this->_expired || $code != $this->_code) {
+        if ($time >= $this->expired || $code != $this->code) {
             return false;
         }
         return true;
@@ -125,7 +123,7 @@ class ImgCode
     /**
      * 清除 session 中的 imgcode 相关信息
      */
-    public function clear()
+    public function clear(): void
     {
         unset($_SESSION['IMGCODE']);
         unset($_SESSION['IMGCODE_EXPIRED']);
@@ -151,10 +149,10 @@ class ImgCode
      * @param int $leftime 验证码有效时间（秒）
      * @param array $options 附加选项，可以指定字体、宽度和高度等参数
      */
-    public function image($type = 0, $length = 4, $lefttime = 900, $options = null)
+    public function image(int $type = 0, int $length = 4, int $lefttime = 900, ?array $options = null): void
     {
-        if ($this->keepCode && $this->_code != '') {
-            $code = $this->_code;
+        if ($this->keepCode && $this->code != '') {
+            $code = $this->code;
         } else {
             // 生成验证码
             switch ($type) {
@@ -180,14 +178,10 @@ class ImgCode
         $_SESSION['IMGCODE_EXPIRED'] = time() + $lefttime;
 
         // 设置选项
-        $paddingLeft = isset($options['paddingLeft']) ?
-                (int)$options['paddingLeft'] : 3;
-        $paddingRight = isset($options['paddingRight']) ?
-                (int)$options['paddingRight'] : 3;
-        $paddingTop = isset($options['paddingTop']) ?
-                (int)$options['paddingTop'] : 2;
-        $paddingBottom = isset($options['paddingBottom']) ?
-                (int)$options['paddingBottom'] : 2;
+        $paddingLeft = (int)($options['paddingLeft'] ?? 3);
+        $paddingRight = (int)($options['paddingRight'] ?? 3);
+        $paddingTop = (int)($options['paddingTop'] ?? 2);
+        $paddingBottom = (int)($options['paddingBottom'] ?? 2);
         $color = $options['color'] ?? '0xffffff';
         $bgcolor = $options['bgcolor'] ?? '0x666666';
         $border = (int) ($options['border'] ?? 1);
@@ -261,7 +255,7 @@ class ImgCode
      *
      * @return array
      */
-    protected function _hex2rgb($color, $defualt = 'ffffff')
+    protected function _hex2rgb(string $color, string $defualt = 'ffffff'): array
     {
         $color = strtolower($color);
         if (substr($color, 0, 2) == '0x') {

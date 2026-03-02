@@ -46,21 +46,21 @@ class FileUploader
      *
      * @var array
      */
-    public $_files = [];
+    public array $files = [];
 
     /**
      * 可用的上传文件对象数量
      *
      * @var int
      */
-    public $_count;
+    public int $count = 0;
 
     /**
      * 构造函数
      *
      * @param boolean $cascade
      */
-    public function __construct($cascade = false)
+    public function __construct(bool $cascade = false)
     {
         if (is_array($_FILES)) {
             foreach ($_FILES as $field => $struct) {
@@ -72,21 +72,21 @@ class FileUploader
                         if ($struct['error'][$i] != UPLOAD_ERR_NO_FILE) {
                             $arr[] = new \FLEA\Helper\FileUploader_File($struct, $field, $i);
                             if (!$cascade) {
-                                $this->_files["{$field}{$i}"] =& $arr[count($arr) - 1];
+                                $this->files["{$field}{$i}"] =& $arr[count($arr) - 1];
                             }
                         }
                     }
                     if ($cascade) {
-                        $this->_files[$field] = $arr;
+                        $this->files[$field] = $arr;
                     }
                 } else {
                     if ($struct['error'] != UPLOAD_ERR_NO_FILE) {
-                        $this->_files[$field] = new \FLEA\Helper\FileUploader_File($struct, $field);
+                        $this->files[$field] = new \FLEA\Helper\FileUploader_File($struct, $field);
                     }
                 }
             }
         }
-        $this->_count = count($this->_files);
+        $this->count = count($this->files);
     }
 
     /**
@@ -94,9 +94,9 @@ class FileUploader
      *
      * @return int
      */
-    public function getCount()
+    public function getCount(): int
     {
-        return $this->_count;
+        return $this->count;
     }
 
     /**
@@ -104,9 +104,9 @@ class FileUploader
      *
      * @return array
      */
-    public function getFiles()
+    public function getFiles(): array
     {
-        return $this->_files;
+        return $this->files;
     }
 
     /**
@@ -116,9 +116,9 @@ class FileUploader
      *
      * @return boolean
      */
-    public function existsFile($name)
+    public function existsFile(string $name): bool
     {
-        return isset($this->_files[$name]);
+        return isset($this->files[$name]);
     }
 
     /**
@@ -130,10 +130,10 @@ class FileUploader
      */
     public function getFile($name)
     {
-        if (!isset($this->_files[$name])) {
+        if (!isset($this->files[$name])) {
             throw new \FLEA\Exception_ExpectedFile('$_FILES[' . $name . ']');
         }
-        return $this->_files[$name];
+        return $this->files[$name];
     }
 
     /**
@@ -143,9 +143,9 @@ class FileUploader
      *
      * @return boolean
      */
-    public function isFileExist($name)
+    public function isFileExist(string $name): bool
     {
-        return isset($this->_files[$name]);
+        return isset($this->files[$name]);
     }
 
     /**
@@ -153,9 +153,9 @@ class FileUploader
      *
      * @param string $destDir
      */
-    public function batchMove($destDir)
+    public function batchMove(string $destDir): void
     {
-        foreach ($this->_files as $file) {
+        foreach ($this->files as $file) {
             /* @var $file \FLEA\Helper\FileUploader_File */
             $file->move($destDir . '/' . $file->getFilename());
         }

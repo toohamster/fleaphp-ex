@@ -30,7 +30,7 @@ class Image
      *
      * @var resource
      */
-    public $_handle = null;
+    public $handle = null;
 
     /**
      * 构造函数
@@ -41,7 +41,7 @@ class Image
      */
     public function __construct($handle)
     {
-        $this->_handle = $handle;
+        $this->handle = $handle;
     }
 
     /**
@@ -59,7 +59,7 @@ class Image
      *
      * @return \FLEA\Helper\Image
      */
-    static public function createFromFile(string $filename, ?string $fileext = null): \FLEA\Helper\Image
+    public static function createFromFile(string $filename, ?string $fileext = null): \FLEA\Helper\Image
     {
         if (is_null($fileext)) {
             $fileext = pathinfo($filename, PATHINFO_EXTENSION);
@@ -88,12 +88,12 @@ class Image
      */
     public function resize(int $width, int $height): void
     {
-        if (is_null($this->_handle)) { return; }
+        if (is_null($this->handle)) { return; }
         $dest = imagecreatetruecolor($width, $height);
-        imagecopyresized($dest, $this->_handle, 0, 0, 0, 0,
-                $width, $height, imagesx($this->_handle), imagesy($this->_handle));
-        imagedestroy($this->_handle);
-        $this->_handle = $dest;
+        imagecopyresized($dest, $this->handle, 0, 0, 0, 0,
+                $width, $height, imagesx($this->handle), imagesy($this->handle));
+        imagedestroy($this->handle);
+        $this->handle = $dest;
     }
 
     /**
@@ -104,12 +104,12 @@ class Image
      */
     public function resampled(int $width, int $height): void
     {
-        if (is_null($this->_handle)) { return; }
+        if (is_null($this->handle)) { return; }
         $dest = imagecreatetruecolor($width, $height);
-        imagecopyresampled($dest, $this->_handle, 0, 0, 0, 0,
-                $width, $height, imagesx($this->_handle), imagesy($this->_handle));
-        imagedestroy($this->_handle);
-        $this->_handle = $dest;
+        imagecopyresampled($dest, $this->handle, 0, 0, 0, 0,
+                $width, $height, imagesx($this->handle), imagesy($this->handle));
+        imagedestroy($this->handle);
+        $this->handle = $dest;
     }
 
     /**
@@ -122,10 +122,10 @@ class Image
      */
     public function resizeCanvas(int $width, int $height, string $pos = 'center', string $bgcolor = '0xffffff'): void
     {
-        if (is_null($this->_handle)) { return; }
+        if (is_null($this->handle)) { return; }
         $dest = imagecreatetruecolor($width, $height);
-        $sx = imagesx($this->_handle);
-        $sy = imagesy($this->_handle);
+        $sx = imagesx($this->handle);
+        $sy = imagesy($this->handle);
 
         // 根据 pos 属性来决定如何定位原始图片
         switch (strtolower($pos)) {
@@ -170,9 +170,9 @@ class Image
         imagefilledrectangle($dest, 0, 0, $width, $height, $bgcolor);
         imagecolordeallocate($dest, $bgcolor);
 
-        imagecopy($dest, $this->_handle, $ox, $oy, 0, 0, $sx, $sy);
-        imagedestroy($this->_handle);
-        $this->_handle = $dest;
+        imagecopy($dest, $this->handle, $ox, $oy, 0, 0, $sx, $sy);
+        imagedestroy($this->handle);
+        $this->handle = $dest;
     }
 
     /**
@@ -185,10 +185,10 @@ class Image
      */
     public function crop(int $width, int $height, bool $highQuality = true, ?bool $nocut = null): void
     {
-        if (is_null($this->_handle)) { return; }
+        if (is_null($this->handle)) { return; }
         $dest = imagecreatetruecolor($width, $height);
-        $sx = imagesx($this->_handle);
-        $sy = imagesy($this->_handle);
+        $sx = imagesx($this->handle);
+        $sy = imagesy($this->handle);
         $ratio = doubleval($width) / doubleval($sx);
 
         if (!is_array($nocut)) {
@@ -254,7 +254,7 @@ class Image
             imagefilledrectangle($dest, 0, 0, $width, $height, $bgcolor);
             imagecolordeallocate($dest, $bgcolor);
 
-            $args = [$dest, $this->_handle, $ox, $oy, 0, 0, $dx, $dy, $sx, $sy];
+            $args = [$dest, $this->handle, $ox, $oy, 0, 0, $dx, $dy, $sx, $sy];
         } else {
             // 允许图像溢出
             if ($sy * $ratio < $height) {
@@ -267,7 +267,7 @@ class Image
                 $sy = $height * $ratio;
             }
 
-            $args = [$dest, $this->_handle, 0, 0, 0, 0, $width, $height, $sx, $sy];
+            $args = [$dest, $this->handle, 0, 0, 0, 0, $width, $height, $sx, $sy];
         }
 
         if ($highQuality) {
@@ -276,8 +276,8 @@ class Image
             call_user_func_array('imagecopyresized', $args);
         }
 
-        imagedestroy($this->_handle);
-        $this->_handle = $dest;
+        imagedestroy($this->handle);
+        $this->handle = $dest;
     }
 
     /**
@@ -288,7 +288,7 @@ class Image
      */
     public function saveAsJpeg(string $filename, int $quality = 80): bool
     {
-        imagejpeg($this->_handle, $filename, $quality);
+        return imagejpeg($this->handle, $filename, $quality);
     }
 
     /**
@@ -298,7 +298,7 @@ class Image
      */
     public function saveAsPng(string $filename): bool
     {
-        imagepng($this->_handle, $filename);
+        return imagepng($this->handle, $filename);
     }
 
     /**
@@ -308,7 +308,7 @@ class Image
      */
     public function saveAsGif(string $filename): bool
     {
-        imagegif($this->_handle, $filename);
+        return imagegif($this->handle, $filename);
     }
 
     /**
@@ -316,8 +316,8 @@ class Image
      */
     public function destory(): void
     {
-        imagedestroy($this->_handle);
-        $this->_handle = null;
+        imagedestroy($this->handle);
+        $this->handle = null;
     }
 
     /**

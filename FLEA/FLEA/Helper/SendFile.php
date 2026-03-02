@@ -35,7 +35,7 @@ class SendFile
      * @param string $filename 发送给浏览器的文件名（尽可能不要使用中文）
      * @param string $mimeType 指示文件类型
      */
-    public function sendFile($serverPath, $filename, $mimeType = 'application/octet-stream')
+    public function sendFile(string $serverPath, string $filename, string $mimeType = 'application/octet-stream'): void
     {
         header("Content-Type: {$mimeType}");
         $filename = '"' . htmlspecialchars($filename) . '"';

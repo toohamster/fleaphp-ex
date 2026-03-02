@@ -25,14 +25,14 @@ class File
      *
      * @var array
      */
-    public $_file = [];
+    public array $file = [];
 
     /**
      * 上传文件对象的名字
      *
      * @var string
      */
-    public $_name;
+    public string $name = '';
 
     /**
      * 构造函数
@@ -41,7 +41,7 @@ class File
      * @param string $name
      * @param int $ix
      */
-    public function __construct($struct, $name, $ix = false)
+    public function __construct(array $struct, string $name, $ix = false)
     {
         if ($ix !== false) {
             $s = [
@@ -51,13 +51,13 @@ class File
                 'error' => $struct['error'][$ix],
                 'size' => $struct['size'][$ix],
             ];
-            $this->_file = $s;
+            $this->file = $s;
         } else {
-            $this->_file = $struct;
+            $this->file = $struct;
         }
 
-        $this->_file['is_moved'] = false;
-        $this->_name = $name;
+        $this->file['is_moved'] = false;
+        $this->name = $name;
     }
 
     /**
@@ -66,9 +66,9 @@ class File
      * @param string $name
      * @param mixed $value
      */
-    public function setAttribute($name, $value)
+    public function setAttribute(string $name, $value): void
     {
-        $this->_file[$name] = $value;
+        $this->file[$name] = $value;
     }
 
     /**
@@ -80,7 +80,7 @@ class File
      */
     public function getAttribute($name)
     {
-        return $this->_file[$name];
+        return $this->file[$name];
     }
 
     /**
@@ -88,9 +88,9 @@ class File
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
-        return $this->_name;
+        return $this->name;
     }
 
     /**
@@ -98,9 +98,9 @@ class File
      *
      * @return boolean
      */
-    public function isSuccessed()
+    public function isSuccessed(): bool
     {
-        return $this->_file['error'] == UPLOAD_ERR_OK;
+        return $this->file['error'] == UPLOAD_ERR_OK;
     }
 
     /**
@@ -108,9 +108,9 @@ class File
      *
      * @return int
      */
-    public function getError()
+    public function getError(): int
     {
-        return $this->_file['error'];
+        return $this->file['error'];
     }
 
     /**
@@ -118,9 +118,9 @@ class File
      *
      * @return boolean
      */
-    public function isMoved()
+    public function isMoved(): bool
     {
-        return $this->_file['is_moved'];
+        return $this->file['is_moved'];
     }
 
     /**
@@ -128,9 +128,9 @@ class File
      *
      * @return string
      */
-    public function getFilename()
+    public function getFilename(): string
     {
-        return $this->_file['name'];
+        return $this->file['name'];
     }
 
     /**
@@ -138,7 +138,7 @@ class File
      *
      * @return string
      */
-    public function getExt()
+    public function getExt(): string
     {
         if ($this->isMoved()) {
             return pathinfo($this->getNewPath(), PATHINFO_EXTENSION);
@@ -152,9 +152,9 @@ class File
      *
      * @return int
      */
-    public function getSize()
+    public function getSize(): int
     {
-        return $this->_file['size'];
+        return $this->file['size'];
     }
 
     /**
@@ -162,9 +162,9 @@ class File
      *
      * @return string
      */
-    public function getMimeType()
+    public function getMimeType(): string
     {
-        return $this->_file['type'];
+        return $this->file['type'];
     }
 
     /**
@@ -172,9 +172,9 @@ class File
      *
      * @return string
      */
-    public function getTmpName()
+    public function getTmpName(): string
     {
-        return $this->_file['tmp_name'];
+        return $this->file['tmp_name'];
     }
 
     /**
@@ -182,9 +182,9 @@ class File
      *
      * @return string
      */
-    public function getNewPath()
+    public function getNewPath(): string
     {
-        return $this->_file['new_path'];
+        return $this->file['new_path'];
     }
 
     /**
@@ -197,7 +197,7 @@ class File
      *
      * @return boolean
      */
-    public function check($allowExts = null, $maxSize = null)
+    public function check(?string $allowExts = null, ?int $maxSize = null): bool
     {
         if (!$this->isSuccessed()) { return false; }
 
@@ -245,17 +245,17 @@ class File
      *
      * @param string $destPath
      */
-    public function move($destPath)
+    public function move(string $destPath): bool
     {
-        $this->_file['is_moved'] = true;
-        $this->_file['new_path'] = $destPath;
-        return move_uploaded_file($this->_file['tmp_name'], $destPath);
+        $this->file['is_moved'] = true;
+        $this->file['new_path'] = $destPath;
+        return move_uploaded_file($this->file['tmp_name'], $destPath);
     }
 
     /**
      * 删除上传的文件
      */
-    public function remove()
+    public function remove(): void
     {
         if ($this->isMoved()) {
             unlink($this->getNewPath());
@@ -267,7 +267,7 @@ class File
     /**
      * 删除移动后的文件
      */
-    public function removeMovedFile()
+    public function removeMovedFile(): void
     {
         if ($this->isMoved()) {
             unlink($this->getNewPath());
