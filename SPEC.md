@@ -132,12 +132,12 @@ namespace FLEA\Db;
 class TableDataGateway
 {
     public string $tableName = '';          // 表名
-    public ?string $fullTableName = null;   // 完整表名
+    public string $fullTableName = '';     // 完整表名
     public $primaryKey = null;              // 主键 (string|array)
-    public ?array $hasOne = null;           // 一对一关联
-    public ?array $belongsTo = null;        // 从属关联
-    public ?array $hasMany = null;          // 一对多关联
-    public ?array $manyToMany = null;       // 多对多关联
+    public array $hasOne = [];             // 一对一关联
+    public array $belongsTo = [];          // 从属关联
+    public array $hasMany = [];            // 一对多关联
+    public array $manyToMany = [];         // 多对多关联
 
     // CRUD 方法
     public function find($conditions, $sort = null, $fields = '*', $queryLinks = true): ?array
@@ -580,7 +580,7 @@ URL 重写：/Post/view/id/1
 框架使用了以下 PHP 7.4 特性：
 
 - **属性类型声明**: `public string $tableName`
-- **可空类型**: `public ?array $hasOne = null`
+- **可空类型**: `public ?string $sort = null`
 - **箭头函数**: `fn($x) => $x * 2`
 - **解构赋值**: `[$a, $b] = $array`
 - **空合并运算符**: `$value ?? $default`

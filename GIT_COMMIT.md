@@ -4,6 +4,16 @@
 
 ---
 
+### docs: 同步更新 SPEC.md 和 USER_GUIDE.md 中的类型声明
+
+与代码改动保持一致：关联属性 `?array` → `array`，`$fullTableName` `?string` → `string`，可空类型示例更新。
+
+**修改的文件:**
+- `SPEC.md`
+- `USER_GUIDE.md`
+
+---
+
 ### refactor: TableDataGateway/AbstractDriver 返回类型修正及代码质量优化
 
 修正 `find()`/`findBySql()` 中 `false` 与 `?array` 返回类型不匹配问题，移除 `findBySql()` 死代码分支；`findAll()`/`findBySql()`/`getAll()`/`getAllWithFieldRefs()` 返回类型收窄为 `array`；`$fullTableName` 改为 `string = ''`；同步 `@var` 注释；SqlStatement `$isResource` 添加 `bool` 类型。
