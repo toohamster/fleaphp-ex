@@ -6,6 +6,41 @@
 
 ## 2026-03-02
 
+### refactor: 全项目 PSR-1/PSR-12 合规性修复及 PHP 7.4 风格优化
+
+**异常类（4 个文件）：**
+- Exception, CheckFailed, InvalidACT, InvalidACTFile — `__construct` 补 `public` 可见性
+
+**核心类（5 个文件）：**
+- Config — `$_instance` → `$instance`（`?self` 类型），`$appInf/$objects/$dbo` 加 `array` 类型
+- Language — `$_dict` → `$dict`，`$_loadedFiles` → `$loadedFiles`，`get()` 加参数和返回类型
+- Log — `$_log/$_logFileDir/$_logFilename/$_enabled/$_errorLevel` 去 `_` 前缀
+- Rbac — `$_sessionKey` → `$sessionKey`，`$_rolesKey` → `$rolesKey`
+- WebControls — `$_extends` → `$extends`，`$_extendsDir` → `$extendsDir`
+
+**Helper 类（7 个文件）：**
+- Pager — `$_conditions/$_sortby/$_basePageIndex/$_currentPage` 去前缀，方法签名补全
+- Verifier — `checkAll()` 加参数类型和返回类型，14 个 `isXXX()` 方法加 `: bool`
+- FileUploader — `$_files` → `$files`，`$_count` → `$count`，方法签名补全
+- FileUploader/File — `$_file` → `$file`，`$_name` → `$name`，方法签名补全
+- Image — `$_handle` → `$handle`，`static public` → `public static`，`saveAs*` 加 `return`
+- ImgCode — `$_code` → `$code`，`$_expired` → `$expired`，方法签名补全
+- SendFile — `sendFile()` 加参数和返回类型
+
+**Session + Rbac 管理器（3 个文件）：**
+- Session/Db — `$tableName/$fieldId/$fieldData/$fieldActivity` 加 `?string`，`$lifeTime` 加 `int`
+- Rbac/RolesManager — `$rolesNameField` 加 `string`
+- Rbac/UsersManager — 7 个属性加类型声明，`encodePassword()` `return false` → `return null`
+
+**App 应用代码（3 个文件）：**
+- PostController — `$postModel/$commentModel` 加类型声明，6 个 action 加 `: void`
+- Post — 6 个方法加参数和返回类型
+- Comment — 4 个方法加参数和返回类型
+
+### refactor: isset 三元表达式替换为 ?? 空合并运算符
+
+Language, Rbac, ImgCode, Dispatcher/Auth, Dispatcher/Simple 共 10 处
+
 ### refactor: FLEA/Acl 目录 PSR-1/PSR-12 合规性修复及 PHP 7.4 风格优化
 
 **Manager.php:**

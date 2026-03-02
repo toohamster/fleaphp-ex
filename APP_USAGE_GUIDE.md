@@ -53,7 +53,7 @@ $posts = $postModel->findAll(null, 'created_at DESC', [$pageSize, $offset]);
 在 `App/Model\Post` 的 `getPublishedPosts` 方法中：
 
 ```php
-public function getPublishedPosts($limit = 10, $offset = 0)
+public function getPublishedPosts(int $limit = 10, int $offset = 0): array
 {
     // 直接传递参数给 findAll，不需要任何额外处理
     // findAll 方法内部会自动处理单个数值或数组的两种情况
@@ -68,7 +68,7 @@ public function getPublishedPosts($limit = 10, $offset = 0)
 **在控制器中调用**：
 
 ```php
-public function actionIndex()
+public function actionIndex(): void
 {
     $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
     $pageSize = 10;
