@@ -213,10 +213,8 @@ class Simple
         $controllerAccessor = strtolower(\FLEA::getAppInf('controllerAccessor'));
         $actionAccessor = strtolower(\FLEA::getAppInf('actionAccessor'));
 
-        $controllerName = isset($args[$controllerAccessor]) ?
-                $args[$controllerAccessor] : null;
-        $actionName = isset($args[$actionAccessor]) ?
-                $args[$actionAccessor] : null;
+        $controllerName = $args[$controllerAccessor] ?? null;
+        $actionName = $args[$actionAccessor] ?? null;
 
         unset($args[$controllerAccessor]);
         unset($args[$actionAccessor]);
