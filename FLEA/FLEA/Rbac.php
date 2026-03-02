@@ -37,22 +37,22 @@ class Rbac
      *
      * @var string
      */
-    public $_sessionKey = 'RBAC_USERDATA';
+    public string $sessionKey = 'RBAC_USERDATA';
 
     /**
      * 指示用户数据中，以什么键保存角色信息
      *
      * @var string
      */
-    public $_rolesKey = 'RBAC_ROLES';
+    public string $rolesKey = 'RBAC_ROLES';
 
     /**
      * 构造函数
      */
     public function __construct()
     {
-        $this->_sessionKey = \FLEA::getAppInf('RBACSessionKey');
-        if ($this->_sessionKey == 'RBAC_USERDATA') {
+        $this->sessionKey = \FLEA::getAppInf('RBACSessionKey');
+        if ($this->sessionKey == 'RBAC_USERDATA') {
             trigger_error(_ET(0x0701005), E_USER_WARNING);
         }
     }
@@ -66,9 +66,9 @@ class Rbac
     public function setUser(array $userData, $rolesData = null): void
     {
         if ($rolesData) {
-            $userData[$this->_rolesKey] = $rolesData;
+            $userData[$this->rolesKey] = $rolesData;
         }
-        $_SESSION[$this->_sessionKey] = $userData;
+        $_SESSION[$this->sessionKey] = $userData;
     }
 
     /**
@@ -78,9 +78,7 @@ class Rbac
      */
     public function getUser(): ?array
     {
-        return isset($_SESSION[$this->_sessionKey]) ?
-                $_SESSION[$this->_sessionKey] :
-                null;
+        return $_SESSION[$this->sessionKey] ?? null;
     }
 
     /**
@@ -88,7 +86,7 @@ class Rbac
      */
     public function clearUser(): void
     {
-        unset($_SESSION[$this->_sessionKey]);
+        unset($_SESSION[$this->sessionKey]);
     }
 
     /**
@@ -99,9 +97,7 @@ class Rbac
     public function getRoles()
     {
         $user = $this->getUser();
-        return isset($user[$this->_rolesKey]) ?
-                $user[$this->_rolesKey] :
-                null;
+        return $user[$this->rolesKey] ?? null;
     }
 
     /**

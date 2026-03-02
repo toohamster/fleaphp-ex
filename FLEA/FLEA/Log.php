@@ -26,7 +26,7 @@ class Log extends AbstractLogger
      *
      * @var string
      */
-    public string $_log = '';
+    public string $log = '';
 
     /**
      * 日期格式
@@ -40,28 +40,28 @@ class Log extends AbstractLogger
      *
      * @var string|null
      */
-    public ?string $_logFileDir = null;
+    public ?string $logFileDir = null;
 
     /**
      * 保存日志的文件名
      *
      * @var string|null
      */
-    public ?string $_logFilename = null;
+    public ?string $logFilename = null;
 
     /**
      * 是否允许日志保存
      *
      * @var bool
      */
-    public bool $_enabled = true;
+    public bool $enabled = true;
 
     /**
      * 要写入日志文件的错误级别
      *
      * @var array|null
      */
-    public ?array $_errorLevel = null;
+    public ?array $errorLevel = null;
 
     /**
      * 构造函数
@@ -78,19 +78,19 @@ class Log extends AbstractLogger
             $dir .= DIRECTORY_SEPARATOR;
         }
         if (!is_dir($dir) || !is_writable($dir)) {
-            $this->_enabled = false;
+            $this->enabled = false;
         } else {
-            $this->_logFileDir = $dir;
-            $this->_logFilename = $this->_logFileDir . \FLEA::getAppInf('logFilename');
+            $this->logFileDir = $dir;
+            $this->logFilename = $this->logFileDir . \FLEA::getAppInf('logFilename');
             $errorLevel = (array)\FLEA::getAppInf('logErrorLevel');
-            $this->_errorLevel = array_flip($errorLevel);
+            $this->errorLevel = array_flip($errorLevel);
 
             [$usec, $sec] = explode(" ", FLEA_LOADED_TIME);
-            $this->_log = sprintf("[%s %s] ======= FleaPHP Loaded =======\n",
+            $this->log = sprintf("[%s %s] ======= FleaPHP Loaded =======\n",
                 date($this->dateFormat, $sec), $usec);
 
             if (isset($_SERVER['REQUEST_URI'])) {
-                $this->_log .= sprintf("[%s] REQUEST_URI: %s\n",
+                $this->log .= sprintf("[%s] REQUEST_URI: %s\n",
                         date($this->dateFormat),
                         $_SERVER['REQUEST_URI']);
             }
@@ -99,8 +99,8 @@ class Log extends AbstractLogger
             register_shutdown_function([$this, '__writeLog']);
 
             // 检查文件是否已经超过指定大小
-            if (file_exists($this->_logFilename)) {
-                $filesize = filesize($this->_logFilename);
+            if (file_exists($this->logFilename)) {
+                $filesize = filesize($this->logFilename);
             } else {
                 $filesize = 0;
             }
@@ -109,11 +109,11 @@ class Log extends AbstractLogger
                 $maxsize = $maxsize * 1024;
                 if ($filesize >= $maxsize) {
                     // 使用新的日志文件名
-                    $pathinfo = pathinfo($this->_logFilename);
+                    $pathinfo = pathinfo($this->logFilename);
                     $newFilename = $pathinfo['dirname'] . DS .
                         basename($pathinfo['basename'], '.' . $pathinfo['extension']) .
                         date('-Ymd-His') . '.' . $pathinfo['extension'];
-                    rename($this->_logFilename, $newFilename);
+                    rename($this->logFilename, $newFilename);
                 }
             }
         }
@@ -128,13 +128,13 @@ class Log extends AbstractLogger
      */
     public function log($level, $message, array $context = []): void
     {
-        if (!$this->_enabled) { return; }
+        if (!$this->enabled) { return; }
 
         $levelStr = strtolower((string)$level);
-        if ($this->_errorLevel !== null && !isset($this->_errorLevel[$levelStr])) { return; }
+        if ($this->errorLevel !== null && !isset($this->errorLevel[$levelStr])) { return; }
 
         $message = $this->interpolate((string)$message, $context);
-        $this->_log .= sprintf("[%s] [%s] %s\n", date($this->dateFormat), $levelStr, $message);
+        $this->log .= sprintf("[%s] [%s] %s\n", date($this->dateFormat), $levelStr, $message);
     }
 
     /**
@@ -149,13 +149,13 @@ class Log extends AbstractLogger
         [$usec, $sec] = explode(" ", $endTime);
         $endTime = (float)$sec + (float)$usec;
         $elapsedTime = $endTime - $beginTime;
-        $this->_log .= sprintf("[%s %s] ======= FleaPHP End (elapsed: %f seconds) =======\n\n",
+        $this->log .= sprintf("[%s %s] ======= FleaPHP End (elapsed: %f seconds) =======\n\n",
             date($this->dateFormat, $sec), $usec, $elapsedTime);
 
-        $fp = fopen($this->_logFilename, 'a');
+        $fp = fopen($this->logFilename, 'a');
         if (!$fp) { return; }
         flock($fp, LOCK_EX);
-        fwrite($fp, str_replace("\r", '', $this->_log));
+        fwrite($fp, str_replace("\r", '', $this->log));
         flock($fp, LOCK_UN);
         fclose($fp);
     }

@@ -18,28 +18,28 @@ class Config
      *
      * @var Config
      */
-    private static $_instance = null;
+    private static ?self $instance = null;
 
     /**
      * 应用程序配置
      *
      * @var array
      */
-    public $appInf = [];
+    public array $appInf = [];
 
     /**
      * 对象实例容器
      *
      * @var array
      */
-    public $objects = [];
+    public array $objects = [];
 
     /**
      * 数据库访问对象
      *
      * @var array
      */
-    public $dbo = [];
+    public array $dbo = [];
 
     /**
      * 私有构造函数，防止外部实例化
@@ -58,10 +58,10 @@ class Config
      */
     public static function getInstance(): self
     {
-        if (self::$_instance === null) {
-            self::$_instance = new self();
+        if (self::$instance === null) {
+            self::$instance = new self();
         }
-        return self::$_instance;
+        return self::$instance;
     }
 
     /**
