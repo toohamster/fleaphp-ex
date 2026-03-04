@@ -4,6 +4,15 @@
 
 ---
 
+### docs: 重写 APP_USAGE_GUIDE.md 博客应用使用手册
+
+基于当前 App/ 目录实际代码重新编写，覆盖目录结构、环境准备、配置、路由、控制器、模型、视图及框架特性说明。
+
+**修改的文件:**
+- `APP_USAGE_GUIDE.md`
+
+---
+
 ### refactor: isset 三元表达式替换为 ?? 空合并运算符
 
 涉及文件：Language, Rbac, ImgCode, Dispatcher/Auth, Dispatcher/Simple（共 10 处）
