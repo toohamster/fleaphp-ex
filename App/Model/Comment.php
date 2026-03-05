@@ -36,7 +36,7 @@ class Comment extends TableDataGateway
      * @param int $postId 文章ID
      * @return array
      */
-    public function getCommentsByPostId($postId)
+    public function getCommentsByPostId(int $postId): array
     {
         return $this->findAll(
             [
@@ -53,7 +53,7 @@ class Comment extends TableDataGateway
      * @param array $data 评论数据
      * @return int
      */
-    public function createComment($data)
+    public function createComment(array $data): int
     {
         $data['status'] = 1; // 自动审核通过
         return $this->create($data);
@@ -65,7 +65,7 @@ class Comment extends TableDataGateway
      * @param int $id 评论ID
      * @return bool
      */
-    public function deleteComment($id)
+    public function deleteComment(int $id): bool
     {
         return $this->removeByPkv($id);
     }
@@ -76,7 +76,7 @@ class Comment extends TableDataGateway
      * @param int $postId 文章ID
      * @return int
      */
-    public function getCommentCount($postId)
+    public function getCommentCount(int $postId): int
     {
         return $this->findCount([
             'post_id' => $postId,

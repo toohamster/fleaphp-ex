@@ -4,6 +4,53 @@
 
 ---
 
+### docs: 重写 APP_USAGE_GUIDE.md 博客应用使用手册
+
+基于当前 App/ 目录实际代码重新编写，覆盖目录结构、环境准备、配置、路由、控制器、模型、视图及框架特性说明。
+
+**修改的文件:**
+- `APP_USAGE_GUIDE.md`
+
+---
+
+### refactor: isset 三元表达式替换为 ?? 空合并运算符
+
+涉及文件：Language, Rbac, ImgCode, Dispatcher/Auth, Dispatcher/Simple（共 10 处）
+
+### refactor: App 应用代码属性加类型声明、方法签名补全（PSR-1/PSR-12）
+
+涉及文件：PostController, Post, Comment
+
+### refactor: Session/Db 及 Rbac 管理器属性加类型声明（PSR-1/PSR-12）
+
+涉及文件：Session/Db, Rbac/RolesManager, Rbac/UsersManager
+- encodePassword() 的 return false 改为 return null 以匹配 ?string 返回类型
+
+### refactor: Helper 类属性去 _ 前缀、加类型声明、方法签名补全（PSR-1/PSR-12）
+
+涉及文件：Pager, Verifier, FileUploader, FileUploader/File, Image, ImgCode, SendFile
+
+### refactor: 核心类属性去 _ 前缀、加类型声明、方法签名补全（PSR-1/PSR-12）
+
+涉及文件：Config, Language, Log, Rbac, WebControls
+
+### refactor: 异常类 __construct 补 public 可见性（PSR-1/PSR-12）
+
+涉及文件：Exception, CheckFailed, InvalidACT, InvalidACTFile
+
+### refactor: FLEA/Acl 目录 PSR-1/PSR-12 合规性修复及 PHP 7.4 风格优化
+
+补全可见性声明、添加类型声明、去除 `_` 前缀属性名、修正返回值类型不匹配、覆盖方法签名对齐父类。
+
+**修改的文件:**
+- `FLEA/FLEA/Acl/Manager.php`
+- `FLEA/FLEA/Acl/Exception/UserGroupNotFound.php`
+- `FLEA/FLEA/Acl/Table/UserGroups.php`
+- `CHANGES.md`
+- `GIT_COMMIT.md`
+
+---
+
 ### docs: 同步更新 SPEC.md 和 USER_GUIDE.md 中的类型声明
 
 与代码改动保持一致：关联属性 `?array` → `array`，`$fullTableName` `?string` → `string`，可空类型示例更新。

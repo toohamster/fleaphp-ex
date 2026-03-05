@@ -91,14 +91,14 @@ class Language
      *
      * @var array
      */
-    public $_dict = [];
+    public array $dict = [];
 
     /**
      * 指示哪些语言文件已经被载入
      *
      * @var array
      */
-    public $_loadedFiles = [];
+    public array $loadedFiles = [];
 
     /**
      * 构造函数
@@ -151,18 +151,18 @@ class Language
 
             $filename = \FLEA::getAppInf('languageFilesDir') . DS .
                 $language . DS . $dictname . '.php';
-            if (isset($this->_loadedFiles[$filename])) { continue; }
+            if (isset($this->loadedFiles[$filename])) { continue; }
 
             if (is_readable($filename)) {
                 $dict = require($filename);
-                $this->_loadedFiles[$filename] = true;
-                if (isset($this->_dict[$language])) {
-                    $this->_dict[$language] = array_merge($this->_dict[$language], $dict);
+                $this->loadedFiles[$filename] = true;
+                if (isset($this->dict[$language])) {
+                    $this->dict[$language] = array_merge($this->dict[$language], $dict);
                 } else {
-                    $this->_dict[$language] = $dict;
+                    $this->dict[$language] = $dict;
                 }
                 if ($default) {
-                    $this->_dict[0] =& $this->_dict[$language];
+                    $this->dict[0] =& $this->dict[$language];
                 }
             } else if (!$noException) {
                 throw new \FLEA\Exception_ExpectedFile($filename);
@@ -178,11 +178,9 @@ class Language
      *
      * @return string
      */
-    public function get($key, $language = '')
+    public function get(string $key, string $language = ''): string
     {
         if ($language == '') { $language = 0; }
-        return isset($this->_dict[$language][$key]) ?
-            $this->_dict[$language][$key] :
-            $key;
+        return $this->dict[$language][$key] ?? $key;
     }
 }

@@ -4,6 +4,20 @@
 
 ---
 
+## 2026-03-02
+
+### refactor: App 应用代码 PSR-1/PSR-12 合规性修复
+
+**App/Controller/PostController.php**
+- `$postModel` 加 `Post` 类型声明，`$commentModel` 加 `Comment` 类型声明
+- 6 个 action 方法加 `: void` 返回类型
+
+**App/Model/Post.php**
+- `getPublishedPosts/getPostById/createPost/updatePost/deletePost/getTotalCount` 加参数和返回类型
+
+**App/Model/Comment.php**
+- `getCommentsByPostId/createComment/deleteComment/getCommentCount` 加参数和返回类型
+
 ## 2026-02-27
 
 ### refactor: 更新 createPost() 和 createComment() 方法的 docblock

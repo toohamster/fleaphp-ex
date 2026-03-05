@@ -43,28 +43,28 @@ class Db
      *
      * @var string
      */
-    public $tableName = null;
+    public ?string $tableName = null;
 
     /**
      * 保存 session id 的字段名，由应用程序设置 sessionDbFieldId 指定
      *
      * @var string
      */
-    public $fieldId = null;
+    public ?string $fieldId = null;
 
     /**
      * 保存 session 数据的字段名，由应用程序设置 sessionDbFieldData 指定
      *
      * @var string
      */
-    public $fieldData = null;
+    public ?string $fieldData = null;
 
     /**
      * 保存 session 过期时间的字段名，由应用程序设置 sessionDbFieldActivity 指定
      *
      * @var string
      */
-    public $fieldActivity = null;
+    public ?string $fieldActivity = null;
 
     /**
      * 指示 session 的有效期
@@ -73,7 +73,7 @@ class Db
      *
      * @var int
      */
-    public $lifeTime = 0;
+    public int $lifeTime = 0;
 
     /**
      * 构造函数

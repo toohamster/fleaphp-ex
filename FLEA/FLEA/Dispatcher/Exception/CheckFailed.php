@@ -33,7 +33,7 @@ class CheckFailed extends \FLEA\Exception
      * @param array $act
      * @param array $roles
      */
-    function __construct($controllerName, $actionName,
+    public function __construct($controllerName, $actionName,
             $act = null, $roles = null)
     {
         $this->controllerName = $controllerName;

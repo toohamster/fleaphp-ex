@@ -42,7 +42,7 @@ class RolesManager extends \FLEA\Db\TableDataGateway
      *
      * @var string
      */
-    public $rolesNameField = 'rolename';
+    public string $rolesNameField = 'rolename';
 
     /**
      * 构造函数

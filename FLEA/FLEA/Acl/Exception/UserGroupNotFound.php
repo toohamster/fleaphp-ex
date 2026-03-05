@@ -22,7 +22,7 @@ class UserGroupNotFound extends \FLEA\Exception
 {
     public $userGroupId;
 
-    function __construct($userGroupId)
+    public function __construct($userGroupId)
     {
         $this->userGroupId = $userGroupId;
         parent::__construct("UserGroup ID: {$userGroupId} not found.");

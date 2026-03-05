@@ -239,9 +239,7 @@ class Auth extends \FLEA\Dispatcher\Simple
 
         $ACT = array_change_key_case($ACT, CASE_UPPER);
         $controllerName = strtoupper($controllerName);
-        return isset($ACT[$controllerName]) ?
-            $ACT[$controllerName] :
-            \FLEA::getAppInf('defaultControllerACT');
+        return $ACT[$controllerName] ?? \FLEA::getAppInf('defaultControllerACT');
     }
 
     /**

@@ -14,12 +14,12 @@ class PostController extends Action
     /**
      * @var Post
      */
-    protected $postModel;
+    protected Post $postModel;
 
     /**
      * @var Comment
      */
-    protected $commentModel;
+    protected Comment $commentModel;
 
     /**
      * @var \FLEA\View\ViewInterface
@@ -40,7 +40,7 @@ class PostController extends Action
     /**
      * 文章列表页
      */
-    public function actionIndex()
+    public function actionIndex(): void
     {
         $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
         $pageSize = 10;
@@ -62,7 +62,7 @@ class PostController extends Action
     /**
      * 文章详情页
      */
-    public function actionView()
+    public function actionView(): void
     {
         $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
@@ -90,7 +90,7 @@ class PostController extends Action
     /**
      * 创建文章
      */
-    public function actionCreate()
+    public function actionCreate(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
@@ -119,7 +119,7 @@ class PostController extends Action
     /**
      * 编辑文章
      */
-    public function actionEdit()
+    public function actionEdit(): void
     {
         $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
@@ -160,7 +160,7 @@ class PostController extends Action
     /**
      * 删除文章
      */
-    public function actionDelete()
+    public function actionDelete(): void
     {
         $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
@@ -183,7 +183,7 @@ class PostController extends Action
     /**
      * 添加评论
      */
-    public function actionComment()
+    public function actionComment(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [

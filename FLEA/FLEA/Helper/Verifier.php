@@ -92,7 +92,7 @@ class Verifier
      *
      * @return array
      */
-    public function checkAll(& $data, & $rules, $skip = 0)
+    public function checkAll(array &$data, array &$rules, $skip = 0): array
     {
         $result = [];
         foreach ($rules as $rule) {
@@ -235,7 +235,7 @@ class Verifier
     /**
      * 数字
      */
-    protected function isNUMBER($value)
+    protected function isNUMBER($value): bool
     {
         return is_numeric($value);
     }
@@ -243,7 +243,7 @@ class Verifier
     /**
      * 整数
      */
-    protected function isINT($value)
+    protected function isINT($value): bool
     {
         return strlen(intval($value)) == strlen($value) && is_numeric($value);
     }
@@ -251,7 +251,7 @@ class Verifier
     /**
      * ASCII 字符串（所有编码小于等于 127 的字符）
      */
-    protected function isASCII($value)
+    protected function isASCII($value): bool
     {
         $ar = [];
         $count = preg_match_all('/[\x20-\x7f]/', $value, $ar);
@@ -261,7 +261,7 @@ class Verifier
     /**
      * Email 地址
      */
-    protected function isEMAIL($value)
+    protected function isEMAIL($value): bool
     {
         return preg_match('/^[A-Za-z0-9]+([._\-\+]*[A-Za-z0-9]+)*@([A-Za-z0-9]+[-A-Za-z0-9]*[A-Za-z0-9]+\.)+[A-Za-z0-9]+$/', $value) != 0;
     }
@@ -269,7 +269,7 @@ class Verifier
     /**
      * 日期（所有 GNU Date Input Formats，例如 yyyy/mm/dd、yyyy-mm-dd）
      */
-    protected function isDATE($value)
+    protected function isDATE($value): bool
     {
         $test = @strtotime($value);
         return $test !== -1 && $test !== false;
@@ -278,7 +278,7 @@ class Verifier
     /**
      * 时间（所有 GNU Date Input Formats，例如 hh:mm:ss）
      */
-    protected function isTIME($value)
+    protected function isTIME($value): bool
     {
         $test = strtotime($value);
         return $test !== -1 && $test !== false;
@@ -287,7 +287,7 @@ class Verifier
     /**
      * IPv4 地址（格式为 a.b.c.h）
      */
-    protected function isIPv4($value)
+    protected function isIPv4($value): bool
     {
         $test = ip2long($value);
         return $test !== -1 && $test !== false;
@@ -296,7 +296,7 @@ class Verifier
     /**
      * 八进制数值
      */
-    protected function isOCTAL($value)
+    protected function isOCTAL($value): bool
     {
         return preg_match('/0[0-7]+/', $value) != 0;
     }
@@ -304,7 +304,7 @@ class Verifier
     /**
      * 二进制数值
      */
-    protected function isBINARY($value)
+    protected function isBINARY($value): bool
     {
         return preg_match('/[01]+/', $value) != 0;
     }
@@ -312,7 +312,7 @@ class Verifier
     /**
      * 十六进制数值
      */
-    protected function isHEX($value)
+    protected function isHEX($value): bool
     {
         return preg_match('/[0-9a-f]+/i', $value) != 0;
     }
@@ -320,7 +320,7 @@ class Verifier
     /**
      * Internet 域名
      */
-    protected function isDOMAIN($value)
+    protected function isDOMAIN($value): bool
     {
         return preg_match('/[a-z0-9\.]+/i', $value) != 0;
     }
@@ -328,7 +328,7 @@ class Verifier
     /**
      * 任意类型
      */
-    protected function isANY()
+    protected function isANY(): bool
     {
         return true;
     }
@@ -336,7 +336,7 @@ class Verifier
     /**
      * 字符串（等同于任意类型）
      */
-    protected function isSTRING()
+    protected function isSTRING(): bool
     {
         return true;
     }
@@ -344,7 +344,7 @@ class Verifier
     /**
      * 文字和数字（26个字母和0－9）
      */
-    protected function isALPHANUM($value)
+    protected function isALPHANUM($value): bool
     {
         return ctype_alnum($value);
     }
@@ -352,7 +352,7 @@ class Verifier
     /**
      * 文字（26个字母）
      */
-    protected function isALPHA($value)
+    protected function isALPHA($value): bool
     {
         return ctype_alpha($value);
     }
@@ -360,7 +360,7 @@ class Verifier
     /**
      * 26个字母及10个数字
      */
-    protected function isALPHANUMX($value)
+    protected function isALPHANUMX($value): bool
     {
         return preg_match('/[^a-z0-9_]/i', $value) == 0;
     }
@@ -368,7 +368,7 @@ class Verifier
     /**
      * 26个字母及 - 符号
      */
-    protected function isALPHAX($value)
+    protected function isALPHAX($value): bool
     {
         return preg_match('/[^a-z\-]/i', $value) == 0;
     }

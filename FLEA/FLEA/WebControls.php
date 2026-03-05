@@ -27,14 +27,14 @@ class WebControls
      *
      * @var array
      */
-    public $_extends = [];
+    public array $extends = [];
 
     /**
      * 保存扩展控件的目录
      *
      * @var array
      */
-    public $_extendsDir = [];
+    public array $extendsDir = [];
 
     /**
      * 构造函数
@@ -44,15 +44,15 @@ class WebControls
     public function __construct($extendsDir = null)
     {
         if (is_array($extendsDir)) {
-            $this->_extendsDir = array_merge($this->_extendsDir, $extendsDir);
+            $this->extendsDir = array_merge($this->extendsDir, $extendsDir);
         } elseif ($extendsDir != '') {
-            $this->_extendsDir[] = $extendsDir;
+            $this->extendsDir[] = $extendsDir;
         }
         $extendsDir = \FLEA::getAppInf('webControlsExtendsDir');
         if (is_array($extendsDir)) {
-            $this->_extendsDir = array_merge($this->_extendsDir, $extendsDir);
+            $this->extendsDir = array_merge($this->extendsDir, $extendsDir);
         } elseif ($extendsDir != '') {
-            $this->_extendsDir[] = $extendsDir;
+            $this->extendsDir[] = $extendsDir;
         }
     }
 
@@ -77,17 +77,17 @@ class WebControls
             $__ctl_out = $this->{$render}($name, $attribs);
         } else {
             $extfilename = ucfirst($type) . '.php';
-            if (!isset($this->_extends[$type])) {
-                foreach ($this->_extendsDir as $dir) {
+            if (!isset($this->extends[$type])) {
+                foreach ($this->extendsDir as $dir) {
                     if (file_exists($dir . DS . $extfilename)) {
                         require($dir . DS . $extfilename);
-                        $this->_extends[$type] = true;
+                        $this->extends[$type] = true;
                         break;
                     }
                 }
             }
 
-            if (isset($this->_extends[$type])) {
+            if (isset($this->extends[$type])) {
                 $__ctl_out = call_user_func_array($render,
                         ['name' => $name, 'attribs' => $attribs]);
             }

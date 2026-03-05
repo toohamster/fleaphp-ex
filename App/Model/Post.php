@@ -37,7 +37,7 @@ class Post extends TableDataGateway
      * @param int $offset 偏移量
      * @return array
      */
-    public function getPublishedPosts($limit = 10, $offset = 0)
+    public function getPublishedPosts(int $limit = 10, int $offset = 0): array
     {
         return $this->findAll(
             ['status' => 1],
@@ -54,7 +54,7 @@ class Post extends TableDataGateway
      * @param int $id 文章ID
      * @return array|null
      */
-    public function getPostById($id)
+    public function getPostById(int $id): ?array
     {
         return $this->find($id);
     }
@@ -65,7 +65,7 @@ class Post extends TableDataGateway
      * @param array $data 文章数据
      * @return int
      */
-    public function createPost($data)
+    public function createPost(array $data): int
     {
         return $this->create($data);
     }
@@ -77,7 +77,7 @@ class Post extends TableDataGateway
      * @param array $data 更新数据
      * @return bool
      */
-    public function updatePost($id, $data)
+    public function updatePost(int $id, array $data): bool
     {
         return $this->updateByConditions([$this->primaryKey => $id], $data);
     }
@@ -88,7 +88,7 @@ class Post extends TableDataGateway
      * @param int $id 文章ID
      * @return bool
      */
-    public function deletePost($id)
+    public function deletePost(int $id): bool
     {
         return $this->removeByPkv($id);
     }
@@ -98,7 +98,7 @@ class Post extends TableDataGateway
      *
      * @return int
      */
-    public function getTotalCount()
+    public function getTotalCount(): int
     {
         return $this->findCount(['status' => 1]);
     }
