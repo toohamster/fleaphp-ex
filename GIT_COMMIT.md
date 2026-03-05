@@ -4,6 +4,15 @@
 
 ---
 
+### docs: 用最新代码更新 SPEC.md 框架规格说明书
+
+与当前代码同步：Config 属性加 `array` 类型；View 新增 ViewInterface/NullView/Simple 完整 API；ActiveRecord 属性去 `_` 前缀并补全方法；Rbac 属性 `$_sessionKey`/`$_rolesKey` → `$sessionKey`/`$rolesKey` 并更新方法列表；Acl\Manager `$_tableClass` → `$tableClass`；Pager 重写构造函数签名和方法列表；Log 属性去 `_` 前缀；Session\Db 属性加 `?string` 类型、方法名改为 `sessionXxx`；生命周期 `_beforeExecute`/`_afterExecute` → `beforeExecute`/`afterExecute`；模型示例加类型声明；目录结构补充 ViewInterface.php、NullView.php、Verifier.php、SendFile.php；修正 dbDSN 配置键的 tab 字符。
+
+**修改的文件:**
+- `SPEC.md`
+
+---
+
 ### docs: 重写 APP_USAGE_GUIDE.md 博客应用使用手册
 
 基于当前 App/ 目录实际代码重新编写，覆盖目录结构、环境准备、配置、路由、控制器、模型、视图及框架特性说明。
