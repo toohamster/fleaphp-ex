@@ -1,5 +1,5 @@
 {
-    "name": "fleaphp/fleaphp",
+    "name": "toohamster/fleaphp-ex",
     "description": "A lightweight PHP framework with MVC architecture, database abstraction layer, and RBAC support",
     "type": "library",
     "keywords": [
@@ -13,8 +13,8 @@
     "license": "LGPL-2.1-or-later",
     "authors": [
         {
-            "name": "FleaPHP Team",
-            "homepage": "http://www.fleaphp.org"
+            "name": "toohamster",
+            "homepage": "https://github.com/toohamster/fleaphp-ex/"
         }
     ],
     "require": {
