@@ -40,7 +40,9 @@ FLEA/
 │   │   ├── FileUploader/      # 文件上传
 │   │   ├── Image.php          # 图像处理
 │   │   ├── ImgCode.php        # 验证码
-│   │   └── Pager.php          # 分页器
+│   │   ├── Pager.php          # 分页器
+│   │   ├── SendFile.php       # 文件下载
+│   │   └── Verifier.php       # 数据验证
 │   ├── Language.php           # 多语言支持
 │   ├── Log.php                # 日志服务 (PSR-3)
 │   ├── Rbac/                  # RBAC (基于角色的访问控制)
@@ -51,7 +53,9 @@ FLEA/
 │   ├── Session/               # Session 处理
 │   │   └── Db.php             # 数据库 Session
 │   ├── View/                  # 视图引擎
-│   │   └── Simple.php         # 简单模板引擎
+│   │   ├── ViewInterface.php  # 视图接口
+│   │   ├── Simple.php         # 简单模板引擎
+│   │   └── NullView.php       # 空视图 (无输出)
 │   └── WebControls.php        # Web 控件库
 ├── FLEA.php                   # 框架入口文件
 └── 3rd/                       # 第三方库
@@ -83,9 +87,9 @@ namespace FLEA;
 
 class Config
 {
-    public $appInf = [];       // 应用程序配置
-    public $objects = [];      // 对象实例容器
-    public $dbo = [];          // 数据库访问对象
+    public array $appInf = [];       // 应用程序配置
+    public array $objects = [];      // 对象实例容器
+    public array $dbo = [];          // 数据库访问对象
 }
 ```
 
@@ -153,16 +157,43 @@ class TableDataGateway
 ```php
 namespace FLEA\View;
 
-class Simple
+interface ViewInterface
+{
+    public function assign($key, $value = null): void;
+    public function display(string $template): void;
+    public function fetch(string $template, ?string $cacheId = null): string;
+}
+```
+
+```php
+namespace FLEA\View;
+
+class Simple implements ViewInterface
 {
     public ?string $templateDir = null;    // 模板目录
     public int $cacheLifetime;              // 缓存过期时间
     public bool $enableCache;               // 是否启用缓存
     public string $cacheDir;                // 缓存目录
     public array $vars = [];                // 模板变量
+    public array $cacheState = [];          // 缓存状态
 
+    public function assign($name, $value = null): void
+    public function display(string $file, ?string $cacheId = null): void
+    public function fetch(string $file, ?string $cacheId = null): string
+    public function isCached(string $file, ?string $cacheId = null): bool
+    public function cleanCache(string $file, ?string $cacheId = null): void
+    public function cleanAllCache(): void
+}
+```
+
+```php
+namespace FLEA\View;
+
+class NullView implements ViewInterface
+{
     public function assign($key, $value = null): void
-    public function display($template): void
+    public function display(string $template): void
+    public function fetch(string $template, ?string $cacheId = null): string
 }
 ```
 
@@ -255,14 +286,22 @@ namespace FLEA\Db;
 
 class ActiveRecord
 {
-    public $_table;           // TableDataGateway 实例
-    public $_idname;          // 主键属性名
-    public $_mapping = false; // 字段映射
-    public $init = false;     // 是否已初始化
+    public $aggregation = [];     // 聚合对象定义
+    public $table;                // TableDataGateway 实例
+    public $idname;               // 主键属性名
+    public $mapping = false;      // 字段映射
+    public $init = false;         // 是否已初始化
 
+    public static function define(): array
     public function __construct($conditions = null)
     public function init(): void
     public function load($conditions): void
+    public function save(): void
+    public function delete(): void
+    public function setId($id): void
+    public function getId()
+    public function toArray(): array
+    public function attach(array &$row): void
 }
 ```
 
@@ -277,12 +316,16 @@ namespace FLEA;
 
 class Rbac
 {
-    public $_sessionKey = 'RBAC_USERDATA';  // Session 键名
-    public $_rolesKey = 'RBAC_ROLES';       // 角色数据键名
+    public string $sessionKey = 'RBAC_USERDATA';  // Session 键名
+    public string $rolesKey = 'RBAC_ROLES';       // 角色数据键名
 
     public function setUser(array $userData, $rolesData = null): void
     public function getUser(): ?array
-    public function checkAccess($act, $roles = null): bool
+    public function clearUser(): void
+    public function getRoles(): mixed
+    public function getRolesArray(): array
+    public function check(array &$roles, array &$ACT): bool
+    public function prepareACT(array $ACT): array
 }
 ```
 
@@ -293,7 +336,7 @@ namespace FLEA\Acl;
 
 class Manager
 {
-    public $_tableClass = [
+    public array $tableClass = [
         'users' => \FLEA\Acl\Table\Users::class,
         'roles' => \FLEA\Acl\Table\Roles::class,
         'userGroups' => \FLEA\Acl\Table\UserGroups::class,
@@ -301,8 +344,8 @@ class Manager
         // ...
     ];
 
+    public function __construct(array $tableClass = [])
     public function getUserWithPermissions($conditions): ?array
-    public function checkPermission($user, $permission): bool
 }
 ```
 
@@ -317,16 +360,26 @@ namespace FLEA\Helper;
 
 class Pager
 {
-    public $source;           // 数据源 (TableDataGateway 或 SQL)
-    public $dbo = null;       // 数据库访问对象
-    public int $pageSize = -1;     // 每页记录数
-    public int $totalCount = -1;   // 总记录数
-    public int $pageCount = -1;    // 总页数
+    public $source;                    // 数据源 (TableDataGateway 或 SQL)
+    public ?\FLEA\Db\Driver\AbstractDriver $dbo = null;  // 数据库访问对象
+    public $conditions;                // 查询条件
+    public ?string $sortby = null;     // 排序
+    public int $basePageIndex = 0;     // 页码基数
+    public int $pageSize = -1;         // 每页记录数
+    public int $totalCount = -1;       // 总记录数
+    public int $pageCount = -1;        // 总页数
+    public int $currentPage = -1;      // 当前页索引
+    public int $currentPageNumber = -1;// 当前页页码
 
-    public function __construct($source, $conditions = null, $sort = null)
-    public function setPage($page): void
-    public function getPage(): int
-    public function exec(): array
+    public function __construct($source, $currentPage, $pageSize = 20, $conditions = null, $sortby = null, $basePageIndex = 0)
+    public function setBasePageIndex(int $index): void
+    public function setPage(int $page): void
+    public function setCount(int $count): void
+    public function setDBO(\FLEA\Db\Driver\AbstractDriver $dbo): void
+    public function findAll($fields = '*', bool $queryLinks = true): array
+    public function getPagerData(bool $returnPageNumbers = true): array
+    public function getNavbarIndexs(int $currentPage = 0, int $navbarLen = 8): array
+    public function renderPageJumper(string $caption = '%u', string $jsfunc = 'fnOnPageChanged'): void
 }
 ```
 
@@ -354,12 +407,12 @@ namespace FLEA;
 
 class Log extends AbstractLogger
 {
-    public string $_log = '';           // 运行期间日志
+    public string $log = '';               // 运行期间日志
     public string $dateFormat = 'Y-m-d H:i:s';
-    public ?string $_logFileDir = null; // 日志目录
-    public ?string $_logFilename = null;// 日志文件
-    public bool $_enabled = true;       // 是否启用
-    public ?array $_errorLevel = null;  // 错误级别
+    public ?string $logFileDir = null;     // 日志目录
+    public ?string $logFilename = null;    // 日志文件
+    public bool $enabled = true;           // 是否启用
+    public ?array $errorLevel = null;      // 错误级别
 
     public function log($level, $message, array $context = []): void
 }
@@ -372,20 +425,21 @@ namespace FLEA\Session;
 
 class Db
 {
-    public $dbo = null;              // 数据库访问对象
-    public $tableName = null;        // Session 表名
-    public $fieldId = null;          // Session ID 字段
-    public $fieldData = null;        // Session 数据字段
-    public $fieldActivity = null;    // 活动时间字段
-    public int $lifeTime = 0;        // 有效期
+    public $dbo = null;                      // 数据库访问对象
+    public ?string $tableName = null;        // Session 表名
+    public ?string $fieldId = null;          // Session ID 字段
+    public ?string $fieldData = null;        // Session 数据字段
+    public ?string $fieldActivity = null;    // 活动时间字段
+    public int $lifeTime = 0;               // 有效期
 
     public function __construct()
-    public function open($savePath, $sessionName): bool
-    public function close(): bool
-    public function read($id): string
-    public function write($id, $data): bool
-    public function destroy($id): bool
-    public function gc($maxlifetime): int
+    public function sessionOpen(string $savePath, string $sessionName): bool
+    public function sessionClose(): bool
+    public function sessionRead(string $sessid): string
+    public function sessionWrite(string $sessid, string $data): bool
+    public function sessionDestroy(string $sessid): bool
+    public function sessionGc(int $maxlifetime): bool
+    public function getOnlineCount(int $lifetime = -1): int
 }
 ```
 
@@ -405,7 +459,7 @@ class Db
 
 ```php
 // 数据库配置
-'	dbDSN' => 'mysql://user:pass@localhost/dbname',
+'dbDSN' => 'mysql://user:pass@localhost/dbname',
 
 // 调度器配置
 'dispatcher' => \FLEA\Dispatcher\Simple::class,
@@ -479,11 +533,11 @@ class Db
    ↓
 5. 实例化控制器
    ↓
-6. 执行 _beforeExecute()
+6. 执行 beforeExecute()
    ↓
 7. 执行动作方法 (actionXxx)
    ↓
-8. 执行 _afterExecute()
+8. 执行 afterExecute()
    ↓
 9. 渲染视图
    ↓
@@ -529,12 +583,12 @@ class Post extends TableDataGateway
     public string $tableName = 'posts';
     public $primaryKey = 'id';
 
-    public function getPublishedPosts($limit = 10)
+    public function getPublishedPosts(int $limit = 10, int $offset = 0): array
     {
         return $this->findAll(
             ['status' => 1],
             'created_at DESC',
-            [$limit, 0]
+            [$limit, $offset]
         );
     }
 }
@@ -542,11 +596,11 @@ class Post extends TableDataGateway
 
 ### 10.3 自定义调度器
 
-继承 `FLEA\Dispatcher\Simple` 并重写 `_executeAction()` 方法。
+继承 `FLEA\Dispatcher\Simple` 并重写 `executeAction()` 方法。
 
 ### 10.4 自定义视图引擎
 
-实现与 `FLEA\View\Simple` 相同的接口。
+实现 `FLEA\View\ViewInterface` 接口。
 
 ---
 

@@ -6,12 +6,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - 操作语言：中文
 - `SPEC.md` 是框架的规格说明书，作为后续开发任务的参考基准
+- FLEA/ 目录代码有变更时，在提交前用最新代码更新 `SPEC.md`（保持框架规格说明书与代码同步）
 - FLEA/ 目录有重要改动后，更新根目录下的 `CHANGES.md`
 - App/ 目录有重要改动后，更新根目录下的 `APP_CHANGES.md`
 - 每次代码改动完成后，将 git commit 说明追加到 `GIT_COMMIT.md`（最新记录在最前）
 - 代码改动完成后等待用户 review，用户确认后再执行 git commit
 - 明确需求后再操作，不确定先问，不猜测
 - 只做用户明确要求的事，完成后立即停止，不自行添加"改进"
+- 发起 Merge Request 和打 Tag 使用 GitHub API（`curl`）直接操作，不使用 `gh` CLI
 
 ## Setup
 
