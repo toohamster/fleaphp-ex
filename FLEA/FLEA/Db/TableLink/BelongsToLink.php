@@ -1,11 +1,4 @@
 <?php
-/**
- * FLEA\Db\TableLink\BelongsToLink 封装 belongs to 关系
- *
- * @package Core
- * @author toohamster
- * @version 1.0
- */
 
 namespace FLEA\Db\TableLink;
 
@@ -13,10 +6,6 @@ use FLEA\Db\TableLink;
 
 /**
  * FLEA\Db\TableLink\BelongsToLink 封装 belongs to 关系
- *
- * @package Core
- * @author toohamster
- * @version 1.0
  */
 class BelongsToLink extends TableLink
 {
@@ -44,7 +33,7 @@ class BelongsToLink extends TableLink
      */
     public function getFindSQL(string $in): string
     {
-        if (!$this->init) { $this->init(); }
+        if (!$this->initialized) { $this->init(); }
         $fields = $this->mainTDG->qpk . ' AS ' . $this->mainTDG->pka . ', ' . $this->dbo->qfields($this->fields, $this->assocTDG->fullTableName, $this->assocTDG->schema);
 
         $sql = "SELECT {$fields} FROM {$this->assocTDG->qtableName} LEFT JOIN {$this->mainTDG->qtableName} ON {$this->mainTDG->qpk} {$in} WHERE {$this->qforeignKey} = {$this->assocTDG->qpk} ";
@@ -63,7 +52,7 @@ class BelongsToLink extends TableLink
     public function saveAssocData(array &$row, $pkv): bool
     {
         if (empty($row)) { return true; }
-        if (!$this->init) { $this->init(); }
+        if (!$this->initialized) { $this->init(); }
         return $this->saveAssocDataBase($row);
     }
 

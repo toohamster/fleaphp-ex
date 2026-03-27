@@ -2,21 +2,9 @@
 
 namespace FLEA\Helper\FileUploader;
 
-
-/**
- * 定义 \FLEA\Helper\FileUploader_File 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: File.php 1018 2007-12-04 23:41:47Z qeeyuan $
- */
-
 /**
  * 封装一个上传的文件
  *
- * @package Core
- * @author toohamster
- * @version 1.0
  */
 class File
 {

@@ -1,12 +1,7 @@
 <?php
 
-
 /**
  * “部署”模式的 FleaPHP 应用程序的默认设置
- *
- * @author toohamster
- * @package Config
- * @version $Id: DEPLOY_MODE_CONFIG.php 1037 2008-04-19 21:19:55Z qeeyuan $
  */
 
 return [
@@ -14,14 +9,12 @@ return [
 
     /**
      * 应用层序的默认时区设置，仅针对 PHP 5.1 以后版本
-     *
      * 如果该设置为 null，则以服务器设置为准。如果服务器没有设置时区，则设置为 Asia/ShangHai。
      */
     'defaultTimezone'           => null,
 
     /**
      * 指示控制器的 url 参数名和默认控制器名
-     *
      * 控制器名字只能是a-z字母和0-9数字，以及"_"下划线。
      */
     'controllerAccessor'        => 'controller',
@@ -36,6 +29,7 @@ return [
     /**
      * url 参数的传递模式，可以是标准、PATHINFO、URL 重写等模式
      */
+    'urlScriptName'             => '',     // 无 rewrite 环境下的入口文件名，如 '/index.php'；有 rewrite 则留空
     'urlMode'                   => URL_STANDARD,
 
     /**
@@ -45,16 +39,13 @@ return [
 
     /**
      * 指示在生成 url 时，是否总是使用应用程序入口文件名，仅限 URL_STANDARD 模式
-     *
      * 如果该设置为 false，则生成的 url 类似：
-     *
      * http://www.example.com/?controller=xxx&action=yyy
      */
     'urlAlwaysUseBootstrap'     => true,
 
     /**
      * 指示在生成 url 时，是否总是使用完整的控制器名和动作名
-     *
      * 如果该设置为 false，则默认的控制器和动作名不会出现在 url 中
      */
     'urlAlwaysUseAccessor'      => true,
@@ -101,6 +92,13 @@ return [
      * 应用程序必须设置该选项才能使用 cache 功能。
      */
     'internalCacheDir'          => null,
+    'cacheTtl'                  => null,  // 缓存默认 TTL（秒），null 表示永不过期
+    'cacheProvider'             => null,  // 缓存驱动，null 使用文件缓存，可设为 \FLEA\RedisCache::class
+    'redisHost'                 => '127.0.0.1',
+    'redisPort'                 => 6379,
+    'redisPassword'             => '',
+    'redisDb'                   => 0,
+    'redisPrefix'               => 'flea:',
 
     /**
      * 指示要自动载入的文件
@@ -121,8 +119,6 @@ return [
      * 指示使用哪些过滤器对 HTTP 请求进行过滤
      */
     'requestFilters'            => [],
-
-    // }}}
 
     // {{{ 数据库相关
 
@@ -152,8 +148,6 @@ return [
      */
     'dbMetaCached'              => true,
 
-    // }}}
-
     // {{{ View 相关
 
     /**
@@ -165,153 +159,6 @@ return [
      * 模板引擎要使用的配置信息
      */
     'viewConfig'                => null,
-
-    /**
-     * 初始化 Ajax 时要载入的类
-     */
-    'ajaxClassName'             => \FLEA\Ajax::class,
-
-    /**
-     * 初始化 WebControls 时要载入的类
-     */
-    'webControlsClassName'      => \FLEA\WebControls::class,
-
-    /**
-     * WebControls 扩展控件的保存目录
-     */
-    'webControlsExtendsDir'     => null,
-
-    // }}}
-
-    // {{{ I18N
-
-    /**
-     * 指示 FleaPHP 应用程序内部处理数据和输出内容要使用的编码
-     */
-    'responseCharset'           => 'utf-8',
-
-    /**
-     * 当 FleaPHP 连接数据库时，用什么编码传递数据
-     */
-    'databaseCharset'           => 'utf8',
-
-    /**
-     * 是否自动输出 Content-Type: text/html; charset=responseCharset
-     */
-    'autoResponseHeader'        => true,
-
-    /**
-     * 指示是否启用多语言支持
-     */
-    'multiLanguageSupport'      => false,
-
-    /**
-     * 指定提供多语言支持的提供程序
-     */
-    'languageSupportProvider'   => \FLEA\Language::class,
-
-    /**
-     * 指示语言文件的保存位置
-     */
-    'languageFilesDir'          => null,
-
-    /**
-     * 指示默认语言
-     */
-    'defaultLanguage'           => 'chinese-utf8',
-
-    /**
-     * 自动载入的语言文件
-     */
-    'autoLoadLanguage'          => null,
-
-    // }}}
-
-    // {{{ \FLEA\Dispatcher\Auth 和 RBAC 组件
-
-    /**
-     * 调度器要使用的验证服务提供程序
-     */
-    'dispatcherAuthProvider'    => \FLEA\Rbac::class,
-
-    /**
-     * 指示 RBAC 组件要使用的默认 ACT 文件
-     */
-    'defaultControllerACTFile'  => '',
-
-    /**
-     * 指示 RBAC 组件是否在没有找到控制器的 ACT 文件时，
-     * 是否从默认 ACT 文件中查询控制器的 ACT
-     */
-    'autoQueryDefaultACTFile'   => false,
-
-    /**
-     * 当控制器没有提供 ACT 文件时，显示警告信息
-     */
-    'controllerACTLoadWarning'  => false,
-
-    /**
-     * 指示当没有为控制器提供 ACT 时，要使用的默认 ACT
-     */
-    'defaultControllerACT'      => null,
-
-    /**
-     * 全局 ACT，当没有指定 ACT 时则从全局 ACT 中查找指定控制器的 ACT
-     */
-    'globalACT'                 => null,
-
-    /**
-     * 用户没有权限访问控制器或控制器方法时，要调用的处理程序
-     */
-    'dispatcherAuthFailedCallback' => null,
-
-    /**
-     * 指示 RBAC 组件用什么键名在 session 中保存用户数据
-     *
-     * 如果在一个域名下同时运行多个应用程序，
-     * 请务必为每一个应用程序使用自己独一无二的键名
-     */
-    'RBACSessionKey'            => 'RBAC_USERDATA',
-
-    // }}}
-
-    // {{{ 日志和错误处理
-    /**
-     * 指示是否启用日志服务
-     */
-    'logEnabled'                => false,
-
-    /**
-     * 指示日志服务的程序
-     */
-    'logProvider'               => \FLEA\Log::class,
-
-    /**
-     * 指示用什么目录保存日志文件
-     *
-     * 如果没有指定日志存放目录，则保存到内部缓存目录中
-     */
-    'logFileDir'                => null,
-
-    /**
-     * 指示用什么文件名保存日志
-     */
-    'logFilename'               => 'error.log',
-
-    /**
-     * 指示当日志文件超过多少 KB 时，自动创建新的日志文件，单位是 KB，不能小于 512KB
-     */
-    'logFileMaxSize'            => 4096,
-
-    /**
-     * 指示哪些级别的错误要保存到日志中
-     */
-    'logErrorLevel'             => [
-        \Psr\Log\LogLevel::WARNING,
-        \Psr\Log\LogLevel::ERROR,
-        \Psr\Log\LogLevel::CRITICAL,
-    ],
-
     /**
      * 异常处理例程
      */
@@ -320,6 +167,10 @@ return [
     /**
      * 指示是否显示错误信息
      */
+    'jwtSecret'                 => '',     // JWT 签名密钥（必须设置）
+    'jwtTtl'                    => 7200,   // JWT 有效期（秒）
+    'jwtIssuer'                 => '',     // JWT 签发者
+    'errorViewsDir'             => null,  // 应用层错误模板目录，null 使用框架默认    'forceJsonResponse'         => false,  // true 时所有异常均返回 JSON，适合纯 API 项目
     'displayErrors'             => true,
 
     /**
@@ -331,8 +182,6 @@ return [
      * 指示是否在错误信息中显示出错位置的源代码
      */
     'displaySource'             => false,
-
-    // }}}
 
     // {{{ 助手库
 
@@ -360,8 +209,6 @@ return [
      * 文件上传助手
      */
     'helper.uploader'           => \FLEA\Helper\FileUploader::class,
-
-    // }}}}
 
     // {{{ \FLEA\Session\Db 设置
 
@@ -392,10 +239,8 @@ return [
 
     /**
      * 指示 session 的有效期
-     *
      * 0 表示由 PHP 运行环境决定，其他数值为超过最后一次活动时间多少秒后失效
      */
     'sessionDbLifeTime'         => 1440,
 
-    // }}}
 ];

@@ -2,21 +2,12 @@
 
 namespace FLEA\Exception;
 
-/**
- * 定义 NotExistsKeyName 异常
- *
- * NotExistsKeyName 异常指示需要的键名不存在
- *
- * @package Exception
- * @version 1.0
- */
-class NotExistsKeyName extends \FLEA\Exception
+class NotExistsKeyName extends \FLEA\Exception implements \Psr\Container\NotFoundExceptionInterface
 {
     public $keyname;
 
     /**
      * 构造函数
-     *
      * @param string $keyname
      */
     public function __construct(string $keyname)

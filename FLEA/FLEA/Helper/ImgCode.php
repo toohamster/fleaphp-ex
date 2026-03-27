@@ -2,15 +2,6 @@
 
 namespace FLEA\Helper;
 
-
-/**
- * 定义 \FLEA\Helper\ImgCode 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: ImgCode.php 972 2007-10-09 20:56:54Z qeeyuan $
- */
-
 /**
  * \FLEA\Helper\ImgCode 类实现了一个简单的图像验证码生成器，并带有检查验证方法
  *
@@ -39,10 +30,6 @@ namespace FLEA\Helper;
  *     }
  * }
  * </code>
- *
- * @package Core
- * @author toohamster
- * @version 1.0
  */
 class ImgCode
 {

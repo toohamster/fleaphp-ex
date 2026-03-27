@@ -1,49 +1,29 @@
 <?php
 
-
-
 namespace FLEA\Exception;
-/**
- * 定义 \FLEA\Exception_ExpectedClass 异常
- *
- * @author toohamster
- * @package Exception
- * @version $Id: ExpectedClass.php 972 2007-10-09 20:56:54Z qeeyuan $
- */
 
-/**
- * \FLEA\Exception_ExpectedClass 异常指示需要的类没有找到
- *
- * @package Exception
- * @author toohamster
- * @version 1.0
- */
 class ExpectedClass extends \FLEA\Exception
 {
     /**
      * 类名称
-     *
      * @var string
      */
     public $className;
 
     /**
      * 类定义文件
-     *
      * @var string
      */
     public $classFile;
 
     /**
      * 指示文件是否存在
-     *
      * @var boolean
      */
     public $fileExists;
 
     /**
      * 构造函数
-     *
      * @param string $className
      * @param string $file
      * @param boolean $fileExists

@@ -5,9 +5,6 @@
  *
  * 该文件包含了所有 FLEA 框架使用的全局函数
  * 通过 composer 自动加载机制进行加载
- *
- * @package Core
- * @version 1.0
  */
 
 /**
@@ -59,236 +56,14 @@ function sql_statement($sql): \FLEA\Db\SqlStatement
 }
 
 /**
- * 重定向浏览器到指定的 URL
+ * 根据命名路由生成 URL
  *
- * @param string $url 要重定向的 URL
- * @param int $delay 延迟多少秒后重定向
- * @param bool $js 是否使用 JavaScript 重定向
- * @param bool $jsWrapped 是否使用 <script> 标签包裹 JavaScript 代码
- * @param bool $return 是否返回 JavaScript 代码而不是直接输出
- * @return ?string
+ * @param string $name 路由名称
+ * @param array $params 路径参数
  */
-function redirect(string $url, int $delay = 0, bool $js = false, bool $jsWrapped = true, bool $return = false): ?string
+function url(string $name, array $params = []): string
 {
-    if ($js) {
-        $html = '';
-        if ($jsWrapped) {
-            $html .= '<script type="text/javascript">';
-        }
-        if ($delay > 0) {
-            $html .= "window.setTimeout(\"location.href = '{$url}';\", {$delay} * 1000);";
-        } else {
-            $html .= "location.href = '{$url}';";
-        }
-        if ($jsWrapped) {
-            $html .= '</script>';
-        }
-
-        if ($return) {
-            return $html;
-        } else {
-            echo $html;
-            return null;
-        }
-    } else {
-        if (headers_sent()) {
-            echo "<script>location.href='{$url}';</script>";
-        } else {
-            if ($delay > 0) {
-                echo "<meta http-equiv='refresh' content='{$delay};url={$url}'>";
-            } else {
-                header("Location: {$url}");
-            }
-        }
-        return null;
-    }
-}
-
-/**
- * 生成 URL 地址
- *
- * @param ?string $controllerName 控制器名称
- * @param ?string $actionName 动作名称
- * @param ?array $params 附加参数
- * @param ?string $anchor 锚点名称
- * @param ?array $options 附加选项
- * @return string
- */
-function url(?string $controllerName = null, ?string $actionName = null, ?array $params = null, ?string $anchor = null, ?array $options = null): string
-{
-    $urlMode = FLEA::getAppInf('urlMode');
-    $controllerAccessor = FLEA::getAppInf('controllerAccessor');
-    $actionAccessor = FLEA::getAppInf('actionAccessor');
-
-    $url = '';
-    if ($urlMode == URL_STANDARD) {
-        $url = detect_uri_base() . '?' . $controllerAccessor . '=' . urlencode($controllerName);
-        if ($actionName != '') {
-            $url .= '&' . $actionAccessor . '=' . urlencode($actionName);
-        }
-        if (is_array($params) && !empty($params)) {
-            $url .= '&' . http_build_query($params);
-        }
-    } elseif ($urlMode == URL_REWRITE) {
-        $url = detect_uri_base();
-        if ($controllerName != '') {
-            $url .= '/' . urlencode($controllerName);
-        }
-        if ($actionName != '') {
-            $url .= '/' . urlencode($actionName);
-        }
-        if (is_array($params) && !empty($params)) {
-            $url .= '?' . http_build_query($params);
-        }
-    } elseif ($urlMode == URL_PATHINFO) {
-        $url = detect_uri_base() . '/' . urlencode($controllerName);
-        if ($actionName != '') {
-            $url .= '/' . urlencode($actionName);
-        }
-        if (is_array($params) && !empty($params)) {
-            $parameterPairStyle = FLEA::getAppInf('urlParameterPairStyle');
-            if ($parameterPairStyle == '/') {
-                $url .= '/' . implode('/', $params);
-            } else {
-                $url .= '?' . http_build_query($params);
-            }
-        }
-    }
-
-    if ($anchor != '') {
-        $url .= '#' . $anchor;
-    }
-
-    return $url;
-}
-
-/**
- * 获得当前请求的 URL 地址
- *
- * 参考 QeePHP 和 Zend Framework 实现。
- *
- * @return string
- */
-function detect_uri_base(): string
-{
-    static $baseuri = null;
-
-    if ($baseuri) { return $baseuri; }
-    $filename = basename($_SERVER['SCRIPT_FILENAME']);
-
-    if (basename($_SERVER['SCRIPT_NAME']) === $filename) {
-        $url = $_SERVER['SCRIPT_NAME'];
-    } elseif (basename($_SERVER['PHP_SELF']) === $filename) {
-        $url = $_SERVER['PHP_SELF'];
-    } elseif (isset($_SERVER['ORIG_SCRIPT_NAME']) && basename($_SERVER['ORIG_SCRIPT_NAME']) === $filename) {
-        $url = $_SERVER['ORIG_SCRIPT_NAME']; // 1and1 shared hosting compatibility
-    } else {
-        // Backtrack up the script_filename to find the portion matching
-        // php_self
-        $path    = $_SERVER['PHP_SELF'];
-        $segs    = explode('/', trim($_SERVER['SCRIPT_FILENAME'], '/'));
-        $segs    = array_reverse($segs);
-        $index   = 0;
-        $last    = count($segs);
-        $url = '';
-        do {
-            $seg     = $segs[$index];
-            $url = '/' . $seg . $url;
-            ++$index;
-        } while (($last > $index) && (false !== ($pos = strpos($path, $url))) && (0 != $pos));
-    }
-
-    // Does the baseUrl have anything in common with the request_uri?
-    if (isset($_SERVER['HTTP_X_REWRITE_URL'])) { // check this first so IIS will catch
-        $request_uri = $_SERVER['HTTP_X_REWRITE_URL'];
-    } elseif (isset($_SERVER['REQUEST_URI'])) {
-        $request_uri = $_SERVER['REQUEST_URI'];
-    } elseif (isset($_SERVER['ORIG_PATH_INFO'])) { // IIS 5.0, PHP as CGI
-        $request_uri = $_SERVER['ORIG_PATH_INFO'];
-        if (!empty($_SERVER['QUERY_STRING'])) {
-            $request_uri .= '?' . $_SERVER['QUERY_STRING'];
-        }
-    } else {
-        $request_uri = '';
-    }
-
-    if (0 === strpos($request_uri, $url)) {
-        // full $url matches
-        $baseuri = $url;
-        return $baseuri;
-    }
-
-    if (0 === strpos($request_uri, dirname($url))) {
-        // directory portion of $url matches
-        $baseuri = rtrim(dirname($url), '/') . '/';
-        return $baseuri;
-    }
-
-    if (!strpos($request_uri, basename($url))) {
-        // no match whatsoever; set it blank
-        return '';
-    }
-
-    // If using mod_rewrite or ISAPI_Rewrite strip the script filename
-    // out of baseUrl. $pos !== 0 makes sure it is not matching a value
-    // from PATH_INFO or QUERY_STRING
-    if ((strlen($request_uri) >= strlen($url))
-        && ((false !== ($pos = strpos($request_uri, $url))) && ($pos !== 0)))
-    {
-        $url = substr($request_uri, 0, $pos + strlen($url));
-    }
-
-    $baseuri = rtrim($url, '/') . '/';
-    return $baseuri;
-}
-
-/**
- * 将数组转换为可通过 url 传递的字符串连接
- *
- * 用法：
- * <code>
- * $string = encode_url_args(array('username' => 'dualface', 'mode' => 'md5'));
- * // $string 现在为 username=dualface&mode=md5
- * </code>
- *
- * @param array $args
- * @param enum $urlMode
- * @param string $parameterPairStyle
- *
- * @return string
- */
-function encode_url_args(array $args, string $urlMode = URL_STANDARD, ?string $parameterPairStyle = null): string
-{
-    $str = '';
-    switch ($urlMode) {
-        case URL_STANDARD:
-            if (is_null($parameterPairStyle)) {
-                $parameterPairStyle = '=';
-            }
-            $sc = '&';
-            break;
-        case URL_PATHINFO:
-        case URL_REWRITE:
-            if (is_null($parameterPairStyle)) {
-                $parameterPairStyle = FLEA::getAppInf('urlParameterPairStyle');
-            }
-            $sc = '/';
-            break;
-    }
-
-    foreach ($args as $key => $value) {
-        if (is_null($value) || $value === '') { continue; }
-        if (is_array($value)) {
-            $append = encode_url_args($value, $urlMode);
-        } else {
-            $append = rawurlencode($key) . $parameterPairStyle . rawurlencode($value);
-        }
-        if (substr($str, -1) != $sc) {
-            $str .= $sc;
-        }
-        $str .= $append;
-    }
-    return substr($str, 1);
+    return \FLEA\Router::urlFor($name, $params);
 }
 
 /**
@@ -311,40 +86,6 @@ function h(string $text): string
 function t(string $text): string
 {
     return nl2br(htmlspecialchars($text, ENT_QUOTES));
-}
-
-/**
- * 显示 JavaScript alert 对话框
- *
- * @param string $message 提示信息
- * @param string $after_action 执行后的操作
- * @param string $url 要跳转的 URL
- * @return void
- */
-function js_alert(string $message = '', string $after_action = '', string $url = ''): void
-{
-    echo '<script type="text/javascript">';
-    if ($message != '') {
-        echo "alert(\"" . addslashes($message) . "\");";
-    }
-    if ($after_action != '') {
-        echo $after_action;
-    }
-    if ($url != '') {
-        echo "location.href='{$url}';";
-    }
-    echo '</script>';
-}
-
-/**
- * 将内容转换为 JavaScript 字符串
- *
- * @param string $content 要转换的内容
- * @return string
- */
-function t2js(string $content): string
-{
-    return str_replace(['\\', '"', "\r", "\n", "'"], ['\\\\', '\\"', '', '\\n', "\\'"], $content);
 }
 
 /**
@@ -382,7 +123,6 @@ function safe_file_get_contents(string $filename): ?string
     return $content === false ? null : $content;
 }
 
-
 /**
  * 调试和错误处理相关的全局函数
  */
@@ -390,36 +130,49 @@ function safe_file_get_contents(string $filename): ?string
 /**
  * FleaPHP 默认的异常处理例程
  *
- * @package Core
- *
  * @param \Throwable $ex
  */
 function __FLEA_EXCEPTION_HANDLER(\Throwable $ex): void
 {
-    if (!FLEA::getAppInf('displayErrors')) { exit; }
-    if (FLEA::getAppInf('friendlyErrorsMessage')) {
-        $language = FLEA::getAppInf('defaultLanguage');
-        $language = preg_replace('/[^a-z0-9\-_]+/i', '', $language);
+    // JSON 响应：Accept 头包含 application/json 或配置强制 JSON 模式
+    $wantsJson = FLEA::getAppInf('forceJsonResponse')
+        || (strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false);
 
-        $exclass = strtoupper(get_class($ex));
-        $template = FLEA_DIR . "/_Errors/{$language}/{$exclass}.php";
-        if (!file_exists($template)) {
-            $template = FLEA_DIR . "/_Errors/{$language}/FLEA_EXCEPTION.php";
-            if (!file_exists($template)) {
-                $template = FLEA_DIR . "/_Errors/default/FLEA_EXCEPTION.php";
+    if ($wantsJson) {
+        if (!headers_sent()) {
+            http_response_code(500);
+            header('Content-Type: application/json; charset=utf-8');
+            if (FLEA::getAppInf('logEnabled') && FLEA::isRegistered(\FLEA\Log::class)) {
+                header('X-Trace-Id: ' . FLEA::registry(\FLEA\Log::class)->getTraceId());
             }
         }
-        include($template);
+        $payload = ['error' => $ex->getMessage(), 'code' => $ex->getCode()];
+        if (DEBUG_MODE) {
+            $payload['exception'] = get_class($ex);
+            $payload['file']      = $ex->getFile();
+            $payload['line']      = $ex->getLine();
+            $payload['trace']     = explode("\n", $ex->getTraceAsString());
+        }
+        echo json_encode($payload, JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    if (!FLEA::getAppInf('displayErrors')) { exit; }
+
+    if (DEBUG_MODE) {
+        if (!headers_sent()) {
+            http_response_code(500);
+            header('Content-Type: text/html; charset=utf-8');
+        }
+        echo (new \FLEA\Error\ErrorRenderer($ex))->render();
     } else {
-        print_ex($ex);
+        \FLEA\Error\ErrorRenderer::renderProduction($ex);
     }
     exit;
 }
 
 /**
  * 打印异常的详细信息
- *
- * @package Core
  *
  * @param \Throwable $ex
  * @param boolean $return 为 true 时返回输出信息，而不是直接显示
@@ -495,6 +248,76 @@ function dump_trace(): void
 }
 
 /**
+ * 生成随机 traceid（62 进制 5 位）
+ *
+ * @return string
+ */
+function generate_traceid(): string
+{
+    static $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $num = random_int(0, 2176782335); // 62^5 - 1
+    $id = '';
+    for ($i = 0; $i < 5; $i++) {
+        $id .= $chars[$num % 62];
+        $num = intdiv($num, 62);
+    }
+    return strrev($id);
+}
+
+/**
+ * 判断字符串是否以指定前缀开头
+ *
+ * @param string $haystack 被搜索的字符串
+ * @param string $needle 前缀字符串
+ * @param string $encoding 字符编码，默认 UTF-8
+ * @return bool
+ */
+function str_start_with(string $haystack, string $needle, string $encoding = 'UTF-8'): bool
+{
+    if ($needle === '') { return true; }
+    if (\FLEA\Env::hasMbstring()) {
+        return mb_strpos($haystack, $needle, 0, $encoding) === 0;
+    }
+    return strncmp($haystack, $needle, strlen($needle)) === 0;
+}
+
+/**
+ * 判断字符串是否以指定后缀结尾
+ *
+ * @param string $haystack 被搜索的字符串
+ * @param string $needle 后缀字符串
+ * @param string $encoding 字符编码，默认 UTF-8
+ * @return bool
+ */
+function str_end_with(string $haystack, string $needle, string $encoding = 'UTF-8'): bool
+{
+    if ($needle === '') { return true; }
+    if (\FLEA\Env::hasMbstring()) {
+        $len = mb_strlen($needle, $encoding);
+        return mb_substr($haystack, -$len, null, $encoding) === $needle;
+    }
+    $len = strlen($needle);
+    return substr($haystack, -$len) === $needle;
+}
+
+/**
+ * 判断字符串是否包含指定子串
+ *
+ * @param string $haystack 被搜索的字符串
+ * @param string $needle 要查找的子串
+ * @param string $encoding 字符编码，默认 UTF-8
+ * @return bool
+ */
+function str_contains(string $haystack, string $needle, string $encoding = 'UTF-8'): bool
+{
+    if ($needle === '') { return true; }
+    if (\FLEA\Env::hasMbstring()) {
+        return mb_strpos($haystack, $needle, 0, $encoding) !== false;
+    }
+    return strpos($haystack, $needle) !== false;
+}
+
+/**
  * 获取浮点数时间值
  *
  * @param ?string $time 时间字符串
@@ -505,7 +328,7 @@ function microtime_float(?string $time = null): float
     if ($time === null) {
         return microtime(true);
     }
-    
+
     // 处理传入的时间字符串
     $parts = explode(' ', $time);
     return (float)($parts[0] ?? 0) + (float)($parts[1] ?? 0);
@@ -536,7 +359,7 @@ function _ET(int $errorCode, bool $appError = false): string
     if (file_exists($errorFile)) {
         $messages = include($errorFile);
         if (isset($messages[$errorCode])) {
-            FLEA::saveCache('errorMessages.' . $errorCode, $messages[$errorCode]);
+            FLEA::writeCache('errorMessages.' . $errorCode, $messages[$errorCode]);
             return $messages[$errorCode];
         }
     }
@@ -586,8 +409,6 @@ function load_language(string $dictname, string $language = '', bool $noExceptio
     }
     return $instance->load($dictname, $language, $noException);
 }
-
-
 
 /**
  * 创建目录（包括所有必要的父目录）
@@ -717,8 +538,8 @@ function array_group_by(array &$arr, string $keyField): array
  * 利用返回的节点引用，可以很方便的获取包含以任意节点为根的子树。
  *
  * @param array $arr 原始数据
- * @param string $fid 节点ID字段名
- * @param string $parentIdKey 节点父ID字段名
+ * @param string $fid 节点 ID 字段名
+ * @param string $parentIdKey 节点父 ID 字段名
  * @param string $childrenIdKey 保存子节点的字段名
  * @param boolean $returnReferences 是否在返回结果中包含节点引用
  *
@@ -798,324 +619,28 @@ function array_sortby_multifields(array $rowset, array $args): array
     if (empty($rowset) || empty($args)) {
         return $rowset;
     }
-    
+
     // 构建排序参数数组
     $sortParams = [];
     $firstRow = reset($rowset);
-    
+
     // 验证字段存在性并构建排序参数
     foreach ($args as $field => $direction) {
         if (!is_array($firstRow) || !array_key_exists($field, $firstRow)) {
             return $rowset;
         }
-        
+
         // 提取该字段的所有值
         $columnValues = array_column($rowset, $field);
         $sortParams[] = $columnValues;
         $sortParams[] = $direction;
     }
-    
+
     // 添加主数组引用
     $sortParams[] = &$rowset;
-    
+
     // 使用 array_multisort 进行排序
     array_multisort(...$sortParams);
-    
+
     return $rowset;
-}
-
-/**
- * 生成下拉列表 HTML
- *
- * @param string $name 名称
- * @param array $arr 选项数组
- * @param mixed $selected 选中的值
- * @param ?string $extra 附加属性
- * @return void
- */
-function html_dropdown_list(string $name, array $arr, $selected = null, ?string $extra = null): void
-{
-    echo '<select name="' . h($name) . '"';
-    if ($extra) {
-        echo ' ' . $extra;
-    }
-    echo ">\n";
-
-    foreach ($arr as $value => $text) {
-        echo '<option value="' . h($value) . '"';
-        if (strval($value) == strval($selected)) {
-            echo ' selected="selected"';
-        }
-        echo '>' . h($text) . "</option>\n";
-    }
-
-    echo "</select>\n";
-}
-
-/**
- * 生成单选按钮组 HTML
- *
- * @param string $name 名称
- * @param array $arr 选项数组
- * @param mixed $checked 选中的值
- * @param string $separator 分隔符
- * @param ?string $extra 附加属性
- * @return void
- */
-function html_radio_group(string $name, array $arr, $checked = null, string $separator = '', ?string $extra = null): void
-{
-    foreach ($arr as $value => $text) {
-        echo '<input type="radio" name="' . h($name) . '" value="' . h($value) . '"';
-        if (strval($value) == strval($checked)) {
-            echo ' checked="checked"';
-        }
-        if ($extra) {
-            echo ' ' . $extra;
-        }
-        echo ' /> ' . h($text) . $separator . "\n";
-    }
-}
-
-/**
- * 生成复选框组 HTML
- *
- * @param string $name 名称
- * @param array $arr 选项数组
- * @param array $selected 选中的值数组
- * @param string $separator 分隔符
- * @param ?string $extra 附加属性
- * @return void
- */
-function html_checkbox_group(string $name, array $arr, $selected = [], string $separator = '', ?string $extra = null): void
-{
-    foreach ($arr as $value => $text) {
-        echo '<input type="checkbox" name="' . h($name) . '[]" value="' . h($value) . '"';
-        if (in_array(strval($value), $selected)) {
-            echo ' checked="checked"';
-        }
-        if ($extra) {
-            echo ' ' . $extra;
-        }
-        echo ' /> ' . h($text) . $separator . "\n";
-    }
-}
-
-/**
- * 生成复选框 HTML
- *
- * @param string $name 名称
- * @param int $value 值
- * @param bool $checked 是否选中
- * @param string $label 标签
- * @param ?string $extra 附加属性
- * @return void
- */
-function html_checkbox(string $name, int $value = 1, bool $checked = false, string $label = '', ?string $extra = null): void
-{
-    echo '<input type="checkbox" name="' . h($name) . '" value="' . h($value) . '"';
-    if ($checked) {
-        echo ' checked="checked"';
-    }
-    if ($extra) {
-        echo ' ' . $extra;
-    }
-    echo ' /> ' . h($label) . "\n";
-}
-
-/**
- * 生成文本框 HTML
- *
- * @param string $name 名称
- * @param string $value 值
- * @param ?int $width 宽度
- * @param ?int $maxLength 最大长度
- * @param ?string $extra 附加属性
- * @return void
- */
-function html_textbox(string $name, string $value = '', ?int $width = null, ?int $maxLength = null, ?string $extra = null): void
-{
-    echo '<input type="text" name="' . h($name) . '" value="' . h($value) . '"';
-    if ($width) {
-        echo ' size="' . h($width) . '"';
-    }
-    if ($maxLength) {
-        echo ' maxlength="' . h($maxLength) . '"';
-    }
-    if ($extra) {
-        echo ' ' . $extra;
-    }
-    echo " />\n";
-}
-
-/**
- * 生成密码框 HTML
- *
- * @param string $name 名称
- * @param string $value 值
- * @param ?int $width 宽度
- * @param ?int $maxLength 最大长度
- * @param ?string $extra 附加属性
- * @return void
- */
-function html_password(string $name, string $value = '', ?int $width = null, ?int $maxLength = null, ?string $extra = null): void
-{
-    echo '<input type="password" name="' . h($name) . '" value="' . h($value) . '"';
-    if ($width) {
-        echo ' size="' . h($width) . '"';
-    }
-    if ($maxLength) {
-        echo ' maxlength="' . h($maxLength) . '"';
-    }
-    if ($extra) {
-        echo ' ' . $extra;
-    }
-    echo " />\n";
-}
-
-/**
- * 生成文本域 HTML
- *
- * @param string $name 名称
- * @param string $value 值
- * @param ?int $width 宽度
- * @param ?int $height 高度
- * @param ?string $extra 附加属性
- * @return void
- */
-function html_textarea(string $name, string $value = '', ?int $width = null, ?int $height = null, ?string $extra = null): void
-{
-    echo '<textarea name="' . h($name) . '"';
-    if ($width) {
-        echo ' cols="' . h($width) . '"';
-    }
-    if ($height) {
-        echo ' rows="' . h($height) . '"';
-    }
-    if ($extra) {
-        echo ' ' . $extra;
-    }
-    echo '>' . h($value) . "</textarea>\n";
-}
-
-/**
- * 生成隐藏字段 HTML
- *
- * @param string $name 名称
- * @param string $value 值
- * @param ?string $extra 附加属性
- * @return void
- */
-function html_hidden(string $name, string $value = '', ?string $extra = null): void
-{
-    echo '<input type="hidden" name="' . h($name) . '" value="' . h($value) . '"';
-    if ($extra) {
-        echo ' ' . $extra;
-    }
-    echo " />\n";
-}
-
-/**
- * 生成文件上传字段 HTML
- *
- * @param string $name 名称
- * @param ?int $width 宽度
- * @param ?string $extra 附加属性
- * @return void
- */
-function html_filefield(string $name, ?int $width = null, ?string $extra = null): void
-{
-    echo '<input type="file" name="' . h($name) . '"';
-    if ($width) {
-        echo ' size="' . h($width) . '"';
-    }
-    if ($extra) {
-        echo ' ' . $extra;
-    }
-    echo " />\n";
-}
-
-/**
- * 生成表单开始标签 HTML
- *
- * @param string $name 名称
- * @param string $action 动作
- * @param string $method 方法
- * @param string $onsubmit 提交时执行的脚本
- * @param ?string $extra 附加属性
- * @return void
- */
-function html_form(string $name, string $action, string $method='post', string $onsubmit='', ?string $extra = null): void
-{
-    echo '<form name="' . h($name) . '" action="' . h($action) . '" method="' . h($method) . '"';
-    if ($onsubmit) {
-        echo ' onsubmit="' . h($onsubmit) . '"';
-    }
-    if ($extra) {
-        echo ' ' . $extra;
-    }
-    echo ">\n";
-}
-
-/**
- * 生成表单结束标签 HTML
- *
- * @return void
- */
-function html_form_close(): void
-{
-    echo "</form>\n";
-}
-
-/**
- * 载入 YAML 文件，返回分析结果
- *
- * load_yaml() 会自动使用缓存，只有当 YAML 文件被改变后，缓存才会更新。
- *
- * 关于 YAML 的详细信息,请参考 www.yaml.org 。
- *
- * 用法：
- * <code>
- * $data = load_yaml('myData.yaml');
- * </code>
- *
- * 注意：为了安全起见，不要使用 YAML 存储敏感信息，例如密码。
- * 或者将 YAML 文件的扩展名设置为 .yaml.php，并且在每一个 YAML 文件开头添加“exit()”。
- * 例如：
- * <code>
- * # <?php exit(); ?>
- *
- * invoice: 34843
- * date   : 2001-01-23
- * bill-to: &id001
- * ......
- * </code>
- *
- * 这样可以确保即便浏览器直接访问该 .yaml.php 文件，也无法看到内容。
- *
- * @param string $filename
- * @param boolean $cacheEnabled 是否缓存分析内容
- * @param null $replace
- *
- * @return array
- * @throws FLEA\Exception\CacheDisabled
- */
-function load_yaml(string $filename, $cacheEnabled = true, $replace = null): array
-{
-    static $firstTime = true;
-
-    if ($firstTime) {
-        require_once FLEA_3RD_DIR . '/Spyc/spyc.php';
-        $firstTime = false;
-    }
-
-    if ($cacheEnabled) {
-        $arr = FLEA::getCache('yaml-' . $filename, filemtime($filename), false);
-        if ($arr) { return $arr; }
-    }
-
-    $arr = spyc_load_file($filename) ?: $replace;
-    if ($cacheEnabled) {
-        FLEA::writeCache('yaml-' . $filename, $arr);
-    }
-    return $arr;
 }

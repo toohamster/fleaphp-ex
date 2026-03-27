@@ -1,15 +1,6 @@
 <?php
 
-
-
 namespace FLEA\Helper;
-/**
- * 定义 \FLEA\Helper\Verifier 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: Verifier.php 1018 2007-12-04 23:41:47Z qeeyuan $
- */
 
 /**
  * \FLEA\Helper\Verifier 对象根据一系列验证规则对指定的数据进行验证
@@ -75,11 +66,6 @@ namespace FLEA\Helper;
  * 但客户端验证仅提供有限的验证能力。包括：
  *
  * notNull, hasDefault, min, max, minLength, maxLength
- *
- *
- * @package Core
- * @author toohamster
- * @version 1.0
  */
 class Verifier
 {
@@ -200,7 +186,7 @@ class Verifier
         if (isset($rule['complexType'])) {
             $func = 'is' . $rule['complexType'];
             if (!method_exists($this, $func)) {
-                throw new \FLEA\Exception_InvalidArguments('$rule[\'complexType\']',
+                throw new \FLEA\Exception\InvalidArguments('$rule[\'complexType\']',
                         $rule['complexType']);
                 return null;
             }

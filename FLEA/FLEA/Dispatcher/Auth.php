@@ -2,25 +2,16 @@
 
 namespace FLEA\Dispatcher;
 
-/**
- * \FLEA\Dispatcher\Auth 分析 HTTP 请求，并转发到合适的 Controller 对象处理
- *
- * @package Core
- * @author toohamster
- * @version 1.0
- */
 class Auth extends \FLEA\Dispatcher\Simple
 {
     /**
      * 用于提供验证服务的对象实例
-     *
      * @var \FLEA\Rbac|null
      */
     protected ?\FLEA\Rbac $auth = null;
 
     /**
      * 构造函数
-     *
      * @param array $request
      */
     public function __construct(array $request)
@@ -31,7 +22,6 @@ class Auth extends \FLEA\Dispatcher\Simple
 
     /**
      * 返回当前使用的验证服务对象
-     *
      * @return \FLEA\Rbac
      */
     public function getAuthProvider(): \FLEA\Rbac
@@ -41,7 +31,6 @@ class Auth extends \FLEA\Dispatcher\Simple
 
     /**
      * 设置要使用的验证服务对象
-     *
      * @param \FLEA\Rbac $auth
      */
     public function setAuthProvider(\FLEA\Rbac $auth): void
@@ -51,7 +40,6 @@ class Auth extends \FLEA\Dispatcher\Simple
 
     /**
      * 通过验证服务对象的 setUser 方法将用户数据保存到 session 中
-     *
      * @param array $userData
      * @param mixed $rolesData
      */
@@ -62,7 +50,6 @@ class Auth extends \FLEA\Dispatcher\Simple
 
     /**
      * 通过验证服务对象的 getUser 方法从 session 中获取保存的用户数据
-     *
      * @return array
      */
     public function getUser(): array
@@ -72,7 +59,6 @@ class Auth extends \FLEA\Dispatcher\Simple
 
     /**
      * 通过验证服务对象的 getRolesArray 方法从 session 中获取保存的用户角色数据
-     *
      * @return array
      */
     public function getUserRoles(): array
@@ -82,7 +68,6 @@ class Auth extends \FLEA\Dispatcher\Simple
 
     /**
      * 通过验证服务对象的 getUser 方法清理保存在 session 中的用户数据
-     *
      * @return void
      */
     public function clearUser(): void
@@ -92,7 +77,6 @@ class Auth extends \FLEA\Dispatcher\Simple
 
     /**
      * 执行控制器方法
-     *
      * @return mixed
      */
     public function dispatching()
@@ -134,17 +118,13 @@ class Auth extends \FLEA\Dispatcher\Simple
 
     /**
      * 检查当前用户是否有权限访问指定的控制器和方法
-     *
      * 验证步骤如下：
-     *
      * 1、通过 authProiver 获取当前用户的角色信息；
      * 2、调用 getControllerACT() 获取指定控制器的访问控制表；
      * 3、根据 ACT 对用户角色进行检查，通过则返回 true，否则返回 false。
-     *
      * @param string $controllerName
      * @param string|null $actionName
      * @param string|null $controllerClass
-     *
      * @return bool
      */
     public function check(string $controllerName, ?string $actionName = null, ?string $controllerClass = null): bool
@@ -187,10 +167,8 @@ class Auth extends \FLEA\Dispatcher\Simple
 
     /**
      * 获取指定控制器的访问控制表（ACT）
-     *
      * @param string $controllerName
      * @param string $controllerClass
-     *
      * @return array|null
      */
     public function getControllerACT(string $controllerName, string $controllerClass): ?array
@@ -219,9 +197,7 @@ class Auth extends \FLEA\Dispatcher\Simple
 
     /**
      * 从默认 ACT 文件中载入指定控制器的 ACT
-     *
      * @param string $controllerName
-     *
      * @return array|null
      */
     public function getControllerACTFromDefaultFile(string $controllerName): ?array
@@ -244,9 +220,7 @@ class Auth extends \FLEA\Dispatcher\Simple
 
     /**
      * 载入 ACT 文件
-     *
      * @param string $actFilename
-     *
      * @return array
      */
     protected function loadACTFile(string $actFilename): array

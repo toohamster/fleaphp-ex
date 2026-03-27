@@ -2,33 +2,11 @@
 
 namespace FLEA;
 
-/////////////////////////////////////////////////////////////////////////////
-// FleaPHP Framework
-//
-// Copyright (c) 2005 - 2007 FleaPHP.org (www.fleaphp.org)
-//
-// 许可协议，请查看源代码中附带的 LICENSE.txt 文件，
-// 或者访问 http://www.fleaphp.org/ 获得详细信息。
-/////////////////////////////////////////////////////////////////////////////
-
-
-/**
- * 定义 \FLEA\Rbac 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: Rbac.php 999 2007-10-30 05:39:57Z qeeyuan $
- */
-
 /**
  * \FLEA\Rbac 提供基于角色的权限检查服务
  *
  * \FLEA\Rbac 并不提供用户管理和角色管理服务，
  * 这些服务由 \FLEA\Rbac_UsersManager 和 \FLEA\Rbac_RolesManager 提供。
- *
- * @package Core
- * @author toohamster
- * @version 1.0
  */
 class Rbac
 {

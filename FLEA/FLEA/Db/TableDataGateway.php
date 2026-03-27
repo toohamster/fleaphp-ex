@@ -3,37 +3,6 @@
 namespace FLEA\Db;
 
 /**
- * 定义 \FLEA\Db\TableDataGateway 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: TableDataGateway.php 1401 2008-10-08 03:00:38Z yangkun $
- */
-
-// }}}}
-
-// {{{ constants
-/**
- * HAS_ONE 关联表示一个记录拥有另一个关联的记录
- */
-define('HAS_ONE',       1);
-
-/**
- * BELONGS_TO 关联表示一个记录属于另一个记录
- */
-define('BELONGS_TO',    2);
-
-/**
- * HAS_MANY 关联表示一个记录拥有多个关联的记录
- */
-define('HAS_MANY',      3);
-
-/**
- * MANY_TO_MANY 关联表示两个数据表的数据互相引用
- */
-define('MANY_TO_MANY',  4);
-
-/**
  * \FLEA\Db\TableDataGateway 类（表数据入口）封装了数据表的 CRUD 操作
  *
  * 开发者应该从 \FLEA\Db\TableDataGateway 派生自己的类，
@@ -41,13 +10,14 @@ define('MANY_TO_MANY',  4);
  *
  * 对于每一个表数据入口对象，都必须在类定义中通过 $tableName 和 $primaryKey
  * 来分别指定数据表的名字和主键字段名。
- *
- * @package Core
- * @author toohamster
- * @version 1.2
  */
 class TableDataGateway
 {
+    const HAS_ONE      = 1;
+    const BELONGS_TO   = 2;
+    const HAS_MANY     = 3;
+    const MANY_TO_MANY = 4;
+
     /**
      * 数据库 schema
      *
@@ -509,15 +479,15 @@ class TableDataGateway
 
             $in = [];
             switch ($assoclink->type) {
-            case HAS_ONE:
-            case BELONGS_TO:
+            case self::HAS_ONE:
+            case self::BELONGS_TO:
                 $pkv = $arow[$link->mainTDG->primaryKey];
                 $in[] = $pkv;
                 $assocRowset = [$pkv => & $arow];
                 $arow[$link->mappingName] = null;
                 break;
-            case HAS_MANY:
-            case MANY_TO_MANY:
+            case self::HAS_MANY:
+            case self::MANY_TO_MANY:
                 $assocRowset = [];
                 foreach (array_keys($arow) as $offset) {
                     $pkv = $arow[$offset][$link->mainTDG->primaryKey];
@@ -578,8 +548,8 @@ class TableDataGateway
             $in = [];
             $assocRowset = [];
             switch ($assoclink->type) {
-            case HAS_ONE:
-            case BELONGS_TO:
+            case self::HAS_ONE:
+            case self::BELONGS_TO:
                 foreach ($keys as $key) {
                     $pkv = $arowset[$key][$link->mainTDG->primaryKey];
                     $in[] = $pkv;
@@ -587,8 +557,8 @@ class TableDataGateway
                     $arowset[$key][$link->mappingName] = null;
                 }
                 break;
-            case HAS_MANY:
-            case MANY_TO_MANY:
+            case self::HAS_MANY:
+            case self::MANY_TO_MANY:
                 foreach ($keys as $key) {
                     foreach (array_keys($arowset[$key]) as $offset) {
                         $pkv = $arowset[$key][$offset][$link->mainTDG->primaryKey];
@@ -833,7 +803,7 @@ class TableDataGateway
         if ($this->autoValidating && !is_null($this->verifier)) {
             if (!$this->checkRowData($row, true)) {
                 // 验证失败抛出异常
-                throw new \FLEA\Exception_ValidationFailed($this->getLastValidation(), $row);
+                throw new \FLEA\Exception\ValidationFailed($this->getLastValidation(), $row);
             }
         }
 
@@ -1056,7 +1026,7 @@ class TableDataGateway
         // 自动验证数据
         if ($this->autoValidating && !is_null($this->verifier)) {
             if (!$this->checkRowData($row)) {
-                throw new \FLEA\Exception_ValidationFailed($this->getLastValidation(), $row);
+                throw new \FLEA\Exception\ValidationFailed($this->getLastValidation(), $row);
             }
         }
 
@@ -1203,17 +1173,17 @@ class TableDataGateway
                 /* @var $link \FLEA\Db\TableLink */
                 if (!$link->enabled) { continue; }
                 switch ($link->type) {
-                case MANY_TO_MANY:
+                case self::MANY_TO_MANY:
                     /* @var $link \FLEA\Db\TableLink\ManyToManyLink */
                     if (!$link->deleteMiddleTableDataByMainForeignKey($qpkv)) {
                         $this->dbo->completeTrans(false);
                         return false;
                     }
                     break;
-                case HAS_ONE:
-                case HAS_MANY:
+                case self::HAS_ONE:
+                case self::HAS_MANY:
                     /**
-                     * 对于 HAS_ONE 和 HAS_MANY 关联，分为两种情况处理
+                     * 对于 self::HAS_ONE 和 self::HAS_MANY 关联，分为两种情况处理
                      *
                      * 当 $link->linkRemove 为 true 时，直接删除关联表中的关联数据
                      * 否则更新关联数据的外键值为 $link->linkRemoveFillValue
@@ -1224,7 +1194,7 @@ class TableDataGateway
                         return false;
                     }
                     break;
-                case BELONGS_TO:
+                case self::BELONGS_TO:
                     if ($link->counterCache) {
                         $counterCacheLinks[] = $link->foreignKey;
                     }
@@ -1326,13 +1296,13 @@ class TableDataGateway
                 $link = $this->links[$linkKey];
                 /* @var $link \FLEA\Db\TableLink */
                 switch ($link->type) {
-                case MANY_TO_MANY:
+                case self::MANY_TO_MANY:
                     /* @var $link \FLEA\Db\TableLink\ManyToManyLink */
                     $link->init();
                     $sql = "DELETE FROM {$link->qjoinTable}";
                     break;
-                case HAS_ONE:
-                case HAS_MANY:
+                case self::HAS_ONE:
+                case self::HAS_MANY:
                     $link->init();
                     $sql = "DELETE FROM {$link->assocTDG->qtableName}";
                     break;
@@ -1448,10 +1418,10 @@ class TableDataGateway
     public function relink(): void
     {
         $this->clearLinks();
-        $this->createLink($this->hasOne,     HAS_ONE);
-        $this->createLink($this->belongsTo,  BELONGS_TO);
-        $this->createLink($this->hasMany,    HAS_MANY);
-        $this->createLink($this->manyToMany, MANY_TO_MANY);
+        $this->createLink($this->hasOne,     self::HAS_ONE);
+        $this->createLink($this->belongsTo,  self::BELONGS_TO);
+        $this->createLink($this->hasMany,    self::HAS_MANY);
+        $this->createLink($this->manyToMany, self::MANY_TO_MANY);
     }
 
     /**
@@ -1591,9 +1561,9 @@ class TableDataGateway
      *
      * @return mixed
      */
-    public function execute(\FLEA\Db\SqlStatement $sql, $inputarr = false)
+    public function execute(\FLEA\Db\SqlStatement $sql, $inputarr = null): \FLEA\Db\SqlStatement
     {
-        return $this->dbo->execute($sql, $inputarr);
+        return $this->dbo->execute($sql, is_array($inputarr) ? $inputarr : null);
     }
 
     /**
@@ -1606,8 +1576,8 @@ class TableDataGateway
      */
     public function qinto(string $sql, ?array $params = null): string
     {
-        if (!is_array($params)) {
-            throw new \FLEA\Exception_TypeMismatch('$params', 'array', gettype($params));
+        if (is_null($params)) {
+            return $sql;
         }
         $arr = explode('?', $sql);
         $sql = array_shift($arr);
@@ -1761,7 +1731,7 @@ class TableDataGateway
      */
     public function qstr($value): string
     {
-        return $this->dbo->qstr($value);
+        return (string)$this->dbo->qstr($value);
     }
 
     /**
@@ -1838,16 +1808,16 @@ class TableDataGateway
                 $distinct = 'DISTINCT ';
 
                 switch ($link->type) {
-                case HAS_ONE:
-                case HAS_MANY:
+                case self::HAS_ONE:
+                case self::HAS_MANY:
                     /* @var $link \FLEA\Db\TableLink\HasOneLink */
                     $sqljoin .= "LEFT JOIN {$link->assocTDG->qtableName} ON {$link->mainTDG->qpk} = {$link->qforeignKey} ";
                     break;
-                case BELONGS_TO:
+                case self::BELONGS_TO:
                     /* @var $link \FLEA\Db\TableLink\BelongsToLink */
                     $sqljoin .= "LEFT JOIN {$link->assocTDG->qtableName} ON {$link->assocTDG->qpk} = {$link->qforeignKey} ";
                     break;
-                case MANY_TO_MANY:
+                case self::MANY_TO_MANY:
                     /* @var $link \FLEA\Db\TableLink\ManyToManyLink */
                     $sqljoin .= "INNER JOIN {$link->qjoinTable} ON {$link->qforeignKey} = {$this->qpk} INNER JOIN {$link->assocTDG->qtableName} ON {$link->assocTDG->qpk} = {$link->qassocForeignKey} ";
                     break;
@@ -2116,7 +2086,7 @@ class TableDataGateway
         foreach (array_keys($this->links) as $linkKey) {
             $link = $this->links[$linkKey];
             /* @var $link \FLEA\Db\TableLink */
-            if ($link->type != BELONGS_TO || !$link->enabled || !$link->counterCache) { continue; }
+            if ($link->type != self::BELONGS_TO || !$link->enabled || !$link->counterCache) { continue; }
             $link->init();
             $f = $link->assocTDG->qfield($link->counterCache);
             if (isset($row[$link->foreignKey])) {

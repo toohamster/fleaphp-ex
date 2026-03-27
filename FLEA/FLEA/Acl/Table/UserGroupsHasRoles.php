@@ -2,22 +2,9 @@
 
 namespace FLEA\Acl\Table;
 
-
-/**
- * 定义 \FLEA\Acl\Table\UserGroupsHasRoles 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: UserGroupsHasRoles.php 1060 2008-05-04 05:02:59Z qeeyuan $
- */
-
-
 /**
  * \FLEA\Acl\Table\UserGroupsHasRoles 用于关联用户组和角色
  *
- * @package Core
- * @author toohamster
- * @version 1.0
  */
 class UserGroupsHasRoles extends \FLEA\Db\TableDataGateway
 {

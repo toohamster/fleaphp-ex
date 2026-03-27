@@ -2,15 +2,6 @@
 
 namespace FLEA\Session;
 
-
-/**
- * 定义 \FLEA\Session\Db 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: Db.php 1032 2008-02-22 06:20:48Z qeeyuan $
- */
-
 /**
  * \FLEA\Session\Db 类提供将 session 保存到数据库的能力
  *
@@ -24,10 +15,6 @@ namespace FLEA\Session;
  *     activity    int(11)         该 session 最后一次读取/写入时间
  *
  * - 修改应用程序设置 sessionProvider 为 \FLEA\Session\Db
- *
- * @package Core
- * @author toohamster
- * @version 1.0
  */
 class Db
 {
@@ -158,7 +145,7 @@ class Db
             $sql .= " AND {$this->fieldActivity} >= {$time}";
         }
 
-        return $this->dbo->getOne(sql_statement($sql));
+        return (string)($this->dbo->getOne(sql_statement($sql)) ?? '');
     }
 
     /**
@@ -215,7 +202,8 @@ class Db
     {
         $sessid = $this->dbo->qstr($sessid);
         $sql = "DELETE FROM {$this->tableName} WHERE {$this->fieldId} = {$sessid}";
-        return $this->dbo->execute(sql_statement($sql));
+        $this->dbo->execute(sql_statement($sql));
+        return true;
     }
 
     /**

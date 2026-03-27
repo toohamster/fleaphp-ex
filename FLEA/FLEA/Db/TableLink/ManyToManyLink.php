@@ -1,11 +1,4 @@
 <?php
-/**
- * FLEA\Db\TableLink\ManyToManyLink 封装 many to many 关系
- *
- * @package Core
- * @author toohamster
- * @version 1.0
- */
 
 namespace FLEA\Db\TableLink;
 
@@ -14,10 +7,6 @@ use FLEA\Db\TableDataGateway;
 
 /**
  * FLEA\Db\TableLink\ManyToManyLink 封装 many to many 关系
- *
- * @package Core
- * @author toohamster
- * @version 1.0
  */
 class ManyToManyLink extends TableLink
 {
@@ -107,7 +96,7 @@ class ManyToManyLink extends TableLink
     {
         static $joinFields = [];
 
-        if (!$this->init) { $this->init(); }
+        if (!$this->initialized) { $this->init(); }
 
         $fields = $this->qforeignKey . ' AS ' . $this->mainTDG->pka . ', ' . $this->assocTDG->qfields($this->fields);
 
@@ -139,7 +128,7 @@ class ManyToManyLink extends TableLink
      */
     public function saveAssocData(array &$row, $pkv): bool
     {
-        if (!$this->init) { $this->init(); }
+        if (!$this->initialized) { $this->init(); }
         $apkvs = [];
         $entityRowset = [];
 
@@ -232,7 +221,7 @@ class ManyToManyLink extends TableLink
      */
     public function deleteMiddleTableDataByMainForeignKey($qpkv)
     {
-        if (!$this->init) { $this->init(); }
+        if (!$this->initialized) { $this->init(); }
         $sql = "DELETE FROM {$this->qjoinTable} WHERE {$this->qforeignKey} = {$qpkv} ";
         return $this->dbo->execute(sql_statement($sql));
     }
@@ -246,7 +235,7 @@ class ManyToManyLink extends TableLink
      */
     public function deleteMiddleTableDataByAssocForeignKey($pkv)
     {
-        if (!$this->init) { $this->init(); }
+        if (!$this->initialized) { $this->init(); }
         $qpkv = $this->dbo->qstr($pkv);
         $sql = "DELETE FROM {$this->qjoinTable} WHERE {$this->qassocForeignKey} = {$qpkv} ";
         return $this->dbo->execute(sql_statement($sql));

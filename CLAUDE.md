@@ -38,23 +38,50 @@ PHP version: **7.4.32**（命令：`php74`）
 
 ## Architecture
 
-This is a FLEA framework MVC application. The framework lives in `FLEA/` and the application code in `App/`.
+FLEA 框架 MVC 应用。框架代码在 `FLEA/`，应用代码在 `App/`。
 
-**Request lifecycle:** `index.php` → `FLEA::runMVC()` → `FLEA\Dispatcher\Simple` parses `?controller=X&action=Y` → instantiates `App\Controller\XController` → calls `actionY()` → controller assigns vars to view → `FLEA\View\Simple` renders `App/View/x/y.php`.
+### 请求生命周期
 
-**Key patterns:**
-- Controllers extend `\FLEA\Controller\Action` and expose methods named `actionFoo()`
-- Models extend `\FLEA\Db\TableDataGateway` with `$tableName` and `$primaryKey` properties
-- Views are plain PHP files in `App/View/{controller}/{action}.php`
-- URL format: `index.php?controller=Post&action=view&id=1`
+```
+1. require FLEA.php → 加载默认配置
+2. FLEA::loadAppInf() 加载应用配置
+3. FLEA::runMVC()
+   - 初始化服务（时区、异常处理、缓存、Session）
+   - Router::dispatch() 匹配路由（可选）
+   - 中间件管道执行
+   - Dispatcher 解析 controller/action
+   - 控制器：beforeExecute() → actionXxx() → afterExecute()
+   - 视图渲染
+```
 
-**Framework components** (in `FLEA/FLEA/`):
-- `Db/TableDataGateway.php` — base model class with query helpers
-- `Dispatcher/Simple.php` — routes GET params to controller/action
-- `View/Simple.php` — PHP template renderer with optional file caching
-- `Helper/Pager.php` — pagination utility
-- `Rbac/` — role-based access control (available but not wired into the blog app)
+### 核心组件（PSR 标准）
 
-**App configuration** (`App/Config.php`): single PHP file returning an array. Controls DB connection, dispatcher class, view class, template/cache dirs, and error display settings.
+| 组件 | 标准 | 说明 |
+|------|------|------|
+| `FLEA\Container` | PSR-11 | 对象容器 |
+| `FLEA\Cache` | PSR-16 | 缓存门面（FileCache/RedisCache） |
+| `FLEA\Log` | PSR-3 | 日志服务 |
+| `FLEA\Database` | - | 数据库连接池 |
+| `FLEA\Config` | - | 配置管理（单例） |
 
-**No test suite or linter is configured** for this project.
+### 新增特性
+
+- **Router**: RESTful 路由、路由分组、命名路由、中间件支持
+- **Middleware**: 洋葱模型管道（Cors/Auth/RateLimit）
+- **Request/Response**: HTTP 封装、JSON body 解析、统一响应结构
+- **Auth/Jwt**: JWT 签发与验证（HS256）
+
+### 配置项（App/Config.php）
+
+```php
+return [
+    'dbDSN' => 'mysql://root:pass@localhost/blog',
+    'dispatcher' => \FLEA\Dispatcher\Simple::class,
+    'view' => \FLEA\View\Simple::class,
+    'cacheProvider' => \FLEA\Cache\FileCache::class,  // PSR-16
+    'jwtSecret' => 'your-secret-key',                  // JWT 密钥
+    'jwtTtl' => 7200,                                  // JWT 有效期
+];
+```
+
+**无测试套件和 linter。**

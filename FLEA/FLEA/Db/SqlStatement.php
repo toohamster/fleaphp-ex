@@ -2,12 +2,6 @@
 
 namespace FLEA\Db;
 
-/**
- * SQL语句封装类
- *
- * 该类用于封装SQL语句或PDOStatement对象，提供统一的接口来处理数据库查询。
- * 支持判断当前封装的是字符串形式的SQL还是PDOStatement资源。
- */
 class SqlStatement
 {
     /**
@@ -17,14 +11,12 @@ class SqlStatement
 
     /**
      * 是否引用
-     *
      * @var bool
      */
     private bool $isResource;
 
     /**
      * 构造函数
-     *
      * @param \PDOStatement|string $sql SQL语句或PDOStatement对象
      */
     public function __construct($sql)
@@ -43,7 +35,6 @@ class SqlStatement
 
     /**
      * 获取SQL语句或PDOStatement对象
-     *
      * @return \PDOStatement|string
      */
     public function getSql()
@@ -53,7 +44,6 @@ class SqlStatement
 
     /**
      * 创建一个新的SqlStatement实例
-     *
      * @param \PDOStatement|self|string $sql SQL语句字符串
      * @return self 返回新的SqlStatement实例
      */

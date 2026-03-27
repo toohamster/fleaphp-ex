@@ -2,27 +2,10 @@
 
 namespace FLEA\Acl;
 
-
-/**
- * 定义 \FLEA\Acl\Manager 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: Manager.php 1060 2008-05-04 05:02:59Z qeeyuan $
- */
-
-/**
- * \FLEA\Acl\Manager 提供 ACL 数据的全面管理功能
- *
- * @package Core
- * @author toohamster
- * @version 1.0
- */
 class Manager
 {
     /**
      * 所有使用到的表数据对象类名称
-     *
      * @var array
      */
     public array $tableClass = [
@@ -43,26 +26,24 @@ class Manager
 
     /**
      * 获取指定用户，及其权限信息
-     *
      * @param array $conditions
      */
     public function getUserWithPermissions($conditions): ?array
     {
-        $tableUsers = FLEA::getSingleton($this->tableClass['users']);
+        $tableUsers = \FLEA::getSingleton($this->tableClass['users']);
         /* @var $tableUsers \FLEA\Acl\Table\Users */
         $user = $tableUsers->find($conditions);
         if (empty($user)) { return null; }
 
         // 取得用户所在用户组的层次数据
-        $tableUserGroups = FLEA::getSingleton($this->tableClass['userGroups']);
+        $tableUserGroups = \FLEA::getSingleton($this->tableClass['userGroups']);
         /* @var $tableUserGroups \FLEA\Acl\Table\UserGroups */
-        $rowset = $tableUserGroups->getPath($user['group']);
+        $rowset = $tableUserGroups->getPath($user['user_group_id']);
 
-        // 找出用户组的单一路径
-        FLEA::loadHelper('array');
-        $ret = array_to_tree($rowset, 'user_group_id', 'parent_id', 'subgroups', true);
-        $tree =& $ret['tree'];
-        $refs =& $ret['refs'];
+        // 找出用户组的单一路径（从根到当前组）
+        $ret  = array_to_tree($rowset, 'user_group_id', 'parent_id', 'subgroups', true);
+        $refs = $ret['refs'];
+
         $groupid = $user['user_group_id'];
         $path = [];
         while (isset($refs[$groupid])) {
@@ -70,12 +51,10 @@ class Manager
             $groupid = $refs[$groupid]['parent_id'];
         }
 
-        // 整理角色信息
+        // 整理角色信息：沿路径继承，后者可覆盖前者
         $userRoles = [];
-
         foreach ($path as $group) {
-            $roles = $group['roles'];
-            foreach ($roles as $role) {
+            foreach ((array)($group['roles'] ?? []) as $role) {
                 $roleid = $role['role_id'];
                 if ($role['_join_is_include']) {
                     $userRoles[$roleid] = ['role_id' => $roleid, 'name' => $role['name']];
@@ -85,7 +64,8 @@ class Manager
             }
         }
 
-        foreach ((array)$user['roles'] as $role) {
+        // 用户自身的角色覆盖用户组继承的角色
+        foreach ((array)($user['roles'] ?? []) as $role) {
             $roleid = $role['role_id'];
             if ($role['_join_is_include']) {
                 $userRoles[$roleid] = ['role_id' => $roleid, 'name' => $role['name']];
@@ -94,7 +74,6 @@ class Manager
             }
         }
 
-        // 整理权限信息
         $user['roles'] = $userRoles;
         return $user;
     }

@@ -1,23 +1,7 @@
 <?php
 
-
-
 namespace FLEA\Exception;
-/**
- * 定义 \FLEA\Exception_NotImplemented 异常
- *
- * @author toohamster
- * @package Exception
- * @version $Id: NotImplemented.php 972 2007-10-09 20:56:54Z qeeyuan $
- */
 
-/**
- * \FLEA\Exception_NotImplemented 异常指示某个方法没有实现
- *
- * @package Exception
- * @author toohamster
- * @version 1.0
- */
 class NotImplemented extends \FLEA\Exception
 {
     public $className;
@@ -25,7 +9,6 @@ class NotImplemented extends \FLEA\Exception
 
     /**
      * 构造函数
-     *
      * @param string $method
      * @param string $class
      */

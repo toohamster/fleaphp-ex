@@ -1,35 +1,17 @@
 <?php
 
-
-
 namespace FLEA\Exception;
-/**
- * 定义 \FLEA\Exception_MissingArguments 异常
- *
- * @author toohamster
- * @package Exception
- * @version $Id: MissingArguments.php 972 2007-10-09 20:56:54Z qeeyuan $
- */
 
-/**
- * \FLEA\Exception_MissingArguments 异常指示缺少必须的参数
- *
- * @package Exception
- * @author toohamster
- * @version 1.0
- */
 class MissingArguments extends \FLEA\Exception
 {
     /**
      * 缺少的参数
-     *
      * @var mixed
      */
     public $args;
 
     /**
      * 构造函数
-     *
      * @param mixed $args
      */
     public function __construct($args)

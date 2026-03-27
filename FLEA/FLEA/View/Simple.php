@@ -2,35 +2,16 @@
 
 namespace FLEA\View;
 
-
-/**
- * 定义 \FLEA\View\Simple 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: Simple.php 1304 2008-08-31 03:00:59Z dualface $
- */
-
-/**
- * \FLEA\View\Simple 实现了一个简单的、使用 PHP 自身作为模版语言，
- * 带有缓存功能的模版引擎
- *
- * @package Core
- * @author toohamster
- * @version 1.0
- */
 class Simple implements ViewInterface
 {
     /**
      * 模板文件所在路径
-     *
      * @var string
      */
     public ?string $templateDir = null;
 
     /**
      * 缓存过期时间
-     *
      * @access public
      * @var int
      */
@@ -38,7 +19,6 @@ class Simple implements ViewInterface
 
     /**
      * 指示是否使用 cache
-     *
      * @access public
      * @var boolean
      */
@@ -46,7 +26,6 @@ class Simple implements ViewInterface
 
     /**
      * 缓存文件保存位置
-     *
      * @access public
      * @var string
      */
@@ -54,7 +33,6 @@ class Simple implements ViewInterface
 
     /**
      * 模板变量
-     *
      * @access private
      * @var array
      */
@@ -62,7 +40,6 @@ class Simple implements ViewInterface
 
     /**
      * 保存各个缓存内容的缓存状态
-     *
      * @access private
      * @var array
      */
@@ -70,7 +47,6 @@ class Simple implements ViewInterface
 
     /**
      * 构造函数
-     *
      * @param string $path 模板文件所在路径
      */
     public function __construct(?string $templateDir = null)
@@ -97,7 +73,6 @@ class Simple implements ViewInterface
 
     /**
      * 设置模板变量
-     *
      * @param mixed $name 模板变量名称
      * @param mixed $value 变量内容
      */
@@ -112,10 +87,8 @@ class Simple implements ViewInterface
 
     /**
      * 构造模板输出内容
-     *
      * @param string $file 模板文件名
      * @param string $cacheId 缓存 ID，如果指定该值则会使用该内容的缓存输出
-     *
      * @return string
      */
     public function fetch(string $file, ?string $cacheId = null): string
@@ -145,7 +118,6 @@ class Simple implements ViewInterface
 
     /**
      * 显示指定模版的内容
-     *
      * @param string $file 模板文件名
      * @param string $cacheId 缓存 ID，如果指定该值则会使用该内容的缓存输出
      */
@@ -156,10 +128,8 @@ class Simple implements ViewInterface
 
     /**
      * 检查内容是否已经被缓存
-     *
      * @param string $file 模板文件名
      * @param string $cacheId 缓存 ID
-     *
      * @return boolean
      */
     public function isCached(string $file, ?string $cacheId = null): bool
@@ -191,7 +161,6 @@ class Simple implements ViewInterface
 
     /**
      * 清除指定的缓存
-     *
      * @param string $file 模板资源名
      * @param string $cacheId 缓存 ID
      */
@@ -212,10 +181,8 @@ class Simple implements ViewInterface
 
     /**
      * 返回缓存文件名
-     *
      * @param string $file
      * @param string $cacheId
-     *
      * @return string
      */
     protected function _getCacheFile(string $file, ?string $cacheId = null): string

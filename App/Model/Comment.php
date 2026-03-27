@@ -2,7 +2,7 @@
 
 namespace App\Model;
 
-use \FLEA\Db\TableDataGateway;
+use FLEA\Db\TableDataGateway;
 
 /**
  * 评论模型

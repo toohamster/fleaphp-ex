@@ -17,14 +17,17 @@ return [
     'actionAccessor' => 'action',
     'defaultController' => 'Post',
     'defaultAction' => 'index',
+    'controllerClassPrefix' => 'App\\Controller\\',
 
-    // URL 配置
-    'urlMode' => URL_STANDARD,
-    'urlBootstrap' => 'index.php',
+    // URL 模式
+    'urlMode' => URL_ROUTER,
+    'urlScriptName' => '',
+    'urlLowerChar' => false,
 
     // 日志配置
-    'logEnabled' => false,
+    'logEnabled' => true,
     'logProvider' => null,
+    'logFilename' => 'app.log',
 
     // 调度器
     'dispatcher' => \FLEA\Dispatcher\Simple::class,
@@ -43,6 +46,15 @@ return [
     'friendlyErrorsMessage' => true,
     'displaySource' => true,
 
-    // 缓存目录
+    // 缓存配置
+    'cacheProvider' => \FLEA\Cache\FileCache::class,
     'internalCacheDir' => __DIR__ . '/../cache',
+
+    // Session 配置
+    'sessionProvider' => null,
+    'autoSessionStart' => false,
+
+    // JWT 配置（如使用 API）
+    'jwtSecret' => 'change-me-to-a-secure-secret',
+    'jwtTtl' => 7200,
 ];

@@ -2,22 +2,9 @@
 
 namespace FLEA\Acl\Table;
 
-
-/**
- * 定义 \FLEA\Acl\Table\UserGroups 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: UserGroups.php 1060 2008-05-04 05:02:59Z qeeyuan $
- */
-
-
 /**
  * \FLEA\Acl\Table\UserGroups 类提供了用户组数据的存储服务
  *
- * @package Core
- * @author toohamster
- * @version 1.0
  */
 class UserGroups extends \FLEA\Db\TableDataGateway
 {

@@ -2,21 +2,9 @@
 
 namespace FLEA\Db\Exception;
 
-
-/**
- * 定义 \FLEA\Db\Exception\SqlQuery 异常
- *
- * @author toohamster
- * @package Exception
- * @version $Id: SqlQuery.php 972 2007-10-09 20:56:54Z qeeyuan $
- */
-
 /**
  * \FLEA\Db\Exception\SqlQuery 异常指示一个 SQL 语句执行错误
  *
- * @package Exception
- * @author toohamster
- * @version 1.0
  */
 class SqlQuery extends \FLEA\Exception
 {

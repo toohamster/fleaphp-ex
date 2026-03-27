@@ -2,185 +2,95 @@
 
 namespace FLEA;
 
-
 /**
- * 定义 FLEA_Language 类
+ * 多语言支持
  *
- * 使用界面多语言支持，要做如下工作：
+ * 用法：
+ *   load_language('ui');           // 载入默认语言的 ui.php 字典
+ *   load_language('ui', 'en');     // 载入 en/ui.php 字典
+ *   _T('key');                     // 从默认语言取翻译
+ *   _T('key', 'en');               // 从指定语言取翻译
  *
- * <strong>1、 修改应用程序设置</strong>
- * - multiLanguageSupport 指定为 true，启用多语言支持；
- * - languageFilesDir 指定一个目录，表示语言文件所在根目录；
- * - defaultLanguage 指定默认语言名，例如 chinese-utf8、chinese-gb2312 等。
- *
- * <strong>2、 准备语言目录和字典文件</strong>
- *
- * 假设 languageFilesDir 指向 d:\www\myapp\APP\Languages，
- * 那么就要在 d:\www\myapp\APP\Languages 下建立不同语言的子目录，
- * 例如 chinese-utf8、chinese-gb2312。
- *
- * 因此应用程序如果是要载入 chinese-utf8 的字典文件，那么实际的字典文件就存放在
- * d:\www\myapp\APP\Languages\chinese-utf8\ 目录。
- *
- * 字典文件的名字可以随意定，但最好有一定意义。
- * 例如用于用户界面的字典文件可以是 ui.php 或者 UserInterface.php。
- *
- * 字典文件的内容很简单，就是用 return 返回一个数组，例如：
- *
- * <code>
- * <?php
- * // d:\www\myapp\APP\Languages\chinese-utf8\UserInterface.php
- * // 用于 chinese-utf8 语言的用户界面字典文件
- *
- * return array(
- *     'applicationTitle' => '应用程序的标题',
- *     'authorName' => '作者名',
- *     'copyright' => '版权所有',
- * );
- *
- * </code>
- *
- * <strong>3、 在应用程序中使用字典文件</strong>
- *
- * 应用程序用 load_language($dictname, $language = null) 载入指定的语言文件。
- * $dictname 参数指定字典名，$language 参数指定语言名。
- * 假如没有指定 $language 参数，则使用应用程序设置 defaultLanguage 的值作为
- * $language 参数的值。
- *
- * <code>
- * // 载入 chinese-utf8 的指定字典文件
- * load_language('UserInterface', 'chinese-utf8');
- * </code>
- *
- * <strong>4、 获取字典中对应的文本</strong>
- *
- * 载入字典文件后，就可以通过字典文件查询原文和翻译后的文本了。
- * 使用 _T($key, $language = null) 获取指定字符串的翻译文本，例如：
- *
- * <code>
- * echo _T('applicationTitle', 'chinese-utf8');
- * </code>
- *
- * 显示结果将是前面字典文件中定义的'应用程序的标题'。
- *
- * <strong>5、 简化操作</strong>
- *
- * 每次都给 _T() 指定第二个参数显然不方便，所以我们可以在应用程序开始执行时，
- * 先获取用户选择的界面语言，然后用 set_app_inf('defaultLanguage', $language)
- * 设置默认语言。
- *
- * 这样后续的 _T() 就不用指定第二个参数了。
- *
- * @author toohamster
- * @package Core
- * @version 1.0
- */
-
-
-/**
- * FLEA_Language 提供了语言转换功能
- *
- * @package Core
- * @author toohamster
- * @version 1.0
  */
 class Language
 {
-    /**
-     * 保存当前载入的字典
-     *
-     * @var array
-     */
-    public array $dict = [];
+    /** @var array<string, array<string, string>> 已载入的字典，key 为语言名 */
+    private array $dict = [];
 
-    /**
-     * 指示哪些语言文件已经被载入
-     *
-     * @var array
-     */
-    public array $loadedFiles = [];
+    /** @var array<string, bool> 已载入的文件路径 */
+    private array $loadedFiles = [];
 
-    /**
-     * 构造函数
-     */
+    /** @var string 当前默认语言 */
+    private string $defaultLanguage = '';
+
     public function __construct()
     {
-        $autoload = \FLEA::getAppInf('autoLoadLanguage');
+        $this->defaultLanguage = \FLEA::getAppInf('defaultLanguage') ?? '';
+
+        $autoload = \FLEA::getAppInf('autoLoadLanguage') ?? '';
         if (!is_array($autoload)) {
-            $autoload = explode(',', $autoload);
+            $autoload = array_filter(array_map('trim', explode(',', $autoload)));
         }
-        foreach ($autoload as $load) {
-            $load = trim($load);
-            if ($load != '') {
-                $this->load($load);
-            }
+        foreach ($autoload as $dictname) {
+            $this->load($dictname);
         }
     }
 
     /**
-     * 载入指定语言的字典文件
+     * 载入字典文件
      *
-     * 所有的语言文件均按照“语言/字典名.php”的形式保存在由应用程序设置
-     * 'languageFilesDir' 指定的目录中。默认的保存目录为 FLEA/Languages。
-     *
-     * 如果没有指定 $language 参数，则载入由应用程序设置 'defaultLanguage'
-     * 指定的语言目录下的文件。
-     *
-     * $language 和 $dicname 参数均只能使用 26 个字母、10 个数字
-     * 和 “-”、“_” 符号。并且为全小写。
-     *
-     * @param string $dictname 字典名，例如 'fleaphp'、'rbac'
-     * @param string $language 指定为 '' 时表示将字典载入默认语言包中
-     * @param boolena $noException
+     * @param string|string[] $dictname 字典名，支持数组或逗号分隔字符串
+     * @param string $language 语言名，空字符串表示使用默认语言
+     * @param bool $noException 找不到文件时是否静默
      */
-    public function load(string $dictname, string $language = '', bool $noException = false): bool
+    public function load($dictname, string $language = '', bool $noException = false): bool
     {
-        $dictnames = explode(',', $dictname);
-        foreach ($dictnames as $dictname) {
-            $dictname = trim($dictname);
-            if ($dictname == '') { continue; }
+        // 统一转为数组
+        if (is_string($dictname)) {
+            $dictname = array_filter(array_map('trim', explode(',', $dictname)));
+        }
 
-            $dictname = preg_replace('/[^a-z0-9\-_]+/i', '', strtolower($dictname));
-            $language = preg_replace('/[^a-z0-9\-_]+/i', '', strtolower($language));
-            if ($language == '') {
-                $language = \FLEA::getAppInf('defaultLanguage');
-                $default = true;
-            } else {
-                $default = false;
-            }
+        $lang = $language !== ''
+            ? preg_replace('/[^a-z0-9\-_]+/i', '', strtolower($language))
+            : $this->defaultLanguage;
 
-            $filename = \FLEA::getAppInf('languageFilesDir') . DS .
-                $language . DS . $dictname . '.php';
+        $dir = \FLEA::getAppInf('languageFilesDir');
+        $loaded = true;
+
+        foreach ($dictname as $name) {
+            $name = preg_replace('/[^a-z0-9\-_]+/i', '', strtolower(trim($name)));
+            if ($name === '') { continue; }
+
+            $filename = $dir . DS . $lang . DS . $name . '.php';
             if (isset($this->loadedFiles[$filename])) { continue; }
 
-            if (is_readable($filename)) {
-                $dict = require($filename);
-                $this->loadedFiles[$filename] = true;
-                if (isset($this->dict[$language])) {
-                    $this->dict[$language] = array_merge($this->dict[$language], $dict);
-                } else {
-                    $this->dict[$language] = $dict;
+            if (!is_readable($filename)) {
+                if (!$noException) {
+                    throw new \FLEA\Exception\ExpectedFile($filename);
                 }
-                if ($default) {
-                    $this->dict[0] =& $this->dict[$language];
-                }
-            } else if (!$noException) {
-                throw new \FLEA\Exception_ExpectedFile($filename);
+                $loaded = false;
+                continue;
             }
+
+            $dict = require($filename);
+            $this->loadedFiles[$filename] = true;
+            $this->dict[$lang] = isset($this->dict[$lang])
+                ? array_merge($this->dict[$lang], $dict)
+                : $dict;
         }
+
+        return $loaded;
     }
 
     /**
-     * 返回指定键的对应语言翻译，没有找到翻译时返回键
+     * 获取翻译，找不到时返回原 key
      *
      * @param string $key
-     * @param string $language 指定为 '' 时表示从默认语言包中获取翻译
-     *
-     * @return string
+     * @param string $language 空字符串表示使用默认语言
      */
     public function get(string $key, string $language = ''): string
     {
-        if ($language == '') { $language = 0; }
-        return $this->dict[$language][$key] ?? $key;
+        $lang = $language !== '' ? $language : $this->defaultLanguage;
+        return $this->dict[$lang][$key] ?? $key;
     }
 }

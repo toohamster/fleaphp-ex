@@ -3,40 +3,16 @@
 namespace FLEA\Db\Driver;
 
 /**
- * 定义 \FLEA\Db\Driver\AbstractDriver 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: Abstract.php 1025 2008-01-09 04:17:59Z qeeyuan $
- */
-
-// {{{ constants
-/**
- * 问号作为参数占位符
- */
-define('DBO_PARAM_QM',          '?');
-/**
- * 冒号开始的命名参数
- */
-define('DBO_PARAM_CL_NAMED',    ':');
-/**
- * $符号开始的序列
- */
-define('DBO_PARAM_DL_SEQUENCE', '$');
-/**
- * @开始的命名参数
- */
-define('DBO_PARAM_AT_NAMED',    '@');
-
-/**
  * \FLEA\Db\Driver\AbstractDriver 是所有数据库驱动的抽象基础类
  *
- * @package Core
- * @author toohamster
- * @version 1.1
  */
 abstract class AbstractDriver
 {
+    const PARAM_QM          = '?';
+    const PARAM_CL_NAMED    = ':';
+    const PARAM_DL_SEQUENCE = '$';
+    const PARAM_AT_NAMED    = '@';
+
     /**
      * 用于描绘 true、false 和 null 的数据库值
      */
@@ -158,6 +134,13 @@ abstract class AbstractDriver
     protected array $savepointStack = [];
 
     /**
+     * 是否启用日志
+     *
+     * @var boolean
+     */
+    protected bool $enableLog = false;
+
+    /**
      * 构造函数
      *
      * @param array $dsn
@@ -189,7 +172,6 @@ abstract class AbstractDriver
         $this->lasterrcode = null;
         $this->insertId = null;
         $this->transCount = 0;
-        $this->_transCommit = true;
     }
 
     /**
@@ -772,7 +754,7 @@ abstract class AbstractDriver
             $fields = array_change_key_case(array_flip($fields), CASE_LOWER);
             foreach (array_keys($inputarr) as $key) {
                 if (!isset($fields[strtolower($key)])) { continue; }
-                if ($paramStyle == DBO_PARAM_QM) {
+                if ($paramStyle == self::PARAM_QM) {
                     $holders[] = $paramStyle;
                 } else {
                     $holders[] = $paramStyle . $key;
@@ -781,7 +763,7 @@ abstract class AbstractDriver
             }
         } else {
             foreach (array_keys($inputarr) as $key) {
-                if ($paramStyle == DBO_PARAM_QM) {
+                if ($paramStyle == self::PARAM_QM) {
                     $holders[] = $paramStyle;
                 } else {
                     $holders[] = $paramStyle . $key;
@@ -810,7 +792,7 @@ abstract class AbstractDriver
             foreach (array_keys($inputarr) as $key) {
                 if (!isset($fields[strtolower($key)])) { continue; }
                 $qkey = $this->qfield($key);
-                if ($paramStyle == DBO_PARAM_QM) {
+                if ($paramStyle == self::PARAM_QM) {
                     $pairs[] = "{$qkey}={$paramStyle}";
                 } else {
                     $pairs[] = "{$qkey}={$paramStyle}{$key}";
@@ -820,7 +802,7 @@ abstract class AbstractDriver
         } else {
             foreach (array_keys($inputarr) as $key) {
                 $qkey = $this->qfield($key);
-                if ($paramStyle == DBO_PARAM_QM) {
+                if ($paramStyle == self::PARAM_QM) {
                     $pairs[] = "{$qkey}={$paramStyle}";
                 } else {
                     $pairs[] = "{$qkey}={$paramStyle}{$key}";
@@ -829,5 +811,21 @@ abstract class AbstractDriver
             }
         }
         return [$pairs, $values];
+    }
+
+    /**
+     * 实际启动事务的操作，子类可覆盖
+     */
+    protected function doStartTrans(): void
+    {
+    }
+
+    /**
+     * 实际完成事务的操作，子类可覆盖
+     *
+     * @param bool $commitOnNoErrors
+     */
+    protected function doCompleteTrans(bool $commitOnNoErrors): void
+    {
     }
 }

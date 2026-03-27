@@ -3,7 +3,7 @@
 require('FLEA.php');
 
 $dbDSN = [
-    'driver'    => 'mysqlt',
+    'driver'    => 'mysql',
     'host'      => 'localhost',
     'login'     => 'root',
     'password'  => '',
@@ -89,7 +89,6 @@ $roles = array_to_hashmap($roles, 'name');
 
 /**
  * 创建用户组层次，并指定角色
- *
  * 开发组
  *   |
  *   +----- QeePHP Team
@@ -191,8 +190,6 @@ $user = $tableUsers->find(['username' => 'dali']);
 $user['roles'][] = $roles['Tester'];
 $tableUsers->update($user);
 
-
-
 $users = [
     [
         'username' => '米粒子',
@@ -238,6 +235,5 @@ $tableUsers->createRowset($users);
 $user = $tableUsers->find(['username' => '肥同小可']);
 $user['roles'][] = $roles['Developer'];
 $tableUsers->update($user);
-
 
 $dbo->completeTrans();

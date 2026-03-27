@@ -2,20 +2,9 @@
 
 namespace FLEA\Acl\Table;
 
-
-/**
- * 定义 \FLEA\Acl\Table\Roles 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: Roles.php 1060 2008-05-04 05:02:59Z qeeyuan $
- */
-
-
 /**
  * \FLEA\Acl\Table\Roles 提供了角色数据的存储服务
  *
- * @package Core
  */
 class Roles extends \FLEA\Db\TableDataGateway
 {

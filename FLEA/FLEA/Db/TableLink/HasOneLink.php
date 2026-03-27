@@ -1,11 +1,4 @@
 <?php
-/**
- * FLEA\Db\TableLink\HasOneLink 封装 has one 关系
- *
- * @package Core
- * @author toohamster
- * @version 1.0
- */
 
 namespace FLEA\Db\TableLink;
 
@@ -13,10 +6,6 @@ use FLEA\Db\TableLink;
 
 /**
  * FLEA\Db\TableLink\HasOneLink 封装 has one 关系
- *
- * @package Core
- * @author toohamster
- * @version 1.0
  */
 class HasOneLink extends TableLink
 {
@@ -36,7 +25,7 @@ class HasOneLink extends TableLink
      */
     public function getFindSQL(string $in): string
     {
-        if (!$this->init) { $this->init(); }
+        if (!$this->initialized) { $this->init(); }
         $fields = $this->qforeignKey . ' AS ' . $this->mainTDG->pka . ', ' . $this->assocTDG->qfields($this->fields);
 
         $sql = "SELECT {$fields} FROM {$this->assocTDG->qtableName} ";
@@ -54,7 +43,7 @@ class HasOneLink extends TableLink
      */
     public function saveAssocData(array &$row, $pkv): bool
     {
-        if (!$this->init) { $this->init(); }
+        if (!$this->initialized) { $this->init(); }
 
         $row[$this->foreignKey] = $pkv;
         return $this->saveAssocDataBase($row);

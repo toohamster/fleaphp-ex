@@ -2,21 +2,9 @@
 
 namespace FLEA\Db\Exception;
 
-
-/**
- * 定义 \FLEA\Db\Exception\MissingLinkOption 异常
- *
- * @author toohamster
- * @package Exception
- * @version $Id: MissingLinkOption.php 972 2007-10-09 20:56:54Z qeeyuan $
- */
-
 /**
  * \FLEA\Db\Exception\MissingLinkOption 异常指示创建 TableLink 对象时没有提供必须的选项
  *
- * @package Exception
- * @author toohamster
- * @version 1.0
  */
 class MissingLinkOption extends \FLEA\Exception
 {

@@ -2,21 +2,9 @@
 
 namespace FLEA\Db\Exception;
 
-
-/**
- * 定义 \FLEA\Db\Exception\PrimaryKeyExists 异常
- *
- * @author toohamster
- * @package Exception
- * @version $Id: PrimaryKeyExists.php 972 2007-10-09 20:56:54Z qeeyuan $
- */
-
 /**
  * \FLEA\Db\Exception\PrimaryKeyExists 异常指示在不需要主键值的时候却提供了主键值
  *
- * @package Exception
- * @author toohamster
- * @version 1.0
  */
 class PrimaryKeyExists extends \FLEA\Exception
 {

@@ -2,15 +2,6 @@
 
 namespace FLEA\Helper;
 
-
-/**
- * 定义 \FLEA\Helper\FileUploader 和 \FLEA\Helper\FileUploader_File 对象
- *
- * @author toohamster
- * @package Core
- * @version $Id: FileUploader.php 1018 2007-12-04 23:41:47Z qeeyuan $
- */
-
 /**
  * \FLEA\Helper\FileUploader 实现了一个简单的、可扩展的文件上传助手
  *
@@ -34,10 +25,6 @@ namespace FLEA\Helper;
  *     $file->move($uploadDir . '/' . $filename);
  * }
  * </code>
- *
- * @package Core
- * @author toohamster
- * @version 1.0
  */
 class FileUploader
 {
@@ -131,7 +118,7 @@ class FileUploader
     public function getFile($name)
     {
         if (!isset($this->files[$name])) {
-            throw new \FLEA\Exception_ExpectedFile('$_FILES[' . $name . ']');
+            throw new \FLEA\Exception\ExpectedFile('$_FILES[' . $name . ']');
         }
         return $this->files[$name];
     }

@@ -2,23 +2,9 @@
 
 namespace FLEA\Db\Driver;
 
-
-/**
- * 定义 \FLEA\Db\Driver\Mysql 驱动
- *
- * @author toohamster
- * @package Core
- * @version $Id: Mysql.php 1077 2008-05-14 17:44:19Z dualface $
- * Updated: Converted to PDO for PHP 7.4 compatibility
- */
-
-
 /**
  * 用于 PDO MySQL 的数据库驱动程序
  *
- * @package Core
- * @author toohamster
- * @version 2.0
  */
 class Mysql extends \FLEA\Db\Driver\AbstractDriver
 {
@@ -32,6 +18,8 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
     protected const META_COLUMNS_SQL = 'SHOW FULL COLUMNS FROM %s';
     protected const HAS_INSERT_ID = true;
     protected const HAS_AFFECTED_ROWS = true;
+    protected const HAS_TRANSACTION = true;
+    protected const HAS_SAVEPOINT = true;
     /**
      * @var \PDO
      */
@@ -482,6 +470,27 @@ class Mysql extends \FLEA\Db\Driver\AbstractDriver
         $this->freeRes($res);
         return $tables;
     }
-}
 
+    /**
+     * 启动 MySQL 事务
+     */
+    protected function doStartTrans(): void
+    {
+        $this->pdo->beginTransaction();
+    }
+
+    /**
+     * 完成 MySQL 事务
+     *
+     * @param bool $commitOnNoErrors
+     */
+    protected function doCompleteTrans(bool $commitOnNoErrors): void
+    {
+        if ($commitOnNoErrors && !$this->hasFailedQuery) {
+            $this->pdo->commit();
+        } else {
+            $this->pdo->rollBack();
+        }
+    }
+}
 

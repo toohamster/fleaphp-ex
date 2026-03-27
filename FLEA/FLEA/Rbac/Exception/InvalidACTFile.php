@@ -1,22 +1,10 @@
 <?php
 
-
-
 namespace FLEA\Rbac\Exception;
-/**
- * 定义 \FLEA\Rbac\Exception\InvalidACTFile 异常
- *
- * @author toohamster
- * @package Exception
- * @version $Id: InvalidACTFile.php 972 2007-10-09 20:56:54Z qeeyuan $
- */
 
 /**
  * \FLEA\Rbac\Exception\InvalidACTFile 异常指示控制器的 ACT 文件无效
  *
- * @package Exception
- * @author toohamster
- * @version 1.0
  */
 class InvalidACTFile extends \FLEA\Exception
 {

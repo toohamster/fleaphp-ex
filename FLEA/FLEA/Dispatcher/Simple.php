@@ -2,32 +2,22 @@
 
 namespace FLEA\Dispatcher;
 
-/**
- * \FLEA\Dispatcher\Simple 分析 HTTP 请求，并转发到合适的 Controller 对象处理
- *
- * @package Core
- * @author toohamster
- * @version 1.0
- */
 class Simple
 {
     /**
      * 保存了请求信息的数组
-     *
      * @var array
      */
     protected array $request = [];
 
     /**
      * 原始的请求信息数组
-     *
      * @var array
      */
     protected array $requestBackup = [];
 
     /**
      * 构造函数
-     *
      * @param array $request
      */
     public function __construct(array &$request)
@@ -50,7 +40,6 @@ class Simple
 
     /**
      * 从请求中分析 Controller、Action 和 Package 名字，然后执行指定的 Action 方法
-     *
      * @return mixed
      */
     public function dispatching()
@@ -62,11 +51,9 @@ class Simple
 
     /**
      * 执行指定的 Action 方法
-     *
      * @param string $controllerName
      * @param string $actionName
      * @param string $controllerClass
-     *
      * @return mixed
      */
     protected function executeAction(string $controllerName, string $actionName, string $controllerClass)
@@ -126,9 +113,7 @@ class Simple
 
     /**
      * 从请求中取得 Controller 名字
-     *
      * 如果没有指定 Controller 名字，则返回配置文件中定义的默认 Controller 名字。
-     *
      * @return string
      */
     public function getControllerName(): string
@@ -145,7 +130,6 @@ class Simple
 
     /**
      * 设置要访问的控制器名字
-     *
      * @param string $controllerName
      */
     public function setControllerName(string $controllerName): void
@@ -155,9 +139,7 @@ class Simple
 
     /**
      * 从请求中取得 Action 名字
-     *
      * 如果没有指定 Action 名字，则返回配置文件中定义的默认 Action 名字。
-     *
      * @return string
      */
     public function getActionName(): string
@@ -171,7 +153,6 @@ class Simple
 
     /**
      * 设置要访问的动作名字
-     *
      * @param string $actionName
      */
     public function setActionName(string $actionName): void
@@ -181,13 +162,16 @@ class Simple
 
     /**
      * 返回指定控制器对应的类名称
-     *
      * @param string $controllerName
-     *
      * @return string
      */
     public function getControllerClass(string $controllerName): string
     {
+        // 如果已经包含 Controller 后缀，直接使用
+        if (str_end_with($controllerName, 'Controller')) {
+            return \FLEA::getAppInf('controllerClassPrefix') . $controllerName;
+        }
+        // 否则添加 Controller 后缀
         $controllerClass = \FLEA::getAppInf('controllerClassPrefix');
         if (\FLEA::getAppInf('urlLowerChar')) {
             $controllerClass .= ucfirst(strtolower($controllerName));
@@ -199,9 +183,7 @@ class Simple
 
     /**
      * 分析 url 地址，找出控制器名字和动作名
-     *
      * @param string $url
-     *
      * @return array
      */
     public function parseUrl(string $url): array
@@ -223,11 +205,8 @@ class Simple
 
     /**
      * 载入控制器类
-     *
      * 使用 Composer PSR-4 自动加载器
-     *
      * @param string $controllerClass
-     *
      * @return boolean
      */
     protected function loadController(string $controllerClass): bool

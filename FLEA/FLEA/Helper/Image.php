@@ -2,32 +2,10 @@
 
 namespace FLEA\Helper;
 
-
-/**
- * 定义 \FLEA\Helper\Image 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: Image.php 1405 2008-10-14 09:56:43Z dualface $
- */
-
-/**
- * \FLEA\Helper\Image 类封装了针对图像的操作
- *
- * 开发者不能直接构造该类的实例，而是应该用 \FLEA\Helper\Image::createFromFile()
- * 静态方法创建一个 \FLEA\Helper\Image 类的实例。
- *
- * 操作大图片时，请确保 php 能够分配足够的内存。
- *
- * @package Core
- * @author toohamster
- * @version 1.0
- */
 class Image
 {
     /**
      * GD 资源句柄
-     *
      * @var resource
      */
     public $handle = null;
@@ -36,7 +14,6 @@ class Image
      * 构造函数
      * 开发者不能直接构造该类的实例，而是应该用 \FLEA\Helper\Image::createFromFile()
      * 静态方法创建一个 \FLEA\Helper\Image 类的实例。
-     *
      * @param resource $handle
      */
     public function __construct($handle)
@@ -46,17 +23,13 @@ class Image
 
     /**
      * 从指定文件创建 Image 对象
-     *
      * 对于上传的文件，由于其临时文件名中并没有包含扩展名。因此需要采用下面的方法创建 Image 对象：
-     *
      * <code>
      * $ext = pathinfo($_FILES['postfile']['name'], PATHINFO_EXTENSION);
      * $image =& \FLEA\Helper\Image::createFromFile($_FILES['postfile']['tmp_name'], $ext);
      * </code>
-     *
      * @param string $filename
      * @param string $fileext
-     *
      * @return \FLEA\Helper\Image
      */
     public static function createFromFile(string $filename, ?string $fileext = null): \FLEA\Helper\Image
@@ -72,7 +45,7 @@ class Image
             'gif' => 'imagecreatefromgif',
         ];
         if (!isset($ext2functions[$fileext])) {
-            throw new \FLEA\Exception_NotImplemented('imagecreatefrom' . $fileext);
+            throw new \FLEA\Exception\NotImplemented('imagecreatefrom' . $fileext);
         }
 
         $handle = $ext2functions[$fileext]($filename);
@@ -82,7 +55,6 @@ class Image
 
     /**
      * 快速缩放图像到指定大小（质量较差）
-     *
      * @param int $width
      * @param int $height
      */
@@ -98,7 +70,6 @@ class Image
 
     /**
      * 缩放图像到指定大小（质量较好，速度比 resize() 慢）
-     *
      * @param int $width
      * @param int $height
      */
@@ -114,7 +85,6 @@ class Image
 
     /**
      * 调整图像大小，但不进行缩放操作
-     *
      * @param int $width
      * @param int $height
      * @param string $pos
@@ -177,7 +147,6 @@ class Image
 
     /**
      * 在保持图像长宽比的情况下将图像裁减到指定大小
-     *
      * @param int $width
      * @param int $height
      * @param boolean $highQuality
@@ -282,7 +251,6 @@ class Image
 
     /**
      * 保存为 JPEG 文件
-     *
      * @param string $filename
      * @param int $quality
      */
@@ -293,7 +261,6 @@ class Image
 
     /**
      * 保存为 PNG 文件
-     *
      * @param string $filename
      */
     public function saveAsPng(string $filename): bool
@@ -303,7 +270,6 @@ class Image
 
     /**
      * 保存为 GIF 文件
-     *
      * @param string $filename
      */
     public function saveAsGif(string $filename): bool
@@ -322,10 +288,8 @@ class Image
 
     /**
      * 将十六进制表示的颜色值转换为 rgb
-     *
      * @param string $color
      * @param string $default
-     *
      * @return array
      */
     public function extractColor($color, string $default = 'ffffff'): array

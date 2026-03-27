@@ -2,20 +2,8 @@
 
 namespace FLEA\Acl\Table;
 
-
-/**
- * 定义 \FLEA\Acl\Table\Permissions 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: Permissions.php 1060 2008-05-04 05:02:59Z qeeyuan $
- */
-
-
 /**
  * \FLEA\Acl\Table\Permissions 提供了权限数据的存储服务
- *
- * @package Core
  */
 class Permissions extends \FLEA\Db\TableDataGateway
 {

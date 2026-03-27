@@ -4,6 +4,44 @@
 
 ---
 
+### docs: 重写 SPEC.md 框架规格说明书 (v2.0)
+
+完全重写 SPEC.md，反映 FLEA 框架 2.0 的重大重构：
+- 新增核心服务类：Container (PSR-11), Database, Cache (PSR-16)
+- 新增 HTTP 组件：Request, Response, Router, Route, Middleware
+- 新增 Auth/Jwt JWT 认证工具
+- 移除已删除的类：Ajax.php, WebControls.php, ActiveRecord.php
+- 删除未使用的 3rd/Spyc/spyc.php（无引用，可用 symfony/yaml 替代）
+- 删除未使用的 _Cache 目录（视图缓存已使用 ./cache 目录）
+- 更新版本历史为 2.0.0
+- 更新 CLAUDE.md Architecture 部分
+
+**修改的文件:**
+- `SPEC.md` (重写)
+- `CLAUDE.md`
+- `GIT_COMMIT.md`
+- 删除：`FLEA/3rd/`
+- 删除：`FLEA/_Cache/`
+
+---
+
+### docs: 更新 SPEC.md 和 CLAUDE.md 反映框架 2.0 重构
+
+全面更新 SPEC.md 规格说明书以反映 FLEA 框架 2.0 重构后的架构：
+- 更新目录结构：移除 Ajax.php、WebControls.php
+- 新增核心服务类：Container (PSR-11)、Database、Cache (PSR-16)
+- 新增 HTTP 组件：Request、Response、Router、Route、Middleware
+- 新增 Auth/Jwt JWT 认证工具
+- 更新版本历史为 2.0.0
+- 更新 CLAUDE.md Architecture 部分
+
+**修改的文件:**
+- `SPEC.md`
+- `CLAUDE.md`
+- `GIT_COMMIT.md`
+
+---
+
 ### docs: 用最新代码更新 SPEC.md 框架规格说明书
 
 与当前代码同步：Config 属性加 `array` 类型；View 新增 ViewInterface/NullView/Simple 完整 API；ActiveRecord 属性去 `_` 前缀并补全方法；Rbac 属性 `$_sessionKey`/`$_rolesKey` → `$sessionKey`/`$rolesKey` 并更新方法列表；Acl\Manager `$_tableClass` → `$tableClass`；Pager 重写构造函数签名和方法列表；Log 属性去 `_` 前缀；Session\Db 属性加 `?string` 类型、方法名改为 `sessionXxx`；生命周期 `_beforeExecute`/`_afterExecute` → `beforeExecute`/`afterExecute`；模型示例加类型声明；目录结构补充 ViewInterface.php、NullView.php、Verifier.php、SendFile.php；修正 dbDSN 配置键的 tab 字符。

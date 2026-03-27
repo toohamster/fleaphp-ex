@@ -5,170 +5,114 @@ namespace FLEA;
 use Psr\Log\AbstractLogger;
 
 /**
- * 定义 FLEA_Log 类
+ * 日志服务，实现 PSR-3 LoggerInterface
  *
- * @author toohamster
- * @package Core
- * @version $Id: Log.php 999 2007-10-30 05:39:57Z qeeyuan $
- */
-
-/**
- * FLEA_Log 类提供基本的日志服务，实现 PSR-3 LoggerInterface
- *
- * @package Core
- * @author toohamster
- * @version 2.0
+ * 每条日志格式：[datetime] [traceId] [level] message
  */
 class Log extends AbstractLogger
 {
-    /**
-     * 保存运行期间的日志，在脚本结束时将日志内容写入到文件
-     *
-     * @var string
-     */
-    public string $log = '';
-
-    /**
-     * 日期格式
-     *
-     * @var string
-     */
+    public string $traceId    = '';
     public string $dateFormat = 'Y-m-d H:i:s';
+    public bool   $enabled    = true;
 
-    /**
-     * 保存日志文件的目录
-     *
-     * @var string|null
-     */
-    public ?string $logFileDir = null;
-
-    /**
-     * 保存日志的文件名
-     *
-     * @var string|null
-     */
+    public ?string $logFileDir  = null;
     public ?string $logFilename = null;
+    public ?array  $errorLevel  = null;
 
-    /**
-     * 是否允许日志保存
-     *
-     * @var bool
-     */
-    public bool $enabled = true;
+    /** 内存中缓存的日志内容 */
+    private string $buffer = '';
 
-    /**
-     * 要写入日志文件的错误级别
-     *
-     * @var array|null
-     */
-    public ?array $errorLevel = null;
-
-    /**
-     * 构造函数
-     */
     public function __construct()
     {
-        $dir = \FLEA::getAppInf('logFileDir');
-        if (empty($dir)) {
-            // 如果没有指定日志存放目录，则保存到内部缓存目录中
-            $dir = \FLEA::getAppInf('internalCacheDir');
-        }
+        $this->traceId = $this->generateTraceId();
+
+        $dir = \FLEA::getAppInf('logFileDir') ?: \FLEA::getAppInf('internalCacheDir');
         $dir = realpath($dir);
-        if (substr($dir, -1) != DIRECTORY_SEPARATOR) {
-            $dir .= DIRECTORY_SEPARATOR;
-        }
-        if (!is_dir($dir) || !is_writable($dir)) {
+        if (!$dir || !is_dir($dir) || !is_writable($dir)) {
             $this->enabled = false;
-        } else {
-            $this->logFileDir = $dir;
-            $this->logFilename = $this->logFileDir . \FLEA::getAppInf('logFilename');
-            $errorLevel = (array)\FLEA::getAppInf('logErrorLevel');
-            $this->errorLevel = array_flip($errorLevel);
-
-            [$usec, $sec] = explode(" ", FLEA_LOADED_TIME);
-            $this->log = sprintf("[%s %s] ======= FleaPHP Loaded =======\n",
-                date($this->dateFormat, $sec), $usec);
-
-            if (isset($_SERVER['REQUEST_URI'])) {
-                $this->log .= sprintf("[%s] REQUEST_URI: %s\n",
-                        date($this->dateFormat),
-                        $_SERVER['REQUEST_URI']);
-            }
-
-            // 注册脚本结束时要运行的方法，将缓存的日志内容写入文件
-            register_shutdown_function([$this, '__writeLog']);
-
-            // 检查文件是否已经超过指定大小
-            if (file_exists($this->logFilename)) {
-                $filesize = filesize($this->logFilename);
-            } else {
-                $filesize = 0;
-            }
-            $maxsize = (int)\FLEA::getAppInf('logFileMaxSize');
-            if ($maxsize >= 512) {
-                $maxsize = $maxsize * 1024;
-                if ($filesize >= $maxsize) {
-                    // 使用新的日志文件名
-                    $pathinfo = pathinfo($this->logFilename);
-                    $newFilename = $pathinfo['dirname'] . DS .
-                        basename($pathinfo['basename'], '.' . $pathinfo['extension']) .
-                        date('-Ymd-His') . '.' . $pathinfo['extension'];
-                    rename($this->logFilename, $newFilename);
-                }
-            }
+            return;
         }
+
+        $this->logFileDir  = rtrim($dir, DS) . DS;
+        $this->logFilename = $this->logFileDir . \FLEA::getAppInf('logFilename');
+        $this->errorLevel  = array_flip((array)\FLEA::getAppInf('logErrorLevel'));
+
+        $this->rotateIfNeeded();
+
+        // 记录请求入口
+        $uri = $_SERVER['REQUEST_URI'] ?? 'cli';
+        $this->buffer = sprintf("[%s] [%s] [info] %s %s\n",
+            date($this->dateFormat), $this->traceId,
+            $_SERVER['REQUEST_METHOD'] ?? 'CLI', $uri
+        );
+
+        register_shutdown_function([$this, 'flush']);
     }
 
     /**
      * PSR-3 核心日志方法
-     *
-     * @param mixed  $level   日志级别（PSR-3 标准级别或自定义级别）
-     * @param string $message 日志消息，支持 {key} 占位符
-     * @param array  $context 上下文数据，用于替换占位符
      */
     public function log($level, $message, array $context = []): void
     {
         if (!$this->enabled) { return; }
 
         $levelStr = strtolower((string)$level);
-        if ($this->errorLevel !== null && !isset($this->errorLevel[$levelStr])) { return; }
+        if ($this->errorLevel && !isset($this->errorLevel[$levelStr])) { return; }
 
-        $message = $this->interpolate((string)$message, $context);
-        $this->log .= sprintf("[%s] [%s] %s\n", date($this->dateFormat), $levelStr, $message);
+        $this->buffer .= sprintf("[%s] [%s] [%s] %s\n",
+            date($this->dateFormat),
+            $this->traceId,
+            $levelStr,
+            $this->interpolate((string)$message, $context)
+        );
     }
 
     /**
-     * 将日志信息写入文件
+     * 将缓冲日志写入文件（由 register_shutdown_function 调用）
      */
-    public function __writeLog(): void
+    public function flush(): void
     {
-        // 计算应用程序执行时间（不包含入口文件）
-        [$usec, $sec] = explode(" ", FLEA_LOADED_TIME);
-        $beginTime = (float)$sec + (float)$usec;
-        $endTime = microtime();
-        [$usec, $sec] = explode(" ", $endTime);
-        $endTime = (float)$sec + (float)$usec;
-        $elapsedTime = $endTime - $beginTime;
-        $this->log .= sprintf("[%s %s] ======= FleaPHP End (elapsed: %f seconds) =======\n\n",
-            date($this->dateFormat, $sec), $usec, $elapsedTime);
+        if (!$this->enabled || $this->buffer === '') { return; }
+
+        $elapsed = microtime(true) - microtime_float(FLEA_LOADED_TIME);
+        $this->buffer .= sprintf("[%s] [%s] [info] elapsed %.4fs\n",
+            date($this->dateFormat), $this->traceId, $elapsed
+        );
 
         $fp = fopen($this->logFilename, 'a');
         if (!$fp) { return; }
         flock($fp, LOCK_EX);
-        fwrite($fp, str_replace("\r", '', $this->log));
+        fwrite($fp, $this->buffer);
         flock($fp, LOCK_UN);
         fclose($fp);
     }
 
-    /**
-     * PSR-3 context 占位符插值
-     *
-     * @param string $message
-     * @param array  $context
-     * @return string
-     */
+    public function getTraceId(): string
+    {
+        return $this->traceId;
+    }
+
+    private function generateTraceId(): string
+    {
+        return generate_traceid();
+    }
+
+    private function rotateIfNeeded(): void
+    {
+        $maxsize = (int)\FLEA::getAppInf('logFileMaxSize');
+        if ($maxsize < 512 || !file_exists($this->logFilename)) { return; }
+        if (filesize($this->logFilename) < $maxsize * 1024) { return; }
+
+        $info = pathinfo($this->logFilename);
+        $newName = $info['dirname'] . DS
+            . basename($info['basename'], '.' . $info['extension'])
+            . date('-Ymd-His') . '.' . $info['extension'];
+        rename($this->logFilename, $newName);
+    }
+
     private function interpolate(string $message, array $context): string
     {
+        if (empty($context)) { return $message; }
         $replace = [];
         foreach ($context as $key => $val) {
             if (!is_array($val) && (!is_object($val) || method_exists($val, '__toString'))) {

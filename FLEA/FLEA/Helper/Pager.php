@@ -1,24 +1,11 @@
 <?php
 
-
-
 namespace FLEA\Helper;
-/**
- * 定义 \FLEA\Helper\Pager 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: Pager.php 1016 2007-11-21 13:53:59Z qeeyuan $
- */
 
 /**
  * \FLEA\Helper\Pager 类提供数据查询分页功能
  *
  * \FLEA\Helper\Pager 使用很简单，只需要构造时传入 \FLEA\Db\TableDataGateway 实例以及查询条件即可。
- *
- * @package Core
- * @author toohamster
- * @version 1.0
  */
 class Pager
 {
@@ -352,22 +339,34 @@ class Pager
     }
 
     /**
-     * 生成一个页面选择跳转控件
+     * 返回页面跳转选项数据（原 renderPageJumper 的数据版本）
      *
-     * @param string $caption
-     * @param string $jsfunc
+     * @return array [['index' => 0, 'number' => 1, 'current' => true], ...]
+     */
+    public function getPageJumperData(): array
+    {
+        $data = [];
+        for ($i = $this->firstPage; $i <= $this->lastPage; $i++) {
+            $data[] = [
+                'index'   => $i,
+                'number'  => $i + 1 - $this->basePageIndex,
+                'current' => $i === $this->currentPage,
+            ];
+        }
+        return $data;
+    }
+
+    /**
+     * @deprecated 直接输出 HTML，请改用 getPageJumperData() 自行渲染
      */
     public function renderPageJumper(string $caption = '%u', string $jsfunc = 'fnOnPageChanged'): void
     {
         $out = "<select name=\"PageJumper\" onchange=\"{$jsfunc}(this.value);\">\n";
-        for ($i = $this->firstPage; $i <= $this->lastPage; $i++) {
-            $out .= "<option value=\"{$i}\"";
-            if ($i == $this->currentPage) {
-                $out .= " selected";
-            }
-            $out .=">";
-            $out .= sprintf($caption, $i + 1 - $this->basePageIndex);
-            $out .= "</option>\n";
+        foreach ($this->getPageJumperData() as $item) {
+            $selected = $item['current'] ? ' selected' : '';
+            $out .= "<option value=\"{$item['index']}\"{$selected}>"
+                . sprintf($caption, $item['number'])
+                . "</option>\n";
         }
         $out .= "</select>\n";
         echo $out;

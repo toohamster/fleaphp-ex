@@ -2,14 +2,8 @@
 
 namespace FLEA\Db\Exception;
 
-
 /**
- * 定义 InvalidDSN 异常
- *
  * InvalidDSN 异常指示没有提供有效的 DSN 设置
- *
- * @package Exception
- * @version 1.0
  */
 class InvalidDSN extends \FLEA\Exception
 {
@@ -18,7 +12,7 @@ class InvalidDSN extends \FLEA\Exception
     /**
      * 构造函数
      *
-     * @param $dsn
+     * @param mixed $dsn
      */
     public function __construct($dsn)
     {

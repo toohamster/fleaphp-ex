@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Model\Post;
 use App\Model\Comment;
-use \FLEA\Controller\Action;
+use FLEA\Controller\Action;
 
 /**
  * 文章控制器

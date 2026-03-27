@@ -2,30 +2,12 @@
 
 namespace FLEA\Db;
 
-
-/**
- * 定义 \FLEA\Db\SqlHelper 类
- *
- * @author toohamster
- * @package Core
- * @version $Id: SqlHelper.php 1449 2008-10-30 06:16:17Z dualface $
- */
-
-/**
- * \FLEA\Db\SqlHelper 类提供了各种生成 SQL 语句的辅助方法
- *
- * @package Core
- * @author toohamster
- * @version 1.0
- */
 class SqlHelper
 {
     /**
      * 分析查询条件
-     *
      * @param mixed $conditions
      * @param TableDataGateway $table
-     *
      * @return array|string
      */
     public static function parseConditions($conditions, TableDataGateway $table)
@@ -125,7 +107,6 @@ class SqlHelper
 
     /**
      * 格式化输出 SQL 日志
-     *
      * @param array $log
      */
     public static function dumpLog(array $log): void
