@@ -2,6 +2,8 @@
 
 namespace FLEA\Acl\Table;
 
+use FLEA\Db\TableDataGateway;
+
 /**
  * 角色表数据网关
  *

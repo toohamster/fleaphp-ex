@@ -54,7 +54,7 @@ class Config
     private function __construct()
     {
         // 加载框架默认配置
-        $this->appInf = \FLEA\Config\Defaults::$config;
+        $this->appInf = \FLEA\Config\Defaults::getConfig();
     }
 
     /**

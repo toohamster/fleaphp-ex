@@ -2,6 +2,8 @@
 
 namespace FLEA\Rbac;
 
+use FLEA\Db\TableDataGateway;
+
 /**
  * 角色管理器
  *

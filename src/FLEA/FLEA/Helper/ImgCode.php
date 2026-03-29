@@ -24,7 +24,7 @@ namespace FLEA\Helper;
  * }
  *
  * // 在模板中显示验证码
- * <img src="<?php echo $this->url('imgcode'); ?>" />
+ * <img src="<?php echo url('Post.imgcode'); ?>" />
  *
  * // 验证用户提交的验证码
  * function actionSubmit() {

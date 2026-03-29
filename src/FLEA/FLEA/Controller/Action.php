@@ -150,37 +150,6 @@ class Action
     }
 
     /**
-     * 生成 URL
-     *
-     * 构造当前控制器的 URL 地址。
-     *
-     * 用法示例：
-     * ```php
-     * // 生成当前控制器默认动作的 URL
-     * $url = $this->url();
-     *
-     * // 生成指定动作的 URL
-     * $url = $this->url('show', ['id' => 123]);
-     *
-     * // 带锚点
-     * $url = $this->url('show', ['id' => 123], 'comments');
-     * ```
-     *
-     * @param string|null $actionName 动作名称（省略时为当前控制器）
-     * @param array|null  $args       URL 参数数组
-     * @param string|null $anchor     URL 锚点
-     *
-     * @return string 生成的 URL
-     */
-    protected function url(?string $actionName = null, ?array $args = null, ?string $anchor = null): string
-    {
-        return url(
-            $actionName ? $this->controllerName . '.' . $actionName : $this->controllerName,
-            $args ?? []
-        );
-    }
-
-    /**
      * 转发到另一个控制器方法
      *
      * 内部转发到另一个控制器的 Action 方法执行。
@@ -264,29 +233,6 @@ class Action
             if (is_array($data)) { $view->assign($data); }
             $view->display($__flea_internal_viewName);
         }
-    }
-
-    /**
-     * 判断是否为 POST 请求
-     *
-     * @return bool POST 请求返回 true，否则返回 false
-     */
-    protected function isPost(): bool
-    {
-        return strtolower($_SERVER['REQUEST_METHOD']) == 'post';
-    }
-
-    /**
-     * 判断是否为 Ajax 请求
-     *
-     * 检查 X-Requested-With 头是否为 XMLHttpRequest。
-     *
-     * @return bool Ajax 请求返回 true，否则返回 false
-     */
-    protected function isAjax(): bool
-    {
-        $r = strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '');
-        return $r == 'xmlhttprequest';
     }
 
     /**
