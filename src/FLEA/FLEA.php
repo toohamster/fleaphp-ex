@@ -1,46 +1,61 @@
 <?php
 
 /**
- * FleaPHP 框架入口
+ * FleaPHP 框架入口类
  *
- * require('FLEA.php') 即可完成框架初始化。
- * FLEA 类作为静态门面，委托给各专职服务类。
+ * FLEA 类作为静态门面（Facade），委托给各专职服务类完成框架初始化。
+ * 开发者通过该类访问框架核心功能：配置、容器、缓存、数据库等。
+ *
+ * 基本用法：
+ * ```php
+ * // 1. 加载框架
+ * require 'vendor/autoload.php';
+ *
+ * // 2. 加载环境变量
+ * \FLEA::loadEnv(__DIR__ . '/../.env');
+ *
+ * // 3. 加载应用配置
+ * \FLEA::loadAppInf(__DIR__ . '/../App/Config.php');
+ *
+ * // 4. 运行 MVC 应用
+ * \FLEA::runMVC();
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ * @see     \FLEA\Config
+ * @see     \FLEA\Container
+ * @see     \FLEA\Database
+ * @see     \FLEA\Cache
  */
-
-define('FLEA_LOADED_TIME', microtime());
-define('FLEA_VERSION', '2.0.0');
-define('DS', DIRECTORY_SEPARATOR);
-define('URL_STANDARD', 'URL_STANDARD');
-define('URL_ROUTER',   'URL_ROUTER');
-define('RBAC_EVERYONE', 'RBAC_EVERYONE');
-define('RBAC_HAS_ROLE', 'RBAC_HAS_ROLE');
-define('RBAC_NO_ROLE', 'RBAC_NO_ROLE');
-define('RBAC_NULL', 'RBAC_NULL');
-define('ACTION_ALL', 'ACTION_ALL');
-
-define('FLEA_DIR', __DIR__ . '/FLEA');
-
-use FLEA\Config;
-use FLEA\Container;
-use FLEA\Database;
-use FLEA\Cache;
-
 class FLEA
 {
+    /**
+     * @var bool 环境变量是否已加载
+     */
     private static bool $envLoaded = false;
 
     /**
      * 加载 .env 环境变量文件
      *
-     * 用法：\FLEA::loadEnv(__DIR__ . '/../.env');
+     * 支持多环境文件自动加载：
+     * 1. 首先加载基础 `.env` 文件
+     * 2. 根据 `APP_ENV` 变量自动加载 `.env.{APP_ENV}` 覆盖配置
      *
-     * 支持多环境文件：
-     * - 加载基础 .env 后，根据 APP_ENV 自动加载 .env.{APP_ENV}
-     * - 例如：APP_ENV=production 时，自动加载 .env.production 覆盖
+     * 用法示例：
+     * ```php
+     * // 加载 .env，若 APP_ENV=production 则自动加载 .env.production
+     * \FLEA::loadEnv(__DIR__ . '/../.env');
+     * ```
      *
-     * @param string $path .env 文件的完整路径
+     * @param string $path .env 文件的完整路径（必须是文件路径，不是目录）
+     *
      * @return void
+     *
      * @throws \Exception 当 .env 文件不存在时抛出异常
+     *
+     * @see    \Dotenv\Dotenv::createImmutable()
      */
     public static function loadEnv(string $path): void
     {
@@ -68,8 +83,35 @@ class FLEA
 
         self::$envLoaded = true;
     }
-    // 配置
 
+    // =========================================================================
+    // 配置管理（委托给 FLEA\Config）
+    // =========================================================================
+
+    /**
+     * 加载应用配置文件
+     *
+     * 支持两种调用方式：
+     * 1. 传入配置文件路径（字符串）
+     * 2. 传入配置数组
+     *
+     * 用法示例：
+     * ```php
+     * // 方式 1：传入文件路径
+     * \FLEA::loadAppInf(__DIR__ . '/../App/Config.php');
+     *
+     * // 方式 2：传入配置数组
+     * \FLEA::loadAppInf(['dbDSN' => 'mysql://localhost/blog']);
+     * ```
+     *
+     * @param string|array|null $config 配置文件路径或配置数组
+     *
+     * @return void
+     *
+     * @throws \FLEA\Exception\ExpectedFile 配置文件路径有效但文件不可读时抛出
+     *
+     * @see    \FLEA\Config::mergeAppInf()
+     */
     public static function loadAppInf($config = null): void
     {
         if (is_string($config)) {
@@ -83,38 +125,169 @@ class FLEA
         }
     }
 
+    /**
+     * 获取应用配置项的值
+     *
+     * 用法示例：
+     * ```php
+     * // 获取单个配置项
+     * $controller = \FLEA::getAppInf('defaultController');
+     *
+     * // 带默认值
+     * $timezone = \FLEA::getAppInf('defaultTimezone', 'UTC');
+     * ```
+     *
+     * @param string $option  配置项名称
+     * @param mixed  $default 默认值（配置项不存在时返回）
+     *
+     * @return mixed 配置项的值，不存在时返回默认值
+     *
+     * @see    \FLEA\Config::getAppInf()
+     */
     public static function getAppInf(string $option, $default = null)
     {
         return Config::getInstance()->getAppInf($option, $default);
     }
 
+    /**
+     * 获取嵌套配置项的值
+     *
+     * 用于获取二维数组形式的配置项中的子值。
+     *
+     * 用法示例：
+     * ```php
+     * // 获取 dbDSN 配置中的 'host' 值
+     * $host = \FLEA::getAppInfValue('dbDSN', 'host');
+     * ```
+     *
+     * @param string $option   配置项名称（如 'dbDSN'）
+     * @param string $keyname  子键名称（如 'host'）
+     * @param mixed  $default  默认值
+     *
+     * @return mixed 配置子项的值
+     *
+     * @see    \FLEA\Config::getAppInfValue()
+     */
     public static function getAppInfValue(string $option, string $keyname, $default = null)
     {
         return Config::getInstance()->getAppInfValue($option, $keyname, $default);
     }
 
+    /**
+     * 设置配置项的值
+     *
+     * 用法示例：
+     * ```php
+     * \FLEA::setAppInfValue('dbDSN', 'host', '192.168.1.100');
+     * ```
+     *
+     * @param string $option   配置项名称
+     * @param string $keyname  子键名称
+     * @param mixed  $value    要设置的值
+     *
+     * @return void
+     *
+     * @see    \FLEA\Config::setAppInfValue()
+     */
     public static function setAppInfValue(string $option, string $keyname, $value): void
     {
         Config::getInstance()->setAppInfValue($option, $keyname, $value);
     }
 
+    /**
+     * 批量设置配置项
+     *
+     * 用法示例：
+     * ```php
+     * // 方式 1：传入键值对数组
+     * \FLEA::setAppInf(['key1' => 'value1', 'key2' => 'value2']);
+     *
+     * // 方式 2：传入单个配置项
+     * \FLEA::setAppInf('key1', 'value1');
+     * ```
+     *
+     * @param string|array $option 配置项名称或配置数组
+     * @param mixed        $data   配置值（当 $option 为字符串时有效）
+     *
+     * @return void
+     *
+     * @see    \FLEA\Config::setAppInf()
+     */
     public static function setAppInf($option, $data = null): void
     {
         Config::getInstance()->setAppInf($option, $data);
     }
 
-    // 对象容器
+    // =========================================================================
+    // 对象容器（委托给 FLEA\Container，PSR-11 兼容）
+    // =========================================================================
 
+    /**
+     * 获取单例对象
+     *
+     * 如果对象尚未注册，则自动创建并缓存。
+     * 后续调用将返回同一实例。
+     *
+     * 用法示例：
+     * ```php
+     * $logger = \FLEA::getSingleton(\FLEA\Log::class);
+     * ```
+     *
+     * @param string $className 类名
+     *
+     * @return object 单例对象实例
+     *
+     * @see    \FLEA\Container::singleton()
+     */
     public static function getSingleton(string $className): object
     {
         return Container::getInstance()->singleton($className);
     }
 
+    /**
+     * 注册对象到容器
+     *
+     * 用法示例：
+     * ```php
+     * // 注册对象实例
+     * $obj = new MyClass();
+     * \FLEA::register($obj, 'myObject');
+     *
+     * // 匿名注册（自动命名）
+     * \FLEA::register(new MyService());
+     * ```
+     *
+     * @param object     $obj  要注册的对象实例
+     * @param string|null $name 对象名称（可选，省略时自动生成）
+     *
+     * @return object 返回注册的对象实例
+     *
+     * @see    \FLEA\Container::register()
+     */
     public static function register(object $obj, ?string $name = null): object
     {
         return Container::getInstance()->register($obj, $name);
     }
 
+    /**
+     * 获取已注册的对象
+     *
+     * 用法示例：
+     * ```php
+     * // 获取指定对象
+     * $obj = \FLEA::registry('myObject');
+     *
+     * // 获取所有已注册对象
+     * $all = \FLEA::registry();
+     * ```
+     *
+     * @param string|null $name 对象名称（省略时返回所有对象）
+     *
+     * @return mixed 当 $name 有值时返回对应对象，否则返回所有对象的数组
+     *
+     * @see    \FLEA\Container::get()
+     * @see    \FLEA\Container::all()
+     */
     public static function registry(?string $name = null)
     {
         if (is_null($name)) {
@@ -123,42 +296,170 @@ class FLEA
         return Container::getInstance()->get($name);
     }
 
+    /**
+     * 检查对象是否已注册到容器
+     *
+     * 用法示例：
+     * ```php
+     * if (\FLEA::isRegistered('myObject')) {
+     *     $obj = \FLEA::registry('myObject');
+     * }
+     * ```
+     *
+     * @param string $name 对象名称
+     *
+     * @return bool 对象已注册返回 true，否则返回 false
+     *
+     * @see    \FLEA\Container::has()
+     */
     public static function isRegistered(string $name): bool
     {
         return Container::getInstance()->has($name);
     }
 
-    // 缓存（委托 PSR-16 Cache）
+    // =========================================================================
+    // 缓存服务（委托给 PSR-16 Cache）
+    // =========================================================================
 
+    /**
+     * 从缓存获取数据
+     *
+     * 用法示例：
+     * ```php
+     * // 获取缓存数据
+     * $data = \FLEA::getCache('user_123');
+     *
+     * // 指定缓存有效期（秒）
+     * $data = \FLEA::getCache('user_123', 3600);
+     * ```
+     *
+     * @param string $cacheId        缓存 ID
+     * @param int    $time           缓存有效期（秒），默认 900 秒
+     * @param bool   $timeIsLifetime 时间参数是否为缓存生命周期（预留参数）
+     * @param bool   $cacheIdIsFilename 缓存 ID 是否为文件路径（预留参数）
+     *
+     * @return mixed 缓存的数据，缓存不存在时返回 false
+     *
+     * @see    \FLEA\Cache::provider()->get()
+     */
     public static function getCache(string $cacheId, int $time = 900, bool $timeIsLifetime = true, bool $cacheIdIsFilename = false)
     {
         return Cache::provider()->get($cacheId) ?? false;
     }
 
+    /**
+     * 写入缓存
+     *
+     * 用法示例：
+     * ```php
+     * \FLEA::writeCache('user_123', $userData);
+     * ```
+     *
+     * @param string $cacheId           缓存 ID
+     * @param mixed  $data              要缓存的数据
+     * @param bool   $cacheIdIsFilename 缓存 ID 是否为文件路径（预留参数）
+     *
+     * @return bool 写入成功返回 true，失败返回 false
+     *
+     * @see    \FLEA\Cache::provider()->set()
+     */
     public static function writeCache(string $cacheId, $data, bool $cacheIdIsFilename = false): bool
     {
         return Cache::provider()->set($cacheId, $data);
     }
 
+    /**
+     * 删除缓存
+     *
+     * 用法示例：
+     * ```php
+     * \FLEA::purgeCache('user_123');
+     * ```
+     *
+     * @param string $cacheId           缓存 ID
+     * @param bool   $cacheIdIsFilename 缓存 ID 是否为文件路径（预留参数）
+     *
+     * @return bool 删除成功返回 true，失败返回 false
+     *
+     * @see    \FLEA\Cache::provider()->delete()
+     */
     public static function purgeCache(string $cacheId, bool $cacheIdIsFilename = false): bool
     {
         return Cache::provider()->delete($cacheId);
     }
 
-    // 数据库
+    // =========================================================================
+    // 数据库服务（委托给 FLEA\Database）
+    // =========================================================================
 
+    /**
+     * 获取数据库连接对象（DBO）
+     *
+     * 用法示例：
+     * ```php
+     * // 获取默认连接
+     * $dbo = \FLEA::getDBO();
+     *
+     * // 获取指定 DSN 的连接
+     * $dbo = \FLEA::getDBO(1);
+     * ```
+     *
+     * @param int|string $dsn DSN 索引或 DSN 字符串（默认 0 表示默认连接）
+     *
+     * @return \FLEA\Db\Driver\AbstractDriver 数据库驱动对象
+     *
+     * @see    \FLEA\Database::getInstance()->connect()
+     */
     public static function getDBO($dsn = 0): \FLEA\Db\Driver\AbstractDriver
     {
         return Database::getInstance()->connect($dsn);
     }
 
+    /**
+     * 解析 DSN 字符串为数组
+     *
+     * 用法示例：
+     * ```php
+     * $config = \FLEA::parseDSN('mysql://root:pass@localhost/blog');
+     * // 返回：['driver'=>'mysql', 'host'=>'localhost', 'login'=>'root', ...]
+     * ```
+     *
+     * @param string|array $dsn DSN 字符串或数组
+     *
+     * @return array|null DSN 配置数组，解析失败返回 null
+     *
+     * @see    \FLEA\Database::getInstance()->parseDSN()
+     */
     public static function parseDSN($dsn): ?array
     {
         return Database::getInstance()->parseDSN($dsn);
     }
 
-    // 辅助
+    // =========================================================================
+    // 辅助功能
+    // =========================================================================
 
+    /**
+     * 加载辅助类
+     *
+     * 根据配置中定义的辅助类名称动态加载。
+     * 辅助类配置格式：`'helper.helpername' => 'ClassName'`
+     *
+     * 用法示例：
+     * ```php
+     * // 假设配置中定义了 'helper.upload' => 'FileUploader'
+     * \FLEA::loadHelper('upload');
+     * ```
+     *
+     * @param string $helperName 辅助类名称（不包含前缀）
+     *
+     * @return void
+     *
+     * @throws \FLEA\Exception\NotExistsKeyName 辅助类配置不存在时抛出
+     * @throws \FLEA\Exception\ExpectedClass    辅助类不存在时抛出
+     *
+     * @see    \FLEA::getAppInf()
+     */
     public static function loadHelper(string $helperName): void
     {
         $setting = self::getAppInf('helper.' . strtolower($helperName));
@@ -170,18 +471,65 @@ class FLEA
         }
     }
 
-    // 中间件
+    // =========================================================================
+    // 中间件管理
+    // =========================================================================
 
-    /** @var \FLEA\Middleware\MiddlewareInterface[] */
+    /**
+     * @var \FLEA\Middleware\MiddlewareInterface[] 已注册的全局中间件
+     */
     private static array $middlewares = [];
 
+    /**
+     * 注册全局中间件
+     *
+     * 全局中间件会在所有请求执行前被调用。
+     *
+     * 用法示例：
+     * ```php
+     * \FLEA::middleware(new CorsMiddleware());
+     * \FLEA::middleware(new AuthMiddleware());
+     * ```
+     *
+     * @param \FLEA\Middleware\MiddlewareInterface $middleware 中间件实例
+     *
+     * @return void
+     *
+     * @see    \FLEA\Middleware\MiddlewareInterface
+     */
     public static function middleware(\FLEA\Middleware\MiddlewareInterface $middleware): void
     {
         self::$middlewares[] = $middleware;
     }
 
+    // =========================================================================
     // MVC 启动
+    // =========================================================================
 
+    /**
+     * 启动 MVC 应用
+     *
+     * 这是框架的入口方法，完成以下工作：
+     * 1. 初始化框架环境（时区、异常处理、缓存等）
+     * 2. 路由匹配（URL_ROUTER 模式）或解析（URL_STANDARD 模式）
+     * 3. 执行中间件管道
+     * 4. 调度控制器执行
+     *
+     * 用法示例：
+     * ```php
+     * require 'vendor/autoload.php';
+     * \FLEA::loadEnv(__DIR__ . '/../.env');
+     * \FLEA::loadAppInf(__DIR__ . '/../App/Config.php');
+     * \FLEA::runMVC();
+     * ```
+     *
+     * @return void
+     *
+     * @see    \FLEA::init()
+     * @see    \FLEA\Router::dispatch()
+     * @see    \FLEA\Dispatcher\Simple::dispatching()
+     * @see    \FLEA\Middleware\Pipeline
+     */
     public static function runMVC(): void
     {
         self::init();
@@ -229,6 +577,27 @@ class FLEA
         }
     }
 
+    /**
+     * 初始化框架环境
+     *
+     * 完成以下初始化工作：
+     * - 设置时区
+     * - 注册异常处理器
+     * - 初始化缓存目录
+     * - 加载请求过滤脚本
+     * - 加载自动加载脚本
+     * - 初始化 Session
+     * - 设置响应头
+     * - 输出日志 Trace ID
+     *
+     * 该方法会被 `runMVC()` 自动调用，一般无需手动调用。
+     *
+     * @param bool $loadMVC 是否启动 MVC 模式（预留参数）
+     *
+     * @return void
+     *
+     * @see    \FLEA::runMVC()
+     */
     public static function init(bool $loadMVC = false): void
     {
         static $initialized = false;

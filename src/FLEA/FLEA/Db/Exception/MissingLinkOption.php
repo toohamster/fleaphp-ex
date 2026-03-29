@@ -3,22 +3,25 @@
 namespace FLEA\Db\Exception;
 
 /**
- * \FLEA\Db\Exception\MissingLinkOption 异常指示创建 TableLink 对象时没有提供必须的选项
+ * MissingLinkOption 异常
  *
+ * 指示创建 TableLink 对象时没有提供必须的选项。
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
  */
 class MissingLinkOption extends \FLEA\Exception
 {
     /**
-     * 缺少的选项名
-     *
-     * @var string
+     * @var string 缺少的选项名
      */
     public string $option;
 
     /**
      * 构造函数
      *
-     * @param string $option
+     * @param string $option 缺少的选项名
      */
     public function __construct($option)
     {

@@ -3,30 +3,31 @@
 namespace FLEA\Db\Exception;
 
 /**
- * \FLEA\Db\Exception\PrimaryKeyExists 异常指示在不需要主键值的时候却提供了主键值
+ * PrimaryKeyExists 异常
  *
+ * 指示在不需要主键值的时候却提供了主键值。
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
  */
 class PrimaryKeyExists extends \FLEA\Exception
 {
     /**
-     * 主键字段名
-     *
-     * @var string
+     * @var string 主键字段名
      */
     public string $primaryKey;
 
     /**
-     * 主键字段值
-     *
-     * @var mixed
+     * @var mixed 主键字段值
      */
     public $pkValue;
 
     /**
      * 构造函数
      *
-     * @param string $pk
-     * @param mixed $pkValue
+     * @param string $pk      主键字段名
+     * @param mixed  $pkValue 主键字段值
      */
     public function __construct($pk, $pkValue = null)
     {

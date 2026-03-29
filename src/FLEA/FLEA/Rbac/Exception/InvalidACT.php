@@ -3,22 +3,26 @@
 namespace FLEA\Rbac\Exception;
 
 /**
- * \FLEA\Rbac\Exception\InvalidACT 异常指示一个无效的 ACT
+ * InvalidACT 异常
  *
+ * 指示一个无效的 ACT（Access Control Table）配置。
+ * 用于 RBAC 权限控制中 ACT 配置无效时的异常抛出。
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
  */
 class InvalidACT extends \FLEA\Exception
 {
     /**
-     * 无效的 ACT 内容
-     *
-     * @var mixed
+     * @var mixed 无效的 ACT 内容
      */
     public $act;
 
     /**
      * 构造函数
      *
-     * @param mixed $act
+     * @param mixed $act 无效的 ACT 配置
      */
     public function __construct($act)
     {

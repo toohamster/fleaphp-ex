@@ -2,31 +2,38 @@
 
 namespace FLEA\Exception;
 
+/**
+ * 预期的类不存在异常
+ *
+ * 当指定的类不存在时抛出此异常。
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ */
 class ExpectedClass extends \FLEA\Exception
 {
     /**
-     * 类名称
-     * @var string
+     * @var string 预期的类名称
      */
     public $className;
 
     /**
-     * 类定义文件
-     * @var string
+     * @var string 预期的类定义文件路径
      */
     public $classFile;
 
     /**
-     * 指示文件是否存在
-     * @var boolean
+     * @var bool 文件是否存在
      */
     public $fileExists;
 
     /**
      * 构造函数
-     * @param string $className
-     * @param string $file
-     * @param boolean $fileExists
+     *
+     * @param string      $className  预期的类名
+     * @param string|null $file       类文件路径（可选）
+     * @param bool        $fileExists 文件是否存在
      */
     public function __construct(string $className, ?string $file = null, bool $fileExists = false)
     {

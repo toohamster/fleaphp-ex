@@ -2,23 +2,32 @@
 
 namespace FLEA\Exception;
 
+/**
+ * 文件操作异常
+ *
+ * 当文件操作失败时抛出此异常。
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ */
 class FileOperation extends \FLEA\Exception
 {
     /**
-     * 正在进行的文件操作
-     * @var string
+     * @var string 正在进行的文件操作
      */
     public $operation;
 
     /**
-     * 操作的参数
-     * @var array
+     * @var array 操作的参数
      */
     public $args;
 
     /**
      * 构造函数
-     * @param string $opeation
+     *
+     * @param string $operation 文件操作名称
+     * @param mixed  ...$args  操作参数
      */
     public function __construct(string $opeation)
     {

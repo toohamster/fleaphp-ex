@@ -3,8 +3,13 @@
 namespace FLEA\Db\Exception;
 
 /**
- * \FLEA\Db\Exception\MissingDSN 异常指示没有提供连接数据库需要的 dbDSN 应用程序设置
+ * MissingDSN 异常
  *
+ * 指示没有提供连接数据库需要的 dbDSN 应用程序设置。
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
  */
 class MissingDSN extends \FLEA\Exception
 {

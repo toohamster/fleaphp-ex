@@ -2,52 +2,77 @@
 
 namespace FLEA\View;
 
+/**
+ * 简单视图引擎（PHP 原生模板）
+ *
+ * 使用 PHP 原生语法作为模板语言，支持模板缓存功能。
+ *
+ * 主要功能：
+ * - 模板变量分配（assign）
+ * - 模板渲染输出（display/fetch）
+ * - 模板缓存（可开关）
+ * - 缓存管理
+ *
+ * 用法示例：
+ * ```php
+ * // 创建视图对象
+ * $view = new \FLEA\View\Simple('/path/to/templates');
+ *
+ * // 分配变量
+ * $view->assign('title', '页面标题');
+ * $view->assign(['name' => 'John', 'age' => 30]);
+ *
+ * // 渲染并输出
+ * $view->display('index.php');
+ *
+ * // 获取渲染内容（不输出）
+ * $content = $view->fetch('index.php');
+ *
+ * // 带缓存渲染
+ * $content = $view->fetch('index.php', 'cache_key_123');
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ * @see     \FLEA\View\ViewInterface
+ */
 class Simple implements ViewInterface
 {
     /**
-     * 模板文件所在路径
-     * @var string
+     * @var string|null 模板文件所在目录
      */
     public ?string $templateDir = null;
 
     /**
-     * 缓存过期时间
-     * @access public
-     * @var int
+     * @var int 缓存有效期（秒），默认 900 秒（15 分钟）
      */
     public int $cacheLifetime;
 
     /**
-     * 指示是否使用 cache
-     * @access public
-     * @var boolean
+     * @var bool 是否启用缓存
      */
     public bool $enableCache;
 
     /**
-     * 缓存文件保存位置
-     * @access public
-     * @var string
+     * @var string 缓存文件目录
      */
     public string $cacheDir;
 
     /**
-     * 模板变量
-     * @access private
-     * @var array
+     * @var array 模板变量
      */
     public array $vars = [];
 
     /**
-     * 保存各个缓存内容的缓存状态
-     * @access private
-     * @var array
+     * @var array 缓存状态记录
      */
     public array $cacheState = [];
 
     /**
      * 构造函数
-     * @param string $path 模板文件所在路径
+     *
+     * @param string|null $templateDir 模板文件目录
      */
     public function __construct(?string $templateDir = null)
     {
@@ -72,9 +97,21 @@ class Simple implements ViewInterface
     }
 
     /**
-     * 设置模板变量
-     * @param mixed $name 模板变量名称
-     * @param mixed $value 变量内容
+     * 分配模板变量
+     *
+     * 用法示例：
+     * ```php
+     * // 分配单个变量
+     * $view->assign('title', '页面标题');
+     *
+     * // 分配多个变量
+     * $view->assign(['name' => 'John', 'age' => 30]);
+     * ```
+     *
+     * @param string|array $name  变量名或变量数组
+     * @param mixed        $value 变量值（当 $name 为字符串时有效）
+     *
+     * @return void
      */
     public function assign($name, $value = null): void
     {
@@ -86,10 +123,24 @@ class Simple implements ViewInterface
     }
 
     /**
-     * 构造模板输出内容
-     * @param string $file 模板文件名
-     * @param string $cacheId 缓存 ID，如果指定该值则会使用该内容的缓存输出
-     * @return string
+     * 获取渲染后的内容
+     *
+     * 渲染模板文件并返回内容，支持缓存功能。
+     * 指定 $cacheId 时会使用缓存，避免重复渲染。
+     *
+     * 用法示例：
+     * ```php
+     * // 渲染模板
+     * $content = $view->fetch('index.php');
+     *
+     * // 使用缓存
+     * $content = $view->fetch('index.php', 'home_page');
+     * ```
+     *
+     * @param string      $file    模板文件名
+     * @param string|null $cacheId 缓存 ID（可选，用于缓存视图内容）
+     *
+     * @return string 渲染后的 HTML 内容
      */
     public function fetch(string $file, ?string $cacheId = null): string
     {
@@ -117,9 +168,23 @@ class Simple implements ViewInterface
     }
 
     /**
-     * 显示指定模版的内容
-     * @param string $file 模板文件名
-     * @param string $cacheId 缓存 ID，如果指定该值则会使用该内容的缓存输出
+     * 显示视图
+     *
+     * 渲染模板并输出到浏览器。
+     *
+     * 用法示例：
+     * ```php
+     * // 直接输出
+     * $view->display('index.php');
+     *
+     * // 使用缓存
+     * $view->display('index.php', 'home_page');
+     * ```
+     *
+     * @param string      $file    模板文件名
+     * @param string|null $cacheId 缓存 ID（可选）
+     *
+     * @return void
      */
     public function display(string $file, ?string $cacheId = null): void
     {
@@ -127,10 +192,14 @@ class Simple implements ViewInterface
     }
 
     /**
-     * 检查内容是否已经被缓存
-     * @param string $file 模板文件名
-     * @param string $cacheId 缓存 ID
-     * @return boolean
+     * 检查缓存是否有效
+     *
+     * 判断指定模板和缓存 ID 的内容是否已缓存且未过期。
+     *
+     * @param string      $file    模板文件名
+     * @param string|null $cacheId 缓存 ID
+     *
+     * @return bool 缓存有效返回 true，否则返回 false
      */
     public function isCached(string $file, ?string $cacheId = null): bool
     {
@@ -160,9 +229,12 @@ class Simple implements ViewInterface
     }
 
     /**
-     * 清除指定的缓存
-     * @param string $file 模板资源名
-     * @param string $cacheId 缓存 ID
+     * 清除指定缓存
+     *
+     * @param string      $file    模板文件名
+     * @param string|null $cacheId 缓存 ID
+     *
+     * @return void
      */
     public function cleanCache(string $file, ?string $cacheId = null): void
     {
@@ -171,6 +243,8 @@ class Simple implements ViewInterface
 
     /**
      * 清除所有缓存
+     *
+     * @return void
      */
     public function cleanAllCache(): void
     {
@@ -180,10 +254,12 @@ class Simple implements ViewInterface
     }
 
     /**
-     * 返回缓存文件名
-     * @param string $file
-     * @param string $cacheId
-     * @return string
+     * 获取缓存文件路径
+     *
+     * @param string      $file    模板文件名
+     * @param string|null $cacheId 缓存 ID
+     *
+     * @return string 缓存文件完整路径
      */
     protected function _getCacheFile(string $file, ?string $cacheId = null): string
     {

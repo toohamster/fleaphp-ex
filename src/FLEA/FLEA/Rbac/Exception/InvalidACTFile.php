@@ -3,38 +3,38 @@
 namespace FLEA\Rbac\Exception;
 
 /**
- * \FLEA\Rbac\Exception\InvalidACTFile 异常指示控制器的 ACT 文件无效
+ * InvalidACTFile 异常
  *
+ * 指示控制器的 ACT 文件无效。
+ * 用于 RBAC 权限控制中 ACT 文件格式错误时的异常抛出。
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
  */
 class InvalidACTFile extends \FLEA\Exception
 {
     /**
-     * ACT 文件名
-     *
-     * @var string
+     * @var string ACT 文件路径
      */
     public $actFilename;
 
     /**
-     * 控制器名字
-     *
-     * @var string
+     * @var string 控制器名称
      */
     public $controllerName;
 
     /**
-     * 无效的 ACT 内容
-     *
-     * @var mixed
+     * @var mixed 无效的 ACT 内容
      */
     public $act;
 
     /**
      * 构造函数
      *
-     * @param string $actFilename
-     * @param string $controllerName
-     * @param mixed $act
+     * @param string      $actFilename    ACT 文件路径
+     * @param mixed       $act            ACT 内容
+     * @param string|null $controllerName 控制器名
      */
     public function __construct($actFilename, $act, $controllerName = null)
     {

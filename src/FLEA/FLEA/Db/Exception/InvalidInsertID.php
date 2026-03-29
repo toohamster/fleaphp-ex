@@ -3,8 +3,13 @@
 namespace FLEA\Db\Exception;
 
 /**
- * \FLEA\Db\Exception\InvalidInsertID 异常指示无法获取刚刚插入的记录的主键值
+ * InvalidInsertID 异常
  *
+ * 指示无法获取刚刚插入记录的主键值。
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
  */
 class InvalidInsertID extends \FLEA\Exception
 {

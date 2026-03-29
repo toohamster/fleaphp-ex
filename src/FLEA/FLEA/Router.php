@@ -5,71 +5,171 @@ namespace FLEA;
 /**
  * HTTP 路由器（支持路由级中间件）
  *
- * 用法：
- *   Router::get('/users', 'UserController@index');
- *   Router::post('/users', 'UserController@store', [new AuthMiddleware()]);
- *   Router::get('/users/{id:\d+}', 'UserController@show');
+ * 提供 RESTful 路由、路由分组、命名路由、中间件支持等功能。
  *
- *   Router::group('/admin', function() {
- *       Router::get('/stats', 'AdminController@stats');
- *   }, [new AuthMiddleware(), new RateLimitMiddleware()]);
+ * 支持的路由方法：
+ * - get/post/put/patch/delete：注册指定 HTTP 方法的路由
+ * - any：注册所有 HTTP 方法的路由
+ * - group：路由分组，支持前缀和共享中间件
  *
- *   Router::dispatch();
- *   FLEA::runMVC();
+ * 用法示例：
+ * ```php
+ * // 基础路由
+ * Router::get('/users', 'UserController@index');
+ * Router::post('/users', 'UserController@store', [new AuthMiddleware()]);
+ * Router::get('/users/{id:\d+}', 'UserController@show');
  *
+ * // 路由分组
+ * Router::group('/admin', function() {
+ *     Router::get('/stats', 'AdminController@stats');
+ *     Router::get('/users', 'AdminController@users');
+ * }, [new AuthMiddleware(), new RateLimitMiddleware()]);
+ *
+ * // 命名路由
+ * Router::get('/users/{id}', 'UserController@show')->name('user.show');
+ * $url = Router::urlFor('user.show', ['id' => 123]);
+ *
+ * // 分发路由
+ * Router::dispatch();
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ * @see     \FLEA\Route
+ * @see     \FLEA\Middleware\MiddlewareInterface
  */
 class Router
 {
-    /** @var string Controller 参数键名 */
+    /**
+     * @var string Controller 参数键名
+     */
     public const CONTROLLER_KEY = 'controller';
 
-    /** @var string Action 参数键名 */
+    /**
+     * @var string Action 参数键名
+     */
     public const ACTION_KEY = 'action';
 
-    /** @var array[] 已注册的路由 */
+    /**
+     * @var array[] 已注册的路由数组
+     */
     private static array $routes = [];
 
-    /** @var array<string, array> 命名路由索引 name => route */
+    /**
+     * @var array<string, array> 命名路由索引（name => route）
+     */
     private static array $namedRoutes = [];
 
-    /** @var string 当前分组前缀 */
+    /**
+     * @var string 当前路由分组前缀
+     */
     private static string $prefix = '';
 
-    /** @var \FLEA\Middleware\MiddlewareInterface[] 当前分组中间件 */
+    /**
+     * @var \FLEA\Middleware\MiddlewareInterface[] 当前分组中间件栈
+     */
     private static array $groupMiddlewares = [];
 
-    /** @var \FLEA\Middleware\MiddlewareInterface[] 当前请求匹配到的路由中间件 */
+    /**
+     * @var \FLEA\Middleware\MiddlewareInterface[] 当前请求匹配到的路由中间件
+     */
     private static array $matchedMiddlewares = [];
 
     // -------------------------------------------------------------------------
     // 路由注册
     // -------------------------------------------------------------------------
 
+    /**
+     * 注册 GET 路由
+     *
+     * 用法示例：
+     * ```php
+     * Router::get('/users', 'UserController@index');
+     * Router::get('/users/{id}', 'UserController@show')->name('user.show');
+     * ```
+     *
+     * @param string $path        路由路径（支持参数如 {id:\d+}）
+     * @param string $handler     处理器（格式：Controller@action）
+     * @param array  $middlewares 中间件数组
+     *
+     * @return \FLEA\Route Route 对象（可用于链式调用 name()）
+     */
     public static function get(string $path, string $handler, array $middlewares = []): \FLEA\Route
     {
         return self::add('GET', $path, $handler, $middlewares);
     }
 
+    /**
+     * 注册 POST 路由
+     *
+     * 用法示例：
+     * ```php
+     * Router::post('/users', 'UserController@store', [new AuthMiddleware()]);
+     * ```
+     *
+     * @param string $path        路由路径
+     * @param string $handler     处理器
+     * @param array  $middlewares 中间件数组
+     *
+     * @return \FLEA\Route Route 对象
+     */
     public static function post(string $path, string $handler, array $middlewares = []): \FLEA\Route
     {
         return self::add('POST', $path, $handler, $middlewares);
     }
 
+    /**
+     * 注册 PUT 路由
+     *
+     * @param string $path        路由路径
+     * @param string $handler     处理器
+     * @param array  $middlewares 中间件数组
+     *
+     * @return \FLEA\Route Route 对象
+     */
     public static function put(string $path, string $handler, array $middlewares = []): \FLEA\Route
     {
         return self::add('PUT', $path, $handler, $middlewares);
     }
 
+    /**
+     * 注册 PATCH 路由
+     *
+     * @param string $path        路由路径
+     * @param string $handler     处理器
+     * @param array  $middlewares 中间件数组
+     *
+     * @return \FLEA\Route Route 对象
+     */
     public static function patch(string $path, string $handler, array $middlewares = []): \FLEA\Route
     {
         return self::add('PATCH', $path, $handler, $middlewares);
     }
 
+    /**
+     * 注册 DELETE 路由
+     *
+     * @param string $path        路由路径
+     * @param string $handler     处理器
+     * @param array  $middlewares 中间件数组
+     *
+     * @return \FLEA\Route Route 对象
+     */
     public static function delete(string $path, string $handler, array $middlewares = []): \FLEA\Route
     {
         return self::add('DELETE', $path, $handler, $middlewares);
     }
 
+    /**
+     * 注册任意 HTTP 方法的路由（GET/POST/PUT/PATCH/DELETE）
+     *
+     * @param string $path        路由路径
+     * @param string $handler     处理器
+     * @param array  $middlewares 中间件数组
+     *
+     * @return \FLEA\Route Route 对象
+     */
     public static function any(string $path, string $handler, array $middlewares = []): \FLEA\Route
     {
         $route = null;
@@ -80,7 +180,23 @@ class Router
     }
 
     /**
-     * @param array $middlewares 该分组所有路由共享的中间件
+     * 注册路由分组
+     *
+     * 分组内的所有路由会共享相同的路径前缀和中间件。
+     *
+     * 用法示例：
+     * ```php
+     * Router::group('/admin', function() {
+     *     Router::get('/stats', 'AdminController@stats');
+     *     Router::get('/users', 'AdminController@users');
+     * }, [new AuthMiddleware()]);
+     * ```
+     *
+     * @param string   $prefix      路由分组前缀
+     * @param callable $callback    分组路由定义回调函数
+     * @param array    $middlewares 该分组所有路由共享的中间件
+     *
+     * @return void
      */
     public static function group(string $prefix, callable $callback, array $middlewares = []): void
     {
@@ -96,6 +212,16 @@ class Router
         self::$groupMiddlewares = $prevMiddlewares;
     }
 
+    /**
+     * 添加路由到路由表
+     *
+     * @param string $method      HTTP 方法
+     * @param string $path        路由路径
+     * @param string $handler     处理器
+     * @param array  $middlewares 中间件数组
+     *
+     * @return \FLEA\Route Route 对象
+     */
     private static function add(string $method, string $path, string $handler, array $middlewares): \FLEA\Route
     {
         $path = self::$prefix . '/' . ltrim($path, '/');
@@ -109,9 +235,24 @@ class Router
     /**
      * 根据命名路由生成 URL
      *
-     * @param string $name 路由名称
-     * @param array $params 路径参数
-     * @throws \InvalidArgumentException
+     * 将命名路由的路径模板中的参数替换为实际值，生成完整 URL。
+     *
+     * 用法示例：
+     * ```php
+     * // 定义命名路由
+     * Router::get('/users/{id}', 'UserController@show')->name('user.show');
+     *
+     * // 生成 URL
+     * $url = Router::urlFor('user.show', ['id' => 123]);
+     * // 返回：/users/123
+     * ```
+     *
+     * @param string $name   路由名称
+     * @param array  $params 路径参数数组
+     *
+     * @return string 生成的 URL
+     *
+     * @throws \InvalidArgumentException 当命名路由不存在或参数缺失时抛出
      */
     public static function urlFor(string $name, array $params = []): string
     {
@@ -137,8 +278,21 @@ class Router
     // -------------------------------------------------------------------------
 
     /**
-     * 匹配当前请求，命中则注入 $_GET 并返回 true，否则返回 false
-     * 匹配到的路由中间件可通过 Router::getMatchedMiddlewares() 获取
+     * 匹配当前请求
+     *
+     * 根据请求方法和 URI 匹配路由表中的路由。命中时将参数注入 $_GET，
+     * 并返回 true。匹配到的路由中间件可通过 getMatchedMiddlewares() 获取。
+     *
+     * 用法示例：
+     * ```php
+     * if (Router::dispatch()) {
+     *     // 路由匹配成功，执行中间件和控制器
+     * } else {
+     *     // 路由未匹配，返回 404
+     * }
+     * ```
+     *
+     * @return bool 请求是否匹配成功
      */
     public static function dispatch(): bool
     {
@@ -177,7 +331,11 @@ class Router
 
     /**
      * 解析当前请求的路径
-     * 自动兼容 URL_REWRITE、URL_PATHINFO、URL_STANDARD 三种模式
+     *
+     * 自动兼容 URL_REWRITE、URL_PATHINFO、URL_STANDARD 三种模式。
+     * 根据配置的 urlScriptName 判断环境，从 PATH_INFO 或 REQUEST_URI 获取路径。
+     *
+     * @return string 解析后的 URI 路径
      */
     private static function resolveUri(): string
     {
@@ -195,15 +353,26 @@ class Router
     }
 
     /**
-     * 返回当前请求匹配到的路由级中间件
+     * 获取当前请求匹配到的路由中间件
      *
-     * @return \FLEA\Middleware\MiddlewareInterface[]
+     * @return \FLEA\Middleware\MiddlewareInterface[] 中间件数组
      */
     public static function getMatchedMiddlewares(): array
     {
         return self::$matchedMiddlewares;
     }
 
+    /**
+     * 匹配 URI 与路由模式
+     *
+     * 将路由路径模式中的 {param} 占位符转换为正则表达式，
+     * 匹配 URI 并提取路径参数。
+     *
+     * @param string $pattern 路由模式（如 /users/{id:\d+}）
+     * @param string $uri     请求 URI
+     *
+     * @return array|null 匹配成功返回参数数组，失败返回 null
+     */
     private static function match(string $pattern, string $uri): ?array
     {
         $regex = preg_replace_callback('/\{(\w+)(?::([^}]+))?\}/', function($m) {
@@ -217,6 +386,11 @@ class Router
         return array_filter($matches, fn($k) => is_string($k), ARRAY_FILTER_USE_KEY);
     }
 
+    /**
+     * 获取所有已注册的路由
+     *
+     * @return array 路由数组
+     */
     public static function routes(): array
     {
         return self::$routes;
@@ -224,6 +398,14 @@ class Router
 
     /**
      * 注册兜底路由（如果开发者未定义）
+     *
+     * 检查路由表中是否已有通配符路由或根路由，
+     * 若无则注册默认的兜底路由规则。
+     *
+     * @param string $defaultController 默认控制器名（不含 Controller 后缀）
+     * @param string $defaultAction     默认 Action 名
+     *
+     * @return void
      */
     public static function registerFallback(string $defaultController, string $defaultAction): void
     {

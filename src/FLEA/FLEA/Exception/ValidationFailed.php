@@ -2,24 +2,32 @@
 
 namespace FLEA\Exception;
 
+/**
+ * 验证失败异常
+ *
+ * 当数据验证失败时抛出此异常。
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ */
 class ValidationFailed extends \FLEA\Exception
 {
     /**
-     * 被验证的数据
-     * @var mixed
+     * @var mixed 被验证的数据
      */
     public $data;
 
     /**
-     * 验证结果
-     * @var array
+     * @var array 验证结果（错误信息数组）
      */
     public $result;
 
     /**
      * 构造函数
-     * @param array $result
-     * @param mixed $data
+     *
+     * @param array $result 验证结果（错误信息数组）
+     * @param mixed $data   被验证的数据
      */
     public function __construct(array $result, $data = null)
     {

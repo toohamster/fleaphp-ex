@@ -3,17 +3,25 @@
 namespace FLEA\Db\Exception;
 
 /**
- * \FLEA\Db\Exception\InvalidLinkType 异常指示无效的数据表关联类型
+ * InvalidLinkType 异常
  *
+ * 指示无效的数据表关联类型。
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
  */
 class InvalidLinkType extends \FLEA\Exception
 {
+    /**
+     * @var mixed 无效的关联类型
+     */
     public $type;
 
     /**
      * 构造函数
      *
-     * @param $type
+     * @param mixed $type 无效的关联类型
      */
     public function __construct($type)
     {

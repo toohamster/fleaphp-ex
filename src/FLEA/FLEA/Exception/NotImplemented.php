@@ -2,15 +2,32 @@
 
 namespace FLEA\Exception;
 
+/**
+ * 方法未实现异常
+ *
+ * 当调用的方法尚未实现时抛出此异常。
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ */
 class NotImplemented extends \FLEA\Exception
 {
+    /**
+     * @var string 类名称
+     */
     public $className;
+
+    /**
+     * @var string 方法名称
+     */
     public $methodName;
 
     /**
      * 构造函数
-     * @param string $method
-     * @param string $class
+     *
+     * @param string $method 方法名
+     * @param string $class  类名（可选）
      */
     public function __construct(string $method, string $class = '')
     {

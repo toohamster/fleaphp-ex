@@ -2,51 +2,56 @@
 
 namespace FLEA\Exception;
 
+/**
+ * 缺少 Action 异常
+ *
+ * 当控制器的 Action 方法不存在时抛出此异常。
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ */
 class MissingAction extends \FLEA\Exception
 {
     /**
-     * 控制器的名字
-     * @var string
+     * @var string 控制器名称
      */
     public $controllerName;
 
     /**
-     * 控制器类名称
-     * @var string
+     * @var string 控制器类名称
      */
     public $controllerClass;
 
     /**
-     * 动作名
-     * @var string
+     * @var string 动作名
      */
     public $actionName;
 
     /**
-     * 动作方法名
-     * @var string
+     * @var string 动作方法名
      */
     public $actionMethod;
 
     /**
-     * 调用参数
-     * @var mixed
+     * @var mixed 调用参数
      */
     public $arguments;
 
     /**
-     * 控制器的类定义文件
-     * @var string
+     * @var string 控制器的类定义文件
      */
     public $controllerClassFilename;
 
     /**
      * 构造函数
-     * @param string $controllerName
-     * @param string $actionName
-     * @param mixed $arguments
-     * @param string $controllerClass
-     * @param string $actionMethod
+     *
+     * @param string      $controllerName          控制器名
+     * @param string      $actionName              动作名
+     * @param mixed       $arguments               调用参数
+     * @param string|null $controllerClass         控制器类名
+     * @param string|null $actionMethod            动作方法名
+     * @param string|null $controllerClassFilename 控制器类文件路径
      */
     public function __construct(string $controllerName, string $actionName, $arguments = null, ?string $controllerClass = null, ?string $actionMethod = null, ?string $controllerClassFilename = null)
     {
