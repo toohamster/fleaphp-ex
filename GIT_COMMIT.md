@@ -4,6 +4,22 @@
 
 ---
 
+### docs: 为 Db 层核心类添加完整 PHPDoc 文档注释
+
+**修改文件：**
+- src/FLEA/FLEA/Db/SqlStatement.php - SQL 语句封装类
+- src/FLEA/FLEA/Db/SqlHelper.php - SQL 辅助类
+- src/FLEA/FLEA/Db/TableLink.php - 表关联定义类
+- src/FLEA/FLEA/Db/Driver/Mysql.php - MySQL 数据库驱动
+
+**主要改进：**
+- 完整的类级别文档注释（功能说明、用法示例）
+- 属性文档注释（@var）
+- 方法文档注释（@param, @return, @throws）
+- 用法示例代码
+
+---
+
 ### feat: 引入 .env 多环境配置支持
 
 **配置架构重构（四层配置，优先级从高到低）：**
