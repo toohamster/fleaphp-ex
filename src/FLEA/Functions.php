@@ -8,6 +8,44 @@
  */
 
 /**
+ * 获取环境变量值
+ *
+ * @param string $key 变量名
+ * @param mixed $default 默认值
+ * @return mixed
+ */
+function env(string $key, $default = null)
+{
+    $value = $_ENV[$key] ?? $_SERVER[$key] ?? getenv($key);
+    if ($value === false) {
+        return $default;
+    }
+
+    // 类型转换
+    switch (strtolower($value)) {
+        case 'true':
+        case '(true)':
+            return true;
+        case 'false':
+        case '(false)':
+            return false;
+        case 'empty':
+        case '(empty)':
+            return '';
+        case 'null':
+        case '(null)':
+            return null;
+    }
+
+    // 检测数字
+    if (is_numeric($value)) {
+        return (float) $value;
+    }
+
+    return $value;
+}
+
+/**
  * 追加日志记录
  *
  * @param mixed  $msg
@@ -147,7 +185,7 @@ function __FLEA_EXCEPTION_HANDLER(\Throwable $ex): void
             }
         }
         $payload = ['error' => $ex->getMessage(), 'code' => $ex->getCode()];
-        if (DEBUG_MODE) {
+        if (!\FLEA\Env::isProd()) {
             $payload['exception'] = get_class($ex);
             $payload['file']      = $ex->getFile();
             $payload['line']      = $ex->getLine();
@@ -159,7 +197,7 @@ function __FLEA_EXCEPTION_HANDLER(\Throwable $ex): void
 
     if (!FLEA::getAppInf('displayErrors')) { exit; }
 
-    if (DEBUG_MODE) {
+    if (!\FLEA\Env::isProd()) {
         if (!headers_sent()) {
             http_response_code(500);
             header('Content-Type: text/html; charset=utf-8');
@@ -183,7 +221,7 @@ function print_ex(\Throwable $ex, bool $return = false): ?string
     if ($ex->getMessage() != '') {
         $out .= " with message '" . $ex->getMessage() . "'";
     }
-    if (defined('DEPLOY_MODE') && DEPLOY_MODE != false) {
+    if (\FLEA\Env::isProd()) {
         $out .= ' in ' . basename($ex->getFile()) . ':' . $ex->getLine() . "\n\n";
     } else {
         $out .= ' in ' . $ex->getFile() . ':' . $ex->getLine() . "\n\n";

@@ -4,6 +4,14 @@
 
 ---
 
+### docs: 移动博客相关文档到 demo/ 并更新 CLAUDE.md
+
+- blog.sql → demo/blog.sql
+- BLOG_SETUP.md → demo/BLOG_SETUP.md
+- 更新 CLAUDE.md 中的数据库初始化命令和服务器启动命令
+
+---
+
 ### refactor: 重构为标准 PHP 框架目录结构 (v2.0)
 
 重大结构调整，将框架与演示应用完全分离：

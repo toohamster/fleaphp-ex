@@ -84,12 +84,20 @@ class Env
     }
 
     /**
-     * 检测是否为开发环境
+     * 检测当前是否为指定环境
+     *
+     * 用法：
+     *   Env::isEnv('production')  // 是否生产环境
+     *   Env::isEnv('development') // 是否开发环境
+     *   Env::isEnv('test')        // 是否测试环境
+     *
+     * @param string $env 环境名称，如 'production', 'development', 'test'
+     * @return bool
      */
-    public static function isDev(): bool
+    public static function isEnv(string $env): bool
     {
-        return self::check('is_dev', function() {
-            return defined('DEBUG_MODE') && DEBUG_MODE === true;
+        return self::check('is_env_' . $env, function() use ($env) {
+            return env('APP_ENV') === $env;
         });
     }
 
@@ -98,9 +106,7 @@ class Env
      */
     public static function isProd(): bool
     {
-        return self::check('is_prod', function() {
-            return defined('DEPLOY_MODE') && DEPLOY_MODE === true;
-        });
+        return self::isEnv('production');
     }
 
     /**

@@ -2,8 +2,11 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+// 加载 .env 环境变量（必须指定完整路径）
+\FLEA::loadEnv(__DIR__ . '/../.env');
+
 // 自动注册 App 命名空间
-class_loader()->addPsr4('App\\', __DIR__ . '/../App/');
+class_loader()->addPsr4('FleaPhpDemo\\', __DIR__ . '/../App/');
 
 // 加载配置
 \FLEA::loadAppInf(__DIR__ . '/../App/Config.php');

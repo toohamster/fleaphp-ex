@@ -1,13 +1,12 @@
 #!/usr/bin/env php
 <?php
 /**
- * FleaPHP 开发服务器启动脚本
+ * FLEA PHP 开发服务器启动脚本
  *
  * 用法：
- *   php bin/serve                          # 运行当前目录项目
- *   php bin/serve --project-dir=demo       # 运行 demo
- *   php bin/serve --project-dir=/path/to/app  # 运行指定项目
- *   php bin/serve --host=0.0.0.0 --port=8080
+ *   php bin/flea-cli                        # 运行当前目录项目
+ *   php bin/flea-cli --project-dir=/path    # 运行指定项目
+ *   php bin/flea-cli --host=0.0.0.0 --port=8080
  */
 
 $host = '127.0.0.1';
@@ -28,15 +27,9 @@ for ($i = 1; $i < $argc; $i++) {
     }
 }
 
-// 如果没有指定项目目录，尝试智能选择
+// 默认使用当前工作目录
 if ($projectDir === null) {
-    // 优先使用 demo（如果存在）
-    if (is_dir(__DIR__ . '/../demo')) {
-        $projectDir = __DIR__ . '/../demo';
-    } else {
-        // 否则使用当前工作目录
-        $projectDir = getcwd();
-    }
+    $projectDir = getcwd();
 } else {
     // 如果是相对路径，相对于当前目录
     if (!str_starts_with($projectDir, '/')) {

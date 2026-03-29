@@ -1,17 +1,13 @@
 <?php
 
-return [
-    // 数据库配置
-    'dbDSN' => [
-        'driver' => 'mysql',
-        'host' => '127.0.0.1',
-        'port' => '3306',
-        'login' => 'root',
-        'password' => '11111111',
-        'database' => 'blog',
-        'charset' => 'utf8mb4',
-    ],
+/**
+ * 演示应用配置
+ *
+ * 框架默认配置已在 FLEA\Config\Defaults 中定义
+ * 此处仅覆盖 demo 应用特有的配置
+ */
 
+return [
     // 控制器配置
     'defaultController' => 'Post',
     'defaultAction' => 'index',
@@ -21,11 +17,6 @@ return [
     'urlMode' => URL_ROUTER,
     'urlScriptName' => '',
     'urlLowerChar' => false,
-
-    // 日志配置
-    'logEnabled' => true,
-    'logProvider' => null,
-    'logFilename' => 'app.log',
 
     // 调度器
     'dispatcher' => \FLEA\Dispatcher\Simple::class,
@@ -40,19 +31,11 @@ return [
     ],
 
     // 错误显示（开发环境）
-    'displayErrors' => true,
+    'displayErrors' => env('APP_DEBUG', true),
     'friendlyErrorsMessage' => true,
     'displaySource' => true,
-
-    // 缓存配置
-    'cacheProvider' => \FLEA\Cache\FileCache::class,
-    'internalCacheDir' => __DIR__ . '/../../cache',
 
     // Session 配置
     'sessionProvider' => null,
     'autoSessionStart' => false,
-
-    // JWT 配置（如使用 API）
-    'jwtSecret' => 'change-me-to-a-secure-secret',
-    'jwtTtl' => 7200,
 ];

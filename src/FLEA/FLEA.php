@@ -25,17 +25,49 @@ use FLEA\Container;
 use FLEA\Database;
 use FLEA\Cache;
 
-if (!defined('DEPLOY_MODE') || DEPLOY_MODE != true) {
-    Config::getInstance()->mergeAppInf(require(FLEA_DIR . '/Config/DEBUG_MODE_CONFIG.php'));
-    define('DEBUG_MODE', true);
-    if (!defined('DEPLOY_MODE')) { define('DEPLOY_MODE', false); }
-} else {
-    Config::getInstance()->mergeAppInf(require(FLEA_DIR . '/Config/DEPLOY_MODE_CONFIG.php'));
-    define('DEBUG_MODE', false);
-}
-
 class FLEA
 {
+    private static bool $envLoaded = false;
+
+    /**
+     * 加载 .env 环境变量文件
+     *
+     * 用法：\FLEA::loadEnv(__DIR__ . '/../.env');
+     *
+     * 支持多环境文件：
+     * - 加载基础 .env 后，根据 APP_ENV 自动加载 .env.{APP_ENV}
+     * - 例如：APP_ENV=production 时，自动加载 .env.production 覆盖
+     *
+     * @param string $path .env 文件的完整路径
+     * @return void
+     * @throws \Exception 当 .env 文件不存在时抛出异常
+     */
+    public static function loadEnv(string $path): void
+    {
+        if (self::$envLoaded) return;
+
+        // 1. 验证文件存在
+        if (!is_file($path)) {
+            throw new \Exception(".env file not found: {$path}");
+        }
+
+        // 2. 加载基础 .env
+        $dotenv = \Dotenv\Dotenv::createImmutable(dirname($path));
+        $dotenv->safeLoad();
+
+        // 3. 读取 APP_ENV，加载对应环境文件
+        $appEnv = $_ENV['APP_ENV'] ?? 'local';
+        $envFile = dirname($path) . '/.env.' . $appEnv;
+        if (is_file($envFile)) {
+            $dotenv = \Dotenv\Dotenv::createImmutable(dirname($path), '.env.' . $appEnv);
+            $dotenv->safeLoad();  // 覆盖已有变量
+        }
+
+        // 4. 设置环境变量（不再定义常量，推荐使用 Env::isProd()）
+        // 如需判断环境，使用：\FLEA\Env::isProd() 或 \FLEA\Env::isEnv('production')
+
+        self::$envLoaded = true;
+    }
     // 配置
 
     public static function loadAppInf($config = null): void
