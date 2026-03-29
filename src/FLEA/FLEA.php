@@ -436,41 +436,7 @@ class FLEA
     }
 
     // =========================================================================
-    // 辅助功能
-    // =========================================================================
-
-    /**
-     * 加载辅助类
-     *
-     * 根据配置中定义的辅助类名称动态加载。
-     * 辅助类配置格式：`'helper.helpername' => 'ClassName'`
-     *
-     * 用法示例：
-     * ```php
-     * // 假设配置中定义了 'helper.upload' => 'FileUploader'
-     * \FLEA::loadHelper('upload');
-     * ```
-     *
-     * @param string $helperName 辅助类名称（不包含前缀）
-     *
-     * @return void
-     *
-     * @throws \FLEA\Exception\NotExistsKeyName 辅助类配置不存在时抛出
-     * @throws \FLEA\Exception\ExpectedClass    辅助类不存在时抛出
-     *
-     * @see    \FLEA::getAppInf()
-     */
-    public static function loadHelper(string $helperName): void
-    {
-        $setting = self::getAppInf('helper.' . strtolower($helperName));
-        if (!$setting) {
-            throw new \FLEA\Exception\NotExistsKeyName('helper.' . $helperName);
-        }
-        if (!class_exists($setting, true)) {
-            throw new \FLEA\Exception\ExpectedClass($setting);
-        }
-    }
-
+    // 中间件管理
     // =========================================================================
     // 中间件管理
     // =========================================================================
@@ -505,6 +471,69 @@ class FLEA
     // =========================================================================
     // MVC 启动
     // =========================================================================
+
+    /**
+     * 绑定 Context 到容器
+     *
+     * 根据配置自动创建 Context 实例并绑定到容器。
+     * 支持多种驱动（Session/Redis/File）和身份标识（Session/JWT/API Key/Request ID）。
+     *
+     * @return void
+     */
+    private static function bindContextToContainer(): void
+    {
+        $driverName = self::getAppInf('contextDriver') ?: 'session';
+        $identityName = self::getAppInf('contextIdentity') ?: 'session';
+
+        // 创建驱动实例
+        switch ($driverName) {
+            case 'redis':
+                $driver = new \FLEA\Context\Driver\RedisDriver(
+                    self::getAppInf('context.redis') ?? []
+                );
+                break;
+            case 'file':
+                $driver = new \FLEA\Context\Driver\FileDriver(
+                    self::getAppInf('context.file.path') ?? ''
+                );
+                break;
+            case 'database':
+                $driver = new \FLEA\Context\Driver\DatabaseSessionDriver(
+                    self::getAppInf('context.database') ?? []
+                );
+                break;
+            case 'session':
+            default:
+                $driver = new \FLEA\Context\Driver\SessionDriver();
+        }
+
+        // 创建身份标识实例
+        switch ($identityName) {
+            case 'jwt':
+                $identity = new \FLEA\Context\Identity\JwtIdentity(
+                    self::getAppInf('jwt.secret') ?? ''
+                );
+                break;
+            case 'api-key':
+                $identity = new \FLEA\Context\Identity\ApiKeyIdentity(
+                    self::getAppInf('context.apiKey.header') ?? 'X-API-Key'
+                );
+                break;
+            case 'request-id':
+                $identity = new \FLEA\Context\Identity\RequestIdIdentity(
+                    self::getAppInf('context.requestId.header') ?? 'X-Request-ID'
+                );
+                break;
+            case 'session':
+            default:
+                $identity = new \FLEA\Context\Identity\SessionIdentity();
+        }
+
+        // 创建 Context 实例并绑定到容器
+        $context = new \FLEA\Context\Context($driver, $identity);
+        $container = self::getSingleton(\FLEA\Container::class);
+        $container->set(\FLEA\Context\Context::class, $context);
+    }
 
     /**
      * 启动 MVC 应用
@@ -623,12 +652,8 @@ class FLEA
             if (file_exists($file)) { require_once($file); }
         }
 
-        if (self::getAppInf('sessionProvider')) {
-            self::getSingleton(self::getAppInf('sessionProvider'));
-        }
-        if (self::getAppInf('autoSessionStart')) {
-            session_start();
-        }
+        // 自动绑定 Context 到容器（如果配置了 contextDriver）
+        self::bindContextToContainer();
 
         define('RESPONSE_CHARSET', self::getAppInf('responseCharset'));
         define('DATABASE_CHARSET', self::getAppInf('databaseCharset'));

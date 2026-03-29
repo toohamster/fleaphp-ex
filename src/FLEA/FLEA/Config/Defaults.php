@@ -84,6 +84,34 @@ class Defaults
             'sessionName' => 'FLEA_SESSION',
             'sessionLifetime' => (int) env('SESSION_LIFETIME', 120),
 
+            // Context（请求上下文存储）
+            'contextDriver' => env('CONTEXT_DRIVER', 'session'),  // session/redis/file/database
+            'contextIdentity' => env('CONTEXT_IDENTITY', 'session'),  // session/jwt/api-key/request-id
+            'context' => [
+                'redis' => [
+                    'host' => env('CONTEXT_REDIS_HOST', '127.0.0.1'),
+                    'port' => (int) env('CONTEXT_REDIS_PORT', 6379),
+                    'password' => env('CONTEXT_REDIS_PASSWORD', ''),
+                    'prefix' => env('CONTEXT_REDIS_PREFIX', 'fleaphp:context:'),
+                ],
+                'file' => [
+                    'path' => env('CONTEXT_FILE_PATH', ''),
+                ],
+                'database' => [
+                    'tableName' => env('CONTEXT_DB_TABLE', 'contexts'),
+                    'fieldId' => env('CONTEXT_DB_FIELD_ID', 'context_id'),
+                    'fieldData' => env('CONTEXT_DB_FIELD_DATA', 'context_data'),
+                    'fieldActivity' => env('CONTEXT_DB_FIELD_ACTIVITY', 'activity'),
+                    'lifeTime' => (int) env('CONTEXT_DB_LIFETIME', 3600),
+                ],
+                'apiKey' => [
+                    'header' => env('CONTEXT_API_KEY_HEADER', 'X-API-Key'),
+                ],
+                'requestId' => [
+                    'header' => env('CONTEXT_REQUEST_ID_HEADER', 'X-Request-ID'),
+                ],
+            ],
+
             // 日志
             'logEnabled' => env('LOG_ENABLED', false),
             'logProvider' => null,

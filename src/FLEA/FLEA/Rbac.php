@@ -9,7 +9,7 @@ namespace FLEA;
  * 不包含用户管理和角色管理功能（由 UsersManager 和 RolesManager 提供）。
  *
  * 主要功能：
- * - 用户数据 Session 存储
+ * - 用户数据上下文存储（基于 Context 组件）
  * - 用户角色管理
  * - ACT 访问控制检查
  * - 角色验证（RBAC_HAS_ROLE/RBAC_NO_ROLE/RBAC_EVERYONE）
@@ -33,7 +33,7 @@ namespace FLEA;
  * ```php
  * $rbac = new Rbac();
  *
- * // 保存用户数据到 Session
+ * // 保存用户数据到上下文存储
  * $rbac->setUser(['user_id' => 1, 'username' => 'admin'], ['admin', 'editor']);
  *
  * // 检查权限
@@ -54,7 +54,7 @@ namespace FLEA;
 class Rbac
 {
     /**
-     * 指示在 session 中用什么名字保存用户的信息
+     * 指示在上下文存储中用什么名字保存用户的信息
      *
      * @var string
      */
@@ -79,7 +79,7 @@ class Rbac
     }
 
     /**
-     * 将用户数据保存到 session 中
+     * 将用户数据保存到上下文存储中
      *
      * @param array $userData
      * @param mixed $rolesData
@@ -89,25 +89,25 @@ class Rbac
         if ($rolesData) {
             $userData[$this->rolesKey] = $rolesData;
         }
-        $_SESSION[$this->sessionKey] = $userData;
+        flea_context()->set($this->sessionKey, $userData);
     }
 
     /**
-     * 获取保存在 session 中的用户数据
+     * 获取保存在上下文存储中的用户数据
      *
      * @return array
      */
     public function getUser(): ?array
     {
-        return $_SESSION[$this->sessionKey] ?? null;
+        return flea_context()->get($this->sessionKey);
     }
 
     /**
-     * 从 session 中清除用户数据
+     * 从上下文存储中清除用户数据
      */
     public function clearUser(): void
     {
-        unset($_SESSION[$this->sessionKey]);
+        flea_context()->remove($this->sessionKey);
     }
 
     /**

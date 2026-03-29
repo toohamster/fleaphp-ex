@@ -5,14 +5,14 @@ namespace FLEA\Helper;
 /**
  * 图像验证码生成器
  *
- * 实现了一个简单的图像验证码生成器，支持 Session 存储和验证。
- * 当启用了 session 时，验证码会保存在 session 中。
+ * 实现了一个简单的图像验证码生成器，支持上下文存储和验证。
+ * 默认使用 Context 组件存储验证码，支持 Session/Redis/File 多种后端。
  *
  * 主要功能：
  * - 生成随机验证码图像
  * - 支持数字、字母、混合三种类型
  * - 自定义字体、颜色、背景色
- * - Session 存储和过期验证
+ * - 上下文存储和过期验证
  * - 区分大小写/不区分大小写验证
  *
  * 用法示例：
@@ -51,7 +51,7 @@ class ImgCode
     /**
      * 验证码过期时间
      *
-     * @var string
+     * @var int
      */
     public int $expired = 0;
 
@@ -73,14 +73,19 @@ class ImgCode
     public $keepCode = false;
 
     /**
+     * 存储键名前缀
+     *
+     * @var string
+     */
+    private string $keyPrefix = 'IMGCODE';
+
+    /**
      * 构造函数
      */
     public function __construct()
     {
-        @session_start();
-
-        $this->code = $_SESSION['IMGCODE'] ?? '';
-        $this->expired = $_SESSION['IMGCODE_EXPIRED'] ?? 0;
+        $this->code = flea_context()->get($this->keyPrefix, '');
+        $this->expired = flea_context()->get($this->keyPrefix . '_EXPIRED', 0);
     }
 
     /**
@@ -116,12 +121,12 @@ class ImgCode
     }
 
     /**
-     * 清除 session 中的 imgcode 相关信息
+     * 清除上下文存储中的 imgcode 相关信息
      */
     public function clear(): void
     {
-        unset($_SESSION['IMGCODE']);
-        unset($_SESSION['IMGCODE_EXPIRED']);
+        flea_context()->remove($this->keyPrefix);
+        flea_context()->remove($this->keyPrefix . '_EXPIRED');
     }
 
     /**
@@ -168,9 +173,11 @@ class ImgCode
             for ($i = 0; $i < $length; $i++) {
                 $code .= substr($seed, rand(0, $len), 1);
             }
-            $_SESSION['IMGCODE'] = $code;
+            // 存储验证码到上下文
+            flea_context()->set($this->keyPrefix, $code, $lefttime);
         }
-        $_SESSION['IMGCODE_EXPIRED'] = time() + $lefttime;
+        // 存储过期时间
+        flea_context()->set($this->keyPrefix . '_EXPIRED', time() + $lefttime, $lefttime);
 
         // 设置选项
         $paddingLeft = (int)($options['paddingLeft'] ?? 3);

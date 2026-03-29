@@ -270,8 +270,7 @@ class TableDataGateway
      *   - tableName: 指定数据表的名称；
      *   - primaryKey: 指定主键字段名
      *   - autoValidating: 指示是否使用自动验证；
-     *   - verifierProvider: 指定要使用的数据验证服务对象。
-     *     如果未指定。则使用应用程序设置 helper.verifier 指定的验证服务提供对象；
+     *   - verifier: 指定要使用的数据验证服务对象。如果未指定，则使用默认的 Verifier 实例；
      *   - skipConnect: 指示初始化表数据入口对象时是否不连接到数据库；
      *   - dbDSN: 指定连接数据库要使用的 DSN，如果未指定则使用默认的 DSN 设置；
      *   - dbo: 指定要使用的数据库访问对象;
@@ -297,13 +296,10 @@ class TableDataGateway
             $this->autoValidating = $params['autoValidating'];
         }
         if ($this->autoValidating) {
-            if (!empty($params['verifierProvider'])) {
-                $provider = $params['verifierProvider'];
+            if (!empty($params['verifier'])) {
+                $this->verifier = $params['verifier'];
             } else {
-                $provider = \FLEA::getAppInf('helper.verifier');
-            }
-            if (!empty($provider)) {
-                $this->verifier = \FLEA::getSingleton($provider);
+                $this->verifier = \FLEA::getSingleton(\FLEA\Helper\Verifier::class);
             }
         }
 

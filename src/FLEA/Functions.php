@@ -406,6 +406,39 @@ function _ET(int $errorCode, bool $appError = false): string
 }
 
 /**
+ * 获取 Context 实例
+ *
+ * 用法：
+ * ```php
+ * // 设置值
+ * flea_context()->set('user_data', $value);
+ * flea_context()->set('user_data', $value, 3600);  // 带过期时间
+ *
+ * // 获取值
+ * $value = flea_context()->get('user_data');
+ * $value = flea_context()->get('user_data', 'default');  // 带默认值
+ *
+ * // 删除值
+ * flea_context()->remove('user_data');
+ *
+ * // 链式调用
+ * flea_context()
+ *     ->set('key1', $value1)
+ *     ->set('key2', $value2);
+ *
+ * // 批量操作
+ * $ctx = flea_context();
+ * $data = $ctx->getMultiple(['key1', 'key2']);
+ * ```
+ *
+ * @return \FLEA\Context\Context
+ */
+function flea_context(): \FLEA\Context\Context
+{
+    return \FLEA::getSingleton(\FLEA\Context\Context::class);
+}
+
+/**
  * 调用 FLEA_Language::get() 获取翻译
  *
  * 用法：
