@@ -4,6 +4,43 @@
 
 ---
 
+### feat: 引入 .env 多环境配置支持
+
+**配置架构重构（四层配置，优先级从高到低）：**
+1. `.env.{APP_ENV}` 环境文件（如 .env.production）
+2. `.env` 基础配置
+3. `demo/App/Config.php`（应用层配置）
+4. `FLEA\Config\Defaults`（框架默认值，使用 env() 函数）
+
+**新增文件：**
+- src/FLEA/FLEA/Config/Defaults.php
+- demo/.env.example
+- demo/.gitignore
+
+**修改文件：**
+- composer.json - 添加 vlucas/phpdotenv ^5.5
+- src/FLEA/FLEA.php - 新增 FLEA::loadEnv() 方法
+- src/FLEA/FLEA/Config.php - 加载 Defaults 默认配置
+- src/FLEA/FLEA/Env.php - 新增 isEnv() 方法
+- src/FLEA/Functions.php - 使用 Env::isProd() 替代 DEBUG_MODE
+- demo/App/Config.php - 使用 env() 读取环境变量
+- demo/public/index.php - 使用 \FLEA::loadEnv()
+- CLAUDE.md - 更新配置架构说明
+
+**删除文件：**
+- DEBUG_MODE_CONFIG.php
+- DEPLOY_MODE_CONFIG.php
+- bin/serve（重命名为 flea-cli）
+
+**用法：**
+```php
+\FLEA::loadEnv(__DIR__ . '/../.env');
+\FLEA\Env::isProd();
+env('APP_ENV');
+```
+
+---
+
 ### docs: 移动博客相关文档到 demo/ 并更新 CLAUDE.md
 
 - blog.sql → demo/blog.sql
