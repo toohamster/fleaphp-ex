@@ -1,7 +1,7 @@
 <?php
 
 /**
- * “部署”模式的 FleaPHP 应用程序的默认设置
+ * "部署"模式的 FleaPHP 应用程序的默认设置
  */
 
 return [
@@ -14,16 +14,13 @@ return [
     'defaultTimezone'           => null,
 
     /**
-     * 指示控制器的 url 参数名和默认控制器名
-     * 控制器名字只能是a-z字母和0-9数字，以及"_"下划线。
+     * 默认控制器名
      */
-    'controllerAccessor'        => 'controller',
     'defaultController'         => 'Default',
 
     /**
-     * 指示 动作方法的 url 参数名和默认 动作方法名
+     * 默认动作方法名
      */
-    'actionAccessor'            => 'action',
     'defaultAction'             => 'index',
 
     /**
@@ -159,6 +156,7 @@ return [
      * 模板引擎要使用的配置信息
      */
     'viewConfig'                => null,
+
     /**
      * 异常处理例程
      */
@@ -170,7 +168,8 @@ return [
     'jwtSecret'                 => '',     // JWT 签名密钥（必须设置）
     'jwtTtl'                    => 7200,   // JWT 有效期（秒）
     'jwtIssuer'                 => '',     // JWT 签发者
-    'errorViewsDir'             => null,  // 应用层错误模板目录，null 使用框架默认    'forceJsonResponse'         => false,  // true 时所有异常均返回 JSON，适合纯 API 项目
+    'errorViewsDir'             => null,  // 应用层错误模板目录，null 使用框架默认
+    'forceJsonResponse'         => false,  // true 时所有异常均返回 JSON，适合纯 API 项目
     'displayErrors'             => true,
 
     /**

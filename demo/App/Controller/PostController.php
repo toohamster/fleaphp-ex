@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Controller;
+namespace FleaPhpDemo\Controller;
 
-use App\Model\Post;
-use App\Model\Comment;
+use FleaPhpDemo\Model\Post;
+use FleaPhpDemo\Model\Comment;
 use FLEA\Controller\Action;
 
 /**
@@ -70,7 +70,7 @@ class PostController extends Action
             throw new \FLEA\Exception\InvalidArguments('文章ID不能为空');
         }
 
-        $post = $this->postModel->find($id, null, '*', true);
+        $post = $this->postModel->find($id);
 
         if (!$post) {
             throw new \FLEA\Exception\InvalidArguments('文章不存在');

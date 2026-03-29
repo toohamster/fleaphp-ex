@@ -24,16 +24,13 @@ class Simple
     {
         $this->requestBackup =& $request;
 
-        $controllerAccessor = strtolower(\FLEA::getAppInf('controllerAccessor'));
-        $actionAccessor = strtolower(\FLEA::getAppInf('actionAccessor'));
-
         $r = array_change_key_case($request, CASE_LOWER);
         $data = ['controller' => null, 'action' => null];
-        if (isset($r[$controllerAccessor])) {
-            $data['controller'] = $r[$controllerAccessor];
+        if (isset($r[\FLEA\Router::CONTROLLER_KEY])) {
+            $data['controller'] = $r[\FLEA\Router::CONTROLLER_KEY];
         }
-        if (isset($r[$actionAccessor])) {
-            $data['action'] = $r[$actionAccessor];
+        if (isset($r[\FLEA\Router::ACTION_KEY])) {
+            $data['action'] = $r[\FLEA\Router::ACTION_KEY];
         }
         $this->request = $data;
     }
@@ -192,14 +189,12 @@ class Simple
         $args = [];
         parse_str($url['query'], $args);
         $args = array_change_key_case($args, CASE_LOWER);
-        $controllerAccessor = strtolower(\FLEA::getAppInf('controllerAccessor'));
-        $actionAccessor = strtolower(\FLEA::getAppInf('actionAccessor'));
 
-        $controllerName = $args[$controllerAccessor] ?? null;
-        $actionName = $args[$actionAccessor] ?? null;
+        $controllerName = $args[\FLEA\Router::CONTROLLER_KEY] ?? null;
+        $actionName = $args[\FLEA\Router::ACTION_KEY] ?? null;
 
-        unset($args[$controllerAccessor]);
-        unset($args[$actionAccessor]);
+        unset($args[\FLEA\Router::CONTROLLER_KEY]);
+        unset($args[\FLEA\Router::ACTION_KEY]);
         return [$controllerName, $actionName, $args];
     }
 

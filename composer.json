@@ -1,7 +1,8 @@
 {
-    "name": "toohamster/fleaphp-ex",
+    "name": "fleaphp/framework",
     "description": "A lightweight PHP framework with MVC architecture, database abstraction layer, and RBAC support",
     "type": "library",
+    "bin": ["bin/serve"],
     "keywords": [
         "framework",
         "mvc",
@@ -25,11 +26,11 @@
     },
     "autoload": {
         "psr-4": {
-            "FLEA\\": "FLEA/FLEA/"
+            "FLEA\\": "src/FLEA/"
         },
         "files": [
-            "FLEA/Functions.php",
-            "FLEA/FLEA.php"
+            "src/FLEA/Functions.php",
+            "src/FLEA/FLEA.php"
         ]
     },
     "autoload-dev": {

@@ -168,10 +168,11 @@ class FLEA
         if (self::getAppInf('urlMode') === URL_ROUTER) {
             // URL_ROUTER 模式：注册默认兜底路由（可通过 routerDefaultRoute=false 关闭）
             if (self::getAppInf('routerDefaultRoute') !== false) {
-                $controllerAccessor = self::getAppInf('controllerAccessor');
-                $actionAccessor     = self::getAppInf('actionAccessor');
-                \FLEA\Router::get("/{controller}/{action}", "{controller}Controller@{action}");
-                \FLEA\Router::get("/{controller}",          "{controller}Controller@index");
+                // 由 Router 类检查开发者是否已定义过兜底路由，未定义则注册
+                \FLEA\Router::registerFallback(
+                    self::getAppInf('defaultController'),
+                    self::getAppInf('defaultAction')
+                );
             }
             // Router 模式：必须匹配，未匹配直接 404
             if (!\FLEA\Router::dispatch()) {

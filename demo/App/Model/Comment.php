@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model;
+namespace FleaPhpDemo\Model;
 
 use FLEA\Db\TableDataGateway;
 

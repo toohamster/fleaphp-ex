@@ -14,16 +14,13 @@ return [
     'defaultTimezone'           => null,
 
     /**
-     * 指示控制器的 url 参数名和默认控制器名
-     * 控制器名字只能是a-z字母和0-9数字，以及"_"下划线。
+     * 默认控制器名
      */
-    'controllerAccessor'        => 'controller',
     'defaultController'         => 'Default',
 
     /**
-     * 指示 动作方法的 url 参数名和默认 动作方法名
+     * 默认动作方法名
      */
-    'actionAccessor'            => 'action',
     'defaultAction'             => 'index',
 
     /**

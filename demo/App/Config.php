@@ -13,11 +13,9 @@ return [
     ],
 
     // 控制器配置
-    'controllerAccessor' => 'controller',
-    'actionAccessor' => 'action',
     'defaultController' => 'Post',
     'defaultAction' => 'index',
-    'controllerClassPrefix' => 'App\\Controller\\',
+    'controllerClassPrefix' => 'FleaPhpDemo\\Controller\\',
 
     // URL 模式
     'urlMode' => URL_ROUTER,
@@ -36,7 +34,7 @@ return [
     'view' => \FLEA\View\Simple::class,
     'viewConfig' => [
         'templateDir' => __DIR__ . '/View',
-        'cacheDir' => __DIR__ . '/../cache',
+        'cacheDir' => __DIR__ . '/../../cache',
         'cacheLifeTime' => 900,
         'enableCache' => false,
     ],
@@ -48,7 +46,7 @@ return [
 
     // 缓存配置
     'cacheProvider' => \FLEA\Cache\FileCache::class,
-    'internalCacheDir' => __DIR__ . '/../cache',
+    'internalCacheDir' => __DIR__ . '/../../cache',
 
     // Session 配置
     'sessionProvider' => null,

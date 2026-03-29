@@ -6,8 +6,8 @@
 .claude/*.json
 .git/
 runtime/
-cache
-uploads/
+demo/cache/
+demo/uploads/
 .phpintel/
 .env
 .log

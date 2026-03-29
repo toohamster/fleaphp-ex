@@ -20,6 +20,12 @@ namespace FLEA;
  */
 class Router
 {
+    /** @var string Controller 参数键名 */
+    public const CONTROLLER_KEY = 'controller';
+
+    /** @var string Action 参数键名 */
+    public const ACTION_KEY = 'action';
+
     /** @var array[] 已注册的路由 */
     private static array $routes = [];
 
@@ -157,8 +163,8 @@ class Router
 
             [$controller, $action] = explode('@', $handler) + [1 => 'index'];
 
-            $_GET[\FLEA::getAppInf('controllerAccessor')] = $controller;
-            $_GET[\FLEA::getAppInf('actionAccessor')]     = $action;
+            $_GET[self::CONTROLLER_KEY] = $controller;
+            $_GET[self::ACTION_KEY]     = $action;
             $_GET = array_merge($_GET, $params);
             $_REQUEST = array_merge($_REQUEST, $_GET);
 
@@ -214,5 +220,38 @@ class Router
     public static function routes(): array
     {
         return self::$routes;
+    }
+
+    /**
+     * 注册兜底路由（如果开发者未定义）
+     */
+    public static function registerFallback(string $defaultController, string $defaultAction): void
+    {
+        $hasControllerAction = false;
+        $hasController = false;
+        $hasRoot = false;
+
+        foreach (self::$routes as $route) {
+            $path = $route['path'];
+            if (str_contains($path, '{controller}') && str_contains($path, '{action}')) {
+                $hasControllerAction = true;
+            }
+            if (str_contains($path, '{controller}') && !str_contains($path, '{action}')) {
+                $hasController = true;
+            }
+            if ($path === '/') {
+                $hasRoot = true;
+            }
+        }
+
+        if (!$hasControllerAction) {
+            self::any("/{controller}/{action}", "{controller}Controller@{action}")->name('fallback.controller_action');
+        }
+        if (!$hasController) {
+            self::any("/{controller}", "{controller}Controller@index")->name('fallback.controller');
+        }
+        if (!$hasRoot) {
+            self::any("/", $defaultController . 'Controller@' . $defaultAction)->name('fallback.root');
+        }
     }
 }

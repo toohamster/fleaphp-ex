@@ -152,7 +152,7 @@
         <div class="container">
             <h1>📝 我的博客</h1>
             <nav>
-                <a href="?controller=Post&action=index">返回首页</a>
+                <a href="<?php echo url('post.index'); ?>">返回首页</a>
             </nav>
         </div>
     </header>
@@ -160,7 +160,7 @@
     <div class="container">
         <div class="form-container">
             <h2>写新文章</h2>
-            <form action="?controller=Post&action=create" method="POST">
+            <form action="<?php echo url('post.create'); ?>" method="POST">
 
                 <div class="form-group">
                     <label for="title">文章标题：</label>
@@ -179,7 +179,7 @@
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">发布文章</button>
-                    <a href="?controller=Post&action=index" class="btn btn-secondary">取消</a>
+                    <a href="<?php echo url('post.index'); ?>" class="btn btn-secondary">取消</a>
                 </div>
             </form>
         </div>

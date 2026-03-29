@@ -150,8 +150,8 @@
         <div class="container">
             <h1>📝 我的博客</h1>
             <nav>
-                <a href="?controller=Post&action=index">首页</a>
-                <a href="?controller=Post&action=create">写文章</a>
+                <a href="<?php echo url('post.index'); ?>">首页</a>
+                <a href="<?php echo url('post.create'); ?>">写文章</a>
             </nav>
         </div>
     </header>
@@ -174,7 +174,7 @@
                         <div class="post-excerpt">
                             <?php echo htmlspecialchars(mb_substr(strip_tags($post['content']), 0, 200)); ?>...
                         </div>
-                        <a href="?controller=Post&action=view&id=<?php echo $post['id']; ?>" class="read-more">阅读全文</a>
+                        <a href="<?php echo url('post.view', ['id' => $post['id']]); ?>" class="read-more">阅读全文</a>
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
@@ -186,7 +186,7 @@
                     <?php if ($i == $page): ?>
                         <span class="current"><?php echo $i; ?></span>
                     <?php else: ?>
-                        <a href="?controller=Post&action=index&page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                        <a href="<?php echo url('post.index', ['page' => $i]); ?>"><?php echo $i; ?></a>
                     <?php endif; ?>
                 <?php endfor; ?>
             </div>

@@ -236,7 +236,7 @@
         <div class="container">
             <h1>📝 我的博客</h1>
             <nav>
-                <a href="?controller=Post&action=index">返回首页</a>
+                <a href="<?php echo url('post.index'); ?>">返回首页</a>
             </nav>
         </div>
     </header>
@@ -255,8 +255,8 @@
                 <?php echo nl2br(htmlspecialchars($post['content'])); ?>
             </div>
             <div class="post-actions">
-                <a href="?controller=Post&action=edit&id=<?php echo $post['id']; ?>" class="btn-primary">编辑文章</a>
-                <a href="?controller=Post&action=delete&id=<?php echo $post['id']; ?>" class="btn-danger">删除文章</a>
+                <a href="<?php echo url('post.edit', ['id' => $post['id']]); ?>" class="btn-primary">编辑文章</a>
+                <a href="<?php echo url('post.delete', ['id' => $post['id']]); ?>" class="btn-danger">删除文章</a>
             </div>
         </article>
 
@@ -286,7 +286,7 @@
 
             <div class="comment-form">
                 <h3>发表评论</h3>
-                <form action="?controller=Post&action=comment" method="POST">
+                <form action="<?php echo url('post.comment'); ?>" method="POST">
                     <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
 
                     <div class="form-group">
