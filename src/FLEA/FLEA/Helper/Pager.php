@@ -3,19 +3,51 @@
 namespace FLEA\Helper;
 
 /**
- * \FLEA\Helper\Pager 类提供数据查询分页功能
+ * 数据分页辅助类
  *
- * \FLEA\Helper\Pager 使用很简单，只需要构造时传入 \FLEA\Db\TableDataGateway 实例以及查询条件即可。
+ * 提供数据查询分页功能，支持 TableDataGateway 和 SQL 语句两种数据源。
+ * 自动计算总记录数、总页数、当前页、上一页、下一页等分页参数。
+ *
+ * 主要功能：
+ * - 自动计算分页参数（总记录数、总页数、当前页等）
+ * - 支持 TableDataGateway 和 SQL 语句两种数据源
+ * - 自定义每页记录数和起始页索引
+ * - 生成翻页导航数据
+ * - 支持排序条件
+ *
+ * 用法示例：
+ * ```php
+ * // 使用 TableDataGateway
+ * $pager = new Pager($postTable, 1, 20, ['status' => 1], 'created_at DESC');
+ * $posts = $pager->findAll();
+ * $pagerData = $pager->getPagerData();
+ *
+ * // 使用 SQL 语句
+ * $pager = new Pager('SELECT * FROM posts WHERE status = 1', 1, 20);
+ * $pager->setCount(100);  // 手动设置总数
+ * $posts = $pager->findAll();
+ *
+ * // 获取翻页导航
+ * foreach ($pager->getNavbarIndexs() as $item) {
+ *     echo "<a href='?page={$item['index']}'>{$item['number']}</a> ";
+ * }
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
  */
 class Pager
 {
     /**
-     * 如果 $this->source 是一个 \FLEA\Db\TableDataGateway 对象，则调用
+     * 数据源
+     *
+     * 如果 $this->source 是一个 TableDataGateway 对象，则调用
      * $this->source->findAll() 来获取记录集。
      *
      * 否则通过 $this->dbo->selectLimit() 来获取记录集。
      *
-     * @var \FLEA\Db\TableDataGateway|string
+     * @var TableDataGateway|string
      */
     public $source;
 

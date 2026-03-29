@@ -5,12 +5,40 @@ namespace FLEA\Db\TableLink;
 use FLEA\Db\TableLink;
 
 /**
- * FLEA\Db\TableLink\HasOneLink 封装 has one 关系
+ * HasOne 关联实现类
+ *
+ * 封装一对一的 HasOne 关联关系，支持关联查询和关联数据保存。
+ * HasOne 关联表示主表记录在关联表中有一条对应的记录。
+ *
+ * 主要功能：
+ * - 构建关联查询 SQL
+ * - 保存关联数据（创建或更新）
+ * - 自动初始化关联配置
+ *
+ * 用法示例：
+ * ```php
+ * // 在 TableDataGateway 子类中定义关联
+ * class User extends TableDataGateway {
+ *     public $hasMany = [
+ *         'profile' => [
+ *             'className' => 'Profile',
+ *             'foreignKey' => 'user_id',
+ *         ],
+ *     ];
+ * }
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ * @see     TableLink
  */
 class HasOneLink extends TableLink
 {
     /**
      * 组合关联数据时是否是一对一
+     *
+     * HasOne 关联始终是一对一关系。
      *
      * @var boolean
      */

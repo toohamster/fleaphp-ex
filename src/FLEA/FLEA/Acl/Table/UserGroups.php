@@ -3,10 +3,45 @@
 namespace FLEA\Acl\Table;
 
 /**
- * \FLEA\Acl\Table\UserGroups 类提供了用户组数据的存储服务
+ * 用户组表数据网关
  *
+ * 提供用户组数据的存储服务，支持层次结构（嵌套集模型）和多对多关联。
+ *
+ * 使用嵌套集模型（Nested Set Model）存储层次结构：
+ * - left_value: 左值
+ * - right_value: 右值
+ * - parent_id: 父用户组 ID
+ *
+ * 关联关系：
+ * - ManyToMany: 多个角色（通过 UserGroupsHasRoles 中间表）
+ * - ManyToMany: 多个权限（通过 UserGroupsHasPermissions 中间表）
+ *
+ * 主要功能：
+ * - 创建用户组（自动维护嵌套集左右值）
+ * - 更新用户组信息
+ * - 删除用户组及其子树
+ * - 获取用户组路径
+ * - 获取子用户组
+ *
+ * 用法示例：
+ * ```php
+ * $userGroupsTable = new UserGroups();
+ *
+ * // 创建用户组
+ * $groupId = $userGroupsTable->create(['name' => 'Tech Dept'], $parentId);
+ *
+ * // 获取用户组路径（从根到当前组）
+ * $path = $userGroupsTable->getPath($group);
+ *
+ * // 获取所有子用户组
+ * $subTree = $userGroupsTable->getSubTree($group);
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
  */
-class UserGroups extends \FLEA\Db\TableDataGateway
+class UserGroups extends TableDataGateway
 {
     /**
      * 主键字段名

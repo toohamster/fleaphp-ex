@@ -4,6 +4,190 @@
 
 ---
 
+## PHPDoc 文档注释批量添加工作总结
+
+**总计：约 88 个 PHP 文件**
+
+**分类统计：**
+| 类别 | 文件数 |
+|------|--------|
+| Db 层核心类 | 6 |
+| Db/TableLink 子类 | 4 |
+| Acl 目录 | 9 |
+| Helper 目录 | 8 |
+| Middleware 中间件 | 3 |
+| Cache 缓存 | 2 |
+| Rbac 权限 | 3 |
+| Session 会话 | 1 |
+| Dispatcher 调度器 | 1 |
+| Error 错误处理 | 1 |
+| Config 配置 | 1 |
+| Auth 认证 | 1 |
+| 其他核心类 | 约 50 |
+
+**文档注释内容：**
+- 类级别文档（功能说明、用法示例、@package、@author、@version）
+- 属性文档（@var）
+- 方法文档（@param、@return、@throws）
+
+---
+
+### docs: 为 Verifier 验证助手类添加 PHPDoc 文档注释
+
+**修改文件 (1 个):**
+- src/FLEA/FLEA/Helper/Verifier.php - 数据验证助手类
+
+**主要改进:**
+- 添加 @package、@subpackage、@author、@version 标签
+
+**备注:** Defaults.php 存在原有 PHP 7.4 语法错误（静态属性包含 env() 函数调用），未修改。
+
+---
+
+### docs: 为 FileUploader/File 类添加 PHPDoc 文档注释
+
+**修改文件 (1 个):**
+- src/FLEA/FLEA/Helper/FileUploader/File.php - 上传文件封装类
+
+**主要改进:**
+- 完整的类级别文档注释（功能说明、用法示例）
+- 文件检查和移动功能说明
+
+**备注:** testACL.php 和 testCreateData.php 为测试脚本文件，不添加文档注释。
+
+---
+
+### docs: 为 Db 层核心类 TableDataGateway 和 AbstractDriver 添加 PHPDoc 文档注释
+
+**修改文件 (2 个):**
+
+**Db 层核心类 (2 个):**
+- src/FLEA/FLEA/Db/TableDataGateway.php - 表数据网关（CRUD 和表关联封装）
+- src/FLEA/FLEA/Db/Driver/AbstractDriver.php - 数据库驱动抽象基类
+
+**主要改进:**
+- TableDataGateway: 完整的类级别文档注释，包含 CRUD 操作、表关联说明、用法示例
+- AbstractDriver: 完整的类级别文档注释，包含数据库连接、查询执行、事务管理等说明
+
+---
+
+### docs: 为 Pager 分页类添加 PHPDoc 文档注释
+
+**修改文件 (1 个):**
+- src/FLEA/FLEA/Helper/Pager.php - 数据分页辅助类
+
+**主要改进:**
+- 完整的类级别文档注释（功能说明、用法示例）
+- 支持的数据源说明
+- 翻页导航生成示例
+
+---
+
+### docs: 为 Rbac、ErrorRenderer 和 Config/Defaults 添加 PHPDoc 文档注释
+
+**修改文件 (3 个):**
+
+**核心类 (3 个):**
+- src/FLEA/FLEA/Rbac.php - RBAC 权限检查服务
+- src/FLEA/FLEA/Error/ErrorRenderer.php - 错误页面渲染器
+- src/FLEA/FLEA/Config/Defaults.php - 框架默认配置
+
+**主要改进:**
+- 完整的类级别文档注释（功能说明、用法示例）
+- Rbac 类的 ACT 格式说明和特殊值说明
+- ErrorRenderer 的错误视图查找顺序说明
+- Defaults 类的配置项分类说明
+
+---
+
+### docs: 为 Acl/Table 目录下的表数据网关类添加 PHPDoc 文档注释
+
+**修改文件 (8 个):**
+
+**Acl/Table 表数据网关类 (8 个):**
+- src/FLEA/FLEA/Acl/Table/Users.php - 用户表（继承 UsersManager）
+- src/FLEA/FLEA/Acl/Table/Roles.php - 角色表
+- src/FLEA/FLEA/Acl/Table/Permissions.php - 权限表
+- src/FLEA/FLEA/Acl/Table/UserGroups.php - 用户组表（嵌套集模型）
+- src/FLEA/FLEA/Acl/Table/UserGroupsHasRoles.php - 用户组 - 角色关联表
+- src/FLEA/FLEA/Acl/Table/UserGroupsHasPermissions.php - 用户组 - 权限关联表
+- src/FLEA/FLEA/Acl/Table/UsersHasRoles.php - 用户 - 角色关联表
+- src/FLEA/FLEA/Acl/Table/UsersHasPermissions.php - 用户 - 权限关联表
+
+**主要改进:**
+- 完整的类级别文档注释（功能说明、用法示例）
+- 关联关系说明（belongsTo/hasMany/manyToMany）
+- UserGroups 类的嵌套集模型说明
+- 中间表用途说明
+
+---
+
+### docs: 为 Helper、Cache、Session、Rbac 和 Dispatcher 类添加 PHPDoc 文档注释
+
+**修改文件 (15 个):**
+
+**Helper 辅助类 (6 个):**
+- src/FLEA/FLEA/Helper/FileUploader.php - 文件上传辅助类
+- src/FLEA/FLEA/Helper/Image.php - 图像处理辅助类（GD 库封装）
+- src/FLEA/FLEA/Helper/ImgCode.php - 图像验证码生成器
+- src/FLEA/FLEA/Helper/Pager.php - 数据分页辅助类
+- src/FLEA/FLEA/Helper/SendFile.php - 文件发送辅助类
+- src/FLEA/FLEA/Helper/Verifier.php - 数据验证器
+
+**Cache 缓存实现 (2 个):**
+- src/FLEA/FLEA/Cache/FileCache.php - 文件缓存实现（PSR-16）
+- src/FLEA/FLEA/Cache/RedisCache.php - Redis 缓存实现（PSR-16）
+
+**Session 会话 (1 个):**
+- src/FLEA/FLEA/Session/Db.php - 数据库 Session 处理器
+
+**Rbac 权限管理 (2 个):**
+- src/FLEA/FLEA/Rbac/RolesManager.php - 角色管理器
+- src/FLEA/FLEA/Rbac/UsersManager.php - 用户管理器
+
+**Dispatcher 调度器 (1 个):**
+- src/FLEA/FLEA/Dispatcher/Auth.php - 带认证的调度器
+
+**Acl 访问控制 (1 个):**
+- src/FLEA/FLEA/Acl/Manager.php - ACL 管理器
+
+**Pager 分页 (1 个):**
+- src/FLEA/FLEA/Helper/Pager.php - 数据分页辅助类
+
+**主要改进:**
+- 完整的类级别文档注释（功能说明、用法示例、配置项说明）
+- 属性文档注释（@var）
+- 方法文档注释（@param, @return, @throws）
+- 补充了 Verifier 类的验证规则说明
+- 补充了 UsersManager 的密码加密方式说明
+
+---
+
+### docs: 为 Db/TableLink 子类、Middleware 和 Jwt 添加 PHPDoc 文档注释
+
+**修改文件 (8 个):**
+
+**Db/TableLink 子类 (4 个):**
+- src/FLEA/FLEA/Db/TableLink/HasOneLink.php - HasOne 关联实现
+- src/FLEA/FLEA/Db/TableLink/BelongsToLink.php - BelongsTo 关联实现
+- src/FLEA/FLEA/Db/TableLink/HasManyLink.php - HasMany 关联实现
+- src/FLEA/FLEA/Db/TableLink/ManyToManyLink.php - ManyToMany 关联实现
+
+**Middleware 中间件 (3 个):**
+- src/FLEA/FLEA/Middleware/CorsMiddleware.php - CORS 跨域中间件
+- src/FLEA/FLEA/Middleware/AuthMiddleware.php - Bearer Token 认证中间件
+- src/FLEA/FLEA/Middleware/RateLimitMiddleware.php - 请求频率限制中间件
+
+**Auth 认证 (1 个):**
+- src/FLEA/FLEA/Auth/Jwt.php - JWT 工具类（HS256）
+
+**主要改进:**
+- 完整的类级别文档注释（功能说明、用法示例、配置项说明）
+- 属性文档注释（@var）
+- 方法文档注释（@param, @return, @throws）
+
+---
+
 ### docs: 批量为框架核心类添加 PHPDoc 文档注释
 
 **修改文件 (49 个):**

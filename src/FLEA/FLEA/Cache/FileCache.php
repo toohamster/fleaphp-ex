@@ -2,8 +2,48 @@
 
 namespace FLEA\Cache;
 
+/**
+ * 文件缓存实现类
+ *
+ * 实现 PSR-16 CacheInterface 接口，将缓存数据保存到文件系统。
+ * 使用 CRC32 校验确保数据完整性，带过期时间支持。
+ *
+ * 主要功能：
+ * - PSR-16 标准接口实现
+ * - 自动过期支持
+ * - 数据完整性校验（CRC32）
+ * - 单例模式
+ *
+ * 缓存文件格式：
+ * - 前缀 16 字节：'<?php die(); ?> '
+ * - CRC32 校验 32 字节
+ * - 序列化数据
+ *
+ * 用法示例：
+ * ```php
+ * $cache = FileCache::getInstance();
+ *
+ * // 设置缓存
+ * $cache->set('key', 'value', 3600);  // 1 小时过期
+ *
+ * // 获取缓存
+ * $value = $cache->get('key', 'default');
+ *
+ * // 批量操作
+ * $cache->setMultiple(['k1' => 'v1', 'k2' => 'v2']);
+ * $values = $cache->getMultiple(['k1', 'k2']);
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ * @see     \Psr\SimpleCache\CacheInterface
+ */
 class FileCache implements \Psr\SimpleCache\CacheInterface
 {
+    /**
+     * @var self|null 单例实例
+     */
     private static ?self $instance = null;
 
     private function __construct() {}

@@ -5,10 +5,43 @@ namespace FLEA\Db\TableLink;
 use FLEA\Db\TableLink;
 
 /**
- * FLEA\Db\TableLink\BelongsToLink 封装 belongs to 关系
+ * BelongsTo 关联实现类
+ *
+ * 封装多对一的 BelongsTo 关联关系，表示当前表属于另一个表。
+ * BelongsTo 关联的外键字段存储在当前表中，指向关联表的主键。
+ *
+ * 主要特点：
+ * - 构造函数中禁用 linkUpdate/Create/Remove，防止级联操作
+ * - 支持反向关联查询
+ * - 自动初始化外键配置
+ *
+ * 用法示例：
+ * ```php
+ * // Post 表属于 User 表（外键 user_id 在 post 表中）
+ * class Post extends TableDataGateway {
+ *     public $belongsTo = [
+ *         'author' => [
+ *             'className' => 'User',
+ *             'foreignKey' => 'user_id',
+ *         ],
+ *     ];
+ * }
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ * @see     TableLink
  */
 class BelongsToLink extends TableLink
 {
+    /**
+     * 组合关联数据时是否是一对一
+     *
+     * BelongsTo 关联是一对一关系（多条记录可以属于同一个目标）。
+     *
+     * @var boolean
+     */
     public bool $oneToOne = true;
 
     /**

@@ -2,9 +2,51 @@
 
 namespace FLEA\Error;
 
+/**
+ * 错误页面渲染器
+ *
+ * 负责渲染异常和错误的 HTML 页面，支持开发模式和生产模式。
+ * 开发模式显示详细的堆栈跟踪和源码上下文，生产模式显示友好的错误页面。
+ *
+ * 主要功能：
+ * - 开发模式：详细错误页面（堆栈跟踪、源码、请求信息）
+ * - 生产模式：友好错误页面（HTTP 状态码、Trace ID）
+ * - 自定义错误视图支持（应用层优先）
+ * - Trace ID 追踪（与日志系统集成）
+ *
+ * 错误视图查找顺序：
+ * 1. {errorViewsDir}/{httpCode}.php
+ * 2. {errorViewsDir}/default.php
+ * 3. views/{httpCode}.php
+ * 4. views/500.php（默认）
+ *
+ * 用法示例：
+ * ```php
+ * // 设置异常处理器
+ * set_exception_handler(function(Throwable $ex) {
+ *     if (\FLEA::getAppInf('displayErrors')) {
+ *         $renderer = new ErrorRenderer($ex);
+ *         echo $renderer->render();
+ *     } else {
+ *         ErrorRenderer::renderProduction($ex);
+ *     }
+ * });
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ */
 class ErrorRenderer
 {
+    /**
+     * @var \Throwable 异常对象
+     */
     private \Throwable $ex;
+
+    /**
+     * @var string 请求追踪 ID
+     */
     private string $traceId;
 
     public function __construct(\Throwable $ex)

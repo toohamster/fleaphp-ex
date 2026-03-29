@@ -3,25 +3,55 @@
 namespace FLEA\Session;
 
 /**
- * \FLEA\Session\Db 类提供将 session 保存到数据库的能力
+ * 数据库 Session 处理器
  *
- * 要使用 \FLEA\Session\Db，必须完成下列准备工作：
+ * 将 Session 数据保存到数据库而非文件系统，支持自定义字段和过期清理。
  *
- * - 创建需要的数据表
+ * 使用前的准备工作：
  *
- *     字段名       类型             用途
- *     sess_id     varchar(64)     存储 session id
- *     sess_data   text            存储 session 数据
- *     activity    int(11)         该 session 最后一次读取/写入时间
+ * 1. 创建数据表（字段说明）：
+ *    - sess_id: varchar(64)  存储 session id
+ *    - sess_data: text       存储 session 数据
+ *    - activity: int(11)     最后一次读取/写入时间
  *
- * - 修改应用程序设置 sessionProvider 为 \FLEA\Session\Db
+ * 2. 配置应用程序：
+ *    - sessionProvider: \FLEA\Session\Db
+ *    - sessionDbTableName: 表名
+ *    - sessionDbFieldId: session id 字段名
+ *    - sessionDbFieldData: session 数据字段名
+ *    - sessionDbFieldActivity: 活动时间字段名
+ *    - sessionDbLifeTime: 有效期（秒）
+ *
+ * 用法示例：
+ * ```php
+ * // 配置文件中设置
+ * return [
+ *     'sessionProvider' => \FLEA\Session\Db::class,
+ *     'sessionDbTableName' => 'sessions',
+ *     'sessionDbFieldId' => 'sess_id',
+ *     'sessionDbFieldData' => 'sess_data',
+ *     'sessionDbFieldActivity' => 'activity',
+ *     'sessionDbLifeTime' => 3600,
+ * ];
+ *
+ * // 创建数据库表
+ * CREATE TABLE sessions (
+ *     sess_id VARCHAR(64) PRIMARY KEY,
+ *     sess_data TEXT,
+ *     activity INT(11)
+ * );
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
  */
 class Db
 {
     /**
      * 数据库访问对象
      *
-     * @var \FLEA\Db\Driver\AbstractDriver
+     * @var \FLEA\Db\Driver\AbstractDriver|null
      */
     public $dbo = null;
 

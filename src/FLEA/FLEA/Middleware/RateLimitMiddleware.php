@@ -2,8 +2,48 @@
 
 namespace FLEA\Middleware;
 
+/**
+ * 请求频率限制中间件
+ *
+ * 基于缓存实现请求频率限制，防止接口被滥用。
+ * 支持按 IP、Token 等方式进行限流。
+ *
+ * 配置项（通过 FLEA::setAppInf 设置）：
+ * - rateLimitMax: 最大请求次数，默认 60 次
+ * - rateLimitWindow: 时间窗口（秒），默认 60 秒
+ * - rateLimitBy: 限流依据，支持 'ip' 或 'token'，默认 'ip'
+ *
+ * 响应头：
+ * - X-RateLimit-Limit: 最大请求次数
+ * - X-RateLimit-Remaining: 剩余请求次数
+ *
+ * 用法示例：
+ * ```php
+ * // 限制每个 IP 每分钟最多 100 次请求
+ * FLEA::setAppInf('rateLimitMax', 100);
+ * FLEA::setAppInf('rateLimitWindow', 60);
+ * FLEA::setAppInf('rateLimitBy', 'ip');
+ *
+ * // 按 Token 限流（适用于 API 场景）
+ * FLEA::setAppInf('rateLimitBy', 'token');
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ */
 class RateLimitMiddleware implements MiddlewareInterface
 {
+    /**
+     * 处理频率限制请求
+     *
+     * 检查请求频率是否超出限制，超出则返回 429 错误。
+     *
+     * @param callable $next 下一个中间件或请求处理器
+     *
+     * @return void
+     * @throws \FLEA\Exception\HttpException 频率超限时抛出 429 异常
+     */
     public function handle(callable $next): void
     {
         $max    = (int)(\FLEA::getAppInf('rateLimitMax')    ?? 60);

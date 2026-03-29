@@ -3,28 +3,40 @@
 namespace FLEA\Helper;
 
 /**
- * \FLEA\Helper\FileUploader 实现了一个简单的、可扩展的文件上传助手
+ * 文件上传辅助类
  *
- * 使用方法：
+ * 实现了一个简单的、可扩展的文件上传助手，支持多文件上传和级联模式。
+ * 提供文件检查、移动、获取文件信息等功能。
  *
- * <code>
+ * 主要功能：
+ * - 自动解析 $_FILES 数组
+ * - 支持级联模式（按字段名分组）
+ * - 文件检查（类型、大小）
+ * - 批量移动文件
+ *
+ * 用法示例：
+ * ```php
  * $allowExts = 'jpg,png,gif';
  * $maxSize = 150 * 1024; // 150KB
  * $uploadDir = __DIR__ . '/upload';
  *
- * $uploader = new \FLEA\Helper\FileUploader();
- * $files =& $uploader->getFiles();
+ * $uploader = new FileUploader();
+ * $files = $uploader->getFiles();
  * foreach ($files as $file) {
  *     if (!$file->check($allowExts, $maxSize)) {
- *         // 上传的文件类型不符或者超过了大小限制。
+ *         // 上传的文件类型不符或者超过了大小限制
  *         return false;
  *     }
- *     // 生成唯一的文件名（重复的可能性极小）
+ *     // 生成唯一的文件名
  *     $id = md5(time() . $file->getFilename() . $file->getSize() . $file->getTmpName());
  *     $filename = $id . '.' . strtolower($file->getExt());
  *     $file->move($uploadDir . '/' . $filename);
  * }
- * </code>
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
  */
 class FileUploader
 {

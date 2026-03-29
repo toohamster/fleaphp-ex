@@ -2,10 +2,40 @@
 
 namespace FLEA\Acl;
 
+/**
+ * ACL（访问控制列表）管理器
+ *
+ * 负责获取用户及其权限信息，处理用户组层次结构和角色继承。
+ *
+ * 主要功能：
+ * - 获取用户及其关联的权限信息
+ * - 处理用户组的层次路径（从根到当前组）
+ * - 沿用户组路径继承角色（后者可覆盖前者）
+ * - 用户自身的角色覆盖用户组继承的角色
+ *
+ * 用法示例：
+ * ```php
+ * $aclManager = new Manager([
+ *     'users' => MyUsersTable::class,
+ *     'roles' => MyRolesTable::class,
+ * ]);
+ *
+ * $user = $aclManager->getUserWithPermissions(['user_id' => 1]);
+ * if ($user) {
+ *     // $user['roles'] 包含用户的所有角色
+ *     // $user['user_group_id'] 包含用户组路径信息
+ * }
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ */
 class Manager
 {
     /**
      * 所有使用到的表数据对象类名称
+     *
      * @var array
      */
     public array $tableClass = [

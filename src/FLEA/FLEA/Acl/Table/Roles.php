@@ -3,10 +3,29 @@
 namespace FLEA\Acl\Table;
 
 /**
- * \FLEA\Acl\Table\Roles 提供了角色数据的存储服务
+ * 角色表数据网关
  *
+ * 提供角色数据的存储服务，支持多对多关联权限。
+ *
+ * 关联关系：
+ * - ManyToMany: 多个权限（通过 roles_has_permissions 中间表）
+ *
+ * 用法示例：
+ * ```php
+ * $rolesTable = new Roles();
+ *
+ * // 查找角色及其权限
+ * $role = $rolesTable->find(1, ['permissions']);
+ *
+ * // 创建角色
+ * $roleId = $rolesTable->create(['rolename' => 'editor']);
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
  */
-class Roles extends \FLEA\Db\TableDataGateway
+class Roles extends TableDataGateway
 {
     /**
      * 主键字段名

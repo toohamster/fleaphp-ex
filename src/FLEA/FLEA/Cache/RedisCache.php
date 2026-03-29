@@ -3,22 +3,53 @@
 namespace FLEA\Cache;
 
 /**
- * Redis 缓存，实现 PSR-16 CacheInterface
+ * Redis 缓存实现类
  *
- * 需要 PHP redis 扩展（pecl install redis）
+ * 实现 PSR-16 CacheInterface 接口，使用 Redis 作为缓存存储。
+ * 支持键前缀、密码认证、数据库选择等配置。
  *
- * 配置示例：
- *   'cacheProvider'  => \FLEA\RedisCache::class,
- *   'redisHost'      => '127.0.0.1',
- *   'redisPort'      => 6379,
- *   'redisPassword'  => '',
- *   'redisDb'        => 0,
- *   'redisPrefix'    => 'flea:',
- *   'cacheTtl'       => 3600,
+ * 需要 PHP redis 扩展（pecl install redis）。
+ *
+ * 配置项（通过 Config 设置）：
+ * - cacheProvider: \FLEA\Cache\RedisCache::class
+ * - redisHost: Redis 主机，默认 '127.0.0.1'
+ * - redisPort: Redis 端口，默认 6379
+ * - redisPassword: Redis 密码，默认空
+ * - redisDb: Redis 数据库编号，默认 0
+ * - redisPrefix: 键前缀，默认 'flea:'
+ * - cacheTtl: 默认缓存时间（秒），默认 3600
+ *
+ * 用法示例：
+ * ```php
+ * $cache = new RedisCache();
+ *
+ * // 设置缓存
+ * $cache->set('key', 'value', 3600);
+ *
+ * // 获取缓存
+ * $value = $cache->get('key', 'default');
+ *
+ * // 检查是否存在
+ * if ($cache->has('key')) {
+ *     // key 存在
+ * }
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ * @see     \Psr\SimpleCache\CacheInterface
  */
 class RedisCache implements \Psr\SimpleCache\CacheInterface
 {
+    /**
+     * @var \Redis Redis 连接实例
+     */
     private \Redis $redis;
+
+    /**
+     * @var string 键前缀
+     */
     private string $prefix;
 
     public function __construct()

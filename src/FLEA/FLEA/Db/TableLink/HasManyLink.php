@@ -5,12 +5,42 @@ namespace FLEA\Db\TableLink;
 use FLEA\Db\TableLink;
 
 /**
- * FLEA\Db\TableLink\HasManyLink 封装 has many 关系
+ * HasMany 关联实现类
+ *
+ * 封装一对多的 HasMany 关联关系，支持关联查询、关联数据保存和级联操作。
+ * HasMany 关联表示主表的一条记录在关联表中有多条对应的记录。
+ *
+ * 主要功能：
+ * - 构建关联查询 SQL
+ * - 保存关联数据（插入、更新、删除）
+ * - 支持计数器缓存（counter cache）
+ * - 自动初始化外键配置
+ *
+ * 用法示例：
+ * ```php
+ * // User 表有多条 Post 记录
+ * class User extends TableDataGateway {
+ *     public $hasMany = [
+ *         'posts' => [
+ *             'className' => 'Post',
+ *             'foreignKey' => 'user_id',
+ *             'counterCache' => 'post_count',  // 可选：自动维护帖子计数
+ *         ],
+ *     ];
+ * }
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ * @see     TableLink
  */
 class HasManyLink extends TableLink
 {
     /**
      * 组合关联数据时是否是一对一
+     *
+     * HasMany 关联是一对多关系，设置为 false。
      *
      * @var boolean
      */

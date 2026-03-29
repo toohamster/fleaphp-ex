@@ -66,6 +66,11 @@ namespace FLEA\Helper;
  * 但客户端验证仅提供有限的验证能力。包括：
  *
  * notNull, hasDefault, min, max, minLength, maxLength
+ *
+ * @package FLEA
+ * @subpackage Helper
+ * @author toohamster
+ * @version 2.0.0
  */
 class Verifier
 {

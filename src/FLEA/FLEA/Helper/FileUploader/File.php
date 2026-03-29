@@ -3,8 +3,41 @@
 namespace FLEA\Helper\FileUploader;
 
 /**
- * 封装一个上传的文件
+ * 上传文件封装类
  *
+ * 封装一个上传的文件，提供文件信息访问、文件检查和移动等功能。
+ *
+ * 主要功能：
+ * - 访问上传文件信息（文件名、类型、大小、临时路径）
+ * - 文件检查（类型、大小限制）
+ * - 文件移动（保存到新位置）
+ * - 删除上传的文件
+ *
+ * 用法示例：
+ * ```php
+ * $uploader = new FileUploader();
+ * $files = $uploader->getFiles();
+ *
+ * foreach ($files as $file) {
+ *     // 获取文件信息
+ *     $name = $file->getFilename();
+ *     $size = $file->getSize();
+ *     $ext = $file->getExt();
+ *
+ *     // 检查文件
+ *     if (!$file->check('jpg,png,gif', 1024 * 1024)) {
+ *         echo "文件检查失败：" . $file->getError();
+ *         continue;
+ *     }
+ *
+ *     // 移动文件
+ *     $file->move('/path/to/uploads/' . $file->getNewPath());
+ * }
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
  */
 class File
 {

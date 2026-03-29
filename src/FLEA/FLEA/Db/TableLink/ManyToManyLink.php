@@ -6,12 +6,57 @@ use FLEA\Db\TableLink;
 use FLEA\Db\TableDataGateway;
 
 /**
- * FLEA\Db\TableLink\ManyToManyLink 封装 many to many 关系
+ * ManyToMany 关联实现类
+ *
+ * 封装多对多的 ManyToMany 关联关系，通过中间表实现双向关联。
+ * ManyToMany 关联允许主表和关联表之间建立多对多的映射关系。
+ *
+ * 主要功能：
+ * - 构建关联查询 SQL（支持中间表为实体或非实体）
+ * - 保存关联数据（插入、更新、删除中间表记录）
+ * - 支持中间表为实体表（可存储额外数据）
+ * - 支持计数器缓存（counter cache）
+ * - 自动初始化中间表配置
+ *
+ * 用法示例：
+ * ```php
+ * // Post 和 Tag 的多对多关系（通过 post_tag 中间表）
+ * class Post extends TableDataGateway {
+ *     public $manyToMany = [
+ *         'tags' => [
+ *             'className' => 'Tag',
+ *             'joinTable' => 'post_tag',           // 可选：自定义中间表名
+ *             'foreignKey' => 'post_id',           // 主表在中间表的外键
+ *             'assocForeignKey' => 'tag_id',       // 关联表在中间表的外键
+ *             'counterCache' => 'tag_count',       // 可选：计数器缓存
+ *         ],
+ *     ];
+ * }
+ *
+ * // 中间表为实体（可存储额外数据，如创建时间）
+ * class Post extends TableDataGateway {
+ *     public $manyToMany = [
+ *         'categories' => [
+ *             'className' => 'Category',
+ *             'joinTableClass' => 'PostCategory',  // 中间表实体类
+ *             'foreignKey' => 'post_id',
+ *             'assocForeignKey' => 'category_id',
+ *         ],
+ *     ];
+ * }
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ * @see     TableLink
  */
 class ManyToManyLink extends TableLink
 {
     /**
      * 组合关联数据时是否是一对一
+     *
+     * ManyToMany 关联是一对多关系，设置为 false。
      *
      * @var boolean
      */
@@ -20,6 +65,8 @@ class ManyToManyLink extends TableLink
     /**
      * 在处理中间表时，是否要将中间表当做实体
      *
+     * 当设置 joinTableClass 时，中间表被视为实体表，可以存储额外数据。
+     *
      * @var boolean
      */
     public bool $joinTableIsEntity = false;
@@ -27,7 +74,7 @@ class ManyToManyLink extends TableLink
     /**
      * 中间表是实体时对应的表数据入口
      *
-     * @var TableDataGateway
+     * @var TableDataGateway|null
      */
     public ?TableDataGateway $joinTDG = null;
 
@@ -48,7 +95,7 @@ class ManyToManyLink extends TableLink
     /**
      * 中间表中保存关联表主键值的字段
      *
-     * @var string
+     * @var string|null
      */
     public $assocForeignKey = null;
 
@@ -60,9 +107,9 @@ class ManyToManyLink extends TableLink
     public string $qassocForeignKey = '';
 
     /**
-     * 中间表对应的表数据入口
+     * 中间表对应的表数据入口类名
      *
-     * @var TableDataGateway
+     * @var string|null
      */
     public $joinTableClass = null;
 

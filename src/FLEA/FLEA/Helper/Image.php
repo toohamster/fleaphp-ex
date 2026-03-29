@@ -2,11 +2,45 @@
 
 namespace FLEA\Helper;
 
+/**
+ * 图像处理辅助类
+ *
+ * 基于 PHP GD 库封装的图像处理工具类，提供常用的图像处理功能。
+ * 支持 JPEG、PNG、GIF 格式图像的读取、缩放、裁剪和保存。
+ *
+ * 主要功能：
+ * - 从文件创建图像对象
+ * - 图像缩放（resize/resampled）
+ * - 画布调整和裁减
+ * - 保持长宽比裁剪
+ * - 保存为 JPEG/PNG/GIF 格式
+ *
+ * 用法示例：
+ * ```php
+ * // 从文件创建图像对象
+ * $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+ * $image = Image::createFromFile($_FILES['image']['tmp_name'], $ext);
+ *
+ * // 缩放到指定大小
+ * $image->resampled(800, 600);
+ *
+ * // 保存为新文件
+ * $image->saveAsJpeg('/path/to/new.jpg', 90);
+ *
+ * // 保持长宽比裁剪
+ * $image->crop(200, 200, true);
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ */
 class Image
 {
     /**
      * GD 资源句柄
-     * @var resource
+     *
+     * @var resource|null
      */
     public $handle = null;
 

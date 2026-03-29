@@ -2,10 +2,66 @@
 
 namespace FLEA\Dispatcher;
 
+/**
+ * 带认证功能的调度器
+ *
+ * 继承自 Simple 调度器，增加了基于 ACT（访问控制表）的认证功能。
+ * 支持控制器级别和方法级别的访问控制。
+ *
+ * 主要功能：
+ * - 基于角色的访问控制（RBAC）
+ * - 控制器 ACT 文件加载
+ * - 用户认证和授权
+ * - 认证失败回调处理
+ *
+ * ACT 文件格式示例：
+ * ```php
+ * return [
+ *     '*' => 'admin',  // 所有方法需要 admin 角色
+ *     'actions' => [
+ *         'view' => '*',      // view 方法允许所有用户
+ *         'edit' => 'editor', // edit 方法需要 editor 角色
+ *         'delete' => 'admin',// delete 方法需要 admin 角色
+ *     ],
+ * ];
+ * ```
+ *
+ * 配置项：
+ * - dispatcherAuthProvider: 认证提供者类名
+ * - globalACT: 全局 ACT 配置
+ * - defaultControllerACT: 默认控制器 ACT
+ * - dispatcherAuthFailedCallback: 认证失败回调
+ *
+ * 用法示例：
+ * ```php
+ * // 控制器中定义 ACT
+ * class PostController extends Action {
+ *     public static $_act = [
+ *         '*' => 'admin',
+ *         'actions' => [
+ *             'view' => '*',
+ *             'edit' => 'editor,admin',
+ *         ],
+ *     ];
+ *
+ *     // 自定义认证失败处理
+ *     public static function _onAuthFailed($controllerName, $actionName, $controllerClass, $ACT, $roles) {
+ *         // 自定义处理逻辑
+ *         return false; // 返回 false 让调度器抛出异常
+ *     }
+ * }
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ * @see     \FLEA\Dispatcher\Simple
+ */
 class Auth extends \FLEA\Dispatcher\Simple
 {
     /**
      * 用于提供验证服务的对象实例
+     *
      * @var \FLEA\Rbac|null
      */
     protected ?\FLEA\Rbac $auth = null;

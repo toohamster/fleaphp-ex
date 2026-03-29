@@ -2,6 +2,49 @@
 
 namespace FLEA\Rbac;
 
+/**
+ * 用户管理器
+ *
+ * 继承自 TableDataGateway，提供用户管理功能，包括用户验证、密码加密、登录统计等。
+ *
+ * 主要功能：
+ * - 用户数据的 CRUD 操作
+ * - 用户验证（用户名/密码）
+ * - 密码加密（支持 MD5/CRYPT/SHA1/SHA2 等）
+ * - 登录信息统计（登录时间、IP、次数）
+ * - 用户角色管理
+ *
+ * 密码加密方式常量：
+ * - PWD_MD5: MD5 加密
+ * - PWD_CRYPT: CRYPT 加密
+ * - PWD_CLEARTEXT: 明文
+ * - PWD_SHA1: SHA1 加密
+ * - PWD_SHA2: SHA2-512 加密
+ *
+ * 用法示例：
+ * ```php
+ * $usersManager = new UsersManager();
+ *
+ * // 验证用户
+ * if ($usersManager->validateUser('username', 'password')) {
+ *     // 验证成功
+ * }
+ *
+ * // 创建用户
+ * $userId = $usersManager->create([
+ *     'username' => 'newuser',
+ *     'email' => 'user@example.com',
+ *     'password' => 'plaintext_password',  // 会自动加密
+ * ]);
+ *
+ * // 更新密码
+ * $usersManager->updatePassword('username', 'newpassword');
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ */
 class UsersManager extends \FLEA\Db\TableDataGateway
 {
     const PWD_MD5       = 1;

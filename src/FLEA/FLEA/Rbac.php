@@ -3,10 +3,53 @@
 namespace FLEA;
 
 /**
- * \FLEA\Rbac 提供基于角色的权限检查服务
+ * RBAC（基于角色的访问控制）服务
  *
- * \FLEA\Rbac 并不提供用户管理和角色管理服务，
- * 这些服务由 \FLEA\Rbac_UsersManager 和 \FLEA\Rbac_RolesManager 提供。
+ * 提供基于角色的权限检查服务，支持 ACT（访问控制表）验证。
+ * 不包含用户管理和角色管理功能（由 UsersManager 和 RolesManager 提供）。
+ *
+ * 主要功能：
+ * - 用户数据 Session 存储
+ * - 用户角色管理
+ * - ACT 访问控制检查
+ * - 角色验证（RBAC_HAS_ROLE/RBAC_NO_ROLE/RBAC_EVERYONE）
+ *
+ * ACT 格式说明：
+ * ```php
+ * // 允许 admin 和 editor 角色，拒绝 guest 角色
+ * [
+ *     'allow' => 'admin,editor',
+ *     'deny' => 'guest',
+ * ]
+ *
+ * // 特殊值
+ * RBAC_HAS_ROLE   - 具有任意角色
+ * RBAC_NO_ROLE    - 没有任何角色
+ * RBAC_EVERYONE   - 所有用户
+ * RBAC_NULL       - 未设置
+ * ```
+ *
+ * 用法示例：
+ * ```php
+ * $rbac = new Rbac();
+ *
+ * // 保存用户数据到 Session
+ * $rbac->setUser(['user_id' => 1, 'username' => 'admin'], ['admin', 'editor']);
+ *
+ * // 检查权限
+ * $ACT = [
+ *     'allow' => 'admin,editor',
+ *     'deny' => 'guest',
+ * ];
+ * $roles = $rbac->getRolesArray();
+ * if ($rbac->check($roles, $ACT)) {
+ *     // 权限检查通过
+ * }
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
  */
 class Rbac
 {

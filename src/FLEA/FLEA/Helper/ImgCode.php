@@ -3,33 +3,41 @@
 namespace FLEA\Helper;
 
 /**
- * \FLEA\Helper\ImgCode 类实现了一个简单的图像验证码生成器，并带有检查验证方法
+ * 图像验证码生成器
  *
- * 当启用了 session 时，验证码会保存在 session 中。用法：
+ * 实现了一个简单的图像验证码生成器，支持 Session 存储和验证。
+ * 当启用了 session 时，验证码会保存在 session 中。
  *
- * 模版页面中，在需要显示验证码的地方使用
- * <code>
- * <img src="<?php echo $this->url('imgcode'); ?>" />
- * </code>
+ * 主要功能：
+ * - 生成随机验证码图像
+ * - 支持数字、字母、混合三种类型
+ * - 自定义字体、颜色、背景色
+ * - Session 存储和过期验证
+ * - 区分大小写/不区分大小写验证
  *
- * 接下来为显示验证码的控制器编写 imgcode 方法：
- * <code>
+ * 用法示例：
+ * ```php
+ * // 在控制器中生成验证码
  * function actionImgcode() {
- *     $imgcode = FLEA::getSingleton('\FLEA\Helper\ImgCode');
+ *     $imgcode = FLEA::getSingleton(ImgCode::class);
  *     $imgcode->image();
  * }
- * </code>
  *
- * 最后，对于用户提交的表单做如下验证：
- * <code>
+ * // 在模板中显示验证码
+ * <img src="<?php echo $this->url('imgcode'); ?>" />
+ *
+ * // 验证用户提交的验证码
  * function actionSubmit() {
- *     $imgcode = FLEA::getSingleton('\FLEA\Helper\ImgCode');
- *     // 假定验证码在表单中的字段名是 imgcode
+ *     $imgcode = FLEA::getSingleton(ImgCode::class);
  *     if ($imgcode->check($_POST['imgcode'])) {
  *         // 验证通过
  *     }
  * }
- * </code>
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
  */
 class ImgCode
 {

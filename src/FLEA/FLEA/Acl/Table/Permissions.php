@@ -3,9 +3,29 @@
 namespace FLEA\Acl\Table;
 
 /**
- * \FLEA\Acl\Table\Permissions 提供了权限数据的存储服务
+ * 权限表数据网关
+ *
+ * 提供权限数据的存储服务。
+ *
+ * 用法示例：
+ * ```php
+ * $permissionsTable = new Permissions();
+ *
+ * // 查找所有权限
+ * $permissions = $permissionsTable->findAll();
+ *
+ * // 创建权限
+ * $permissionId = $permissionsTable->create([
+ *     'name' => 'post.edit',
+ *     'description' => '编辑帖子',
+ * ]);
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
  */
-class Permissions extends \FLEA\Db\TableDataGateway
+class Permissions extends TableDataGateway
 {
     /**
      * 主键字段名

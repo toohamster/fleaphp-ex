@@ -3,8 +3,52 @@
 namespace FLEA\Db\Driver;
 
 /**
- * \FLEA\Db\Driver\AbstractDriver 是所有数据库驱动的抽象基础类
+ * 数据库驱动抽象基类
  *
+ * 所有数据库驱动的基础抽象类，定义了数据库驱动的通用接口和属性。
+ * 具体的数据库驱动（如 MySQL、PostgreSQL 等）需要继承此类并实现抽象方法。
+ *
+ * 主要功能：
+ * - 数据库连接管理（connect/close/selectDb）
+ * - SQL 查询执行（execute/selectLimit）
+ * - 结果集获取（getAll/getOne/getCol/getRow/getAssoc）
+ * - 事务管理（startTrans/completeTrans/savePoint/rollbackSavePoint）
+ * - 序列支持（genSeq/dropSeq/nextId）
+ * - 元数据获取（metaColumns/metaTables）
+ * - SQL 转义和引用（qstr/qtable/qfield）
+ * - 参数绑定（bind）
+ *
+ * 常量说明：
+ * - PARAM_*: 参数占位符样式（?/:/@/$）
+ * - TRUE_VALUE/FALSE_VALUE/NULL_VALUE: 布尔和空的数据库值
+ * - HAS_INSERT_ID: 是否支持自增 ID
+ * - HAS_AFFECTED_ROWS: 是否支持获取影响行数
+ * - HAS_TRANSACTION: 是否支持事务
+ * - HAS_SAVEPOINT: 是否支持保存点
+ *
+ * 用法示例：
+ * ```php
+ * // 获取数据库驱动实例
+ * $dbo = FLEA::getDBO();
+ *
+ * // 执行查询
+ * $result = $dbo->execute(sql_statement('SELECT * FROM users'));
+ * $users = $dbo->getAll($result);
+ *
+ * // 事务处理
+ * $dbo->startTrans();
+ * try {
+ *     $dbo->execute(sql_statement('INSERT INTO ...'));
+ *     $dbo->execute(sql_statement('UPDATE ...'));
+ *     $dbo->completeTrans();
+ * } catch (Exception $e) {
+ *     $dbo->completeTrans(false);  // 回滚
+ * }
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
  */
 abstract class AbstractDriver
 {

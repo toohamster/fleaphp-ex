@@ -3,13 +3,75 @@
 namespace FLEA\Db;
 
 /**
- * \FLEA\Db\TableDataGateway 类（表数据入口）封装了数据表的 CRUD 操作
+ * 表数据网关（Table Data Gateway）
  *
- * 开发者应该从 \FLEA\Db\TableDataGateway 派生自己的类，
- * 并通过添加方法来封装针对该数据表的更复杂的数据库操作。
+ * 封装了数据表的 CRUD 操作和表关联关系。
+ * 开发者应该从 TableDataGateway 派生自己的类，并通过添加方法来封装针对该数据表的更复杂的数据库操作。
  *
- * 对于每一个表数据入口对象，都必须在类定义中通过 $tableName 和 $primaryKey
- * 来分别指定数据表的名字和主键字段名。
+ * 主要功能：
+ * - CRUD 操作（create/find/update/remove）
+ * - 表关联（hasOne/belongsTo/hasMany/manyToMany）
+ * - 字段验证（基于元数据）
+ * - 事务支持
+ * - 软删除支持
+ * - 计数器缓存
+ * - 钩子方法（beforeCreateDb/afterCreateDb 等）
+ *
+ * 关联类型常量：
+ * - HAS_ONE: 一对一关联
+ * - BELONGS_TO: 从属关联
+ * - HAS_MANY: 一对多关联
+ * - MANY_TO_MANY: 多对多关联
+ *
+ * 用法示例：
+ * ```php
+ * // 定义表数据网关类
+ * class Post extends TableDataGateway {
+ *     public string $tableName = 'posts';
+ *     public $primaryKey = 'id';
+ *
+ *     public $belongsTo = [
+ *         'author' => [
+ *             'tableClass' => User::class,
+ *             'foreignKey' => 'user_id',
+ *         ],
+ *     ];
+ *
+ *     public $hasMany = [
+ *         'comments' => [
+ *             'tableClass' => Comment::class,
+ *             'foreignKey' => 'post_id',
+ *         ],
+ *     ];
+ * }
+ *
+ * // 使用
+ * $postTable = new Post();
+ *
+ * // 查询
+ * $post = $postTable->find(1);
+ * $posts = $postTable->findAll(['status' => 1], 'created_at DESC', [10, 0]);
+ *
+ * // 创建
+ * $postId = $postTable->create([
+ *     'title' => 'New Post',
+ *     'content' => 'Post content',
+ *     'user_id' => 1,
+ * ]);
+ *
+ * // 更新
+ * $postTable->update(['id' => 1, 'title' => 'Updated Title']);
+ *
+ * // 删除
+ * $postTable->remove(1);
+ *
+ * // 带关联查询
+ * $post = $postTable->find(1, ['author', 'comments']);
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
  */
 class TableDataGateway
 {
