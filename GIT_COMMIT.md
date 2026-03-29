@@ -4,6 +4,51 @@
 
 ---
 
+### refactor: 重构为标准 PHP 框架目录结构 (v2.0)
+
+重大结构调整，将框架与演示应用完全分离：
+
+**目录结构变更：**
+- FLEA/ → src/FLEA/ (框架源码，PSR-4: FLEA\)
+- App/ → demo/App/ (演示应用，FleaPhpDemo\ 命名空间)
+- index.php → demo/public/index.php (入口文件)
+- cache/ → demo/cache/ (缓存目录)
+- 新增 bin/serve 和 bin/router.php (开发服务器工具)
+
+**composer.json 变更：**
+- name 改为 fleaphp/framework
+- 添加 bin 脚本支持
+- autoload 只加载 FLEA\ 命名空间
+- FleaPhpDemo\ 由 demo/public/index.php 手动加载
+
+**配置文件变更：**
+- 删除 controllerAccessor 和 actionAccessor 配置项
+- 改用 Router::CONTROLLER_KEY 和 Router::ACTION_KEY 常量
+- 更新 controllerClassPrefix 为 FleaPhpDemo\Controller\
+
+**文档调整：**
+- APP_CHANGES.md 和 APP_USAGE_GUIDE.md 移至 demo/
+- 更新 CLAUDE.md 中的路径引用
+
+**技术优化：**
+- bin/serve 支持 --project-dir 参数指定项目
+- bin/router.php 通过环境变量获取项目根目录
+- .gitignore 更新为 demo/cache/ 和 demo/uploads/
+
+此提交为 v2.0 的核心重构，使框架可通过 Composer 独立安装。
+
+**修改的文件:**
+- `src/FLEA/` (重命名自 FLEA/)
+- `demo/App/` (重命名自 App/)
+- `demo/public/index.php` (新建)
+- `bin/serve` (新建)
+- `bin/router.php` (新建)
+- `composer.json`
+- `CLAUDE.md`
+- `.gitignore`
+
+---
+
 ### docs: 重写 SPEC.md 框架规格说明书 (v2.0)
 
 完全重写 SPEC.md，反映 FLEA 框架 2.0 的重大重构：
