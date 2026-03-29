@@ -4,6 +4,28 @@
 
 ---
 
+### docs: 批量为框架核心类添加 PHPDoc 文档注释
+
+**修改文件 (49 个):**
+
+**异常类 (30 个):**
+- FLEA/Exception/ - 17 个通用异常类
+- FLEA/Db/Exception/ - 10 个数据库异常类
+- FLEA/Auth/, FLEA/Rbac/, FLEA/Acl/ - 3 个认证授权异常类
+
+**核心类 (19 个):**
+- FLEA.php - 框架核心类
+- Config.php, Container.php, Database.php - 配置/容器/数据库
+- Request.php, Response.php, Route.php, Router.php - HTTP/路由
+- Cache.php, Log.php, Env.php, Language.php - 缓存/日志/环境/多语言
+- Controller/Action.php, Dispatcher/Simple.php - 控制器/调度器
+- Middleware/ - 2 个中间件类
+- View/ - 3 个视图类
+
+**统计:** 2758 行新增，379 行删除
+
+---
+
 ### docs: 为 Db 层核心类添加完整 PHPDoc 文档注释
 
 **修改文件：**
