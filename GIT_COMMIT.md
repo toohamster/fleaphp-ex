@@ -4,6 +4,30 @@
 
 ---
 
+### feat: Container 添加 set() 方法
+
+添加 set() 方法作为 register() 的别名，提供更直观的 API。
+该方法委托给 register()，行为完全一致（不允许覆盖已存在对象）。
+
+主要用于绑定 Context 等对象到容器。
+
+---
+
+### refactor: 替换 str_* 函数为 mb_str_* 多字节安全版本
+
+将框架代码中使用的 PHP 8 str_starts_with/str_ends_with/str_contains
+函数替换为框架提供的 mb_str_* 多字节安全版本，确保 PHP 7.4 兼容性
+和对中文等多字节字符的正确处理。
+
+修改文件：
+- src/FLEA/Middleware/AuthMiddleware.php
+- src/FLEA/Context/Identity/JwtIdentity.php
+- src/FLEA/Dispatcher/Simple.php
+- src/FLEA/Request.php (2 处)
+- src/FLEA/Router.php (2 处)
+
+---
+
 ## PHPDoc 文档注释批量添加工作总结
 
 **总计：约 88 个 PHP 文件**
