@@ -270,14 +270,7 @@ class Router
 
         // 根据 urlScriptName 配置决定是否加入口文件前缀
         $scriptName = \FLEA::getAppInf('urlScriptName') ?? '';
-        $url = $scriptName !== '' ? $scriptName . $path : $path;
-
-        // 根据 urlLowerChar 配置决定是否转小写（默认 false，保持路由定义的原样）
-        if (\FLEA::getAppInf('urlLowerChar') ?? false) {
-            $url = strtolower($url);
-        }
-
-        return $url;
+        return $scriptName !== '' ? $scriptName . $path : $path;
     }
 
     // -------------------------------------------------------------------------
@@ -317,25 +310,8 @@ class Router
             if ($params === null) { continue; }
 
             $handler = $route['handler'];
-            // 替换 handler 中的占位符，支持过滤器语法 {param|filter}
+            // 替换 handler 中的占位符
             foreach ($params as $key => $value) {
-                // 处理带过滤器的占位符 {key|filter}
-                $handler = preg_replace_callback('/\{' . $key . '\|(\w+)\}/', function($m) use ($value) {
-                    $filter = $m[1];
-                    switch ($filter) {
-                        case 'lower':
-                            return strtolower($value);
-                        case 'upper':
-                            return strtoupper($value);
-                        case 'ucfirst':
-                            return ucfirst($value);
-                        case 'lcfirst':
-                            return lcfirst($value);
-                        default:
-                            return $value;
-                    }
-                }, $handler);
-                // 处理不带过滤器的占位符 {key}
                 $handler = str_replace('{' . $key . '}', $value, $handler);
             }
 
@@ -456,12 +432,10 @@ class Router
         }
 
         if (!$hasControllerAction) {
-            // 兜底路由：controller/action → controllerController@action（URL 小写，action 首字母大写）
-            self::any("/{controller}/{action}", "{controller|lower}Controller@{action|ucfirst}")->name('fallback.controller_action');
+            self::any("/{controller}/{action}", "{controller}Controller@{action}")->name('fallback.controller_action');
         }
         if (!$hasController) {
-            // 兜底路由：controller → controllerController@index（URL 小写）
-            self::any("/{controller}", "{controller|lower}Controller@index")->name('fallback.controller');
+            self::any("/{controller}", "{controller}Controller@index")->name('fallback.controller');
         }
         if (!$hasRoot) {
             self::any("/", $defaultController . 'Controller@' . $defaultAction)->name('fallback.root');
