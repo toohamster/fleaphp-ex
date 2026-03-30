@@ -29,6 +29,27 @@
  * @see     \FLEA\Database
  * @see     \FLEA\Cache
  */
+
+// =============================================================================
+// 框架常量定义
+// =============================================================================
+define('FLEA_LOADED_TIME', microtime());
+define('FLEA_VERSION', '2.0.0');
+define('DS', DIRECTORY_SEPARATOR);
+define('RBAC_EVERYONE', 'RBAC_EVERYONE');
+define('RBAC_HAS_ROLE', 'RBAC_HAS_ROLE');
+define('RBAC_NO_ROLE', 'RBAC_NO_ROLE');
+define('RBAC_NULL', 'RBAC_NULL');
+define('ACTION_ALL', 'ACTION_ALL');
+
+// =============================================================================
+// 命名空间导入
+// =============================================================================
+use FLEA\Config;
+use FLEA\Container;
+use FLEA\Database;
+use FLEA\Cache;
+
 class FLEA
 {
     /**
@@ -531,7 +552,7 @@ class FLEA
 
         // 创建 Context 实例并绑定到容器
         $context = new \FLEA\Context\Context($driver, $identity);
-        $container = self::getSingleton(\FLEA\Container::class);
+        $container = self::getSingleton(Container::class);
         $container->set(\FLEA\Context\Context::class, $context);
     }
 
@@ -540,7 +561,7 @@ class FLEA
      *
      * 这是框架的入口方法，完成以下工作：
      * 1. 初始化框架环境（时区、异常处理、缓存等）
-     * 2. 路由匹配（URL_ROUTER 模式）或解析（URL_STANDARD 模式）
+     * 2. 路由匹配
      * 3. 执行中间件管道
      * 4. 调度控制器执行
      *
@@ -574,22 +595,16 @@ class FLEA
             $dispatcher->dispatching();
         };
 
-        if (self::getAppInf('urlMode') === URL_ROUTER) {
-            // URL_ROUTER 模式：注册默认兜底路由（可通过 routerDefaultRoute=false 关闭）
-            if (self::getAppInf('routerDefaultRoute') !== false) {
-                // 由 Router 类检查开发者是否已定义过兜底路由，未定义则注册
-                \FLEA\Router::registerFallback(
-                    self::getAppInf('defaultController'),
-                    self::getAppInf('defaultAction')
-                );
-            }
-            // Router 模式：必须匹配，未匹配直接 404
-            if (!\FLEA\Router::dispatch()) {
-                \FLEA\Response::error('Not Found', 404);
-            }
-        } else {
-            // URL_STANDARD：尝试 Router 匹配，未匹配降级旧式路由
-            \FLEA\Router::dispatch();
+        // 一切走 Router，注册兜底路由（可通过 routerDefaultRoute=false 关闭）
+        if (self::getAppInf('routerDefaultRoute') !== false) {
+            \FLEA\Router::registerFallback(
+                self::getAppInf('defaultController'),
+                self::getAppInf('defaultAction')
+            );
+        }
+
+        if (!\FLEA\Router::dispatch()) {
+            \FLEA\Response::error('Not Found', 404);
         }
 
         // 全局中间件 + 路由级中间件

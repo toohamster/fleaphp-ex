@@ -268,9 +268,16 @@ class Router
             return urlencode($params[$key]);
         }, $path);
 
-        // 无 rewrite 环境：配置了 urlScriptName 则加前缀
+        // 根据 urlScriptName 配置决定是否加入口文件前缀
         $scriptName = \FLEA::getAppInf('urlScriptName') ?? '';
-        return $scriptName !== '' ? $scriptName . $path : $path;
+        $url = $scriptName !== '' ? $scriptName . $path : $path;
+
+        // 根据 urlLowerChar 配置决定是否转小写（默认 false，保持路由定义的原样）
+        if (\FLEA::getAppInf('urlLowerChar') ?? false) {
+            $url = strtolower($url);
+        }
+
+        return $url;
     }
 
     // -------------------------------------------------------------------------
@@ -310,8 +317,25 @@ class Router
             if ($params === null) { continue; }
 
             $handler = $route['handler'];
-            // 替换 handler 中的占位符
+            // 替换 handler 中的占位符，支持过滤器语法 {param|filter}
             foreach ($params as $key => $value) {
+                // 处理带过滤器的占位符 {key|filter}
+                $handler = preg_replace_callback('/\{' . $key . '\|(\w+)\}/', function($m) use ($value) {
+                    $filter = $m[1];
+                    switch ($filter) {
+                        case 'lower':
+                            return strtolower($value);
+                        case 'upper':
+                            return strtoupper($value);
+                        case 'ucfirst':
+                            return ucfirst($value);
+                        case 'lcfirst':
+                            return lcfirst($value);
+                        default:
+                            return $value;
+                    }
+                }, $handler);
+                // 处理不带过滤器的占位符 {key}
                 $handler = str_replace('{' . $key . '}', $value, $handler);
             }
 
@@ -332,7 +356,7 @@ class Router
     /**
      * 解析当前请求的路径
      *
-     * 自动兼容 URL_REWRITE、URL_PATHINFO、URL_STANDARD 三种模式。
+     * 自动兼容 Rewrite 和 PATHINFO 两种环境。
      * 根据配置的 urlScriptName 判断环境，从 PATH_INFO 或 REQUEST_URI 获取路径。
      *
      * @return string 解析后的 URI 路径
@@ -367,6 +391,7 @@ class Router
      *
      * 将路由路径模式中的 {param} 占位符转换为正则表达式，
      * 匹配 URI 并提取路径参数。
+     * 支持大小写不敏感匹配（由 urlCaseInsensitive 配置控制）。
      *
      * @param string $pattern 路由模式（如 /users/{id:\d+}）
      * @param string $uri     请求 URI
@@ -379,7 +404,11 @@ class Router
             return '(?P<' . $m[1] . '>' . ($m[2] ?? '[^/]+') . ')';
         }, $pattern);
 
-        if (!preg_match('#^' . $regex . '$#', $uri, $matches)) {
+        // 大小写不敏感匹配（默认开启）
+        $caseInsensitive = \FLEA::getAppInf('urlCaseInsensitive') ?? true;
+        $pattern = $caseInsensitive ? '(?i)' . $regex : $regex;
+
+        if (!preg_match('#^' . $pattern . '$#', $uri, $matches)) {
             return null;
         }
 
@@ -427,10 +456,12 @@ class Router
         }
 
         if (!$hasControllerAction) {
-            self::any("/{controller}/{action}", "{controller}Controller@{action}")->name('fallback.controller_action');
+            // 兜底路由：controller/action → controllerController@action（URL 小写，action 首字母大写）
+            self::any("/{controller}/{action}", "{controller|lower}Controller@{action|ucfirst}")->name('fallback.controller_action');
         }
         if (!$hasController) {
-            self::any("/{controller}", "{controller}Controller@index")->name('fallback.controller');
+            // 兜底路由：controller → controllerController@index（URL 小写）
+            self::any("/{controller}", "{controller|lower}Controller@index")->name('fallback.controller');
         }
         if (!$hasRoot) {
             self::any("/", $defaultController . 'Controller@' . $defaultAction)->name('fallback.root');

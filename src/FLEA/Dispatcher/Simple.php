@@ -96,9 +96,8 @@ class Simple
     {
         $callback = \FLEA::getAppInf('dispatcherFailedCallback');
 
-        // 确定动作方法名
-        $actionPrefix = \FLEA::getAppInf('actionMethodPrefix');
-        $actionMethod = $actionPrefix . $actionName . \FLEA::getAppInf('actionMethodSuffix');
+        // 确定动作方法名（action 前缀 + 首字母大写，如 show → actionShow）
+        $actionMethod = 'action' . ucfirst($actionName);
 
         $controller = null;
         do {

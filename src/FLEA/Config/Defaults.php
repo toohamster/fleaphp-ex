@@ -60,10 +60,9 @@ class Defaults
             'controllerDir' => 'App/Controller',
 
             // URL 模式
-            'urlMode' => 'URL_ROUTER',
             'urlScriptName' => '',
             'urlLowerChar' => false,
-            'routerDefaultRoute' => true,
+            'urlCaseInsensitive' => true,  // 路由匹配大小写不敏感（默认开启）
 
             // 视图
             'view' => \FLEA\View\Simple::class,

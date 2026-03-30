@@ -14,7 +14,6 @@ return [
     'controllerClassPrefix' => 'FleaPhpDemo\\Controller\\',
 
     // URL 模式
-    'urlMode' => URL_ROUTER,
     'urlScriptName' => '',
     'urlLowerChar' => false,
 
