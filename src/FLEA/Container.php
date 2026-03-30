@@ -203,6 +203,28 @@ class Container implements \Psr\Container\ContainerInterface
     }
 
     /**
+     * 设置/注册对象到容器中
+     *
+     * 作为 register() 的别名，提供更直观的 API。
+     *
+     * 用法示例：
+     * ```php
+     * $container->set('myService', new MyService());
+     * ```
+     *
+     * @param string $id   对象名称
+     * @param object $obj  对象实例
+     *
+     * @return object 返回注册的对象实例
+     *
+     * @throws \FLEA\Exception\ExistsKeyName 当对象名称已存在时抛出
+     */
+    public function set(string $id, object $obj): object
+    {
+        return $this->register($obj, $id);
+    }
+
+    /**
      * 获取所有已注册的对象
      *
      * 用法示例：
