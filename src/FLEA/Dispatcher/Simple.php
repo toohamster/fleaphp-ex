@@ -221,7 +221,7 @@ class Simple
     public function getControllerClass(string $controllerName): string
     {
         // 如果已经包含 Controller 后缀，直接使用
-        if (str_end_with($controllerName, 'Controller')) {
+        if (mb_str_ends_with($controllerName, 'Controller')) {
             return \FLEA::getAppInf('controllerClassPrefix') . $controllerName;
         }
         // 否则添加 Controller 后缀

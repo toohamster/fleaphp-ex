@@ -62,7 +62,7 @@ class JwtIdentity implements IdentityInterface
 
         // 移除 Bearer 前缀
         $token = $authHeader;
-        if (str_starts_with($authHeader, $this->bearerPrefix)) {
+        if (mb_str_starts_with($authHeader, $this->bearerPrefix)) {
             $token = substr($authHeader, strlen($this->bearerPrefix));
         }
 

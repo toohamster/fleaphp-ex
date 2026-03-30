@@ -50,7 +50,7 @@ class AuthMiddleware implements MiddlewareInterface
         // 检查排除路径
         $exclude = (array)\FLEA::getAppInf('authExclude');
         foreach ($exclude as $path) {
-            if ($uri === $path || str_starts_with($uri, rtrim($path, '/') . '/')) {
+            if ($uri === $path || mb_str_starts_with($uri, rtrim($path, '/') . '/')) {
                 $next();
                 return;
             }

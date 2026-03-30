@@ -148,7 +148,7 @@ class Request
      */
     public function isJson(): bool
     {
-        return str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'application/json');
+        return mb_str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'application/json');
     }
 
     // -------------------------------------------------------------------------
@@ -321,7 +321,7 @@ class Request
     public function bearerToken(): ?string
     {
         $auth = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-        if (str_starts_with($auth, 'Bearer ')) {
+        if (mb_str_starts_with($auth, 'Bearer ')) {
             return substr($auth, 7);
         }
         return null;

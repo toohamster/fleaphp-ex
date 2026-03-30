@@ -415,10 +415,10 @@ class Router
 
         foreach (self::$routes as $route) {
             $path = $route['path'];
-            if (str_contains($path, '{controller}') && str_contains($path, '{action}')) {
+            if (mb_str_contains($path, '{controller}') && mb_str_contains($path, '{action}')) {
                 $hasControllerAction = true;
             }
-            if (str_contains($path, '{controller}') && !str_contains($path, '{action}')) {
+            if (mb_str_contains($path, '{controller}') && !mb_str_contains($path, '{action}')) {
                 $hasController = true;
             }
             if ($path === '/') {
