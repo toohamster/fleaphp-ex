@@ -1,117 +1,40 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+此文件指导 Claude Code 在此仓库中工作。
 
 ## 操作规范
 
-- 操作语言：中文
+- **操作语言：中文**
 - **修改任何代码前必须先给方案，用户确认后再执行，禁止擅自修改代码**
 - **每次开始新任务前，必须重新阅读本规则**
 - **修改文件内容时必须逐个文件阅读和编辑，禁止使用正则批量替换**
-- `SPEC.md` 是框架的规格说明书，作为后续开发任务的参考基准
-- FLEA/ 目录代码有变更时，在提交前用最新代码更新 `SPEC.md`（保持框架规格说明书与代码同步）
-- FLEA/ 目录有重要改动后，更新根目录下的 `CHANGES.md`
+- **记忆文件位置：`.claude/memory/memory.md`（项目目录下）**
+- `SPEC.md` 是框架规格说明书，作为开发任务参考基准
+- FLEA/ 目录代码有变更时，更新 `SPEC.md` 保持同步
+- FLEA/ 目录有重要改动后，更新 `CHANGES.md`
 - demo/ 目录有重要改动后，更新 `demo/APP_CHANGES.md`
-- 每次代码改动完成后，将 git commit 说明追加到 `GIT_COMMIT.md`（最新记录在最前）
-- 代码改动完成后等待用户 review，用户确认后再执行 git commit
+- 每次代码改动完成后，将 git commit 说明追加到 `GIT_COMMIT.md`
+- 代码改动完成后等待用户 review，确认后再执行 git commit
 - 明确需求后再操作，不确定先问，不猜测
-- 只做用户明确要求的事，完成后立即停止，不自行添加"改进"
-- 发起 Merge Request 和打 Tag 使用 GitHub API（`curl`）直接操作，不使用 `gh` CLI
-- **修改框架代码前必须先给方案，用户确认后再执行，禁止擅自批量修改**
-- **禁止使用正则批量替换文件内容，必须逐个文件阅读和编辑**
+- 只做用户明确要求的事，完成后立即停止
+- 发起 MR 和打 Tag 使用 GitHub API（`curl`），不使用 `gh` CLI
 
 ## Setup
 
 ```bash
-# 配置环境变量
 cp demo/.env.example demo/.env
-# 编辑 demo/.env 配置数据库等信息
-
-# 初始化数据库
 mysql -u root -p < demo/blog.sql
-
-# 安装/更新依赖
 php74 ~/bin/composer.phar install
-
-# 启动开发服务器
-# 运行 demo
 php bin/flea-cli --project-dir=demo
-# 或在 demo 目录下
-cd demo && php ../bin/flea-cli
-# 访问：http://127.0.0.1:8081/index.php
+# 访问 http://127.0.0.1:8081/index.php
 ```
 
-Database config defaults (change in `demo/.env`):
-- Host: `127.0.0.1:3306`, DB: `blog`, User: `root`, Password: `11111111`
+数据库默认：Host=`127.0.0.1:3306`, DB=`blog`, User=`root`, Password=`11111111`
 
-Run via web server: `http://127.0.0.1:8081/index.php`
+PHP 版本：**7.4.32**（命令：`php74`）
 
-PHP version: **7.4.32**（命令：`php74`）
+## 项目概览
 
-## Architecture
-
-FLEA 框架 MVC 演示应用。框架代码在 `src/FLEA/`，演示应用代码在 `demo/App/`。
-
-### 请求生命周期
-
-```
-1. require FLEA.php → 加载默认配置
-2. FLEA::loadAppInf() 加载应用配置
-3. FLEA::runMVC()
-   - 初始化服务（时区、异常处理、缓存、Session）
-   - Router::dispatch() 匹配路由（可选）
-   - 中间件管道执行
-   - Dispatcher 解析 controller/action
-   - 控制器：beforeExecute() → actionXxx() → afterExecute()
-   - 视图渲染
-```
-
-### 核心组件（PSR 标准）
-
-| 组件 | 标准 | 说明 |
-|------|------|------|
-| `FLEA\Container` | PSR-11 | 对象容器 |
-| `FLEA\Cache` | PSR-16 | 缓存门面（FileCache/RedisCache） |
-| `FLEA\Log` | PSR-3 | 日志服务 |
-| `FLEA\Database` | - | 数据库连接池 |
-| `FLEA\Config` | - | 配置管理（单例） |
-
-### 新增特性
-
-- **Router**: RESTful 路由、路由分组、命名路由、中间件支持
-- **Middleware**: 洋葱模型管道（Cors/Auth/RateLimit）
-- **Request/Response**: HTTP 封装、JSON body 解析、统一响应结构
-- **Auth/Jwt**: JWT 签发与验证（HS256）
-
-### 配置架构
-
-**三层配置（优先级从高到低）：**
-1. `.env.{APP_ENV}` 环境文件（最高优先级，可选）
-2. `.env` 基础配置
-3. `demo/App/Config.php`（应用层配置）
-4. `FLEA\Config\Defaults`（框架默认值）
-
-**多环境文件支持：**
-- `.env` - 基础配置（必须）
-- `.env.local` - 本地开发覆盖（可选，个人配置）
-- `.env.development` - 开发环境
-- `.env.test` - 测试环境
-- `.env.production` - 生产环境
-
-**用法示例：**
-```php
-// demo/public/index.php
-require_once __DIR__ . '/../vendor/autoload.php';
-\FLEA::loadEnv(__DIR__ . '/../.env');  // 必须指定完整路径
-
-// .env 中设置 APP_ENV=production
-// 框架会自动加载 .env.production 覆盖基础配置
-
-// 在 Config.php 中使用 env()
-return [
-    'displayErrors' => env('APP_DEBUG', true),
-    'jwtSecret' => env('JWT_SECRET', 'change-me'),
-];
-```
-
-**无测试套件和 linter。**
+- 框架代码：`src/FLEA/`，演示应用：`demo/App/`
+- 详细架构和配置说明见 `SPEC.md`
+- **无测试套件和 linter**

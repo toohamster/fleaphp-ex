@@ -42,8 +42,8 @@
             "FLEA\\": "src/FLEA/"
         },
         "files": [
-            "src/FLEA/Functions.php",
-            "src/FLEA/FLEA.php"
+            "src/Functions.php",
+            "src/FLEA.php"
         ]
     },
     "autoload-dev": {
