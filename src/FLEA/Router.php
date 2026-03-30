@@ -402,6 +402,81 @@ class Router
     }
 
     /**
+     * 注册 RESTful 资源路由
+     *
+     * 一行代码生成 7 条 RESTful 路由（index/create/store/show/edit/update/destroy）。
+     * 支持 only/except 选项过滤路由。
+     *
+     * 用法示例：
+     * ```php
+     * // 生成全部 7 条路由
+     * Router::resource('post', 'PostController');
+     *
+     * // 只保留部分方法
+     * Router::resource('post', 'PostController', ['only' => ['index', 'show']]);
+     *
+     * // 排除部分方法
+     * Router::resource('post', 'PostController', ['except' => ['create', 'edit']]);
+     * ```
+     *
+     * 生成的路由表：
+     * | 方法 | URI | 处理器 | 路由名 |
+     * |------|-----|--------|--------|
+     * | GET | /{name} | {controller}@index | {name}.index |
+     * | GET | /{name}/create | {controller}@create | {name}.create |
+     * | POST | /{name} | {controller}@store | {name}.store |
+     * | GET | /{name}/{id} | {controller}@show | {name}.show |
+     * | GET | /{name}/{id}/edit | {controller}@edit | {name}.edit |
+     * | PUT | /{name}/{id} | {controller}@update | {name}.update |
+     * | POST | /{name}/{id} | {controller}@update | {name}.update.post (fallback) |
+     * | DELETE | /{name}/{id} | {controller}@destroy | {name}.destroy |
+     * | POST | /{name}/{id} | {controller}@destroy | {name}.destroy.post (fallback) |
+     *
+     * @param string $name 资源名称（单数名词，如 'post'）
+     * @param string $controller 控制器类名（不含 Controller 后缀，如 'PostController'）
+     * @param array $options 选项：only (白名单) / except (黑名单)
+     *
+     * @return void
+     */
+    public static function resource(string $name, string $controller, array $options = []): void
+    {
+        $only = $options['only'] ?? null;
+        $except = $options['except'] ?? [];
+
+        $routes = [
+            'index'   => ['GET', "/{$name}", "{$controller}@index"],
+            'create'  => ['GET', "/{$name}/create", "{$controller}@create"],
+            'store'   => ['POST', "/{$name}", "{$controller}@store"],
+            'show'    => ['GET', "/{$name}/{id}", "{$controller}@show"],
+            'edit'    => ['GET', "/{$name}/{id}/edit", "{$controller}@edit"],
+            'update'  => ['PUT', "/{$name}/{id}", "{$controller}@update"],
+            'destroy' => ['DELETE', "/{$name}/{id}", "{$controller}@destroy"],
+        ];
+
+        foreach ($routes as $action => $route) {
+            // only 白名单过滤
+            if ($only && !in_array($action, $only)) {
+                continue;
+            }
+            // except 黑名单过滤
+            if (in_array($action, $except)) {
+                continue;
+            }
+
+            [$method, $path, $handler] = $route;
+            self::$method($path, $handler)->name("{$name}.{$action}");
+
+            // update 和 destroy 额外注册 POST fallback（兼容 HTML 表单）
+            if ($action === 'update') {
+                self::post($path, $handler)->name("{$name}.{$action}.post");
+            }
+            if ($action === 'destroy') {
+                self::post($path, $handler)->name("{$name}.{$action}.post");
+            }
+        }
+    }
+
+    /**
      * 注册兜底路由（如果开发者未定义）
      *
      * 检查路由表中是否已有通配符路由或根路由，

@@ -98,7 +98,13 @@ chmod -R 777 demo/cache/
 php bin/flea-cli --project-dir=demo
 ```
 
-访问：`http://127.0.0.1:8081/index.php`
+或者在 `demo` 目录下执行：
+
+```bash
+cd demo && php ../bin/flea-cli
+```
+
+访问：`http://127.0.0.1:8081/`
 
 ---
 
@@ -115,6 +121,7 @@ fleaphp-ex/
 │   ├── cache/                  # 缓存目录
 │   └── App/
 │       ├── Config.php          # 应用配置
+│       ├── routes.php          # 路由定义
 │       ├── Controller/
 │       │   └── PostController.php   # 文章控制器
 │       ├── Model/
@@ -128,9 +135,8 @@ fleaphp-ex/
 │               └── edit.php         # 编辑文章页
 ├── src/FLEA/                   # 框架核心代码
 ├── vendor/                     # Composer 依赖
-├── bin/
-│   └── flea-cli                # CLI 启动脚本
-└── docs-book/                  # 图书项目预留目录
+└── bin/
+    └── flea-cli                # CLI 启动脚本
 ```
 
 ---
@@ -205,17 +211,33 @@ fleaphp-ex/
 
 ### 开发服务器
 
-启动后访问：`http://127.0.0.1:8081/index.php`
+启动后访问：`http://127.0.0.1:8081/`
 
-### URL 模式
+### URL 路由
 
 | 功能 | URL |
 |------|-----|
-| 文章列表 | `/index.php/post/index` |
-| 文章详情 | `/index.php/post/view/id/1` |
-| 创建文章 | `/index.php/post/create` |
-| 编辑文章 | `/index.php/post/edit/id/1` |
-| 删除文章 | `/index.php/post/delete/id/1` |
+| 文章列表 | `/post` |
+| 文章详情 | `/post/1` |
+| 创建文章 | `/post/create` |
+| 编辑文章 | `/post/1/edit` |
+| 删除文章 | `/post/1/delete` (POST) |
+
+### 命名路由
+
+在视图文件中使用：
+
+```php
+// 生成文章详情页 URL
+<a href="<?php echo \FLEA\Router::urlFor('post.view', ['id' => $post['id']]); ?>">
+    查看详情
+</a>
+
+// 生成编辑页 URL
+<a href="<?php echo \FLEA\Router::urlFor('post.edit', ['id' => $post['id']]); ?>">
+    编辑
+</a>
+```
 
 ---
 

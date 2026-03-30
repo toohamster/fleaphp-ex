@@ -255,7 +255,36 @@ Router::group('/admin', function() {
 
 // 任何方法
 Router::any('/webhook', 'WebhookController@handle');
+
+// RESTful 资源路由（一行生成 7 条路由）
+Router::resource('post', 'PostController');
+
+// 只保留部分方法
+Router::resource('post', 'PostController', ['only' => ['index', 'show']]);
+
+// 排除部分方法
+Router::resource('post', 'PostController', ['except' => ['create', 'edit']]);
 ```
+
+**Router::resource() 生成的路由表**：
+
+| 方法 | URI | 处理器 | 路由名 |
+|------|-----|--------|--------|
+| GET | /{name} | {controller}@index | {name}.index |
+| GET | /{name}/create | {controller}@create | {name}.create |
+| POST | /{name} | {controller}@store | {name}.store |
+| GET | /{name}/{id} | {controller}@show | {name}.show |
+| GET | /{name}/{id}/edit | {controller}@edit | {name}.edit |
+| PUT | /{name}/{id} | {controller}@update | {name}.update |
+| PUT | /{name}/{id} | {controller}@update | {name}.update.post (fallback) |
+| DELETE | /{name}/{id} | {controller}@destroy | {name}.destroy |
+| POST | /{name}/{id} | {controller}@destroy | {name}.destroy.post (fallback) |
+
+**说明**：
+- `resource()` 方法一行代码生成 7 条 RESTful 路由
+- 支持 `only`（白名单）和 `except`（黑名单）选项过滤路由
+- update 和 destroy 额外注册 POST fallback 路由，兼容 HTML 表单只支持 GET/POST 的限制
+- 路由名格式：`{name}.{action}`（如 `post.index`、`post.update.post`）
 
 ---
 

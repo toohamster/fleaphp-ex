@@ -156,10 +156,6 @@ return [
     'defaultController' => 'Post',
     'defaultAction' => 'index',
 
-    // URL 模式
-    'urlMode' => URL_REWRITE,
-    'urlBootstrap' => 'index.php',
-
     // 调度器
     'dispatcher' => \FLEA\Dispatcher\Simple::class,
 
@@ -184,7 +180,6 @@ return [
 |--------|------|--------|
 | `defaultController` | 默认控制器 | `Post` |
 | `defaultAction` | 默认动作 | `index` |
-| `urlMode` | URL 模式（`URL_REWRITE` / `URL_STANDARD`） | `URL_REWRITE` |
 | `dispatcher` | 调度器类 | `Simple` |
 | `view` | 视图引擎类 | `Simple` |
 | `displayErrors` | 是否显示详细错误 | `true`（开发） |
@@ -193,25 +188,44 @@ return [
 
 ## URL 路由
 
-博客应用使用简单路由模式，URL 格式：
+博客应用使用路由器模式，路由定义在 `App/routes.php` 文件中。
 
+### 路由定义
+
+```php
+// 文章相关路由
+\FLEA\Router::get('/post', 'PostController@index')->name('post.index');
+\FLEA\Router::get('/post/create', 'PostController@create')->name('post.create');
+\FLEA\Router::get('/post/{id:\d+}', 'PostController@view')->name('post.view');
+\FLEA\Router::any('/post/{id:\d+}/edit', 'PostController@edit')->name('post.edit');
+\FLEA\Router::post('/post/{id:\d+}/delete', 'PostController@delete')->name('post.delete');
+\FLEA\Router::post('/post/comment', 'PostController@comment')->name('post.comment');
+
+// 兜底路由（框架自动注册）
+// /{controller}/{action} → {Controller}Controller@action
+// /{controller} → {Controller}Controller@index
+// / → PostController@index
 ```
-index.php/{controller}/{action}/{param1}/{param2}/...
-```
+
+### URL 格式
 
 | URL | 对应方法 |
 |-----|---------|
-| `/index.php/post/index` | `PostController::actionIndex()` |
-| `/index.php/post/view/id/1` | `PostController::actionView()` |
-| `/index.php/post/create` | `PostController::actionCreate()` |
-| `/index.php/post/edit/id/1` | `PostController::actionEdit()` |
-| `/index.php/post/delete/id/1` | `PostController::actionDelete()` |
+| `/post` | `PostController::actionIndex()` |
+| `/post/create` | `PostController::actionCreate()` |
+| `/post/1` | `PostController::actionView()` |
+| `/post/1/edit` | `PostController::actionEdit()` |
+| `/post/1/delete` (POST) | `PostController::actionDelete()` |
 
-在 `URL_REWRITE` 模式下，可省略 `index.php`：
+### 命名路由
 
-```
-/post/index    → PostController::actionIndex()
-/post/view/1   → PostController::actionView()
+```php
+// 生成 URL
+$url = \FLEA\Router::urlFor('post.view', ['id' => 1]);
+// 输出：/post/1
+
+$url = \FLEA\Router::urlFor('post.edit', ['id' => 2]);
+// 输出：/post/2/edit
 ```
 
 ---
@@ -263,7 +277,7 @@ public function actionIndex(): void
 public function actionView(): void
 ```
 
-- 获取文章 ID
+- 获取文章 ID（从路由参数）
 - 调用 `$this->postModel->find($id, null, '*', true)` 查询并加载关联评论
 - 评论数据从 `$post['comments']` 获取（一次查询）
 - 传递 `post, comments, commentCount` 给视图
@@ -276,10 +290,12 @@ GET 显示表单，POST 处理提交。
 public function actionCreate(): void
 ```
 
-- POST 数据：`title, content, author`
-- 设置 `status = 1`（发布状态）
-- 调用 `$this->postModel->createPost($data)` 创建
-- 时间戳由框架自动填充
+- GET 请求：显示创建表单
+- POST 请求：
+  - 获取表单数据：`title, content, author`
+  - 设置 `status = 1`（发布状态）
+  - 调用 `$this->postModel->createPost($data)` 创建
+  - 时间戳由框架自动填充
 
 #### actionEdit() — 编辑文章
 
@@ -289,9 +305,11 @@ GET 显示编辑表单，POST 处理更新。
 public function actionEdit(): void
 ```
 
-- 获取文章 ID
-- POST 数据：`title, content, author`
-- 调用 `$this->postModel->updatePost($id, $data)` 更新
+- GET 请求：显示编辑表单（预填内容）
+- POST 请求：
+  - 获取文章 ID
+  - 获取表单数据：`title, content, author`
+  - 调用 `$this->postModel->updatePost($id, $data)` 更新
 
 #### actionDelete() — 删除文章
 
@@ -303,6 +321,7 @@ public function actionDelete(): void
 
 - 获取文章 ID
 - 调用 `$this->postModel->deletePost($id)` 删除
+- 重定向到文章列表页
 
 ---
 

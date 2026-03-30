@@ -4,6 +4,55 @@
 
 ---
 
+## 2026-03-30
+
+### feat: 新增 Router::resource() RESTful 资源路由方法
+
+**修改的文件:**
+- `src/FLEA/Router.php`
+
+**新增方法:**
+```php
+public static function resource(string $name, string $controller, array $options = []): void
+```
+
+**功能说明:**
+- 一行代码生成 7 条 RESTful 路由（index/create/store/show/edit/update/destroy）
+- 支持 `only`（白名单）和 `except`（黑名单）选项过滤路由
+- update 和 destroy 额外注册 POST fallback 路由，兼容 HTML 表单只支持 GET/POST 的限制
+- 路由名格式：`{name}.{action}`（如 `post.index`、`post.update.post`）
+
+**生成的路由表:**
+
+| 方法 | URI | 处理器 | 路由名 |
+|------|-----|--------|--------|
+| GET | /{name} | {controller}@index | {name}.index |
+| GET | /{name}/create | {controller}@create | {name}.create |
+| POST | /{name} | {controller}@store | {name}.store |
+| GET | /{name}/{id} | {controller}@show | {name}.show |
+| GET | /{name}/{id}/edit | {controller}@edit | {name}.edit |
+| PUT | /{name}/{id} | {controller}@update | {name}.update |
+| PUT | /{name}/{id} | {controller}@update | {name}.update.post (fallback) |
+| DELETE | /{name}/{id} | {controller}@destroy | {name}.destroy |
+| POST | /{name}/{id} | {controller}@destroy | {name}.destroy.post (fallback) |
+
+**用法示例:**
+```php
+// 生成全部 7 条路由
+Router::resource('post', 'PostController');
+
+// 只保留部分方法
+Router::resource('post', 'PostController', ['only' => ['index', 'show']]);
+
+// 排除部分方法
+Router::resource('post', 'PostController', ['except' => ['create', 'edit']]);
+```
+
+**文档更新:**
+- 更新 `SPEC.md` 补充 resource 路由说明
+
+---
+
 ## 2026-03-02
 
 ### refactor: 全项目 PSR-1/PSR-12 合规性修复及 PHP 7.4 风格优化

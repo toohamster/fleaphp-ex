@@ -4,6 +4,25 @@
 
 ---
 
+### feat: 新增 Router::resource() RESTful 资源路由方法
+
+新增 `Router::resource()` 方法，一行代码生成 7 条 RESTful 路由。
+
+**修改的文件:**
+- `src/FLEA/Router.php` - 新增 resource() 方法
+- `SPEC.md` - 补充 resource 路由说明
+- `USER_GUIDE.md` - 添加 resource 路由使用示例
+- `demo/APP_USAGE_GUIDE.md` - 更新路由说明和配置
+- `demo/BLOG_SETUP.md` - 更新项目结构和访问方式
+- `CHANGES.md` - 记录代码修改
+
+**功能特性:**
+- 支持 `only` 和 `except` 选项过滤路由
+- update 和 destroy 额外注册 POST fallback 路由
+- 路由名格式：`{name}.{action}`
+
+---
+
 ### feat: Container 添加 set() 方法
 
 添加 set() 方法作为 register() 的别名，提供更直观的 API。
