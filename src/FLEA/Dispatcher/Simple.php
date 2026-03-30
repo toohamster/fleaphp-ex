@@ -96,8 +96,11 @@ class Simple
     {
         $callback = \FLEA::getAppInf('dispatcherFailedCallback');
 
-        // 确定动作方法名（action 前缀 + 首字母大写，如 show → actionShow）
-        $actionMethod = 'action' . ucfirst($actionName);
+        // 将 kebab-case 转换为 PascalCase: user-list → UserList
+        $actionName = kebab_to_pascal($actionName);
+
+        // 确定动作方法名（action 前缀 + PascalCase，如 show → actionShow）
+        $actionMethod = 'action' . $actionName;
 
         $controller = null;
         do {
@@ -223,6 +226,10 @@ class Simple
         if (mb_str_ends_with($controllerName, 'Controller')) {
             return \FLEA::getAppInf('controllerClassPrefix') . $controllerName;
         }
+
+        // 将 kebab-case 转换为 PascalCase: order-apply → OrderApply
+        $controllerName = kebab_to_pascal($controllerName);
+
         // 否则添加 Controller 后缀
         $controllerClass = \FLEA::getAppInf('controllerClassPrefix');
         if (\FLEA::getAppInf('urlLowerChar')) {

@@ -4,6 +4,26 @@
 
 ---
 
+### feat: 新增 kebab_to_pascal() 函数及 URL 路由支持
+
+新增 `kebab_to_pascal()` 全局函数，支持 Laravel 风格的 kebab-case URL 路由。
+
+**修改的文件:**
+- `src/Functions.php` - 新增 kebab_to_pascal() 函数
+- `src/FLEA/Dispatcher/Simple.php` - 修改 getControllerClass() 和 executeAction() 方法
+
+**功能特性:**
+- kebab-case → PascalCase 转换（如 order-apply → OrderApply）
+- 兜底路由 `/{controller}/{action}` 自动支持短横线命名
+- 控制器和动作方法名自动转换
+
+**转换示例:**
+- `/order-apply` → OrderApplyController
+- `/user-profile-settings` → UserProfileSettingsController
+- `/create-new` → actionCreateNew
+
+---
+
 ### feat: 新增 Router::resource() RESTful 资源路由方法
 
 新增 `Router::resource()` 方法，一行代码生成 7 条 RESTful 路由。

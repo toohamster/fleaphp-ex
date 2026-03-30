@@ -127,6 +127,24 @@ function t(string $text): string
 }
 
 /**
+ * 将 kebab-case 转换为 PascalCase
+ *
+ * 用于将 URL 路径中的短横线命名转换为 PHP 类名/方法名格式
+ *
+ * @param string $value kebab-case 字符串
+ * @return string PascalCase 字符串
+ *
+ * 示例:
+ * - order-apply → OrderApply
+ * - user-list → UserList
+ * - create-new-order → CreateNewOrder
+ */
+function kebab_to_pascal(string $value): string
+{
+    return str_replace(' ', '', ucwords(str_replace('-', ' ', $value)));
+}
+
+/**
  * 安全地写入文件
  *
  * @param string $filename 文件名

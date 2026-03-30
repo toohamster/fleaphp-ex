@@ -183,7 +183,62 @@ class FLEA
 }
 ```
 
-### 3.2 Config (配置管理器)
+### 3.2 全局辅助函数
+
+在 `src/Functions.php` 中定义的全局函数：
+
+```php
+// 环境变量
+env(string $key, $default = null): mixed
+
+// 日志
+log_message($msg, $level = 'debug', $title = ''): void
+
+// SQL 语句
+sql_statement($sql): \FLEA\Db\SqlStatement
+
+// 路由
+url(string $name, array $params = []): string
+
+// 字符串转换
+kebab_to_pascal(string $value): string
+// order-apply → OrderApply
+// user-list → UserList
+
+// HTML 转义
+h(string $text): string
+t(string $text): string
+
+// Context 上下文
+flea_context(): \FLEA\Context\Context
+
+// 翻译
+_T(string $key, string $language = ''): string
+load_language(string $dictname, string $language = ''): bool
+
+// 调试
+dump($vars, string $label = '', bool $return = false): ?string
+dump_trace(): void
+print_ex(\Throwable $ex, bool $return = false): string
+
+// 文件操作
+safe_file_put_contents(string $filename, string $content): bool
+safe_file_get_contents(string $filename): ?string
+mkdirs(string $dir, int $mode = 0777): bool
+rmdirs(string $dir): bool
+
+// 数组操作
+array_remove_empty(array &$arr, bool $trim = true): void
+array_col_values(array $arr, string $col): array
+array_to_hashmap(array &$arr, string $keyField, ?string $valueField = null): array
+array_group_by(array &$arr, string $keyField): array
+array_to_tree(array $arr, string $fid, string $parentIdKey = 'parent_id', string $childrenIdKey = 'children', bool $returnReferences = false): array
+tree_to_array(array &$node, string $fchildren = 'children'): array
+array_column_sort(array $array, string $key, int $sort = SORT_ASC): array
+array_sortby_multifields(array $rowset, array $args): array
+```
+
+### 3.3 Config (配置管理器)
 
 单例模式，管理应用程序配置：
 
@@ -203,7 +258,7 @@ class Config
 }
 ```
 
-### 3.3 Container (对象容器)
+### 3.4 Container (对象容器)
 
 实现 PSR-11 依赖注入容器：
 
@@ -220,7 +275,7 @@ class Container implements \Psr\Container\ContainerInterface
 }
 ```
 
-### 3.4 Database (数据库连接管理)
+### 3.5 Database (数据库连接管理)
 
 管理数据库连接池：
 
@@ -235,7 +290,7 @@ class Database
 }
 ```
 
-### 3.5 Cache (缓存门面)
+### 3.6 Cache (缓存门面)
 
 PSR-16 缓存门面：
 
@@ -252,7 +307,7 @@ class Cache
 - `null` (默认) → `FLEA\Cache\FileCache`
 - `\FLEA\Cache\RedisCache::class` → Redis
 
-### 3.6 Log (日志服务)
+### 3.7 Log (日志服务)
 
 实现 PSR-3 LoggerInterface：
 
@@ -272,7 +327,7 @@ class Log extends \Psr\Log\AbstractLogger
 }
 ```
 
-### 3.7 Env (环境检测工具)
+### 3.8 Env (环境检测工具)
 
 ```php
 namespace FLEA;
