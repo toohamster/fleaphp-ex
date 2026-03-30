@@ -23,7 +23,7 @@
         "source": "https://github.com/toohamster/fleaphp-ex",
         "docs": "https://github.com/toohamster/fleaphp-ex/blob/master/SPEC.md"
     },
-    "license": "LGPL-2.1-or-later",
+    "license": "MIT",
     "authors": [
         {
             "name": "toohamster",

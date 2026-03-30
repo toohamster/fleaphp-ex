@@ -1,213 +1,349 @@
-# FLEA 博客小程序 - 安装完成
+# 博客应用安装指南 v2.0
 
-基于 FLEA 框架开发的博客小程序已成功创建！
+基于 FleaPHP v2.0 框架开发的博客示例应用安装指南。
+
+---
+
+## 系统要求
+
+- **PHP**: 7.4+
+- **MySQL**: 5.0+ 或 PDO 支持的其他数据库
+- **Composer**: 依赖管理工具
+- **Web 服务器**: Apache/Nginx（可选，开发环境可用 PHP 内置服务器）
+
+---
+
+## 安装步骤
+
+### 方式一：通过 Composer 安装（推荐）
+
+```bash
+composer require toohamster/fleaphp-ex
+```
+
+### 方式二：克隆项目
+
+```bash
+git clone https://github.com/toohamster/fleaphp-ex.git
+cd fleaphp-ex
+```
+
+### 安装依赖
+
+在项目根目录执行：
+
+```bash
+php74 ~/bin/composer.phar install
+```
+
+### 3. 配置环境变量
+
+复制环境配置示例文件：
+
+```bash
+cp demo/.env.example demo/.env
+```
+
+编辑 `demo/.env` 文件，配置数据库连接：
+
+```env
+# 应用环境
+APP_ENV=local
+APP_DEBUG=true
+
+# 数据库配置
+DB_DRIVER=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD=your_password
+DB_DATABASE=blog
+```
+
+**配置说明**：
+
+| 配置项 | 说明 | 默认值 |
+|--------|------|--------|
+| `APP_ENV` | 应用环境 | `local` |
+| `APP_DEBUG` | 调试模式 | `true` |
+| `DB_DRIVER` | 数据库驱动 | `mysql` |
+| `DB_HOST` | 数据库主机 | `127.0.0.1` |
+| `DB_PORT` | 数据库端口 | `3306` |
+| `DB_USERNAME` | 数据库用户名 | `root` |
+| `DB_PASSWORD` | 数据库密码 | 需修改 |
+| `DB_DATABASE` | 数据库名 | `blog` |
+
+### 4. 初始化数据库
+
+```bash
+mysql -u root -p < demo/blog.sql
+```
+
+`blog.sql` 会执行以下操作：
+- 创建 `blog` 数据库
+- 创建 `posts` 和 `comments` 数据表
+- 插入示例数据（3 篇文章，3 条评论）
+
+### 5. 设置缓存目录权限
+
+```bash
+chmod -R 777 demo/cache/
+```
+
+### 6. 启动开发服务器
+
+在项目根目录执行：
+
+```bash
+php bin/flea-cli --project-dir=demo
+```
+
+访问：`http://127.0.0.1:8081/index.php`
+
+---
 
 ## 项目结构
 
 ```
 fleaphp-ex/
-├── App/                    # 应用目录
-│   ├── Config.php          # 应用配置文件
-│   ├── Controller/
-│   │   └── Post.php        # 文章控制器
-│   ├── Model/
-│   │   ├── Post.php        # 文章模型
-│   │   └── Comment.php     # 评论模型
-│   └── View/
-│       └── post/
-│           ├── index.php   # 文章列表页
-│           ├── view.php    # 文章详情页
-│           ├── create.php  # 创建文章页
-│           └── edit.php    # 编辑文章页
-├── blog.sql                # 数据库数据库初始化脚本
-├── index.php               # 应用入口文件
-├── cache/                  # 缓存目录
-└── FLEA/                   # FLEA 框架核心
+├── demo/                       # 博客应用目录
+│   ├── .env                    # 环境配置
+│   ├── .env.example            # 配置示例
+│   ├── blog.sql                # 数据库初始化脚本
+│   ├── public/
+│   │   └── index.php           # Web 入口
+│   ├── cache/                  # 缓存目录
+│   └── App/
+│       ├── Config.php          # 应用配置
+│       ├── Controller/
+│       │   └── PostController.php   # 文章控制器
+│       ├── Model/
+│       │   ├── Post.php             # 文章模型
+│       │   └── Comment.php          # 评论模型
+│       └── View/
+│           └── post/
+│               ├── index.php        # 文章列表页
+│               ├── view.php         # 文章详情页
+│               ├── create.php       # 创建文章页
+│               └── edit.php         # 编辑文章页
+├── src/FLEA/                   # 框架核心代码
+├── vendor/                     # Composer 依赖
+├── bin/
+│   └── flea-cli                # CLI 启动脚本
+└── docs-book/                  # 图书项目预留目录
 ```
 
-## 已完成的设置
+---
 
-### 1. 数据库设置
-✅ 数据库 `blog` 已创建
-✅ 数据表 `posts` 和 `comments` 已创建
-✅ 示例数据已插入（3篇文章，3条评论）
+## 数据库结构
 
-### 2. 配置文件
-✅ 数据库连接配置已完成
-- 主机: 127.0.0.1:3306
-- 用户名: root
-- 密码: 11111111
-- 数据库: blog
+### posts 表（文章表）
 
-✅ 应用配置已设置
-- 默认控制器: Post
-- 默认动作: index
-- 视图引擎: PHP
-- 错误显示: 开启
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | INT AUTO_INCREMENT | 主键 |
+| title | VARCHAR(255) | 文章标题 |
+| content | TEXT | 文章内容 |
+| author | VARCHAR(100) | 作者 |
+| created_at | DATETIME | 创建时间（自动填充） |
+| updated_at | DATETIME | 更新时间（自动更新） |
+| status | TINYINT | 0=草稿，1=发布 |
 
-### 3. 代码文件
-✅ Model 层 (Post.php, Comment.php)
-✅ Controller 层 (Post.php)
-✅ View 层 (4个视图文件)
-✅ 入口文件 (index.php)
+### comments 表（评论表）
 
-## 功能特性
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | INT AUTO_INCREMENT | 主键 |
+| post_id | INT | 文章 ID（外键，级联删除） |
+| author | VARCHAR(100) | 评论者 |
+| email | VARCHAR(255) | 邮箱（可选） |
+| content | TEXT | 评论内容 |
+| created_at | DATETIME | 创建时间（自动填充） |
+| status | TINYINT | 0=待审核，1=已审核 |
 
-### 文章管理
-- ✅ 查看文章列表（分页）
-- ✅ 查看文章详情
-- ✅ 创建新文章
-- ✅ 编辑文章
-- ✅ 删除文章
-
-### 评论功能
-- ✅ 查看文章评论
-- ✅ 发表评论
-
-### 用户界面
-- ✅ 响应式设计
-- ✅ 美观的界面
-- ✅ 友好的交互
-
-## 如何使用
-
-### 访问博客首页
-在浏览器中访问：
-```
-http://localhost/fleaphp-ex/
-或
-http://localhost/fleaphp-ex/index.php?controller=Post&action=index
-```
-
-### URL 访问模式
-
-1. **文章列表**: `?controller=Post&action=index`
-2. **文章详情**: `?controller=Post&action=view&id=1`
-3. **创建文章**: `?controller=Post&action=create`
-4. **编辑文章**: `?controller=Post&action=edit&id=1`
-5. **删除文章**: `?controller=Post&action=delete&id=1`
-6. **发表评论**: `?controller=Post&action=comment` (POST)
-
-## 数据库信息
-
-### posts 表 (文章表)
-```sql
-字段名        类型          说明
-id          INT          主键
-title       VARCHAR(255) 文章标题
-content     TEXT         文章内容
-author      VARCHAR(100) 作者
-created_at  DATETIME     创建时间
-updated_at  DATETIME     更新时间
-status      TINYINT      状态 (0-草稿, 1-发布)
-```
-
-### comments 表 (评论表)
-```sql
-字段名        类型          说明
-id          INT          主键
-post_id     INT          文章ID (外键)
-author      VARCHAR(100) 评论者
-email       VARCHAR(255) 邮箱
-content     TEXT         评论内容
-created_at  DATETIME     创建时间
-status      TINYINT      状态 (0-待审核, 1-已审核)
-```
+---
 
 ## 示例数据
 
 数据库中已包含以下示例数据：
 
 ### 文章
-1. "欢迎来到我的博客" - 管理员
-2. "FLEA 框架介绍" - 管理员
-3. "PHP 最佳实践" - 技术专家
+
+1. **欢迎来到我的博客** - 管理员
+2. **FleaPHP 框架介绍** - 管理员
+3. **PHP 最佳实践** - 技术专家
 
 ### 评论
-1. 访客1 对文章1的评论
-2. 访客2 对文章1的评论
-3. 开发者 对文章2的评论
 
-## 技术栈
+1. 访客 1 对文章 1 的评论
+2. 访客 2 对文章 1 的评论
+3. 开发者 对文章 2 的评论
 
-- **后端框架**: FLEA (PSR-4 标准)
-- **数据库**: MySQL
-- **PHP版本**: 7.1+
-- **模板引擎**: 原生 PHP
-- **CSS**: 自定义响应式样式
+---
 
-## 开发说明
+## 功能特性
 
-### 添加新的控制器
+### 文章管理
+- 查看文章列表（分页显示）
+- 查看文章详情
+- 创建新文章
+- 编辑文章
+- 删除文章
 
-在 `App/Controller/` 目录下创建新的 PHP 文件，例如：
+### 评论功能
+- 查看文章评论
+- 发表评论
 
-```php
-<?php
+### 用户界面
+- 响应式设计
+- 简洁美观的界面
+- 友好的交互体验
 
-namespace App\Controller;
+---
 
-use \FLEA\Controller\Action;
+## 访问方式
 
-class MyController extends Action
-{
-    public function actionIndex()
-    {
-        $this->view->assign('title', '我的页面');
-        $this->view->display('my/index.php');
+### 开发服务器
+
+启动后访问：`http://127.0.0.1:8081/index.php`
+
+### URL 模式
+
+| 功能 | URL |
+|------|-----|
+| 文章列表 | `/index.php/post/index` |
+| 文章详情 | `/index.php/post/view/id/1` |
+| 创建文章 | `/index.php/post/create` |
+| 编辑文章 | `/index.php/post/edit/id/1` |
+| 删除文章 | `/index.php/post/delete/id/1` |
+
+---
+
+## 生产环境部署
+
+### 1. 修改环境配置
+
+编辑 `demo/.env`：
+
+```env
+APP_ENV=production
+APP_DEBUG=false
+```
+
+### 2. 配置 Web 服务器
+
+**Apache 配置示例**：
+
+```apache
+<VirtualHost *:80>
+    ServerName blog.example.com
+    DocumentRoot /path/to/fleaphp-ex/demo/public
+
+    <Directory /path/to/fleaphp-ex/demo/public>
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+```
+
+**Nginx 配置示例**：
+
+```nginx
+server {
+    listen 80;
+    server_name blog.example.com;
+    root /path/to/fleaphp-ex/demo/public;
+    index index.php;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
     }
 }
 ```
 
-### 添加新的模型
+### 3. 优化设置
 
-在 `App/Model/` 目录下创建新的 PHP 文件，例如：
+- 开启视图缓存（`App/Config.php` 中设置 `enableCache => true`）
+- 关闭错误显示
+- 使用 OPcache 加速
 
-```php
-<?php
-
-namespace App\Model;
-
-use \FLEA\Db\TableDataGateway;
-
-class MyModel extends TableDataGateway
-{
-    public $tableName = 'my_table';
-    public $primaryKey = 'id';
-}
-```
-
-### 添加新的视图
-
-在 `App/View/` 目录下创建对应的视图文件。
-
-## 注意事项
-
-1. 确保 MySQL 服务正在运行
-2. 确保数据库用户名和密码正确
-3. 确保 `cache` 目录有写入权限
-4. 开发环境建议开启错误显示
+---
 
 ## 故障排除
 
-### 如果遇到错误
-1. 检查数据库连接是否正常
-2. 检查 cache 目录权限
-3. 查看 PHP 错误日志
-4. 确保 vendor 目录已正确安装
+### 数据库连接失败
+
+检查 `.env` 中的数据库配置是否正确：
+
+```bash
+# 测试数据库连接
+mysql -u root -p -e "USE blog; SELECT 1;"
+```
+
+### 缓存目录权限错误
+
+```bash
+chmod -R 777 demo/cache/
+```
+
+### 自动加载问题
+
+重新生成自动加载文件：
+
+```bash
+php74 ~/bin/composer.phar dump-autoload
+```
+
+### PHP 版本检查
+
+确保使用 PHP 7.4+：
+
+```bash
+php74 -v
+```
 
 ### 重置数据库
+
 ```bash
-mysql -u root -p11111111 < blog.sql
+mysql -u root -p < demo/blog.sql
 ```
+
+---
+
+## 技术栈
+
+| 组件 | 版本/类型 |
+|------|----------|
+| 框架 | FleaPHP v2.0 |
+| PHP | 7.4+ |
+| 数据库 | MySQL 5.0+ |
+| 依赖管理 | Composer |
+| 模板引擎 | Simple View |
+
+---
 
 ## 下一步
 
 你可以根据需要扩展此博客系统：
-- 添加用户登录功能
-- 添加标签分类
-- 添加文章搜索
-- 添加图片上传
-- 添加后台管理界面
 
-祝你使用愉快！🎉
+- 添加用户登录/注册功能
+- 添加文章标签和分类
+- 添加文章搜索功能
+- 添加图片上传功能
+- 添加后台管理界面
+- 添加 Markdown 编辑器
+
+---
+
+## 参考文档
+
+- [APP_USAGE_GUIDE.md](APP_USAGE_GUIDE.md) - 博客应用使用手册
+- [USER_GUIDE.md](../USER_GUIDE.md) - 框架用户手册
+- [SPEC.md](../SPEC.md) - 框架规格说明书

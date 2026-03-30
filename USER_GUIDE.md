@@ -1,373 +1,324 @@
-# FleaPHP 框架用户手册
+# FleaPHP 用户手册 v2.0
 
 ## 目录
 
 1. [简介](#简介)
-2. [快速开始](#快速开始)
-3. [核心组件](#核心组件)
-4. [配置管理](#配置管理)
-5. [控制器开发](#控制器开发)
-6. [模型开发](#模型开发)
-7. [视图开发](#视图开发)
-8. [数据库操作](#数据库操作)
-9. [关联关系](#关联关系)
-10. [异常处理](#异常处理)
-11. [分页功能](#分页功能)
-12. [Ajax 支持](#ajax-支持)
-13. [RBAC 权限控制](#rbac-权限控制)
-14. [ACL 访问控制列表](#acl-访问控制列表)
-15. [Session 管理](#session-管理)
-16. [日志服务](#日志服务)
-17. [辅助类](#辅助类)
-18. [开发最佳实践](#开发最佳实践)
-19. [常见问题](#常见问题)
+2. [安装与配置](#安装与配置)
+3. [核心概念](#核心概念)
+4. [HTTP 基础](#http-基础)
+5. [中间件开发](#中间件开发)
+6. [控制器开发](#控制器开发)
+7. [模型与数据库](#模型与数据库)
+8. [视图开发](#视图开发)
+9. [JWT 认证](#jwt-认证)
+10. [Context 上下文](#context-上下文)
+11. [日志与缓存](#日志与缓存)
+12. [最佳实践](#最佳实践)
 
 ---
 
 ## 简介
 
-FleaPHP 是一个轻量级的 PHP MVC 框架，采用 PSR-4 命名空间标准和 Composer 自动加载机制。框架设计简洁，适合快速开发中小型 Web 应用。
+FleaPHP 是一个轻量级的 PHP MVC 框架，采用 PSR-4 命名空间标准和 Composer 自动加载机制，支持 PHP 7.4+。
 
 ### 主要特性
 
-- **MVC 架构**：清晰的模型 - 视图 - 控制器分离
-- **PSR-4 自动加载**：基于 Composer 的标准自动加载
-- **TableDataGateway 模式**：简洁的数据库 CRUD 操作
-- **简单视图引擎**：使用原生 PHP 作为模板语言，支持模板缓存
-- **事件回调**：支持控制器生命周期回调（beforeExecute、afterExecute）
-- **关联查询**：支持 HAS_ONE、HAS_MANY、BELONGS_TO、MANY_TO_MANY 关联
-- **异常处理**：完善的异常处理机制
-- **日志服务**：实现 PSR-3 标准的日志接口
-- **RBAC/ACL**：内置基于角色的权限控制和访问控制列表
+- **PSR 标准**：PSR-11 容器、PSR-16 缓存、PSR-3 日志
+- **MVC 架构**：模型 - 视图 - 控制器清晰分离
+- **路由器**：RESTful 路由、路由分组、命名路由
+- **中间件**：洋葱模型管道
+- **JWT 认证**：HS256 签名
+- **Context 上下文**：可插拔的状态管理
+- **TableDataGateway**：简洁的数据库 CRUD
+- **关联查询**：HAS_ONE、HAS_MANY、BELONGS_TO、MANY_TO_MANY
 
 ### 系统要求
 
 - **PHP**: 7.4+
-- **Composer**: 用于依赖管理
-- **数据库**: MySQL 5.0+ 或其他 PDO 支持的数据库（PostgreSQL、SQLite 等）
-- **Web 服务器**: Apache/Nginx（可选，用于 URL 重写）
-
-### 框架版本
-
-当前版本：**1.7.1524**
+- **Composer**: 依赖管理
+- **数据库**: MySQL 5.0+ 或 PDO 支持的其他数据库
 
 ---
 
-## 快速开始
+## 安装与配置
 
-### 1. 项目初始化
+### 1. 安装依赖
 
 ```bash
-# 进入项目目录
-cd your-project
-
-# 安装依赖
 composer install
-
-# 启动开发服务器（PHP 7.4）
-php74 -S 127.0.0.1:8081
-
-# 访问应用
-http://127.0.0.1:8081/index.php
 ```
 
-### 2. 项目结构
+### 2. 配置环境变量
 
-```
-project/
-├── App/
-│   ├── Config.php          # 应用配置文件
-│   ├── Controller/         # 控制器目录
-│   │   └── PostController.php
-│   ├── Model/              # 模型目录
-│   │   ├── Post.php
-│   │   └── Comment.php
-│   └── View/               # 视图模板目录
-│       └── post/
-│           ├── index.php
-│           ├── view.php
-│           ├── create.php
-│           └── edit.php
-├── FLEA/                   # 框架核心目录
-│   ├── FLEA.php           # 框架入口
-│   └── FLEA/              # 框架组件
-├── cache/                  # 缓存目录（需可写）
-├── vendor/                 # Composer 依赖
-├── composer.json           # Composer 配置
-└── index.php               # 应用入口
+复制示例配置文件：
+
+```bash
+cp .env.example .env
 ```
 
-### 3. 入口文件
+编辑 `.env` 文件：
 
-```php
-<?php
-// index.php
+```env
+# 应用环境
+APP_ENV=local
+APP_DEBUG=true
 
-require_once 'vendor/autoload.php';
+# 数据库配置
+DB_DRIVER=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD=your_password
+DB_DATABASE=blog
 
-// 注册 App 命名空间到自动加载器
-class_loader()->addPsr4('App\\', __DIR__ . '/App/');
+# Context 配置
+CONTEXT_DRIVER=session
+CONTEXT_IDENTITY=session
 
-// 加载应用配置
-\FLEA::loadAppInf('App/Config.php');
+# JWT 配置
+JWT_SECRET=your-secret-key-change-this
+JWT_TTL=7200
 
-// 运行 MVC 应用
-\FLEA::runMVC();
+# 日志配置
+LOG_ENABLED=false
+LOG_LEVEL=debug
 ```
 
-### 4. URL 访问格式
+### 3. 初始化数据库
 
-**标准模式**（默认）：
-```
-index.php?controller=Post&action=index
-index.php?controller=Post&action=view&id=1
+```bash
+mysql -u root -p < blog.sql
 ```
 
-**PATHINFO 模式**：
+### 4. 启动开发服务器
+
+```bash
+# 在项目根目录执行
+php bin/flea-cli --project-dir=demo
+
+# 访问 http://127.0.0.1:8081/index.php
 ```
-index.php/Post/index
-index.php/Post/view/id/1
-```
-
-**URL 重写模式**（需要 .htaccess 或 Nginx 配置）：
-```
-/Post/index
-/Post/view/id/1
-```
-
-### 5. 第一个控制器
-
-```php
-<?php
-// App/Controller/IndexController.php
-
-namespace App\Controller;
-
-use \FLEA\Controller\Action;
-
-class IndexController extends Action
-{
-    public function __construct()
-    {
-        parent::__construct('Index');
-    }
-
-    public function actionIndex()
-    {
-        echo "Hello, FleaPHP!";
-    }
-}
-```
-
-访问：`index.php?controller=Index&action=index`
 
 ---
 
-## 核心组件
+## 核心概念
 
 ### FLEA 类
 
-框架的主入口类，提供静态方法管理框架服务：
+框架主入口类，提供静态方法访问核心功能：
 
 ```php
-class FLEA
-{
-    // 加载应用配置
-    public static function loadAppInf($config): void
+// 加载环境变量
+\FLEA::loadEnv(__DIR__ . '/../.env');
 
-    // 获取配置值
-    public static function getAppInf(string $option, $default = null)
+// 加载应用配置
+\FLEA::loadAppInf(__DIR__ . '/../App/Config.php');
 
-    // 设置配置值
-    public static function setAppInf($option, $data = null): void
+// 获取配置项
+$controller = \FLEA::getAppInf('defaultController');
 
-    // 获取单例实例
-    public static function getSingleton(string $className)
+// 获取单例对象
+$container = \FLEA::getSingleton(\FLEA\Container::class);
 
-    // 注册对象实例
-    public static function register($object, string $id): void
-
-    // 检查对象是否已注册
-    public static function isRegistered(string $id): bool
-
-    // 获取数据库访问对象
-    public static function getDBO(?string $dsn = null)
-
-    // 运行 MVC 应用
-    public static function runMVC()
-}
-```
-
-### 使用示例
-
-```php
-// 加载配置
-\FLEA::loadAppInf('App/Config.php');
-
-// 获取配置值
-$dbConfig = \FLEA::getAppInf('dbDSN');
-$siteName = \FLEA::getAppInf('siteName', '默认站点名');
-
-// 设置配置值
-\FLEA::setAppInf('siteName', '我的博客');
-
-// 获取数据库对象
-$dbo = \FLEA::getDBO();
-
-// 运行应用
+// 启动 MVC
 \FLEA::runMVC();
 ```
 
-### Config 配置管理器
+### 容器（Container）
 
-单例模式管理框架配置：
+实现 PSR-11 标准的依赖注入容器：
 
 ```php
-namespace FLEA;
+use FLEA\Container;
 
-class Config
-{
-    public array $appInf = [];       // 应用程序配置
-    public array $objects = [];      // 对象实例容器
-    public array $dbo = [];          // 数据库访问对象
+$container = Container::getInstance();
 
-    // 获取单例实例
-    public static function getInstance(): self
+// 注册对象
+$container->register(new MyService(), 'myService');
 
-    // 获取配置值
-    public function getAppInf(string $option, $default = null)
+// 获取单例
+$service = $container->singleton(MyService::class);
 
-    // 设置配置值
-    public function setAppInf($option, $data = null): void
-
-    // 合并配置
-    public function mergeAppInf(array $config): void
+// 检查是否存在
+if ($container->has('myService')) {
+    $service = $container->get('myService');
 }
+```
+
+### 配置管理
+
+配置加载顺序（优先级从高到低）：
+
+1. `.env.{APP_ENV}` 环境文件
+2. `.env` 基础配置
+3. `App/Config.php` 应用配置
+4. `FLEA\Config\Defaults` 框架默认配置
+
+```php
+// 获取配置
+$dbHost = \FLEA::getAppInfValue('dbDSN', 'host');
+$jwtSecret = \FLEA::getAppInf('jwtSecret', '');
+
+// 设置配置
+\FLEA::setAppInfValue('dbDSN', 'host', '192.168.1.100');
 ```
 
 ---
 
-## 配置管理
+## HTTP 基础
 
-### 配置文件结构
-
-```php
-<?php
-// App/Config.php
-
-return [
-    // ========================
-    // 数据库配置
-    // ========================
-    'dbDSN' => [
-        'driver' => 'mysql',
-        'host' => '127.0.0.1',
-        'port' => '3306',
-        'login' => 'root',
-        'password' => 'password',
-        'database' => 'blog',
-        'charset' => 'utf8mb4',
-    ],
-
-    // 数据表前缀
-    'dbTablePrefix' => '',
-
-    // ========================
-    // 控制器配置
-    // ========================
-    'controllerAccessor' => 'controller',     // URL 中控制器的参数名
-    'actionAccessor' => 'action',             // URL 中动作的参数名
-    'defaultController' => 'Post',            // 默认控制器
-    'defaultAction' => 'index',               // 默认动作
-    'controllerClassPrefix' => '\\App\\Controller\\',  // 控制器类名前缀
-    'actionMethodPrefix' => 'action',      // 控制器方法前缀
-    'actionMethodSuffix' => '',            // 控制器方法后缀
-
-    // ========================
-    // URL 配置
-    // ========================
-    'urlMode' => URL_STANDARD,    // URL_STANDARD, URL_PATHINFO, URL_REWRITE
-    'urlBootstrap' => 'index.php',
-    'urlLowerChar' => false,      // URL 是否转换为小写
-
-    // ========================
-    // 视图配置
-    // ========================
-    'view' => \FLEA\View\Simple::class,
-    'viewConfig' => [
-        'templateDir' => __DIR__ . '/View',
-        'cacheDir' => __DIR__ . '/../cache',
-        'cacheLifeTime' => 900,     // 缓存时间（秒）
-        'enableCache' => false,     // 开发环境建议关闭
-    ],
-
-    // ========================
-    // 调度器配置
-    // ========================
-    'dispatcher' => \FLEA\Dispatcher\Simple::class,
-
-    // ========================
-    // 日志配置
-    // ========================
-    'logEnabled' => false,
-    'logProvider' => null,
-    'logFileDir' => __DIR__ . '/../logs',
-    'logFilename' => 'app.log',
-    'logErrorLevel' => [
-        \Psr\Log\LogLevel::ERROR,
-        \Psr\Log\LogLevel::WARNING,
-    ],
-
-    // ========================
-    // Session 配置
-    // ========================
-    'sessionProvider' => null,  // 默认使用 PHP 原生 Session
-    // 'sessionProvider' => \FLEA\Session\Db::class,  // 使用数据库 Session
-
-    // ========================
-    // 错误显示（开发环境）
-    // ========================
-    'displayErrors' => true,
-    'displaySource' => true,
-    'friendlyErrorsMessage' => true,
-
-    // ========================
-    // 缓存目录
-    // ========================
-    'internalCacheDir' => __DIR__ . '/../cache',
-];
-```
-
-### 调试模式与生产模式
-
-FleaPHP 支持两种运行模式：
-
-**调试模式**（默认）：
-```php
-// 不定义 DEPLOY_MODE 或定义为 false
-// 使用 Config/DEBUG_MODE_CONFIG.php 中的配置
-// 显示详细错误信息，适合开发环境
-```
-
-**生产模式**：
-```php
-// 在 index.php 中定义
-define('DEPLOY_MODE', true);
-
-// 使用 Config/DEPLOY_MODE_CONFIG.php 中的配置
-// 隐藏错误信息，记录日志，适合生产环境
-```
-
-### 配置继承与覆盖
+### Request 请求封装
 
 ```php
-// 在配置文件中可以先加载默认配置，然后覆盖
-$defaultConfig = require FLEA_DIR . '/Config/DEBUG_MODE_CONFIG.php';
-$customConfig = [
-    'dbDSN' => [...],  // 覆盖数据库配置
-];
-return array_merge($defaultConfig, $customConfig);
+use FLEA\Request;
+
+$request = Request::current();
+
+// 请求方法
+$method = $request->method();
+$isPost = $request->isPost();
+$isAjax = $request->isAjax();
+
+// 获取参数
+$id = $request->input('id');
+$name = $request->get('name', 'default');
+$data = $request->post('data');
+
+// JSON 请求体
+$json = $request->json();
+$userId = $request->json('user_id');
+
+// 请求头
+$token = $request->header('Authorization');
+$ip = $request->ip();
+$uri = $request->uri();
 ```
+
+### Response 响应封装
+
+```php
+use FLEA\Response;
+
+// 成功响应
+Response::success([
+    'id' => 1,
+    'name' => 'John'
+]);
+
+// 错误响应
+Response::error('资源未找到', 404);
+
+// 自定义响应
+Response::make()
+    ->code(200)
+    ->header('X-Custom', 'value')
+    ->json($data);
+
+// 分页响应
+Response::paginate($items, $total, $page, $pageSize);
+```
+
+**统一响应结构**：
+
+```json
+// 成功
+{"code": 0, "message": "ok", "data": {...}}
+
+// 错误
+{"code": -1, "message": "error message", "data": null}
+```
+
+### Router 路由器
+
+```php
+use FLEA\Router;
+
+// 基本路由
+Router::get('/users', 'UserController@index');
+Router::post('/users', 'UserController@store');
+Router::put('/users/{id}', 'UserController@update');
+Router::delete('/users/{id}', 'UserController@destroy');
+
+// 带正则参数的路由
+Router::get('/users/{id:\d+}', 'UserController@show');
+Router::get('/posts/{slug:[a-z-]+}', 'PostController@showBySlug');
+
+// 命名路由
+Router::get('/users', 'UserController@index')->name('users.index');
+$url = Router::urlFor('users.index');
+
+// 路由分组
+Router::group('/admin', function() {
+    Router::get('/dashboard', 'AdminController@dashboard');
+    Router::get('/settings', 'AdminController@settings');
+}, [new AuthMiddleware()]);
+
+// 任何方法
+Router::any('/webhook', 'WebhookController@handle');
+```
+
+---
+
+## 中间件开发
+
+### 中间件接口
+
+```php
+namespace FLEA\Middleware;
+
+interface MiddlewareInterface
+{
+    public function handle(callable $next): void;
+}
+```
+
+### 自定义中间件
+
+```php
+namespace App\Middleware;
+
+use FLEA\Middleware\MiddlewareInterface;
+
+class CheckAdminMiddleware implements MiddlewareInterface
+{
+    public function handle(callable $next): void
+    {
+        // 前置处理：检查用户是否为管理员
+        $user = flea_context()->get('user');
+        if (!$user || !$user['is_admin']) {
+            \FLEA\Response::error('权限不足', 403);
+            return;
+        }
+
+        // 调用下一个中间件或处理器
+        $next();
+
+        // 后置处理（如果需要）
+    }
+}
+```
+
+### 注册中间件
+
+```php
+// 全局中间件（对所有请求生效）
+\FLEA::middleware(new \FLEA\Middleware\CorsMiddleware());
+\FLEA::middleware(new \App\Middleware\CheckAdminMiddleware());
+
+// 路由级中间件
+Router::get('/admin/dashboard', 'AdminController@dashboard', [
+    new \FLEA\Middleware\AuthMiddleware(),
+    new \App\Middleware\CheckAdminMiddleware()
+]);
+```
+
+### 内置中间件
+
+| 中间件 | 说明 |
+|--------|------|
+| `CorsMiddleware` | CORS 跨域支持 |
+| `AuthMiddleware` | JWT 认证检查 |
+| `RateLimitMiddleware` | 请求限流 |
 
 ---
 
@@ -376,387 +327,259 @@ return array_merge($defaultConfig, $customConfig);
 ### 基本结构
 
 ```php
-<?php
 namespace App\Controller;
 
-use \FLEA\Controller\Action;
+use FLEA\Controller\Action;
 use App\Model\Post;
 
-/**
- * 文章控制器
- */
 class PostController extends Action
 {
-    /**
-     * @var Post
-     */
     protected Post $postModel;
 
-    /**
-     * @var \FLEA\View\ViewInterface
-     */
-    public $view;
-
-    /**
-     * 构造函数
-     */
     public function __construct()
     {
-        // 调用父类构造函数，传入控制器名称
         parent::__construct('Post');
-
-        // 初始化模型
         $this->postModel = new Post();
-
-        // 获取视图对象
-        $this->view = $this->getView();
     }
 
-    /**
-     * 列表页 - action 前缀的方法是公开的控制器动作
-     */
+    // 生命周期回调
+    public function beforeExecute($actionMethod): void
+    {
+        // 在 action 之前执行
+    }
+
+    public function afterExecute($actionMethod): void
+    {
+        // 在 action 之后执行
+    }
+}
+```
+
+### 动作方法
+
+```php
+class PostController extends Action
+{
+    // 列表页
     public function actionIndex(): void
     {
         $posts = $this->postModel->findAll(['status' => 1]);
-        $this->view->assign('posts', $posts);
-        $this->view->display('post/index.php');
+        $this->getView()->assign('posts', $posts);
+        $this->getView()->display('post/index.php');
     }
 
-    /**
-     * 详情页
-     */
+    // 详情页
     public function actionView(): void
     {
-        $id = intval($_GET['id'] ?? 0);
-        if (!$id) {
-            throw new \FLEA\Exception\InvalidArguments('文章 ID 不能为空');
-        }
-
+        $id = $this->request->input('id');
         $post = $this->postModel->find($id);
+
         if (!$post) {
-            throw new \FLEA\Exception\InvalidArguments('文章不存在');
+            \FLEA\Response::error('文章未找到', 404);
+            return;
         }
 
-        $this->view->assign('post', $post);
-        $this->view->display('post/view.php');
+        $this->getView()->assign('post', $post);
+        $this->getView()->display('post/view.php');
     }
 
-    /**
-     * 创建文章 - 处理 GET 和 POST 请求
-     */
+    // 创建（GET 显示表单，POST 处理提交）
     public function actionCreate(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // 处理表单提交
+        if ($this->request->isPost()) {
             $data = [
-                'title' => $_POST['title'] ?? '',
-                'content' => $_POST['content'] ?? '',
-                'author' => $_POST['author'] ?? '匿名',
+                'title' => $this->request->post('title'),
+                'content' => $this->request->post('content'),
             ];
-
-            // 数据验证
-            if (empty($data['title'])) {
-                echo '<script>alert("标题不能为空"); history.back();</script>';
-                return;
-            }
-
-            // 创建文章
-            $id = $this->postModel->createPost($data);
-            if ($id) {
-                echo '<script>alert("创建成功"); location.href="?controller=Post&action=index";</script>';
-            } else {
-                echo '<script>alert("创建失败"); history.back();</script>';
-            }
-        } else {
-            // 显示表单
-            $this->view->display('post/create.php');
+            $id = $this->postModel->create($data);
+            \FLEA\Response::success(['id' => $id]);
+            return;
         }
+
+        $this->getView()->display('post/create.php');
     }
 
-    /**
-     * 编辑文章
-     */
+    // 编辑
     public function actionEdit(): void
     {
-        $id = intval($_GET['id'] ?? 0);
-        if (!$id) {
-            throw new \FLEA\Exception\InvalidArguments('文章 ID 不能为空');
-        }
-
-        // 获取文章
+        $id = $this->request->input('id');
         $post = $this->postModel->find($id);
-        if (!$post) {
-            throw new \FLEA\Exception\InvalidArguments('文章不存在');
-        }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if ($this->request->isPost()) {
             $data = [
-                'title' => $_POST['title'] ?? '',
-                'content' => $_POST['content'] ?? '',
-                'author' => $_POST['author'] ?? '匿名',
+                'id' => $id,
+                'title' => $this->request->post('title'),
+                'content' => $this->request->post('content'),
             ];
-
-            if (empty($data['title'])) {
-                echo '<script>alert("标题不能为空"); history.back();</script>';
-                return;
-            }
-
-            // 更新文章
-            $result = $this->postModel->updatePost($id, $data);
-            if ($result) {
-                echo '<script>alert("更新成功"); location.href="?controller=Post&action=view&id=' . $id . '";</script>';
-            } else {
-                echo '<script>alert("更新失败"); history.back();</script>';
-            }
-        } else {
-            $this->view->assign('post', $post);
-            $this->view->display('post/edit.php');
+            $this->postModel->update($data);
+            \FLEA\Response::success();
+            return;
         }
+
+        $this->getView()->assign('post', $post);
+        $this->getView()->display('post/edit.php');
     }
 
-    /**
-     * 删除文章
-     */
+    // 删除
     public function actionDelete(): void
     {
-        $id = intval($_GET['id'] ?? 0);
-        if (!$id) {
-            throw new \FLEA\Exception\InvalidArguments('文章 ID 不能为空');
-        }
-
-        // 二次确认
-        if (isset($_GET['confirm']) && $_GET['confirm'] === 'yes') {
-            $result = $this->postModel->removeByPkv($id);
-            if ($result) {
-                echo '<script>alert("删除成功"); location.href="?controller=Post&action=index";</script>';
-            } else {
-                echo '<script>alert("删除失败"); history.back();</script>';
-            }
-        } else {
-            echo '<script>if(confirm("确定要删除吗？")) { location.href="?controller=Post&action=delete&id=' . $id . '&confirm=yes"; } else { history.back(); }</script>';
-        }
+        $id = $this->request->input('id');
+        $this->postModel->remove($id);
+        \FLEA\Response::success();
     }
 }
 ```
 
-### 控制器生命周期方法
+### 辅助方法
 
 ```php
-class MyController extends Action
+class PostController extends Action
 {
-    /**
-     * 设置控制器信息（由调度器调用）
-     */
-    public function setController(string $controllerName, string $actionName): void
+    public function actionExample(): void
     {
-        $this->controllerName = $controllerName;
-        $this->actionName = $actionName;
+        // 获取视图对象
+        $view = $this->getView();
+
+        // 获取调度器
+        $dispatcher = $this->getDispatcher();
+
+        // URL 生成
+        $url = $this->url('view', ['id' => 1]);
+        $url = $this->url(null, ['page' => 2]); // 当前控制器
+
+        // 重定向
+        $this->forward('Post', 'index');
+
+        // 判断请求类型
+        if ($this->isPost()) { }
+        if ($this->isAjax()) { }
     }
-
-    /**
-     * 设置调度器（由调度器调用）
-     */
-    public function setDispatcher(\FLEA\Dispatcher\Simple $dispatcher): void
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    /**
-     * 动作执行前的回调
-     * 可用于：权限检查、登录验证、数据预处理等
-     */
-    public function beforeExecute($actionMethod): void
-    {
-        // 检查用户是否登录
-        session_start();
-        if (!isset($_SESSION['user_id'])) {
-            header('Location: ?controller=User&action=login');
-            exit;
-        }
-
-        // 记录访问日志
-        log_message("访问 {$this->controllerName}::{$actionMethod}", \Psr\Log\LogLevel::INFO);
-    }
-
-    /**
-     * 动作执行后的回调
-     * 可用于：清理资源、记录操作日志等
-     */
-    public function afterExecute($actionMethod): void
-    {
-        // 清理临时数据
-    }
-}
-```
-
-### 控制器间跳转
-
-```php
-public function actionSuccess()
-{
-    // 重定向到另一个动作
-    header('Location: ?controller=Post&action=index');
-    exit;
-}
-```
-
-### 返回 JSON 数据
-
-```php
-public function actionAjaxSearch()
-{
-    header('Content-Type: application/json');
-
-    $keyword = $_GET['keyword'] ?? '';
-    $results = $this->model->search($keyword);
-
-    echo json_encode([
-        'success' => true,
-        'data' => $results,
-    ]);
-    exit;
 }
 ```
 
 ---
 
-## 模型开发
+## 模型与数据库
 
-### 基本模型
+### TableDataGateway 基础
 
 ```php
-<?php
 namespace App\Model;
 
-use \FLEA\Db\TableDataGateway;
+use FLEA\Db\TableDataGateway;
 
-/**
- * 文章模型
- */
 class Post extends TableDataGateway
 {
-    /**
-     * 数据表名
-     */
     public string $tableName = 'posts';
+    public string $primaryKey = 'id';
 
-    /**
-     * 主键字段
-     */
-    public $primaryKey = 'id';
-
-    /**
-     * 启用自动验证
-     */
-    public $autoValidating = true;
-
-    /**
-     * 定义验证器
-     */
-    public $verifier = null;  // 设置验证器实例
-
-    /**
-     * 获取所有已发布的文章
-     *
-     * @param int $limit 限制数量
-     * @param int $offset 偏移量
-     * @return array
-     */
+    // 自定义查询方法
     public function getPublishedPosts(int $limit = 10, int $offset = 0): array
     {
         return $this->findAll(
             ['status' => 1],
             'created_at DESC',
-            [$limit, $offset],
-            '*',
-            false  // 不启用关联查询，提高性能
+            [$limit, $offset]
         );
-    }
-
-    /**
-     * 根据 ID 获取文章
-     *
-     * @param int $id 文章 ID
-     * @return array|null
-     */
-    public function getPostById(int $id): ?array
-    {
-        return $this->find($id);
-    }
-
-    /**
-     * 获取文章总数
-     *
-     * @return int
-     */
-    public function getTotalCount(): int
-    {
-        return $this->findCount(['status' => 1]);
-    }
-
-    /**
-     * 创建文章
-     *
-     * @param array $data 文章数据
-     * @return int 插入的自增 ID（失败返回 0）
-     */
-    public function createPost(array $data): int
-    {
-        return $this->create($data);
-    }
-
-    /**
-     * 更新文章
-     *
-     * @param int $id 文章 ID
-     * @param array $data 更新数据
-     * @return bool
-     */
-    public function updatePost(int $id, array $data): bool
-    {
-        return $this->updateByConditions([$this->primaryKey => $id], $data);
-    }
-
-    /**
-     * 删除文章
-     *
-     * @param int $id 文章 ID
-     * @return bool
-     */
-    public function deletePost(int $id): bool
-    {
-        return $this->removeByPkv($id);
     }
 }
 ```
 
-### 模型方法返回类型
-
-| 方法 | 返回类型 | 说明 |
-|------|----------|------|
-| `find()` | `?array` | 查询单条记录，不存在返回 null |
-| `findAll()` | `array` | 查询多条记录，返回数组 |
-| `findByField()` | `?array` | 按字段查询单条记录 |
-| `findByPkv()` | `?array` | 按主键查询单条记录 |
-| `findCount()` | `int` | 统计记录数 |
-| `create()` | `int` | 创建记录，返回插入 ID |
-| `update()` | `bool` | 更新记录 |
-| `remove()` | `bool` | 删除记录 |
-| `save()` | `int` | 保存记录（自动判断创建或更新），返回插入 ID 或更新影响行数 |
-
-### 自动时间戳
-
-TableDataGateway 会自动处理以下时间戳字段：
+### CRUD 操作
 
 ```php
-// 创建记录时自动填充
-$createdTimeFields = ['CREATED', 'CREATED_ON', 'CREATED_AT'];
+$postModel = new Post();
 
-// 创建和更新记录时自动填充
-$updatedTimeFields = ['UPDATED', 'UPDATED_ON', 'UPDATED_AT'];
+// 查询
+$post = $postModel->find(1);                          // 根据主键查询
+$post = $postModel->find(['status' => 1], 'id DESC'); // 条件查询
+$posts = $postModel->findAll();                       // 查询所有
+$posts = $postModel->findAll(['status' => 1], 'id DESC', [10, 0]); // 分页
+$count = $postModel->findCount(['status' => 1]);      // 计数
+
+// 创建
+$id = $postModel->create([
+    'title' => 'New Post',
+    'content' => 'Content here',
+    'status' => 1,
+]);
+
+// 更新
+$postModel->update([
+    'id' => 1,
+    'title' => 'Updated Title',
+]);
+
+// 删除
+$postModel->remove(1);
+$postModel->removeByPkv(1);
 ```
 
-如果表中包含这些字段，框架会自动设置当前时间，无需手动指定。
+### 关联关系
+
+```php
+class Post extends TableDataGateway
+{
+    public string $tableName = 'posts';
+
+    // HAS_MANY: 一篇文章有多条评论
+    public array $hasMany = [
+        [
+            'tableClass' => Comment::class,
+            'foreignKey' => 'post_id',
+            'mappingName' => 'comments',
+        ],
+    ];
+
+    // HAS_ONE: 一篇文章有一个作者
+    public array $hasOne = [
+        [
+            'tableClass' => User::class,
+            'foreignKey' => 'user_id',
+            'mappingName' => 'author',
+        ],
+    ];
+}
+
+class Comment extends TableDataGateway
+{
+    public string $tableName = 'comments';
+
+    // BELONGS_TO: 评论属于一篇文章
+    public array $belongsTo = [
+        [
+            'tableClass' => Post::class,
+            'foreignKey' => 'post_id',
+            'mappingName' => 'post',
+        ],
+    ];
+}
+
+// 使用关联查询
+$post = $postModel->find(1, null, '*', true); // true = 加载关联
+$comments = $post['comments'];  // HAS_MANY 关联
+$author = $post['author'];      // HAS_ONE 关联
+```
+
+### MANY_TO_MANY 关联
+
+```php
+class User extends TableDataGateway
+{
+    public string $tableName = 'users';
+
+    // 多对多：用户 - 角色
+    public array $manyToMany = [
+        [
+            'tableClass' => Role::class,
+            'foreignKey' => 'user_id',
+            'associationTable' => 'user_roles',
+            'associationForeignKey' => 'role_id',
+            'mappingName' => 'roles',
+        ],
+    ];
+}
+```
 
 ---
 
@@ -766,1246 +589,363 @@ $updatedTimeFields = ['UPDATED', 'UPDATED_ON', 'UPDATED_AT'];
 
 ```php
 // 控制器中
-$this->view->assign('title', '文章标题');
-$this->view->assign('content', '文章内容');
-$this->view->assign('tags', ['PHP', 'MySQL', 'FleaPHP']);
-$this->view->display('post/view.php');
+$view = $this->getView();
+
+// 赋值
+$view->assign('title', '页面标题');
+$view->assign('posts', $posts);
+$view->assign(['user' => $user, 'roles' => $roles]);
+
+// 渲染
+$view->display('post/index.php');
+
+// 或获取 HTML 内容
+$html = $view->fetch('post/index.php');
 ```
 
 ### 模板文件
 
 ```php
-<!-- App/View/post/view.php -->
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($title); ?></title>
-</head>
-<body>
-    <h1><?php echo htmlspecialchars($title); ?></h1>
-
-    <div class="content">
-        <?php echo $content; ?>
-    </div>
-
-    <!-- 遍历数组 -->
-    <div class="tags">
-        <?php if (!empty($tags)): ?>
-            <span>标签：</span>
-            <?php foreach ($tags as $tag): ?>
-                <span class="tag"><?php echo htmlspecialchars($tag); ?></span>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    </div>
-</body>
-</html>
-```
-
-### 视图配置
-
-```php
-'view' => \FLEA\View\Simple::class,
-'viewConfig' => [
-    'templateDir' => __DIR__ . '/View',  // 模板目录
-    'cacheDir' => __DIR__ . '/../cache', // 缓存目录
-    'cacheLifeTime' => 900,              // 缓存时间（秒），0 表示永久
-    'enableCache' => false,              // 是否启用缓存
-],
-```
-
-### 模板缓存
-
-启用缓存后，模板会被编译成 PHP 文件并保存：
-
-```php
-// 开发环境建议关闭缓存
-'enableCache' => false,
-
-// 生产环境启用缓存
-'enableCache' => true,
-'cacheLifeTime' => 3600,
-```
-
-### 子视图（部分视图）
-
-```php
-// 控制器中
-$this->view->assign('posts', $posts);
-$this->view->assign('users', $users);
-
-// 视图中渲染子视图
-<?php $this->view->display('post/_list.php'); ?>
-<?php $this->view->display('common/_header.php'); ?>
-```
-
-### 布局（Layout）
-
-```php
-// 控制器中
-$this->view->assign('content', $renderedContent);
-$this->view->display('layouts/main.php');
-```
-
-```php
-<!-- App/View/layouts/main.php -->
+<!-- App/View/post/index.php -->
 <!DOCTYPE html>
 <html>
 <head>
-    <title>我的博客</title>
+    <title><?php echo $title; ?></title>
 </head>
 <body>
-    <?php include __DIR__ . '/../common/_header.php'; ?>
+    <h1>文章列表</h1>
 
-    <div class="container">
-        <?php echo $content; ?>
-    </div>
-
-    <?php include __DIR__ . '/../common/_footer.php'; ?>
+    <?php foreach ($posts as $post): ?>
+        <div class="post">
+            <h2><?php echo htmlspecialchars($post['title']); ?></h2>
+            <p><?php echo nl2br($post['content']); ?></p>
+        </div>
+    <?php endforeach; ?>
 </body>
 </html>
 ```
 
+### NullView（无视图）
+
+用于 API 等不需要视图的场景：
+
+```php
+// Config.php
+return [
+    'view' => \FLEA\View\NullView::class,
+];
+
+// 或控制器中
+public function actionApi(): void
+{
+    \FLEA\Response::success($data);
+}
+```
+
 ---
 
-## 数据库操作
+## JWT 认证
 
-### 查询方法
-
-```php
-<?php
-$postModel = new Post();
-
-// ========================
-// 查询单条记录
-// ========================
-
-// 按主键查询
-$post = $postModel->find($id);
-
-// 按条件查询第一条
-$post = $postModel->findByField('status', 1);
-$post = $postModel->findByField('id', $id);
-
-// 按主键值查询
-$post = $postModel->findByPkv($id);
-
-// 带字段选择
-$post = $postModel->find($id, null, 'id,title,content');
-
-// ========================
-// 查询多条记录
-// ========================
-
-// 查询所有
-$posts = $postModel->findAll();
-
-// 带条件查询
-$posts = $postModel->findAll(['status' => 1]);
-
-// 带排序
-$posts = $postModel->findAll(['status' => 1], 'created_at DESC');
-
-// 带分页（limit, offset）
-$posts = $postModel->findAll(
-    ['status' => 1],
-    'created_at DESC',
-    [10, 0]  // [limit, offset]
-);
-
-// 带字段选择
-$posts = $postModel->findAll(
-    ['status' => 1],
-    null,
-    null,
-    'id,title,created_at'
-);
-
-// ========================
-// 统计
-// ========================
-
-// 统计总数
-$count = $postModel->findCount();
-
-// 带条件统计
-$count = $postModel->findCount(['status' => 1]);
-```
-
-### 条件查询
+### 签发 Token
 
 ```php
-// 等于条件
-$posts = $postModel->findAll(['status' => 1]);
+use FLEA\Auth\Jwt;
 
-// 多个等于条件（AND）
-$posts = $postModel->findAll([
-    'status' => 1,
-    'author' => 'admin',
+// 基本签发
+$token = Jwt::encode([
+    'user_id' => 123,
+    'username' => 'john',
 ]);
 
-// SQL 字符串条件
-$posts = $postModel->findAll('status = 1 AND author = "admin"');
+// 指定有效期（秒）
+$token = Jwt::encode(['user_id' => 123], 3600);
 
-// LIKE 查询
-$posts = $postModel->findAll(['title LIKE' => '%关键词%']);
-
-// IN 查询
-$posts = $postModel->findAll(['id IN' => [1, 2, 3, 4, 5]]);
-
-// NOT IN 查询
-$posts = $postModel->findAll(['id NOT IN' => [1, 2, 3]]);
-
-// 大于/小于
-$posts = $postModel->findAll([
-    'created_at >=' => '2024-01-01 00:00:00',
-    'view_count >' => 100,
-]);
-
-// 组合条件
-$posts = $postModel->findAll([
-    'status' => 1,
-    'title LIKE' => '%PHP%',
-    'created_at >=' => '2024-01-01',
+// 完整配置
+$token = Jwt::encode([
+    'user_id' => 123,
+    'exp' => time() + 3600,  // 过期时间
+    'iat' => time(),          // 签发时间
+    'iss' => 'my-app',        // 签发者
 ]);
 ```
 
-### 操作方法
+### 验证 Token
 
 ```php
-<?php
-$postModel = new Post();
+use FLEA\Auth\Jwt;
+use FLEA\Auth\JwtException;
 
-// ========================
-// 创建记录
-// ========================
-$data = [
-    'title' => '我的文章',
-    'content' => '文章内容...',
-    'author' => '作者名',
-    'status' => 1,
-];
-
-// create() 返回插入的自增 ID
-$id = $postModel->create($data);
-
-// ========================
-// 更新记录
-// ========================
-
-// 方式 1：update() - 需要提供完整记录（包含主键）
-$data = [
-    'id' => 1,
-    'title' => '新标题',
-    'content' => '新内容',
-];
-$postModel->update($data);
-
-// 方式 2：updateByConditions() - 按条件更新
-$data = ['title' => '新标题'];
-$postModel->updateByConditions(['id' => 1], $data);
-
-// 方式 3：更新多个字段
-$postModel->updateByConditions(
-    ['status' => 0],  // 条件
-    ['status' => 1]   // 要更新的数据
-);
-
-// ========================
-// 删除记录
-// ========================
-
-// 方式 1：removeByPkv() - 按主键删除
-$postModel->removeByPkv($id);
-
-// 方式 2：remove() - 删除记录数组
-$row = $postModel->find($id);
-$postModel->remove($row);
-
-// 方式 3：removeByConditions() - 按条件删除
-$postModel->removeByConditions(['status' => 0]);
-
-// ========================
-// 保存记录（自动判断创建或更新）
-// ========================
-
-// 如果数据包含主键值，则更新；否则创建
-$data = ['title' => '标题'];
-$postModel->save($data);
-```
-
-### 字段操作
-
-```php
-// 增加字段值
-$postModel->incrField(['id' => 1], 'view_count', 1);
-
-// 减少字段值
-$postModel->decrField(['id' => 1], 'stock', 1);
-
-// 更新单个字段
-$postModel->updateField(['id' => 1], 'status', 1);
-```
-
-### 事务处理
-
-```php
-$dbo = \FLEA::getDBO();
-
-$dbo->startTrans();
 try {
-    // 创建文章
-    $postId = $postModel->create($postData);
+    // 解码并验证
+    $payload = Jwt::decode($token);
 
-    // 创建标签关联
-    foreach ($tags as $tagId) {
-        $tagModel->create([
-            'post_id' => $postId,
-            'tag_id' => $tagId,
-        ]);
+    // 或者只验证不获取 payload
+    if (Jwt::verify($token)) {
+        // Token 有效
     }
 
-    $dbo->completeTrans();  // 提交事务
-} catch (Exception $e) {
-    $dbo->completeTrans(false);  // 回滚事务
-    throw $e;
+} catch (JwtException $e) {
+    // 验证失败：Token 过期、签名无效等
+    \FLEA\Response::error('Token 无效', 401);
+}
+```
+
+### AuthMiddleware 中间件
+
+```php
+// 路由中使用
+Router::get('/api/profile', 'UserController@profile', [
+    new \FLEA\Middleware\AuthMiddleware()
+]);
+
+// 或全局注册
+\FLEA::middleware(new \FLEA\Middleware\AuthMiddleware());
+```
+
+### 在控制器中获取当前用户
+
+```php
+class UserController extends Action
+{
+    public function actionProfile(): void
+    {
+        // 从 Context 获取用户信息（由 AuthMiddleware 设置）
+        $user = flea_context()->get('user');
+
+        if (!$user) {
+            \FLEA\Response::error('未登录', 401);
+            return;
+        }
+
+        \FLEA\Response::success($user);
+    }
 }
 ```
 
 ---
 
-## 关联关系
+## Context 上下文
 
-### 定义关联
+Context 提供请求级别的状态管理，替代传统的 `$_SESSION`。
 
-```php
-<?php
-namespace App\Model;
-
-use \FLEA\Db\TableDataGateway;
-
-/**
- * 文章模型
- */
-class Post extends TableDataGateway
-{
-    public string $tableName = 'posts';
-    public $primaryKey = 'id';
-
-    /**
-     * 一对多：一篇文章有多个评论
-     */
-    public array $hasMany = [
-        [
-            'tableClass' => Comment::class,
-            'foreignKey' => 'post_id',
-            'mappingName' => 'comments',
-        ],
-    ];
-}
-
-/**
- * 评论模型
- */
-class Comment extends TableDataGateway
-{
-    public string $tableName = 'comments';
-    public $primaryKey = 'id';
-
-    /**
-     * 从属：评论属于一篇文章
-     */
-    public array $belongsTo = [
-        [
-            'tableClass' => Post::class,
-            'foreignKey' => 'post_id',
-            'mappingName' => 'post',
-        ],
-    ];
-}
-```
-
-### 使用关联查询
+### 基本使用
 
 ```php
-// ========================
-// 启用关联查询
-// ========================
+use FLEA\Context\Context;
 
-// find() 的第四个参数控制是否查询关联数据
-$post = $postModel->find($id, null, '*', true);  // true 启用关联
+// 通过容器获取
+$context = \FLEA::getSingleton(Context::class);
 
-// 获取文章及评论
-$comments = $post['comments'];
-foreach ($comments as $comment) {
-    echo $comment['content'];
-}
+// 或使用全局辅助函数
+$context = flea_context();
 
-// 获取评论及所属文章
-$comment = $commentModel->find($id, null, '*', true);
-$post = $comment['post'];
-echo $post['title'];
+// 存储数据
+flea_context()->set('user_id', 123);
+flea_context()->set('cart', ['item1', 'item2']);
 
-// ========================
-// 禁用关联查询（提高性能）
-// ========================
+// 读取数据
+$user_id = flea_context()->get('user_id');
+$cart = flea_context()->get('cart', []); // 带默认值
 
-// 列表页通常不需要关联数据
-$posts = $postModel->findAll(
-    ['status' => 1],
-    'created_at DESC',
-    [10, 0],
-    '*',
-    false  // false 禁用关联
-);
-```
-
-### 关联类型详解
-
-#### HAS_ONE（一对一）
-
-```php
-public array $hasOne = [
-    [
-        'tableClass' => UserProfile::class,
-        'foreignKey' => 'user_id',
-        'mappingName' => 'profile',
-    ],
-];
-```
-
-#### HAS_MANY（一对多）
-
-```php
-public array $hasMany = [
-    [
-        'tableClass' => Comment::class,
-        'foreignKey' => 'post_id',
-        'mappingName' => 'comments',
-        'sort' => 'created_at ASC',  // 可选：排序
-    ],
-];
-```
-
-#### BELONGS_TO（从属）
-
-```php
-public array $belongsTo = [
-    [
-        'tableClass' => Author::class,
-        'foreignKey' => 'author_id',
-        'mappingName' => 'author',
-    ],
-];
-```
-
-#### MANY_TO_MANY（多对多）
-
-```php
-public array $manyToMany = [
-    [
-        'tableClass' => Tag::class,
-        'foreignKey' => 'post_id',
-        'assocForeignKey' => 'tag_id',
-        'joinTableClass' => PostTag::class,  // 中间表
-        'mappingName' => 'tags',
-    ],
-];
-```
-
-### 关联数据操作
-
-```php
-// 获取关联对象
-$link = $postModel->getLink('comments');
-
-// 启用/禁用关联
-$postModel->enableLink('comments');
-$postModel->disableLink('comments');
-$postModel->disableLinks();  // 禁用所有关联
-
-// 清除关联
-$postModel->clearLinks();
-
-// 重新建立关联
-$postModel->relink();
-```
-
----
-
-## 异常处理
-
-### 框架异常类
-
-```php
-namespace FLEA\Exception;
-
-// 参数异常
-class InvalidArguments extends \Exception {}      // 无效参数
-class MissingArguments extends \Exception {}      // 缺少参数
-class TypeMismatch extends \Exception {}          // 类型不匹配
-
-// 控制器/动作异常
-class MissingController extends \Exception {}     // 控制器不存在
-class MissingAction extends \Exception {}         // 动作不存在
-class ExpectedClass extends \Exception {}         // 期望的类不存在
-class ExpectedFile extends \Exception {}          // 期望的文件不存在
-
-// 其他异常
-class NotImplemented extends \Exception {}        // 方法未实现
-class MustOverwrite extends \Exception {}         // 必须覆盖的方法
-class ValidationFailed extends \Exception {}      // 验证失败
-class CacheDisabled extends \Exception {}         // 缓存已禁用
-class FileOperation extends \Exception {}         // 文件操作失败
-class ExistsKeyName extends \Exception {}         // 键名已存在
-class NotExistsKeyName extends \Exception {}      // 键名不存在
-```
-
-### 数据库异常
-
-```php
-namespace FLEA\Db\Exception;
-
-class MissingDSN extends \Exception {}            // 缺少 DSN
-class InvalidDSN extends \Exception {}            // 无效 DSN
-class MissingPrimaryKey extends \Exception {}     // 缺少主键
-class PrimaryKeyExists extends \Exception {}      // 主键已存在
-class SqlQuery extends \Exception {}              // SQL 查询错误
-class InvalidInsertID extends \Exception {}       // 无效的插入 ID
-class MissingLink extends \Exception {}           // 关联不存在
-class MissingLinkOption extends \Exception {}     // 缺少关联选项
-class InvalidLinkType extends \Exception {}       // 无效的关联类型
-class MetaColumnsFailed extends \Exception {}     // 获取表结构失败
-```
-
-### 异常处理示例
-
-```php
-public function actionView()
-{
-    try {
-        $id = intval($_GET['id'] ?? 0);
-
-        if (!$id) {
-            throw new \FLEA\Exception\InvalidArguments('文章 ID 不能为空');
-        }
-
-        $post = $this->postModel->find($id);
-
-        if (!$post) {
-            throw new \FLEA\Exception\InvalidArguments('文章不存在');
-        }
-
-        $this->view->assign('post', $post);
-        $this->view->display('post/view.php');
-
-    } catch (\FLEA\Exception\InvalidArguments $e) {
-        // 参数错误，显示错误页面
-        echo '<div class="error">' . htmlspecialchars($e->getMessage()) . '</div>';
-
-    } catch (\FLEA\Db\Exception\MissingPrimaryKey $e) {
-        // 数据库错误
-        log_message($e->getMessage(), \Psr\Log\LogLevel::ERROR);
-        echo '<div class="error">系统错误，请稍后重试</div>';
-
-    } catch (\Exception $e) {
-        // 其他异常
-        log_message($e->getMessage(), \Psr\Log\LogLevel::ERROR);
-        throw $e;
-    }
-}
-```
-
-### 全局异常处理
-
-```php
-// 在 index.php 中设置异常处理
-set_exception_handler(function($e) {
-    if (DEBUG_MODE) {
-        // 调试模式：显示详细错误信息
-        echo '<pre>';
-        echo "Exception: " . get_class($e) . "\n";
-        echo "Message: " . $e->getMessage() . "\n";
-        echo "File: " . $e->getFile() . "\n";
-        echo "Line: " . $e->getLine() . "\n";
-        echo "Trace:\n" . $e->getTraceAsString();
-        echo '</pre>';
-    } else {
-        // 生产模式：显示友好错误页面
-        include 'App/View/errors/500.php';
-    }
-});
-```
-
----
-
-## 分页功能
-
-### Pager 辅助类
-
-```php
-use \FLEA\Helper\Pager;
-
-// 创建分页对象
-$pager = new Pager(
-    $postModel,           // 数据源（TableDataGateway 实例）
-    $page,                // 当前页码
-    10,                   // 每页记录数
-    ['status' => 1],      // 查询条件
-    'created_at DESC'     // 排序
-);
-
-// 执行查询
-$posts = $pager->findAll();
-
-// 获取分页信息
-$totalCount = $pager->totalCount;       // 总记录数
-$pageCount = $pager->pageCount;         // 总页数
-$currentPage = $pager->currentPage;     // 当前页码
-```
-
-### 获取分页数据
-
-```php
-// getPagerData() 返回包含所有分页信息的数组
-$pagerData = $pager->getPagerData();
-
-// 返回的数组包含：
-// totalCount, pageCount, pageSize, currentPage,
-// firstPage, lastPage, prevPage, nextPage,
-// firstPageNumber, lastPageNumber, prevPageNumber, nextPageNumber,
-// currentPageNumber, pageNumbers (页码数组)
-```
-
-### 自定义分页链接
-
-```php
-$pager = new Pager($postModel, $page, 10, ['status' => 1], 'created_at DESC');
-$posts = $pager->findAll();
-
-// 手动生成分页 HTML
-$html = '<div class="pagination">';
-for ($i = 1; $i <= $pager->pageCount; $i++) {
-    if ($i == $pager->currentPage) {
-        $html .= '<span class="current">' . $i . '</span>';
-    } else {
-        $html .= '<a href="?page=' . $i . '">' . $i . '</a>';
-    }
-}
-$html .= '</div>';
-
-echo $html;
-```
-
-### 生成导航栏页码
-
-```php
-// getNavbarIndexs() 返回当前页附近的页码数组
-$pageNumbers = $pager->getNavbarIndexs($pager->currentPage, 8);
-// 例如当前第 5 页，返回 [1, 2, 3, 4, 5, 6, 7, 8]
-```
-
----
-
-## Ajax 支持
-
-### Ajax 类
-
-```php
-use \FLEA\Ajax;
-
-// 初始化 Ajax 对象
-$ajax = new Ajax();
-
-// 注册点击事件
-$ajax->registerEvent(
-    '#deleteBtn',           // 页面对象 ID
-    'click',                // 事件类型
-    '?controller=Post&action=delete'  // 目标 URL
-);
-
-// 注册表单提交事件
-$ajax->registerEvent(
-    '#postForm',
-    'submit',
-    '?controller=Post&action=create',
-    [
-        'beforeSubmit' => 'validateForm',
-        'success' => 'handleSuccess',
-        'error' => 'handleError',
-        'clearForm' => true,
-    ]
-);
-
-// 输出 JavaScript
-$ajax->dumpJs();
-```
-
-### 前端 JavaScript
-
-```html
-<script src="jquery.js"></script>
-<?php $ajax->dumpJs(); ?>
-
-<script>
-function validateForm() {
-    // 表单验证
-    var title = $('#title').val();
-    if (!title) {
-        alert('标题不能为空');
-        return false;
-    }
-    return true;
-}
-
-function handleSuccess(response) {
-    // 处理成功响应
-    alert('操作成功');
-    location.reload();
-}
-
-function handleError(xhr, status, error) {
-    // 处理错误
-    alert('操作失败：' + error);
-}
-</script>
-```
-
-### 控制器处理 Ajax 请求
-
-```php
-public function actionDelete()
-{
-    if (\FLEA::isAjaxRequest()) {
-        header('Content-Type: application/json');
-
-        $id = intval($_POST['id'] ?? 0);
-        if (!$id) {
-            echo json_encode(['success' => false, 'message' => 'ID 无效']);
-            exit;
-        }
-
-        $result = $this->postModel->removeByPkv($id);
-        if ($result) {
-            echo json_encode(['success' => true]);
-        } else {
-            echo json_encode(['success' => false, 'message' => '删除失败']);
-        }
-        exit;
-    }
-
-    // 非 Ajax 请求的处理
+// 检查键是否存在
+if (flea_context()->has('user_id')) {
     // ...
 }
+
+// 删除数据
+flea_context()->remove('user_id');
+```
+
+### 配置 Context 驱动
+
+```php
+// App/Config.php
+return [
+    // 存储驱动：session/redis/file/database
+    'contextDriver' => env('CONTEXT_DRIVER', 'session'),
+
+    // 身份标识：session/jwt/api-key/request-id
+    'contextIdentity' => env('CONTEXT_IDENTITY', 'session'),
+];
+```
+
+### 不同驱动的配置
+
+```env
+# Session 驱动（默认）
+CONTEXT_DRIVER=session
+
+# Redis 驱动
+CONTEXT_DRIVER=redis
+CONTEXT_REDIS_HOST=127.0.0.1
+CONTEXT_REDIS_PORT=6379
+CONTEXT_REDIS_PASSWORD=
+CONTEXT_REDIS_PREFIX=fleaphp:context:
+
+# File 驱动
+CONTEXT_DRIVER=file
+CONTEXT_FILE_PATH=/path/to/context/data
+
+# Database 驱动
+CONTEXT_DRIVER=database
+CONTEXT_DB_TABLE=contexts
+CONTEXT_DB_FIELD_ID=context_id
+CONTEXT_DB_FIELD_DATA=context_data
+```
+
+### 身份标识
+
+```env
+# Session ID（默认）
+CONTEXT_IDENTITY=session
+
+# JWT 用户
+CONTEXT_IDENTITY=jwt
+JWT_SECRET=your-secret-key
+
+# API Key
+CONTEXT_IDENTITY=api-key
+CONTEXT_API_KEY_HEADER=X-API-Key
+
+# Request ID
+CONTEXT_IDENTITY=request-id
+CONTEXT_REQUEST_ID_HEADER=X-Request-ID
 ```
 
 ---
 
-## RBAC 权限控制
+## 日志与缓存
 
-### Rbac 类
+### 日志服务
 
 ```php
-use \FLEA\Rbac;
+use FLEA;
 
-// 创建 RBAC 实例
-$rbac = new Rbac();
+// 获取日志实例
+$log = FLEA::getSingleton(FLEA\Log::class);
 
-// 设置用户信息到 Session
-$rbac->setUser(
-    ['user_id' => 1, 'username' => 'admin'],
-    ['admin', 'editor']  // 角色列表
-);
+// 记录日志
+$log->debug('调试信息', ['user_id' => 123]);
+$log->info('用户登录', ['username' => 'john']);
+$log->warning('警告信息');
+$log->error('错误发生', ['error' => $e->getMessage()]);
+$log->critical('严重错误');
 
-// 获取当前用户信息
-$userData = $rbac->getUser();
+// 获取 Trace ID（用于请求追踪）
+$traceId = $log->getTraceId();
 
-// 检查访问权限
-if ($rbac->checkAccess('PostController::create')) {
-    // 有权限
-} else {
-    // 无权限
-}
+// 响应头中返回 Trace ID
+header('X-Trace-Id: ' . $traceId);
 ```
 
-### 在控制器中使用 RBAC
+### 缓存服务
 
 ```php
-class PostController extends Action
+// 获取缓存
+$data = FLEA::getCache('user_123');
+$data = FLEA::getCache('user_123', 3600); // 指定有效期
+
+// 写入缓存
+FLEA::writeCache('user_123', $userData);
+
+// 删除缓存
+FLEA::purgeCache('user_123');
+```
+
+### 缓存驱动配置
+
+```php
+// App/Config.php
+return [
+    // 缓存驱动
+    'cacheProvider' => \FLEA\Cache\FileCache::class,
+
+    // 或使用 Redis
+    // 'cacheProvider' => \FLEA\Cache\RedisCache::class,
+];
+```
+
+---
+
+## 最佳实践
+
+### 项目结构
+
+```
+your-app/
+├── App/
+│   ├── Config.php          # 应用配置
+│   ├── Controller/         # 控制器
+│   │   ├── Admin/          # 后台控制器
+│   │   └── Api/            # API 控制器
+│   ├── Model/              # 模型
+│   │   └── User.php
+│   ├── Middleware/         # 自定义中间件
+│   │   └── CheckAdminMiddleware.php
+│   └── View/               # 视图
+│       ├── layouts/        # 布局模板
+│       └── user/           # 用户相关视图
+├── public/
+│   └── index.php           # Web 入口
+├── .env                    # 环境配置
+└── vendor/                 # 依赖
+```
+
+### 命名约定
+
+| 类型 | 约定 | 示例 |
+|------|------|------|
+| 控制器 | 复数 + Controller | `UsersController` |
+| 模型 | 单数 | `User` |
+| 动作方法 | action + 驼峰 | `actionUserProfile()` |
+| 视图文件 | `{controller}/{action}.php` | `user/profile.php` |
+
+### 错误处理
+
+```php
+// 在 Config.php 中配置
+return [
+    // 开发环境开启错误显示
+    'displayErrors' => env('APP_DEBUG', false),
+
+    // 生产环境使用友好错误
+    'friendlyErrorsMessage' => true,
+];
+
+// 或在控制器中捕获异常
+public function actionShow(): void
 {
-    public function beforeExecute($actionMethod): void
-    {
-        session_start();
-        $rbac = new Rbac();
-        $user = $rbac->getUser();
-
-        // 检查是否登录
-        if (!$user) {
-            header('Location: ?controller=User&action=login');
-            exit;
-        }
-
-        // 检查特定动作的权限
-        $act = 'PostController::' . $actionMethod;
-        if (!$rbac->checkAccess($act, $user[$rbac->rolesKey])) {
-            throw new \Exception('无权访问');
-        }
+    try {
+        $post = $this->postModel->find($id);
+    } catch (\Exception $e) {
+        \FLEA\Response::error('加载失败', 500);
+        return;
     }
 }
 ```
 
-### UsersManager 和 RolesManager
+### 数据验证
 
 ```php
-use \FLEA\Rbac\UsersManager;
-use \FLEA\Rbac\RolesManager;
-
-// 用户管理
-$userManager = new UsersManager();
-
-// 查找用户
-$user = $userManager->findByUsername('admin');
-
-// 验证用户
-$result = $userManager->validateUser('admin', 'password');
-if ($result) {
-    // 验证成功
-    $rbac = new Rbac();
-    $roles = $userManager->fetchRoles($user);
-    $rbac->setUser($user, $roles);
-}
-
-// 角色管理
-$rolesManager = new RolesManager();
-
-// 查找角色
-$role = $rolesManager->findByRolename('admin');
-```
-
----
-
-## ACL 访问控制列表
-
-### Acl Manager
-
-```php
-use \FLEA\Acl\Manager;
-
-$acl = new Manager();
-
-// 获取用户及其权限信息
-$user = $acl->getUserWithPermissions(['username' => 'admin']);
-
-// 检查用户是否有特定权限
-$hasPermission = false;
-foreach ($user['roles'] as $role) {
-    foreach ($role['permissions'] as $permission) {
-        if ($permission['name'] === 'post.create') {
-            $hasPermission = true;
-            break;
-        }
-    }
-}
-```
-
-### ACL 表结构
-
-```
-users (用户表)
-├── user_id
-├── username
-├── password
-├── email
-└── user_group_id (用户组 ID)
-
-user_groups (用户组表)
-├── user_group_id
-├── name
-├── parent_id
-├── left_value  (嵌套集左值)
-└── right_value (嵌套集右值)
-
-roles (角色表)
-├── role_id
-├── name
-└── description
-
-permissions (权限表)
-├── permission_id
-├── name
-└── description
-
-多对多关联表:
-- user_groups_has_roles (用户组 - 角色)
-- user_groups_has_permissions (用户组 - 权限)
-- users_has_roles (用户 - 角色)
-- users_has_permissions (用户 - 权限)
-```
-
----
-
-## Session 管理
-
-### 数据库 Session
-
-```php
-// 配置中使用数据库 Session
-'sessionProvider' => \FLEA\Session\Db::class,
-```
-
-### 创建 Session 表
-
-```sql
-CREATE TABLE sessions (
-    sess_id VARCHAR(64) PRIMARY KEY,
-    sess_data TEXT,
-    activity INT(11)
-);
-```
-
-### 使用 Session
-
-```php
-// 启动 Session
-session_start();
-
-// 设置 Session
-$_SESSION['user_id'] = 1;
-$_SESSION['username'] = 'admin';
-
-// 获取 Session
-$userId = $_SESSION['user_id'] ?? null;
-
-// 删除 Session
-unset($_SESSION['user_id']);
-
-// 销毁 Session
-session_destroy();
-```
-
----
-
-## 日志服务
-
-### Log 类（PSR-3）
-
-```php
-use \FLEA\Log;
-use \Psr\Log\LogLevel;
-
-// 日志记录
-log_message('调试信息', LogLevel::DEBUG);
-log_message('普通信息', LogLevel::INFO);
-log_message('警告信息', LogLevel::WARNING);
-log_message('错误信息', LogLevel::ERROR);
-
-// 记录带上下文的数据
-log_message('用户登录：{username}', LogLevel::INFO, [
-    'username' => 'admin'
-]);
-
-// 记录对象
-$user = ['id' => 1, 'name' => 'admin'];
-log_message('用户数据：' . print_r($user, true), LogLevel::DEBUG);
-```
-
-### 日志配置
-
-```php
-'logEnabled' => true,
-'logFileDir' => __DIR__ . '/../logs',
-'logFilename' => 'app_' . date('Y-m-d') . '.log',
-'logErrorLevel' => [
-    LogLevel::ERROR,
-    LogLevel::WARNING,
-    LogLevel::INFO,
-],
-```
-
-### 日志级别
-
-```php
-// PSR-3 日志级别
-LogLevel::EMERGENCY    // 系统不可用
-LogLevel::ALERT        // 需要立即行动
-LogLevel::CRITICAL     // 严重情况
-LogLevel::ERROR        // 错误
-LogLevel::WARNING      // 警告
-LogLevel::NOTICE       // 正常但重要的事件
-LogLevel::INFO         // 信息
-LogLevel::DEBUG        // 调试信息
-```
-
----
-
-## 辅助类
-
-### Pager（分页器）
-
-```php
-use \FLEA\Helper\Pager;
-
-$pager = new Pager($model, $currentPage, $pageSize, $conditions, $sort);
-$result = $pager->findAll();
-
-// 属性
-$pager->totalCount   // 总记录数
-$pager->pageCount    // 总页数
-$pager->pageSize     // 每页记录数
-$pager->currentPage  // 当前页码
-```
-
-### FileUploader（文件上传）
-
-```php
-use \FLEA\Helper\FileUploader;
-
-$uploader = new FileUploader();
-
-// 获取上传文件数量
-$count = $uploader->getCount();
-
-// 检查文件是否存在
-if ($uploader->existsFile('avatar')) {
-    $file = $uploader->getFile('avatar');
-
-    // 检查文件类型和大小
-    if ($file->check('jpg,png,gif', 2097152)) {
-        // 移动到目标目录
-        $file->move('./uploads/' . $file->getFilename());
-    }
-}
-
-// 批量移动所有上传文件
-$uploader->batchMove('./uploads/');
-```
-
-### Image（图像处理）
-
-```php
-use \FLEA\Helper\Image;
-
-// 打开图片
-$img = Image::createFromFile('photo.jpg');
-
-// 调整大小
-$img->resize(200, 150);
-
-// 裁剪（高质量）
-$img->crop(200, 200, true);
-
-// 保存为不同格式
-$img->saveAsJpeg('thumb.jpg', 80);  // 质量 80
-$img->saveAsPng('thumb.png');
-$img->saveAsGif('thumb.gif');
-
-// 释放资源
-$img->destory();
-```
-
----
-
-## 开发最佳实践
-
-### 1. 命名规范
-
-```php
-// 控制器：XxxController
-class PostController extends Action {}
-class UserController extends Action {}
-
-// 模型：表名单数形式，首字母大写
-class Post extends TableDataGateway {}
-class User extends TableDataGateway {}
-
-// 动作方法：action 前缀 + 驼峰式
-public function actionIndex() {}
-public function actionCreate() {}
-public function actionEditPost() {}
-
-// 视图文件：{controller}/{action}.php
-App/View/post/index.php
-App/View/post/create.php
-
-// 变量：驼峰式
-$userName = 'admin';
-$postList = [];
-
-// 常量：大写 + 下划线
-define('MAX_PAGE_SIZE', 100);
-```
-
-### 2. 目录组织
-
-```
-App/
-├── Config.php              # 配置文件
-├── Controller/             # 控制器
-│   ├── PostController.php
-│   └── UserController.php
-├── Model/                  # 模型
-│   ├── Post.php
-│   └── User.php
-├── View/                   # 视图
-│   ├── post/
-│   │   ├── index.php
-│   │   └── view.php
-│   ├── user/
-│   │   ├── login.php
-│   │   └── profile.php
-│   └── layouts/            # 布局文件
-│       └── main.php
-└── Helper/                 # 辅助函数（可选）
-    └── functions.php
-```
-
-### 3. 代码组织
-
-```php
-<?php
-namespace App\Controller;
-
-// 1. use 声明（按字母顺序）
-use \FLEA\Controller\Action;
-use App\Model\Post;
-
-// 2. 类定义
-class PostController extends Action
+// 在模型中定义验证规则
+class Post extends TableDataGateway
 {
-    // 3. 常量
-
-    // 4. 静态属性
-
-    // 5. 实例属性（可见性分组：public → protected → private）
-    public $view;
-    protected Post $postModel;
-    private $cache;
-
-    // 6. 构造函数
-    public function __construct()
-    {
-        parent::__construct('Post');
-        $this->postModel = new Post();
-    }
-
-    // 7. 公有方法（动作方法优先）
-    public function actionIndex(): void {}
-    public function actionView(): void {}
-
-    // 8. 受保护的方法
-    protected function validateData() {}
-
-    // 9. 私有方法
-    private function getCache() {}
-}
-```
-
-### 4. 安全实践
-
-```php
-// ========================
-// XSS 防护
-// ========================
-// 转义输出
-echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8');
-echo htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
-
-// ========================
-// SQL 注入防护
-// ========================
-// 使用参数化查询（框架已内置）
-$posts = $postModel->findAll(['id' => $id]);  // 安全
-
-// ========================
-// CSRF 防护
-// ========================
-// 生成 Token
-session_start();
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    public array $validateRules = [
+        'title' => [
+            'required' => true,
+            'minLength' => 5,
+            'maxLength' => 255,
+        ],
+        'content' => [
+            'required' => true,
+            'minLength' => 10,
+        ],
+    ];
 }
 
-// 表单中添加 Token
-<input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-
-// 验证 Token
-if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-    throw new \Exception('CSRF 验证失败');
-}
-
-// ========================
-// 文件上传安全
-// ========================
-$allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-if (!in_array($_FILES['file']['type'], $allowedTypes)) {
-    throw new \Exception('不允许的文件类型');
-}
-
-// 重命名文件
-$newName = uniqid() . '_' . basename($_FILES['file']['name']);
-```
-
-### 5. 性能优化
-
-```php
-// ========================
-// 禁用不需要的关联
-// ========================
-$posts = $postModel->findAll(
-    ['status' => 1],
-    'created_at DESC',
-    [10, 0],
-    '*',
-    false  // 禁用关联查询
-);
-
-// ========================
-// 只查询需要的字段
-// ========================
-$posts = $postModel->findAll(
-    ['status' => 1],
-    null,
-    null,
-    'id,title,created_at'  // 避免 SELECT *
-);
-
-// ========================
-// 使用缓存
-// ========================
-'viewConfig' => [
-    'enableCache' => true,
-    'cacheLifeTime' => 3600,
-],
-
-// ========================
-// 延迟加载
-// ========================
-// 只在需要时才查询关联数据
-$post = $postModel->find($id, null, '*', false);
-if ($needComments) {
-    $comments = $commentModel->findAll(['post_id' => $id]);
-}
-```
-
-### 6. 错误处理
-
-```php
-// 使用 try-catch 处理异常
-try {
-    $post = $this->postModel->find($id);
-    if (!$post) {
-        throw new \FLEA\Exception\InvalidArguments('文章不存在');
-    }
-} catch (\FLEA\Exception\InvalidArguments $e) {
-    log_message($e->getMessage(), \Psr\Log\LogLevel::WARNING);
-    $this->view->assign('error', $e->getMessage());
-    $this->view->display('error.php');
-    return;
-} catch (\Exception $e) {
-    log_message($e->getMessage(), \Psr\Log\LogLevel::ERROR);
-    throw $e;  // 生产环境记录日志后显示友好错误
-}
+// 自动验证（需在创建实例时启用）
+$postModel = new Post(['autoValidating' => true]);
+$postModel->create($data);
 ```
 
 ---
@@ -2014,145 +954,36 @@ try {
 
 ### 1. 数据库连接失败
 
-**问题**：无法连接到数据库
+检查 `.env` 文件中的数据库配置是否正确，确保 MySQL 服务已启动。
 
-**解决**：
-1. 检查 `App/Config.php` 中的 `dbDSN` 配置
-2. 确认 MySQL 服务已启动
-3. 检查数据库用户权限
-4. 确认数据库存在
+### 2. 缓存目录权限
 
-```php
-'dbDSN' => [
-    'driver' => 'mysql',
-    'host' => '127.0.0.1',
-    'login' => 'root',
-    'password' => '正确的密码',
-    'database' => '正确的数据库名',
-],
-```
+确保 `cache/` 目录可写：
 
-### 2. 缓存目录权限问题
-
-**问题**：缓存文件无法写入
-
-**解决**：
 ```bash
 chmod -R 777 cache/
-chown -R www-data:www-data cache/
 ```
 
-### 3. URL 重写不工作
+### 3. 自动加载问题
 
-**Apache 配置**：
-```apache
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ index.php/$1 [L]
-</IfModule>
+运行以下命令重新生成自动加载文件：
+
+```bash
+composer dump-autoload
 ```
 
-**Nginx 配置**：
-```nginx
-location / {
-    try_files $uri $uri/ /index.php?$query_string;
-}
-```
+### 4. PHP 版本检查
 
-### 4. 控制器找不到
+确保使用 PHP 7.4+：
 
-**问题**：访问时提示控制器不存在
-
-**解决**：
-1. 检查控制器类名是否正确（首字母大写，Controller 后缀）
-2. 检查命名空间是否正确
-3. 检查 Composer 自动加载配置
-4. 确认 URL 参数正确
-
-```php
-// 正确的控制器
-namespace App\Controller;
-class PostController extends Action {}
-
-// URL 访问
-index.php?controller=Post&action=index
-```
-
-### 5. 视图文件找不到
-
-**问题**：提示视图文件不存在
-
-**解决**：
-1. 检查视图文件路径：`App/View/{controller}/{action}.php`
-2. 控制器名称和视图目录名对应（小写）
-3. 检查 `viewConfig` 中的 `templateDir` 配置
-
-### 6. 关联查询不工作
-
-**问题**：关联数据为空或报错
-
-**解决**：
-1. 检查关联定义是否正确
-2. 确认外键字段存在
-3. 检查关联表数据
-4. 确认是否启用了关联查询（find/findAll 的第 4/5 个参数）
-
-```php
-// 启用关联
-$post = $postModel->find($id, null, '*', true);
-$comments = $post['comments'];
+```bash
+php74 -v
 ```
 
 ---
 
-## 附录
-
-### A. 常量定义
-
-```php
-// URL 模式
-URL_STANDARD     // 标准模式 (?controller=X&action=Y)
-URL_PATHINFO     // PATHINFO 模式 (/index.php/X/Y)
-URL_REWRITE      // URL 重写模式 (/X/Y)
-
-// 关联类型
-HAS_ONE          // 一对一
-HAS_MANY         // 一对多
-BELONGS_TO       // 从属
-MANY_TO_MANY     // 多对多
-
-// 日志级别（PSR-3）
-LogLevel::DEBUG
-LogLevel::INFO
-LogLevel::NOTICE
-LogLevel::WARNING
-LogLevel::ERROR
-LogLevel::CRITICAL
-LogLevel::ALERT
-LogLevel::EMERGENCY
-```
-
-### B. 辅助函数
-
-```php
-// 日志记录
-log_message($message, $level = LogLevel::DEBUG, $context = [])
-
-// 翻译（多语言）
-_T($key, $language = null)
-_ET($errorId)
-
-// 加载辅助文件
-\FLEA::loadHelper('array')
-\FLEA::loadHelper('string')
-\FLEA::loadHelper('file')
-```
-
-### C. 相关文档
+## 参考文档
 
 - [SPEC.md](SPEC.md) - 框架规格说明书
-- [README.md](README.md) - 项目说明
-- [CHANGES.md](CHANGES.md) - 框架修改记录
-- [GIT_COMMIT.md](GIT_COMMIT.md) - Git 提交记录
+- [README.md](README.md) - 项目主页
+- [demo/APP_USAGE_GUIDE.md](demo/APP_USAGE_GUIDE.md) - 博客应用使用手册
