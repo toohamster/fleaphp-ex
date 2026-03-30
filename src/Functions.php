@@ -303,14 +303,15 @@ function generate_traceid(): string
 }
 
 /**
- * 判断字符串是否以指定前缀开头
+ * 多字节安全的 str_starts_with 版本
+ * Symfony polyfill 的 str_starts_with 不支持多字节字符
  *
  * @param string $haystack 被搜索的字符串
  * @param string $needle 前缀字符串
  * @param string $encoding 字符编码，默认 UTF-8
  * @return bool
  */
-function str_start_with(string $haystack, string $needle, string $encoding = 'UTF-8'): bool
+function mb_str_starts_with(string $haystack, string $needle, string $encoding = 'UTF-8'): bool
 {
     if ($needle === '') { return true; }
     if (\FLEA\Env::hasMbstring()) {
@@ -320,14 +321,15 @@ function str_start_with(string $haystack, string $needle, string $encoding = 'UT
 }
 
 /**
- * 判断字符串是否以指定后缀结尾
+ * 多字节安全的 str_ends_with 版本
+ * Symfony polyfill 的 str_ends_with 不支持多字节字符
  *
  * @param string $haystack 被搜索的字符串
  * @param string $needle 后缀字符串
  * @param string $encoding 字符编码，默认 UTF-8
  * @return bool
  */
-function str_end_with(string $haystack, string $needle, string $encoding = 'UTF-8'): bool
+function mb_str_ends_with(string $haystack, string $needle, string $encoding = 'UTF-8'): bool
 {
     if ($needle === '') { return true; }
     if (\FLEA\Env::hasMbstring()) {
@@ -339,14 +341,15 @@ function str_end_with(string $haystack, string $needle, string $encoding = 'UTF-
 }
 
 /**
- * 判断字符串是否包含指定子串
+ * 多字节安全的 str_contains 版本
+ * Symfony polyfill 的 str_contains 不支持多字节字符
  *
  * @param string $haystack 被搜索的字符串
  * @param string $needle 要查找的子串
  * @param string $encoding 字符编码，默认 UTF-8
  * @return bool
  */
-function str_contains(string $haystack, string $needle, string $encoding = 'UTF-8'): bool
+function mb_str_contains(string $haystack, string $needle, string $encoding = 'UTF-8'): bool
 {
     if ($needle === '') { return true; }
     if (\FLEA\Env::hasMbstring()) {

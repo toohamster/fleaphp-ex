@@ -32,7 +32,7 @@ if ($projectDir === null) {
     $projectDir = getcwd();
 } else {
     // 如果是相对路径，相对于当前目录
-    if (!str_starts_with($projectDir, '/')) {
+    if (mb_substr($projectDir, 0, 1) !== '/') {
         $projectDir = getcwd() . '/' . $projectDir;
     }
 }

@@ -45,7 +45,7 @@ class FileDriver implements DriverInterface
      *
      * @return mixed
      */
-    public function get(string $key, mixed $default = null): mixed
+    public function get(string $key, $default = null)
     {
         $file = $this->path . '/' . md5($key);
         if (!file_exists($file)) {
@@ -75,7 +75,7 @@ class FileDriver implements DriverInterface
      *
      * @return bool
      */
-    public function set(string $key, mixed $value, ?int $ttl = null): bool
+    public function set(string $key, $value, ?int $ttl = null): bool
     {
         $data = [
             'value' => $value,

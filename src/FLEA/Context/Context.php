@@ -131,7 +131,7 @@ class Context
      *
      * @return mixed
      */
-    public function get(string $key, mixed $default = null): mixed
+    public function get(string $key, $default = null)
     {
         return $this->driver->get($this->makeKey($key), $default);
     }
@@ -145,7 +145,7 @@ class Context
      *
      * @return bool
      */
-    public function set(string $key, mixed $value, ?int $ttl = null): bool
+    public function set(string $key, $value, ?int $ttl = null): bool
     {
         return $this->driver->set($this->makeKey($key), $value, $ttl);
     }

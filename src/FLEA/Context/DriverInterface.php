@@ -22,7 +22,7 @@ interface DriverInterface
      *
      * @return mixed 存储的值或默认值
      */
-    public function get(string $key, mixed $default = null): mixed;
+    public function get(string $key, $default = null);
 
     /**
      * 设置值
@@ -33,7 +33,7 @@ interface DriverInterface
      *
      * @return bool 是否成功
      */
-    public function set(string $key, mixed $value, ?int $ttl = null): bool;
+    public function set(string $key, $value, ?int $ttl = null): bool;
 
     /**
      * 删除值

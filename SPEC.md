@@ -884,6 +884,8 @@ return [
     'dispatcher' => \FLEA\Dispatcher\Simple::class,
     'defaultController' => 'Index',
     'defaultAction' => 'index',
+    'actionMethodPrefix' => 'action',
+    'actionMethodSuffix' => '',
 
     // 视图
     'view' => \FLEA\View\Simple::class,

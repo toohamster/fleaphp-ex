@@ -35,7 +35,7 @@ class SessionDriver implements DriverInterface
      *
      * @return mixed
      */
-    public function get(string $key, mixed $default = null): mixed
+    public function get(string $key, $default = null)
     {
         return $_SESSION[$key] ?? $default;
     }
@@ -49,7 +49,7 @@ class SessionDriver implements DriverInterface
      *
      * @return bool
      */
-    public function set(string $key, mixed $value, ?int $ttl = null): bool
+    public function set(string $key, $value, ?int $ttl = null): bool
     {
         $_SESSION[$key] = $value;
         return true;

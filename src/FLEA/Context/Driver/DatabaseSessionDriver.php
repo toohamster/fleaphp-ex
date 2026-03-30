@@ -114,7 +114,7 @@ class DatabaseSessionDriver implements DriverInterface
      *
      * @return mixed
      */
-    public function get(string $key, mixed $default = null): mixed
+    public function get(string $key, $default = null)
     {
         $key = $this->dbo->qstr($key);
         $sql = "SELECT {$this->fieldData} FROM {$this->tableName} WHERE {$this->fieldId} = {$key}";
@@ -141,7 +141,7 @@ class DatabaseSessionDriver implements DriverInterface
      *
      * @return bool
      */
-    public function set(string $key, mixed $value, ?int $ttl = null): bool
+    public function set(string $key, $value, ?int $ttl = null): bool
     {
         $key = $this->dbo->qstr($key);
         $data = $this->dbo->qstr(serialize($value));
