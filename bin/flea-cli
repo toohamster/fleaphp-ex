@@ -1,0 +1,67 @@
+#!/usr/bin/env php
+<?php
+/**
+ * FLEA PHP 开发服务器启动脚本
+ *
+ * 用法：
+ *   php bin/flea-cli                        # 运行当前目录项目
+ *   php bin/flea-cli --project-dir=/path    # 运行指定项目
+ *   php bin/flea-cli --host=0.0.0.0 --port=8080
+ */
+
+$host = '127.0.0.1';
+$port = '8081';
+$projectDir = null;
+
+// 解析参数
+for ($i = 1; $i < $argc; $i++) {
+    $arg = $argv[$i];
+    if (preg_match('/--host=(.+)/', $arg, $m)) {
+        $host = $m[1];
+    }
+    if (preg_match('/--port=(\d+)/', $arg, $m)) {
+        $port = $m[1];
+    }
+    if (preg_match('/--project-dir=(.+)/', $arg, $m)) {
+        $projectDir = $m[1];
+    }
+}
+
+// 默认使用当前工作目录
+if ($projectDir === null) {
+    $projectDir = getcwd();
+} else {
+    // 如果是相对路径，相对于当前目录
+    if (mb_substr($projectDir, 0, 1) !== '/') {
+        $projectDir = getcwd() . '/' . $projectDir;
+    }
+}
+
+// 验证项目目录
+if (!is_dir($projectDir)) {
+    fwrite(STDERR, "错误：项目目录不存在：{$projectDir}\n");
+    exit(1);
+}
+
+if (!is_dir($projectDir . '/public')) {
+    fwrite(STDERR, "错误：项目缺少 public 目录：{$projectDir}/public\n");
+    exit(1);
+}
+
+if (!is_file($projectDir . '/public/index.php')) {
+    fwrite(STDERR, "错误：项目缺少入口文件：{$projectDir}/public/index.php\n");
+    exit(1);
+}
+
+$publicDir = $projectDir . '/public';
+$routerScript = __DIR__ . '/router.php';
+
+echo "Starting FleaPHP development server at http://{$host}:{$port}\n";
+echo "Project root: {$projectDir}\n";
+echo "Document root: {$publicDir}\n";
+echo "Press Ctrl+C to stop.\n\n";
+
+// 设置环境变量，供 router.php 使用
+putenv("FLEA_PROJECT_DIR={$projectDir}");
+
+passthru(escapeshellcmd(PHP_BINARY) . " -S {$host}:{$port} -t {$publicDir} {$routerScript}");

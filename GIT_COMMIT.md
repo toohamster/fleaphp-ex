@@ -4,6 +4,419 @@
 
 ---
 
+### feat: 新增 kebab_to_pascal() 函数及 URL 路由支持
+
+新增 `kebab_to_pascal()` 全局函数，支持 Laravel 风格的 kebab-case URL 路由。
+
+**修改的文件:**
+- `src/Functions.php` - 新增 kebab_to_pascal() 函数
+- `src/FLEA/Dispatcher/Simple.php` - 修改 getControllerClass() 和 executeAction() 方法
+
+**功能特性:**
+- kebab-case → PascalCase 转换（如 order-apply → OrderApply）
+- 兜底路由 `/{controller}/{action}` 自动支持短横线命名
+- 控制器和动作方法名自动转换
+
+**转换示例:**
+- `/order-apply` → OrderApplyController
+- `/user-profile-settings` → UserProfileSettingsController
+- `/create-new` → actionCreateNew
+
+---
+
+### feat: 新增 Router::resource() RESTful 资源路由方法
+
+新增 `Router::resource()` 方法，一行代码生成 7 条 RESTful 路由。
+
+**修改的文件:**
+- `src/FLEA/Router.php` - 新增 resource() 方法
+- `SPEC.md` - 补充 resource 路由说明
+- `USER_GUIDE.md` - 添加 resource 路由使用示例
+- `demo/APP_USAGE_GUIDE.md` - 更新路由说明和配置
+- `demo/BLOG_SETUP.md` - 更新项目结构和访问方式
+- `CHANGES.md` - 记录代码修改
+
+**功能特性:**
+- 支持 `only` 和 `except` 选项过滤路由
+- update 和 destroy 额外注册 POST fallback 路由
+- 路由名格式：`{name}.{action}`
+
+---
+
+### feat: Container 添加 set() 方法
+
+添加 set() 方法作为 register() 的别名，提供更直观的 API。
+该方法委托给 register()，行为完全一致（不允许覆盖已存在对象）。
+
+主要用于绑定 Context 等对象到容器。
+
+---
+
+### refactor: 替换 str_* 函数为 mb_str_* 多字节安全版本
+
+将框架代码中使用的 PHP 8 str_starts_with/str_ends_with/str_contains
+函数替换为框架提供的 mb_str_* 多字节安全版本，确保 PHP 7.4 兼容性
+和对中文等多字节字符的正确处理。
+
+修改文件：
+- src/FLEA/Middleware/AuthMiddleware.php
+- src/FLEA/Context/Identity/JwtIdentity.php
+- src/FLEA/Dispatcher/Simple.php
+- src/FLEA/Request.php (2 处)
+- src/FLEA/Router.php (2 处)
+
+---
+
+## PHPDoc 文档注释批量添加工作总结
+
+**总计：约 88 个 PHP 文件**
+
+**分类统计：**
+| 类别 | 文件数 |
+|------|--------|
+| Db 层核心类 | 6 |
+| Db/TableLink 子类 | 4 |
+| Acl 目录 | 9 |
+| Helper 目录 | 8 |
+| Middleware 中间件 | 3 |
+| Cache 缓存 | 2 |
+| Rbac 权限 | 3 |
+| Session 会话 | 1 |
+| Dispatcher 调度器 | 1 |
+| Error 错误处理 | 1 |
+| Config 配置 | 1 |
+| Auth 认证 | 1 |
+| 其他核心类 | 约 50 |
+
+**文档注释内容：**
+- 类级别文档（功能说明、用法示例、@package、@author、@version）
+- 属性文档（@var）
+- 方法文档（@param、@return、@throws）
+
+---
+
+### docs: 为 Verifier 验证助手类添加 PHPDoc 文档注释
+
+**修改文件 (1 个):**
+- src/FLEA/FLEA/Helper/Verifier.php - 数据验证助手类
+
+**主要改进:**
+- 添加 @package、@subpackage、@author、@version 标签
+
+**备注:** Defaults.php 存在原有 PHP 7.4 语法错误（静态属性包含 env() 函数调用），未修改。
+
+---
+
+### docs: 为 FileUploader/File 类添加 PHPDoc 文档注释
+
+**修改文件 (1 个):**
+- src/FLEA/FLEA/Helper/FileUploader/File.php - 上传文件封装类
+
+**主要改进:**
+- 完整的类级别文档注释（功能说明、用法示例）
+- 文件检查和移动功能说明
+
+**备注:** testACL.php 和 testCreateData.php 为测试脚本文件，不添加文档注释。
+
+---
+
+### docs: 为 Db 层核心类 TableDataGateway 和 AbstractDriver 添加 PHPDoc 文档注释
+
+**修改文件 (2 个):**
+
+**Db 层核心类 (2 个):**
+- src/FLEA/FLEA/Db/TableDataGateway.php - 表数据网关（CRUD 和表关联封装）
+- src/FLEA/FLEA/Db/Driver/AbstractDriver.php - 数据库驱动抽象基类
+
+**主要改进:**
+- TableDataGateway: 完整的类级别文档注释，包含 CRUD 操作、表关联说明、用法示例
+- AbstractDriver: 完整的类级别文档注释，包含数据库连接、查询执行、事务管理等说明
+
+---
+
+### docs: 为 Pager 分页类添加 PHPDoc 文档注释
+
+**修改文件 (1 个):**
+- src/FLEA/FLEA/Helper/Pager.php - 数据分页辅助类
+
+**主要改进:**
+- 完整的类级别文档注释（功能说明、用法示例）
+- 支持的数据源说明
+- 翻页导航生成示例
+
+---
+
+### docs: 为 Rbac、ErrorRenderer 和 Config/Defaults 添加 PHPDoc 文档注释
+
+**修改文件 (3 个):**
+
+**核心类 (3 个):**
+- src/FLEA/FLEA/Rbac.php - RBAC 权限检查服务
+- src/FLEA/FLEA/Error/ErrorRenderer.php - 错误页面渲染器
+- src/FLEA/FLEA/Config/Defaults.php - 框架默认配置
+
+**主要改进:**
+- 完整的类级别文档注释（功能说明、用法示例）
+- Rbac 类的 ACT 格式说明和特殊值说明
+- ErrorRenderer 的错误视图查找顺序说明
+- Defaults 类的配置项分类说明
+
+---
+
+### docs: 为 Acl/Table 目录下的表数据网关类添加 PHPDoc 文档注释
+
+**修改文件 (8 个):**
+
+**Acl/Table 表数据网关类 (8 个):**
+- src/FLEA/FLEA/Acl/Table/Users.php - 用户表（继承 UsersManager）
+- src/FLEA/FLEA/Acl/Table/Roles.php - 角色表
+- src/FLEA/FLEA/Acl/Table/Permissions.php - 权限表
+- src/FLEA/FLEA/Acl/Table/UserGroups.php - 用户组表（嵌套集模型）
+- src/FLEA/FLEA/Acl/Table/UserGroupsHasRoles.php - 用户组 - 角色关联表
+- src/FLEA/FLEA/Acl/Table/UserGroupsHasPermissions.php - 用户组 - 权限关联表
+- src/FLEA/FLEA/Acl/Table/UsersHasRoles.php - 用户 - 角色关联表
+- src/FLEA/FLEA/Acl/Table/UsersHasPermissions.php - 用户 - 权限关联表
+
+**主要改进:**
+- 完整的类级别文档注释（功能说明、用法示例）
+- 关联关系说明（belongsTo/hasMany/manyToMany）
+- UserGroups 类的嵌套集模型说明
+- 中间表用途说明
+
+---
+
+### docs: 为 Helper、Cache、Session、Rbac 和 Dispatcher 类添加 PHPDoc 文档注释
+
+**修改文件 (15 个):**
+
+**Helper 辅助类 (6 个):**
+- src/FLEA/FLEA/Helper/FileUploader.php - 文件上传辅助类
+- src/FLEA/FLEA/Helper/Image.php - 图像处理辅助类（GD 库封装）
+- src/FLEA/FLEA/Helper/ImgCode.php - 图像验证码生成器
+- src/FLEA/FLEA/Helper/Pager.php - 数据分页辅助类
+- src/FLEA/FLEA/Helper/SendFile.php - 文件发送辅助类
+- src/FLEA/FLEA/Helper/Verifier.php - 数据验证器
+
+**Cache 缓存实现 (2 个):**
+- src/FLEA/FLEA/Cache/FileCache.php - 文件缓存实现（PSR-16）
+- src/FLEA/FLEA/Cache/RedisCache.php - Redis 缓存实现（PSR-16）
+
+**Session 会话 (1 个):**
+- src/FLEA/FLEA/Session/Db.php - 数据库 Session 处理器
+
+**Rbac 权限管理 (2 个):**
+- src/FLEA/FLEA/Rbac/RolesManager.php - 角色管理器
+- src/FLEA/FLEA/Rbac/UsersManager.php - 用户管理器
+
+**Dispatcher 调度器 (1 个):**
+- src/FLEA/FLEA/Dispatcher/Auth.php - 带认证的调度器
+
+**Acl 访问控制 (1 个):**
+- src/FLEA/FLEA/Acl/Manager.php - ACL 管理器
+
+**Pager 分页 (1 个):**
+- src/FLEA/FLEA/Helper/Pager.php - 数据分页辅助类
+
+**主要改进:**
+- 完整的类级别文档注释（功能说明、用法示例、配置项说明）
+- 属性文档注释（@var）
+- 方法文档注释（@param, @return, @throws）
+- 补充了 Verifier 类的验证规则说明
+- 补充了 UsersManager 的密码加密方式说明
+
+---
+
+### docs: 为 Db/TableLink 子类、Middleware 和 Jwt 添加 PHPDoc 文档注释
+
+**修改文件 (8 个):**
+
+**Db/TableLink 子类 (4 个):**
+- src/FLEA/FLEA/Db/TableLink/HasOneLink.php - HasOne 关联实现
+- src/FLEA/FLEA/Db/TableLink/BelongsToLink.php - BelongsTo 关联实现
+- src/FLEA/FLEA/Db/TableLink/HasManyLink.php - HasMany 关联实现
+- src/FLEA/FLEA/Db/TableLink/ManyToManyLink.php - ManyToMany 关联实现
+
+**Middleware 中间件 (3 个):**
+- src/FLEA/FLEA/Middleware/CorsMiddleware.php - CORS 跨域中间件
+- src/FLEA/FLEA/Middleware/AuthMiddleware.php - Bearer Token 认证中间件
+- src/FLEA/FLEA/Middleware/RateLimitMiddleware.php - 请求频率限制中间件
+
+**Auth 认证 (1 个):**
+- src/FLEA/FLEA/Auth/Jwt.php - JWT 工具类（HS256）
+
+**主要改进:**
+- 完整的类级别文档注释（功能说明、用法示例、配置项说明）
+- 属性文档注释（@var）
+- 方法文档注释（@param, @return, @throws）
+
+---
+
+### docs: 批量为框架核心类添加 PHPDoc 文档注释
+
+**修改文件 (49 个):**
+
+**异常类 (30 个):**
+- FLEA/Exception/ - 17 个通用异常类
+- FLEA/Db/Exception/ - 10 个数据库异常类
+- FLEA/Auth/, FLEA/Rbac/, FLEA/Acl/ - 3 个认证授权异常类
+
+**核心类 (19 个):**
+- FLEA.php - 框架核心类
+- Config.php, Container.php, Database.php - 配置/容器/数据库
+- Request.php, Response.php, Route.php, Router.php - HTTP/路由
+- Cache.php, Log.php, Env.php, Language.php - 缓存/日志/环境/多语言
+- Controller/Action.php, Dispatcher/Simple.php - 控制器/调度器
+- Middleware/ - 2 个中间件类
+- View/ - 3 个视图类
+
+**统计:** 2758 行新增，379 行删除
+
+---
+
+### docs: 为 Db 层核心类添加完整 PHPDoc 文档注释
+
+**修改文件：**
+- src/FLEA/FLEA/Db/SqlStatement.php - SQL 语句封装类
+- src/FLEA/FLEA/Db/SqlHelper.php - SQL 辅助类
+- src/FLEA/FLEA/Db/TableLink.php - 表关联定义类
+- src/FLEA/FLEA/Db/Driver/Mysql.php - MySQL 数据库驱动
+
+**主要改进：**
+- 完整的类级别文档注释（功能说明、用法示例）
+- 属性文档注释（@var）
+- 方法文档注释（@param, @return, @throws）
+- 用法示例代码
+
+---
+
+### feat: 引入 .env 多环境配置支持
+
+**配置架构重构（四层配置，优先级从高到低）：**
+1. `.env.{APP_ENV}` 环境文件（如 .env.production）
+2. `.env` 基础配置
+3. `demo/App/Config.php`（应用层配置）
+4. `FLEA\Config\Defaults`（框架默认值，使用 env() 函数）
+
+**新增文件：**
+- src/FLEA/FLEA/Config/Defaults.php
+- demo/.env.example
+- demo/.gitignore
+
+**修改文件：**
+- composer.json - 添加 vlucas/phpdotenv ^5.5
+- src/FLEA/FLEA.php - 新增 FLEA::loadEnv() 方法
+- src/FLEA/FLEA/Config.php - 加载 Defaults 默认配置
+- src/FLEA/FLEA/Env.php - 新增 isEnv() 方法
+- src/FLEA/Functions.php - 使用 Env::isProd() 替代 DEBUG_MODE
+- demo/App/Config.php - 使用 env() 读取环境变量
+- demo/public/index.php - 使用 \FLEA::loadEnv()
+- CLAUDE.md - 更新配置架构说明
+
+**删除文件：**
+- DEBUG_MODE_CONFIG.php
+- DEPLOY_MODE_CONFIG.php
+- bin/serve（重命名为 flea-cli）
+
+**用法：**
+```php
+\FLEA::loadEnv(__DIR__ . '/../.env');
+\FLEA\Env::isProd();
+env('APP_ENV');
+```
+
+---
+
+### docs: 移动博客相关文档到 demo/ 并更新 CLAUDE.md
+
+- blog.sql → demo/blog.sql
+- BLOG_SETUP.md → demo/BLOG_SETUP.md
+- 更新 CLAUDE.md 中的数据库初始化命令和服务器启动命令
+
+---
+
+### refactor: 重构为标准 PHP 框架目录结构 (v2.0)
+
+重大结构调整，将框架与演示应用完全分离：
+
+**目录结构变更：**
+- FLEA/ → src/FLEA/ (框架源码，PSR-4: FLEA\)
+- App/ → demo/App/ (演示应用，FleaPhpDemo\ 命名空间)
+- index.php → demo/public/index.php (入口文件)
+- cache/ → demo/cache/ (缓存目录)
+- 新增 bin/serve 和 bin/router.php (开发服务器工具)
+
+**composer.json 变更：**
+- name 改为 fleaphp/framework
+- 添加 bin 脚本支持
+- autoload 只加载 FLEA\ 命名空间
+- FleaPhpDemo\ 由 demo/public/index.php 手动加载
+
+**配置文件变更：**
+- 删除 controllerAccessor 和 actionAccessor 配置项
+- 改用 Router::CONTROLLER_KEY 和 Router::ACTION_KEY 常量
+- 更新 controllerClassPrefix 为 FleaPhpDemo\Controller\
+
+**文档调整：**
+- APP_CHANGES.md 和 APP_USAGE_GUIDE.md 移至 demo/
+- 更新 CLAUDE.md 中的路径引用
+
+**技术优化：**
+- bin/serve 支持 --project-dir 参数指定项目
+- bin/router.php 通过环境变量获取项目根目录
+- .gitignore 更新为 demo/cache/ 和 demo/uploads/
+
+此提交为 v2.0 的核心重构，使框架可通过 Composer 独立安装。
+
+**修改的文件:**
+- `src/FLEA/` (重命名自 FLEA/)
+- `demo/App/` (重命名自 App/)
+- `demo/public/index.php` (新建)
+- `bin/serve` (新建)
+- `bin/router.php` (新建)
+- `composer.json`
+- `CLAUDE.md`
+- `.gitignore`
+
+---
+
+### docs: 重写 SPEC.md 框架规格说明书 (v2.0)
+
+完全重写 SPEC.md，反映 FLEA 框架 2.0 的重大重构：
+- 新增核心服务类：Container (PSR-11), Database, Cache (PSR-16)
+- 新增 HTTP 组件：Request, Response, Router, Route, Middleware
+- 新增 Auth/Jwt JWT 认证工具
+- 移除已删除的类：Ajax.php, WebControls.php, ActiveRecord.php
+- 删除未使用的 3rd/Spyc/spyc.php（无引用，可用 symfony/yaml 替代）
+- 删除未使用的 _Cache 目录（视图缓存已使用 ./cache 目录）
+- 更新版本历史为 2.0.0
+- 更新 CLAUDE.md Architecture 部分
+
+**修改的文件:**
+- `SPEC.md` (重写)
+- `CLAUDE.md`
+- `GIT_COMMIT.md`
+- 删除：`FLEA/3rd/`
+- 删除：`FLEA/_Cache/`
+
+---
+
+### docs: 更新 SPEC.md 和 CLAUDE.md 反映框架 2.0 重构
+
+全面更新 SPEC.md 规格说明书以反映 FLEA 框架 2.0 重构后的架构：
+- 更新目录结构：移除 Ajax.php、WebControls.php
+- 新增核心服务类：Container (PSR-11)、Database、Cache (PSR-16)
+- 新增 HTTP 组件：Request、Response、Router、Route、Middleware
+- 新增 Auth/Jwt JWT 认证工具
+- 更新版本历史为 2.0.0
+- 更新 CLAUDE.md Architecture 部分
+
+**修改的文件:**
+- `SPEC.md`
+- `CLAUDE.md`
+- `GIT_COMMIT.md`
+
+---
+
 ### docs: 用最新代码更新 SPEC.md 框架规格说明书
 
 与当前代码同步：Config 属性加 `array` 类型；View 新增 ViewInterface/NullView/Simple 完整 API；ActiveRecord 属性去 `_` 前缀并补全方法；Rbac 属性 `$_sessionKey`/`$_rolesKey` → `$sessionKey`/`$rolesKey` 并更新方法列表；Acl\Manager `$_tableClass` → `$tableClass`；Pager 重写构造函数签名和方法列表；Log 属性去 `_` 前缀；Session\Db 属性加 `?string` 类型、方法名改为 `sessionXxx`；生命周期 `_beforeExecute`/`_afterExecute` → `beforeExecute`/`afterExecute`；模型示例加类型声明；目录结构补充 ViewInterface.php、NullView.php、Verifier.php、SendFile.php；修正 dbDSN 配置键的 tab 字符。
