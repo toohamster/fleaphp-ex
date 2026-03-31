@@ -1,0 +1,341 @@
+<?php
+
+namespace FLEA\Helper;
+
+/**
+ * 图像处理辅助类
+ *
+ * 基于 PHP GD 库封装的图像处理工具类，提供常用的图像处理功能。
+ * 支持 JPEG、PNG、GIF 格式图像的读取、缩放、裁剪和保存。
+ *
+ * 主要功能：
+ * - 从文件创建图像对象
+ * - 图像缩放（resize/resampled）
+ * - 画布调整和裁减
+ * - 保持长宽比裁剪
+ * - 保存为 JPEG/PNG/GIF 格式
+ *
+ * 用法示例：
+ * ```php
+ * // 从文件创建图像对象
+ * $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+ * $image = Image::createFromFile($_FILES['image']['tmp_name'], $ext);
+ *
+ * // 缩放到指定大小
+ * $image->resampled(800, 600);
+ *
+ * // 保存为新文件
+ * $image->saveAsJpeg('/path/to/new.jpg', 90);
+ *
+ * // 保持长宽比裁剪
+ * $image->crop(200, 200, true);
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ */
+class Image
+{
+    /**
+     * GD 资源句柄
+     *
+     * @var resource|null
+     */
+    public $handle = null;
+
+    /**
+     * 构造函数
+     * 开发者不能直接构造该类的实例，而是应该用 \FLEA\Helper\Image::createFromFile()
+     * 静态方法创建一个 \FLEA\Helper\Image 类的实例。
+     * @param resource $handle
+     */
+    public function __construct($handle)
+    {
+        $this->handle = $handle;
+    }
+
+    /**
+     * 从指定文件创建 Image 对象
+     * 对于上传的文件，由于其临时文件名中并没有包含扩展名。因此需要采用下面的方法创建 Image 对象：
+     * <code>
+     * $ext = pathinfo($_FILES['postfile']['name'], PATHINFO_EXTENSION);
+     * $image =& \FLEA\Helper\Image::createFromFile($_FILES['postfile']['tmp_name'], $ext);
+     * </code>
+     * @param string $filename
+     * @param string $fileext
+     * @return \FLEA\Helper\Image
+     */
+    public static function createFromFile(string $filename, ?string $fileext = null): \FLEA\Helper\Image
+    {
+        if (is_null($fileext)) {
+            $fileext = pathinfo($filename, PATHINFO_EXTENSION);
+        }
+        $fileext = strtolower($fileext);
+        $ext2functions = [
+            'jpg' => 'imagecreatefromjpeg',
+            'jpeg' => 'imagecreatefromjpeg',
+            'png' => 'imagecreatefrompng',
+            'gif' => 'imagecreatefromgif',
+        ];
+        if (!isset($ext2functions[$fileext])) {
+            throw new \FLEA\Exception\NotImplemented('imagecreatefrom' . $fileext);
+        }
+
+        $handle = $ext2functions[$fileext]($filename);
+        $img = new \FLEA\Helper\Image($handle);
+        return $img;
+    }
+
+    /**
+     * 快速缩放图像到指定大小（质量较差）
+     * @param int $width
+     * @param int $height
+     */
+    public function resize(int $width, int $height): void
+    {
+        if (is_null($this->handle)) { return; }
+        $dest = imagecreatetruecolor($width, $height);
+        imagecopyresized($dest, $this->handle, 0, 0, 0, 0,
+                $width, $height, imagesx($this->handle), imagesy($this->handle));
+        imagedestroy($this->handle);
+        $this->handle = $dest;
+    }
+
+    /**
+     * 缩放图像到指定大小（质量较好，速度比 resize() 慢）
+     * @param int $width
+     * @param int $height
+     */
+    public function resampled(int $width, int $height): void
+    {
+        if (is_null($this->handle)) { return; }
+        $dest = imagecreatetruecolor($width, $height);
+        imagecopyresampled($dest, $this->handle, 0, 0, 0, 0,
+                $width, $height, imagesx($this->handle), imagesy($this->handle));
+        imagedestroy($this->handle);
+        $this->handle = $dest;
+    }
+
+    /**
+     * 调整图像大小，但不进行缩放操作
+     * @param int $width
+     * @param int $height
+     * @param string $pos
+     * @param string $bgcolor
+     */
+    public function resizeCanvas(int $width, int $height, string $pos = 'center', string $bgcolor = '0xffffff'): void
+    {
+        if (is_null($this->handle)) { return; }
+        $dest = imagecreatetruecolor($width, $height);
+        $sx = imagesx($this->handle);
+        $sy = imagesy($this->handle);
+
+        // 根据 pos 属性来决定如何定位原始图片
+        switch (strtolower($pos)) {
+        case 'left':
+            $ox = 0;
+            $oy = ($height - $sy) / 2;
+            break;
+        case 'right':
+            $ox = $width - $sx;
+            $oy = ($height - $sy) / 2;
+            break;
+        case 'top':
+            $ox = ($width - $sx) / 2;
+            $oy = 0;
+            break;
+        case 'bottom':
+            $ox = ($width - $sx) / 2;
+            $oy = $height - $sy;
+            break;
+        case 'top-left':
+            $ox = $oy = 0;
+            break;
+        case 'top-right':
+            $ox = $width - $sx;
+            $oy = 0;
+            break;
+        case 'bottom-left':
+            $ox = 0;
+            $oy = $height - $sy;
+            break;
+        case 'bottom-right':
+            $ox = $width - $sx;
+            $oy = $height - $sy;
+            break;
+        default:
+            $ox = ($width - $sx) / 2;
+            $oy = ($height - $sy) / 2;
+        }
+
+        [$r, $g, $b] = $this->extractColor($bgcolor, '0xffffff');
+        $bgcolor = imagecolorallocate($dest, $r, $g, $b);
+        imagefilledrectangle($dest, 0, 0, $width, $height, $bgcolor);
+        imagecolordeallocate($dest, $bgcolor);
+
+        imagecopy($dest, $this->handle, $ox, $oy, 0, 0, $sx, $sy);
+        imagedestroy($this->handle);
+        $this->handle = $dest;
+    }
+
+    /**
+     * 在保持图像长宽比的情况下将图像裁减到指定大小
+     * @param int $width
+     * @param int $height
+     * @param boolean $highQuality
+     * @param array $nocut
+     */
+    public function crop(int $width, int $height, bool $highQuality = true, ?bool $nocut = null): void
+    {
+        if (is_null($this->handle)) { return; }
+        $dest = imagecreatetruecolor($width, $height);
+        $sx = imagesx($this->handle);
+        $sy = imagesy($this->handle);
+        $ratio = doubleval($width) / doubleval($sx);
+
+        if (!is_array($nocut)) {
+            if ($nocut) {
+                $nocut = ['enabled' => true, 'pos' => 'center', 'bgcolor' => '0xffffff'];
+            } else {
+                $nocut = ['enabled' => false];
+            }
+        } else {
+            $nocut['enabled'] = $nocut['enabled'] ?? true;
+            $nocut['pos'] = $nocut['pos'] ?? 'center';
+            $nocut['bgcolor'] = $nocut['bgcolor'] ?? '0xffffff';
+        }
+
+        if ($nocut['enabled']) {
+            // 求缩放后的最大宽度和高度
+            if ($sy * $ratio > $height) {
+                $ratio = doubleval($height) / doubleval($sy);
+            }
+            $dx = $sx * $ratio;
+            $dy = $sy * $ratio;
+
+            // 根据 pos 属性来决定如何定位原始图片
+            switch (strtolower($nocut['pos'])) {
+            case 'left':
+                $ox = 0;
+                $oy = ($height - $sy * $ratio) / 2;
+                break;
+            case 'right':
+                $ox = $width - $sx * $ratio;
+                $oy = ($height - $sy * $ratio) / 2;
+                break;
+            case 'top':
+                $ox = ($width - $sx * $ratio) / 2;
+                $oy = 0;
+                break;
+            case 'bottom':
+                $ox = ($width - $sx * $ratio) / 2;
+                $oy = $height - $sy * $ratio;
+                break;
+            case 'top-left':
+                $ox = $oy = 0;
+                break;
+            case 'top-right':
+                $ox = $width - $sx * $ratio;
+                $oy = 0;
+                break;
+            case 'bottom-left':
+                $ox = 0;
+                $oy = $height - $sy * $ratio;
+                break;
+            case 'bottom-right':
+                $ox = $width - $sx * $ratio;
+                $oy = $height - $sy * $ratio;
+                break;
+            default:
+                $ox = ($width - $sx * $ratio) / 2;
+                $oy = ($height - $sy * $ratio) / 2;
+            }
+
+            [$r, $g, $b] = $this->extractColor($nocut['bgcolor'], '0xffffff');
+            $bgcolor = imagecolorallocate($dest, $r, $g, $b);
+            imagefilledrectangle($dest, 0, 0, $width, $height, $bgcolor);
+            imagecolordeallocate($dest, $bgcolor);
+
+            $args = [$dest, $this->handle, $ox, $oy, 0, 0, $dx, $dy, $sx, $sy];
+        } else {
+            // 允许图像溢出
+            if ($sy * $ratio < $height) {
+                // 当按照比例缩放后的图像高度小于要求的高度时，只有放弃原始图像右边的部分内容
+                $ratio = doubleval($sy) / doubleval($height);
+                $sx = $width * $ratio;
+            } elseif ($sy * $ratio > $height) {
+                // 当按照比例缩放后的图像高度大于要求的高度时，只有放弃原始图像底部的部分内容
+                $ratio = doubleval($sx) / doubleval($width);
+                $sy = $height * $ratio;
+            }
+
+            $args = [$dest, $this->handle, 0, 0, 0, 0, $width, $height, $sx, $sy];
+        }
+
+        if ($highQuality) {
+            call_user_func_array('imagecopyresampled', $args);
+        } else {
+            call_user_func_array('imagecopyresized', $args);
+        }
+
+        imagedestroy($this->handle);
+        $this->handle = $dest;
+    }
+
+    /**
+     * 保存为 JPEG 文件
+     * @param string $filename
+     * @param int $quality
+     */
+    public function saveAsJpeg(string $filename, int $quality = 80): bool
+    {
+        return imagejpeg($this->handle, $filename, $quality);
+    }
+
+    /**
+     * 保存为 PNG 文件
+     * @param string $filename
+     */
+    public function saveAsPng(string $filename): bool
+    {
+        return imagepng($this->handle, $filename);
+    }
+
+    /**
+     * 保存为 GIF 文件
+     * @param string $filename
+     */
+    public function saveAsGif(string $filename): bool
+    {
+        return imagegif($this->handle, $filename);
+    }
+
+    /**
+     * 销毁图像
+     */
+    public function destory(): void
+    {
+        imagedestroy($this->handle);
+        $this->handle = null;
+    }
+
+    /**
+     * 将十六进制表示的颜色值转换为 rgb
+     * @param string $color
+     * @param string $default
+     * @return array
+     */
+    public function extractColor($color, string $default = 'ffffff'): array
+    {
+        $hex = trim($color, '#&Hh');
+        $len = strlen($hex);
+        if ($len == 3) {
+            $hex = "{$hex[0]}{$hex[0]}{$hex[1]}{$hex[1]}{$hex[2]}{$hex[2]}";
+        } elseif ($len < 6) {
+            $hex = $default;
+        }
+        $dec = hexdec($hex);
+        return [($dec >> 16) & 0xff, ($dec >> 8) & 0xff, $dec & 0xff];
+    }
+}

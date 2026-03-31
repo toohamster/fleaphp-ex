@@ -1,0 +1,447 @@
+<?php
+
+namespace FLEA\Helper;
+
+/**
+ * 数据分页辅助类
+ *
+ * 提供数据查询分页功能，支持 TableDataGateway 和 SQL 语句两种数据源。
+ * 自动计算总记录数、总页数、当前页、上一页、下一页等分页参数。
+ *
+ * 主要功能：
+ * - 自动计算分页参数（总记录数、总页数、当前页等）
+ * - 支持 TableDataGateway 和 SQL 语句两种数据源
+ * - 自定义每页记录数和起始页索引
+ * - 生成翻页导航数据
+ * - 支持排序条件
+ *
+ * 用法示例：
+ * ```php
+ * // 使用 TableDataGateway
+ * $pager = new Pager($postTable, 1, 20, ['status' => 1], 'created_at DESC');
+ * $posts = $pager->findAll();
+ * $pagerData = $pager->getPagerData();
+ *
+ * // 使用 SQL 语句
+ * $pager = new Pager('SELECT * FROM posts WHERE status = 1', 1, 20);
+ * $pager->setCount(100);  // 手动设置总数
+ * $posts = $pager->findAll();
+ *
+ * // 获取翻页导航
+ * foreach ($pager->getNavbarIndexs() as $item) {
+ *     echo "<a href='?page={$item['index']}'>{$item['number']}</a> ";
+ * }
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ */
+class Pager
+{
+    /**
+     * 数据源
+     *
+     * 如果 $this->source 是一个 TableDataGateway 对象，则调用
+     * $this->source->findAll() 来获取记录集。
+     *
+     * 否则通过 $this->dbo->selectLimit() 来获取记录集。
+     *
+     * @var TableDataGateway|string
+     */
+    public $source;
+
+    /**
+     * 数据库访问对象，当 $this->source 参数为 SQL 语句时，必须调用
+     * $this->setDBO() 设置查询时要使用的数据库访问对象。
+     *
+     * @var \FLEA\Db\Driver\AbstractDriver
+     */
+    public ?\FLEA\Db\Driver\AbstractDriver $dbo = null;
+
+    /**
+     * 查询条件
+     *
+     * @var mixed
+     */
+    public $conditions;
+
+    /**
+     * 排序
+     *
+     * @var string
+     */
+    public ?string $sortby = null;
+
+    /**
+     * 计算实际页码时的基数
+     *
+     * @var int
+     */
+    public int $basePageIndex = 0;
+
+    /**
+     * 每页记录数
+     *
+     * @var int
+     */
+    public int $pageSize = -1;
+
+    /**
+     * 数据表中符合查询条件的记录总数
+     *
+     * @var int
+     */
+    public int $totalCount = -1;
+
+    /**
+     * 数据表中符合查询条件的记录总数
+     *
+     * @var int
+     */
+    public int $count = -1;
+
+    /**
+     * 符合条件的记录页数
+     *
+     * @var int
+     */
+    public int $pageCount = -1;
+
+    /**
+     * 第一页的索引，从 0 开始
+     *
+     * @var int
+     */
+    public int $firstPage = -1;
+
+    /**
+     * 第一页的页码
+     *
+     * @var int
+     */
+    public int $firstPageNumber = -1;
+
+    /**
+     * 最后一页的索引，从 0 开始
+     *
+     * @var int
+     */
+    public int $lastPage = -1;
+
+    /**
+     * 最后一页的页码
+     *
+     * @var int
+     */
+    public int $lastPageNumber = -1;
+
+    /**
+     * 上一页的索引
+     *
+     * @var int
+     */
+    public int $prevPage = -1;
+
+    /**
+     * 上一页的页码
+     *
+     * @var int
+     */
+    public int $prevPageNumber = -1;
+
+    /**
+     * 下一页的索引
+     *
+     * @var int
+     */
+    public int $nextPage = -1;
+
+    /**
+     * 下一页的页码
+     *
+     * @var int
+     */
+    public int $nextPageNumber = -1;
+
+    /**
+     * 当前页的索引
+     *
+     * @var int
+     */
+    public int $currentPage = -1;
+
+    /**
+     * 构造函数中提供的当前页索引，用于 setBasePageIndex() 后重新计算页码
+     *
+     * @var int
+     */
+    public int $currentPageRaw = -1;
+
+    /**
+     * 当前页的页码
+     *
+     * @var int
+     */
+    public int $currentPageNumber = -1;
+
+    /**
+     * 构造函数
+     *
+     * 如果 $source 参数是一个 TableDataGateway 对象，则 \FLEA\Helper\Pager 会调用
+     * 该 TDG 对象的 findCount() 和 findAll() 来确定记录总数并返回记录集。
+     *
+     * 如果 $source 参数是一个字符串，则假定为 SQL 语句。这时，\FLEA\Helper\Pager
+     * 不会自动调用计算各项分页参数。必须通过 setCount() 方法来设置作为分页计算
+     * 基础的记录总数。
+     *
+     * 同时，如果 $source 参数为一个字符串，则不需要 $conditions 和 $sortby 参数。
+     * 而且可以通过 setDBO() 方法设置要使用的数据库访问对象。否则 \FLEA\Helper\Pager
+     * 将尝试获取一个默认的数据库访问对象。
+     *
+     * @param \FLEA\Db\TableDataGateway|string $source
+     * @param int $currentPage
+     * @param int $pageSize
+     * @param mixed $conditions
+     * @param null $sortby
+     * @param int $basePageIndex
+     */
+    public function __construct($source, $currentPage, $pageSize = 20, $conditions = null, $sortby = null, $basePageIndex = 0)
+    {
+        $this->basePageIndex = $basePageIndex;
+        $this->currentPageRaw = $this->currentPage = $currentPage;
+        $this->pageSize = $pageSize;
+
+        if (is_object($source)) {
+            $this->source = $source;
+            $this->conditions = $conditions;
+            $this->sortby = $sortby;
+            $this->totalCount = $this->count = (int)$this->source->findCount($conditions);
+            $this->computingPage();
+        } elseif (!empty($source)) {
+            $this->source = $source;
+            $sql = "SELECT COUNT(*) FROM ( $source ) as _count_table";
+            $this->dbo = \FLEA::getDBO();
+            $this->totalCount = $this->count = (int)$this->dbo->getOne(\FLEA\Db\SqlStatement::create($sql));
+            $this->computingPage();
+        }
+    }
+
+    /**
+     * 设置分页索引第一页的基数
+     *
+     * @param int $index
+     */
+    public function setBasePageIndex(int $index): void
+    {
+        $this->basePageIndex = $index;
+        $this->currentPage = $this->currentPageRaw;
+        $this->computingPage();
+    }
+
+    /**
+     * 设置当前页码，以便用 findAll() 获得其他页的数据
+     *
+     * @param int $page
+     */
+    public function setPage(int $page): void
+    {
+        $this->currentPageRaw = $page;
+        $this->currentPage = $page;
+        $this->computingPage();
+    }
+
+    /**
+     * 设置记录总数，从而更新分页参数
+     *
+     * @param int $count
+     */
+    public function setCount(int $count): void
+    {
+        $this->count = $count;
+        $this->computingPage();
+    }
+
+    /**
+     * 设置数据库访问对象
+     *
+     * @param \FLEA\Db\Driver\AbstractDriver $dbo
+     */
+    public function setDBO(\FLEA\Db\Driver\AbstractDriver $dbo): void
+    {
+        $this->dbo = $dbo;
+    }
+
+    /**
+     * 返回当前页对应的记录集
+     *
+     * @param string $fields
+     * @param boolean $queryLinks
+     *
+     * @return array
+     */
+    public function findAll($fields = '*', bool $queryLinks = true): array
+    {
+        if ($this->count == -1) {
+            $this->count = 20;
+        }
+
+        $offset = ($this->currentPage - $this->basePageIndex) * $this->pageSize;
+        if (is_object($this->source)) {
+            $limit = [$this->pageSize, $offset];
+            $rowset = $this->source->findAll($this->conditions, $this->sortby, $limit, $fields, $queryLinks);
+        } else {
+            if (is_null($this->dbo)) {
+                $this->dbo = FLEA::getDBO(false);
+            }
+            $rs = $this->dbo->selectLimit($this->source, $this->pageSize, $offset);
+            $rowset = $this->dbo->getAll($rs);
+        }
+        return $rowset;
+    }
+
+    /**
+     * 返回分页信息，方便在模版中使用
+     *
+     * @param boolean $returnPageNumbers
+     *
+     * @return array
+     */
+    public function getPagerData(bool $returnPageNumbers = true): array
+    {
+        $data = [
+            'pageSize' => $this->pageSize,
+            'totalCount' => $this->totalCount,
+            'count' => $this->count,
+            'pageCount' => $this->pageCount,
+            'firstPage' => $this->firstPage,
+            'firstPageNumber' => $this->firstPageNumber,
+            'lastPage' => $this->lastPage,
+            'lastPageNumber' => $this->lastPageNumber,
+            'prevPage' => $this->prevPage,
+            'prevPageNumber' => $this->prevPageNumber,
+            'nextPage' => $this->nextPage,
+            'nextPageNumber' => $this->nextPageNumber,
+            'currentPage' => $this->currentPage,
+            'currentPageNumber' => $this->currentPageNumber,
+        ];
+
+        if ($returnPageNumbers) {
+            $data['pagesNumber'] = [];
+            for ($i = 0; $i < $this->pageCount; $i++) {
+                $data['pagesNumber'][$i] = $i + 1;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * 产生指定范围内的页面索引和页号
+     *
+     * @param int $currentPage
+     * @param int $navbarLen
+     *
+     * @return array
+     */
+    public function getNavbarIndexs(int $currentPage = 0, int $navbarLen = 8): array
+    {
+        $mid = intval($navbarLen / 2);
+        if ($currentPage < $this->firstPage) {
+            $currentPage = $this->firstPage;
+        }
+        if ($currentPage > $this->lastPage) {
+            $currentPage = $this->lastPage;
+        }
+
+        $begin = $currentPage - $mid;
+        if ($begin < $this->firstPage) { $begin = $this->firstPage; }
+        $end = $begin + $navbarLen - 1;
+        if ($end >= $this->lastPage) {
+            $end = $this->lastPage;
+            $begin = $end - $navbarLen + 1;
+            if ($begin < $this->firstPage) { $begin = $this->firstPage; }
+        }
+
+        $data = [];
+        for ($i = $begin; $i <= $end; $i++) {
+            $data[] = ['index' => $i, 'number' => ($i + 1 - $this->basePageIndex)];
+        }
+        return $data;
+    }
+
+    /**
+     * 返回页面跳转选项数据（原 renderPageJumper 的数据版本）
+     *
+     * @return array [['index' => 0, 'number' => 1, 'current' => true], ...]
+     */
+    public function getPageJumperData(): array
+    {
+        $data = [];
+        for ($i = $this->firstPage; $i <= $this->lastPage; $i++) {
+            $data[] = [
+                'index'   => $i,
+                'number'  => $i + 1 - $this->basePageIndex,
+                'current' => $i === $this->currentPage,
+            ];
+        }
+        return $data;
+    }
+
+    /**
+     * @deprecated 直接输出 HTML，请改用 getPageJumperData() 自行渲染
+     */
+    public function renderPageJumper(string $caption = '%u', string $jsfunc = 'fnOnPageChanged'): void
+    {
+        $out = "<select name=\"PageJumper\" onchange=\"{$jsfunc}(this.value);\">\n";
+        foreach ($this->getPageJumperData() as $item) {
+            $selected = $item['current'] ? ' selected' : '';
+            $out .= "<option value=\"{$item['index']}\"{$selected}>"
+                . sprintf($caption, $item['number'])
+                . "</option>\n";
+        }
+        $out .= "</select>\n";
+        echo $out;
+    }
+
+    /**
+     * 计算各项分页参数
+     */
+    protected function computingPage(): void
+    {
+        $this->pageCount = ceil($this->count / $this->pageSize);
+        $this->firstPage = $this->basePageIndex;
+        $this->lastPage = $this->pageCount + $this->basePageIndex - 1;
+        if ($this->lastPage < $this->firstPage) { $this->lastPage = $this->firstPage; }
+
+        if ($this->lastPage < $this->basePageIndex) {
+            $this->lastPage = $this->basePageIndex;
+        }
+
+        if ($this->currentPage >= $this->pageCount + $this->basePageIndex) {
+            $this->currentPage = $this->lastPage;
+        }
+
+        if ($this->currentPage < $this->basePageIndex) {
+            $this->currentPage = $this->firstPage;
+        }
+
+        if ($this->currentPage < $this->lastPage - 1) {
+            $this->nextPage = $this->currentPage + 1;
+        } else {
+            $this->nextPage = $this->lastPage;
+        }
+
+        if ($this->currentPage > $this->basePageIndex) {
+            $this->prevPage = $this->currentPage - 1;
+        } else {
+            $this->prevPage = $this->basePageIndex;
+        }
+
+        $this->firstPageNumber = $this->firstPage + 1 - $this->basePageIndex;
+        $this->lastPageNumber = $this->lastPage + 1 - $this->basePageIndex;
+        $this->nextPageNumber = $this->nextPage + 1 - $this->basePageIndex;
+        $this->prevPageNumber = $this->prevPage + 1 - $this->basePageIndex;
+        $this->currentPageNumber = $this->currentPage + 1 - $this->basePageIndex;
+    }
+}

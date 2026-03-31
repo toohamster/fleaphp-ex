@@ -1,0 +1,8 @@
+# Ignore local environment configuration
+.env
+
+# Cache
+cache/
+
+# Uploads
+uploads/

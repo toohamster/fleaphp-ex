@@ -1,309 +1,263 @@
-# FleaPHP 博客系统
+# FleaPHP v2.0
 
-一个基于 FleaPHP 框架开发的博客系统，演示了框架的核心功能。
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PHP 7.4+](https://img.shields.io/badge/PHP-7.4+-blue.svg)](https://www.php.net/)
 
-## 功能特性
+轻量级 PHP MVC 框架，采用 PSR 标准，支持 Router、Middleware、JWT 认证和 Context 上下文管理。
 
-- ✅ 文章列表展示（分页）
-- ✅ 文章详情查看
-- ✅ 创建新文章
-- ✅ 编辑文章
-- ✅ 删除文章
-- ✅ 评论功能
-- ✅ 响应式设计
+---
 
-## 环境要求
+## 特性
 
-- **PHP**: 7.4+
-- **MySQL**: 5.0+
-- **Composer**: 依赖管理
+- **PSR 标准**：PSR-11 容器、PSR-16 缓存、PSR-3 日志
+- **MVC 架构**：清晰的模型 - 视图 - 控制器分离
+- **路由器**：RESTful 路由、路由分组、命名路由
+- **中间件**：洋葱模型管道，支持 CORS/认证/限流
+- **JWT 认证**：HS256 签名，支持 Token 刷新
+- **Context 上下文**：可插拔的状态管理（Session/Redis/File/Database）
+- **TableDataGateway**：简洁的数据库 CRUD 和关联查询
+- **RBAC/ACL**：基于角色的权限控制和访问控制列表
 
-## 安装步骤
+---
 
-### 1. 克隆项目
+## 快速开始
+
+### 方式一：通过 Composer 安装
 
 ```bash
-git clone <repository-url>
+composer require toohamster/fleaphp-ex
+```
+
+### 方式二：克隆项目
+
+```bash
+git clone https://github.com/toohamster/fleaphp-ex.git
 cd fleaphp-ex
 ```
 
-### 2. 安装依赖
+### 安装依赖
 
 ```bash
 php74 ~/bin/composer.phar install
 ```
 
-### 3. 创建数据库
+### 3. 配置环境变量
 
 ```bash
-mysql -u root -p < blog.sql
+# 复制示例配置
+cp demo/.env.example demo/.env
+
+# 编辑 demo/.env 配置数据库等信息
 ```
 
-或手动执行 `blog.sql` 中的 SQL 语句创建数据库和表。
-
-### 4. 配置数据库连接
-
-编辑 `App/Config.php` 文件，配置数据库连接信息：
-
-```php
-'dbDSN' => [
-    'driver' => 'mysql',
-    'host' => '127.0.0.1',
-    'port' => '3306',
-    'login' => 'root',
-    'password' => '11111111',  // 修改为你的密码
-    'database' => 'blog',
-    'charset' => 'utf8mb4',
-],
-```
-
-### 5. 设置缓存目录权限
+### 4. 初始化数据库
 
 ```bash
-chmod -R 777 cache/
+mysql -u root -p < demo/blog.sql
 ```
 
-### 6. 启动开发服务器
+### 5. 启动开发服务器
 
 ```bash
-php74 -S 127.0.0.1:8081
+# 在项目根目录执行
+php bin/flea-cli --project-dir=demo
+
+# 访问 http://127.0.0.1:8081/index.php
 ```
 
-### 7. 访问应用
+---
 
-打开浏览器访问：http://127.0.0.1:8081/index.php
-
-## 项目结构
+## 目录结构
 
 ```
 fleaphp-ex/
-├── App/
-│   ├── Config.php              # 应用配置文件
-│   ├── Controller/
-│   │   └── PostController.php  # 文章控制器
-│   ├── Model/
-│   │   ├── Post.php            # 文章模型
-│   │   └── Comment.php         # 评论模型
-│   └── View/
-│       └── post/
-│           ├── index.php       # 文章列表页
-│           ├── view.php        # 文章详情页
-│           ├── create.php      # 创建文章页
-│           └── edit.php        # 编辑文章页
-├── FLEA/                       # FleaPHP 框架核心
-│   ├── FLEA.php               # 框架入口文件
-│   └── FLEA/                  # 框架组件
-├── cache/                      # 缓存目录
-├── vendor/                     # Composer 依赖
-├── blog.sql                    # 数据库初始化脚本
-├── composer.json               # Composer 配置
-├── index.php                   # 应用入口文件
-├── USER_GUIDE.md               # 用户手册
-├── SPEC.md                     # 框架规格说明
-└── README.md                   # 本文件
+├── src/
+│   ├── FLEA.php            # 框架入口
+│   ├── Functions.php       # 全局函数
+│   └── FLEA/               # 框架核心代码
+│       ├── Auth/           # JWT 认证
+│       ├── Cache/          # 缓存驱动
+│       ├── Config/         # 配置管理
+│       ├── Context/        # 上下文组件（新增）
+│       ├── Controller/     # 控制器基类
+│       ├── Db/             # 数据库组件
+│       ├── Dispatcher/     # 调度器
+│       ├── Error/          # 错误处理
+│       ├── Exception/      # 异常类
+│       ├── Helper/         # 辅助类
+│       ├── Middleware/     # 中间件（新增）
+│       ├── Rbac/           # RBAC 权限
+│       ├── Acl/            # ACL 访问控制
+│       ├── View/           # 视图引擎
+│       ├── Request.php     # HTTP 请求（新增）
+│       ├── Response.php    # HTTP 响应（新增）
+│       ├── Router.php      # 路由器（新增）
+│       └── Log.php         # 日志服务
+├── demo/
+│   ├── .env                # 环境配置
+│   ├── .env.example        # 配置示例
+│   ├── App/
+│   │   ├── Config.php      # 应用配置
+│   │   ├── Controller/     # 应用控制器
+│   │   ├── Model/          # 应用模型
+│   │   └── View/           # 应用视图
+│   ├── public/
+│   │   └── index.php       # Web 入口
+│   └── blog.sql            # 数据库脚本
+├── docs-book/              # 图书项目预留目录
+├── LICENSE                 # MIT 许可证
+├── README.md               # 本文件
+├── SPEC.md                 # 框架规格说明书
+└── USER_GUIDE.md           # 用户手册
 ```
 
-## 使用说明
+---
 
-### 访问首页（文章列表）
+## 核心组件
 
-```
-http://127.0.0.1:8081/index.php
-或
-http://127.0.0.1:8081/index.php?controller=Post&action=index
-```
-
-### 查看文章详情
-
-```
-http://127.0.0.1:8081/index.php?controller=Post&action=view&id=1
-```
-
-### 创建文章
-
-```
-http://127.0.0.1:8081/index.php?controller=Post&action=create
-```
-
-### 编辑文章
-
-```
-http://127.0.0.1:8081/index.php?controller=Post&action=edit&id=1
-```
-
-### 删除文章
-
-```
-http://127.0.0.1:8081/index.php?controller=Post&action=delete&id=1
-```
-
-## 数据库表结构
-
-### posts (文章表)
-
-| 字段 | 类型 | 说明 |
+| 组件 | 标准 | 说明 |
 |------|------|------|
-| id | INT PRIMARY KEY | 主键 |
-| title | VARCHAR(255) | 文章标题 |
-| content | TEXT | 文章内容 |
-| author | VARCHAR(100) | 作者 |
-| created_at | DATETIME | 创建时间 |
-| updated_at | DATETIME | 更新时间 |
-| status | TINYINT | 状态 (0-草稿，1-发布) |
+| `FLEA\Container` | PSR-11 | 依赖注入容器 |
+| `FLEA\Cache` | PSR-16 | 缓存门面（FileCache/RedisCache） |
+| `FLEA\Log` | PSR-3 | 日志服务 |
+| `FLEA\Database` | - | 数据库连接池 |
+| `FLEA\Config` | - | 配置管理（单例） |
+| `FLEA\Context` | - | 请求上下文（新增） |
+| `FLEA\Router` | - | HTTP 路由器（新增） |
+| `FLEA\Middleware` | - | 中间件管道（新增） |
 
-### comments (评论表)
+---
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | INT PRIMARY KEY | 主键 |
-| post_id | INT | 文章 ID (外键) |
-| author | VARCHAR(100) | 评论者 |
-| email | VARCHAR(255) | 邮箱 |
-| content | TEXT | 评论内容 |
-| created_at | DATETIME | 创建时间 |
-| status | TINYINT | 状态 (0-待审核，1-已审核) |
+## 基础用法
 
-## 开发指南
-
-### 添加新的控制器
-
-在 `App/Controller/` 目录下创建新的控制器类：
+### 路由定义
 
 ```php
-<?php
-namespace App\Controller;
+// 基本路由
+Router::get('/users', 'UserController@index');
+Router::post('/users', 'UserController@store');
 
-use \FLEA\Controller\Action;
+// 带参数路由
+Router::get('/users/{id:\d+}', 'UserController@show');
 
-class MyController extends Action
+// 路由分组
+Router::group('/admin', function() {
+    Router::get('/stats', 'AdminController@stats');
+}, [new AuthMiddleware()]);
+```
+
+### 中间件
+
+```php
+// 注册全局中间件
+\FLEA::middleware(new CorsMiddleware());
+\FLEA::middleware(new AuthMiddleware());
+
+// 自定义中间件
+class MyMiddleware implements \FLEA\Middleware\MiddlewareInterface
 {
-    public function __construct()
+    public function handle(callable $next): void
     {
-        parent::__construct('My');
-    }
-
-    public function actionIndex()
-    {
-        // 处理逻辑
-        $this->view->display('my/index.php');
+        // 前置处理
+        $next();
+        // 后置处理
     }
 }
 ```
 
-### 添加新的模型
-
-在 `App/Model/` 目录下创建新的模型类：
+### Context 上下文
 
 ```php
-<?php
-namespace App\Model;
+// 存储数据
+flea_context()->set('user_id', 123);
 
-use \FLEA\Db\TableDataGateway;
+// 读取数据
+$user_id = flea_context()->get('user_id');
 
-class MyModel extends TableDataGateway
-{
-    public string $tableName = 'my_table';
-    public $primaryKey = 'id';
-
-    public function getActiveRecords()
-    {
-        return $this->findAll(['status' => 1]);
-    }
+// 检查键是否存在
+if (flea_context()->has('user_id')) {
+    // ...
 }
 ```
 
-### 创建视图模板
-
-在 `App/View/` 目录下创建对应的视图文件：
+### JWT 认证
 
 ```php
-<!-- App/View/my/index.php -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>我的页面</title>
-</head>
-<body>
-    <h1>欢迎访问</h1>
-</body>
-</html>
+use FLEA\Auth\Jwt;
+
+// 签发 Token
+$token = Jwt::encode(['user_id' => 123], 7200);
+
+// 验证 Token
+$payload = Jwt::decode($token);
+
+// 验证有效性
+if (Jwt::verify($token)) {
+    // Token 有效
+}
 ```
 
-## 技术栈
-
-- **框架**: FleaPHP (PSR-4 标准)
-- **PHP**: 7.4+
-- **数据库**: MySQL
-- **模板引擎**: 原生 PHP
-- **CSS**: 自定义响应式样式
+---
 
 ## 配置说明
 
-### 主要配置项 (App/Config.php)
+### 数据库配置（.env）
 
-```php
-return [
-    // 数据库配置
-    'dbDSN' => [...],
-
-    // 控制器配置
-    'controllerAccessor' => 'controller',
-    'actionAccessor' => 'action',
-    'defaultController' => 'Post',
-    'defaultAction' => 'index',
-
-    // URL 配置
-    'urlMode' => URL_STANDARD,  // URL_STANDARD, URL_PATHINFO, URL_REWRITE
-
-    // 视图配置
-    'view' => \FLEA\View\Simple::class,
-    'viewConfig' => [
-        'templateDir' => __DIR__ . '/View',
-        'cacheDir' => __DIR__ . '/../cache',
-        'cacheLifeTime' => 900,
-        'enableCache' => false,
-    ],
-
-    // 日志配置
-    'logEnabled' => false,
-
-    // 错误显示（开发环境）
-    'displayErrors' => true,
-];
+```env
+DB_DRIVER=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD=your_password
+DB_DATABASE=blog
 ```
 
-## 常见问题
+### Context 配置
 
-### 1. 数据库连接失败
+```env
+# 驱动：session/redis/file/database
+CONTEXT_DRIVER=session
 
-检查 `App/Config.php` 中的数据库配置是否正确，确保 MySQL 服务已启动。
-
-### 2. 缓存目录权限问题
-
-确保 `cache/` 目录可写：
-
-```bash
-chmod -R 777 cache/
+# 身份标识：session/jwt/api-key/request-id
+CONTEXT_IDENTITY=session
 ```
 
-### 3. PHP 版本不兼容
+### JWT 配置
 
-确保使用 PHP 7.4+ 版本：
-
-```bash
-php74 -v
+```env
+JWT_SECRET=your-secret-key
+JWT_TTL=7200
 ```
+
+---
+
+## 环境要求
+
+- **PHP**: 7.4+
+- **Composer**: 依赖管理
+- **数据库**: MySQL 5.0+ 或 PDO 支持的其他数据库
+
+---
+
+## 文档
+
+| 文档 | 说明 |
+|------|------|
+| [SPEC.md](SPEC.md) | 框架规格说明书 |
+| [USER_GUIDE.md](USER_GUIDE.md) | 用户手册 |
+| [demo/APP_USAGE_GUIDE.md](demo/APP_USAGE_GUIDE.md) | 博客应用使用手册 |
+| [demo/BLOG_SETUP.md](demo/BLOG_SETUP.md) | 博客安装指南 |
+| [CHANGES.md](CHANGES.md) | 框架修改记录 |
+
+---
 
 ## 许可证
 
-MIT License
+本项目采用 [MIT 许可证](LICENSE) 开源。
 
-## 相关文档
+**注意**：框架代码采用 MIT 许可，但 `docs-book/` 目录下的图书项目版权归作者所有，未经许可不得用于商业出版。
 
-- [USER_GUIDE.md](USER_GUIDE.md) - 用户手册
-- [SPEC.md](SPEC.md) - 框架规格说明书
-- [CHANGES.md](CHANGES.md) - 框架修改记录
-- [GIT_COMMIT.md](GIT_COMMIT.md) - Git 提交记录
+---
 
 ## 作者
 

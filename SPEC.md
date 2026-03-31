@@ -1,115 +1,666 @@
-# FleaPHP 框架规格说明书
+# FleaPHP 框架规格说明书 v2.0
 
 ## 1. 概述
 
 FleaPHP 是一个轻量级的 PHP MVC 框架，采用 PSR-4 自动加载机制，支持 PHP 7.4+。
 
-**版本**: 1.7.1524
-**命名空间**: `FLEA\`
-**许可证**: 查看 LICENSE.txt
+| 项目 | 说明 |
+|------|------|
+| **版本** | 2.0.0 |
+| **命名空间** | `FLEA\` |
+| **PHP 要求** | 7.4+ |
+| **许可证** | MIT |
+
+### 1.1 PSR 标准合规
+
+| 组件 | PSR 标准 | 说明 |
+|------|----------|------|
+| `FLEA\Container` | PSR-11 | 依赖注入容器 |
+| `FLEA\Cache` | PSR-16 | 缓存接口 |
+| `FLEA\Log` | PSR-3 | 日志接口 |
 
 ---
 
 ## 2. 目录结构
 
+### 2.1 框架目录
+
 ```
-FLEA/
-├── FLEA/                      # 框架核心代码
-│   ├── Acl/                   # ACL (访问控制列表) 管理
-│   │   ├── Exception/         # ACL 相关异常
-│   │   ├── Table/             # ACL 数据表入口
-│   │   └── Manager.php        # ACL 管理器
-│   ├── Ajax.php               # Ajax 支持类
-│   ├── Config.php             # 配置管理器 (单例)
-│   ├── Controller/            # 控制器基类
-│   │   └── Action.php         # 动作控制器基类
-│   ├── Db/                    # 数据库相关组件
-│   │   ├── Driver/            # 数据库驱动
-│   │   ├── Exception/         # 数据库异常
-│   │   ├── TableLink/         # 表关联处理
-│   │   ├── ActiveRecord.php   # ActiveRecord 模式实现
-│   │   ├── SqlStatement.php   # SQL 语句处理
-│   │   ├── TableDataGateway.php # 表数据入口 (CRUD)
-│   │   └── TableLink.php      # 表关联基类
-│   ├── Dispatcher/            # 请求调度器
-│   │   ├── Exception/         # 调度器异常
-│   │   ├── Auth.php           # 认证调度器
-│   │   └── Simple.php         # 简单调度器
-│   ├── Exception/             # 框架通用异常
-│   ├── Helper/                # 辅助类
-│   │   ├── FileUploader/      # 文件上传
-│   │   ├── Image.php          # 图像处理
-│   │   ├── ImgCode.php        # 验证码
-│   │   ├── Pager.php          # 分页器
-│   │   ├── SendFile.php       # 文件下载
-│   │   └── Verifier.php       # 数据验证
-│   ├── Language.php           # 多语言支持
-│   ├── Log.php                # 日志服务 (PSR-3)
-│   ├── Rbac/                  # RBAC (基于角色的访问控制)
-│   │   ├── Exception/         # RBAC 异常
-│   │   ├── RolesManager.php   # 角色管理
-│   │   └── UsersManager.php   # 用户管理
-│   ├── Rbac.php               # RBAC 服务类
-│   ├── Session/               # Session 处理
-│   │   └── Db.php             # 数据库 Session
-│   ├── View/                  # 视图引擎
-│   │   ├── ViewInterface.php  # 视图接口
-│   │   ├── Simple.php         # 简单模板引擎
-│   │   └── NullView.php       # 空视图 (无输出)
-│   └── WebControls.php        # Web 控件库
-├── FLEA.php                   # 框架入口文件
-└── 3rd/                       # 第三方库
+src/
+├── FLEA.php                        # 框架入口文件（全局类）
+├── Functions.php                   # 全局函数（flea_context 等）
+└── FLEA/                           # 框架核心代码（命名空间 FLEA\Xxx 的根）
+    ├── Auth/                       # 认证支持
+    │   ├── Jwt.php                 # JWT 工具 (HS256)
+    │   └── JwtException.php        # JWT 异常
+    ├── Cache/                      # 缓存驱动
+    │   ├── FileCache.php           # 文件缓存 (PSR-16)
+    │   └── RedisCache.php          # Redis 缓存 (PSR-16)
+    ├── Config/                     # 配置相关
+    │   └── Defaults.php            # 默认配置
+    ├── Context/                    # 上下文管理（请求级状态）
+    │   ├── Context.php             # 核心类
+    │   ├── DriverInterface.php     # 驱动接口
+    │   ├── IdentityInterface.php   # 身份标识接口
+    │   ├── Driver/                 # 存储驱动
+    │   │   ├── SessionDriver.php   # Session 存储
+    │   │   ├── RedisDriver.php     # Redis 存储
+    │   │   ├── FileDriver.php      # 文件存储
+    │   │   └── DatabaseSessionDriver.php  # 数据库存储
+    │   └── Identity/               # 身份标识
+    │       ├── SessionIdentity.php # Session ID
+    │       ├── JwtIdentity.php     # JWT 用户
+    │       ├── ApiKeyIdentity.php  # API Key
+    │       └── RequestIdIdentity.php # Request ID
+    ├── Controller/                 # 控制器基类
+    │   └── Action.php              # 动作控制器基类
+    ├── Db/                         # 数据库相关组件
+    │   ├── Driver/                 # 数据库驱动
+    │   │   ├── AbstractDriver.php  # 抽象基类
+    │   │   └── Mysql.php           # MySQL 驱动
+    │   ├── Exception/              # 数据库异常
+    │   ├── TableLink/              # 表关联处理
+    │   │   ├── HasOneLink.php
+    │   │   ├── BelongsToLink.php
+    │   │   ├── HasManyLink.php
+    │   │   └── ManyToManyLink.php
+    │   ├── SqlHelper.php           # SQL 辅助
+    │   ├── SqlStatement.php        # SQL 语句处理
+    │   ├── TableDataGateway.php    # 表数据入口 (CRUD)
+    │   └── TableLink.php           # 表关联基类
+    ├── Dispatcher/                 # 请求调度器
+    │   ├── Exception/
+    │   │   └── CheckFailed.php
+    │   ├── Auth.php                # 认证调度器
+    │   └── Simple.php              # 简单调度器
+    ├── Error/                      # 错误处理
+    │   ├── ErrorRenderer.php       # 错误渲染器
+    │   └── views/
+    │       └── 500.php
+    ├── Exception/                  # 框架通用异常
+    ├── Helper/                     # 辅助类
+    │   ├── FileUploader/
+    │   │   └── File.php
+    │   ├── FileUploader.php        # 文件上传
+    │   ├── Image.php               # 图像处理
+    │   ├── ImgCode.php             # 验证码
+    │   ├── Pager.php               # 分页器
+    │   ├── SendFile.php            # 文件下载
+    │   └── Verifier.php            # 数据验证
+    ├── Middleware/                 # 中间件
+    │   ├── MiddlewareInterface.php # 中间件接口
+    │   ├── Pipeline.php            # 中间件管道
+    │   ├── CorsMiddleware.php      # CORS 中间件
+    │   ├── AuthMiddleware.php      # 认证中间件
+    │   └── RateLimitMiddleware.php # 限流中间件
+    ├── Rbac/                       # RBAC 子组件
+    │   ├── Exception/
+    │   │   ├── InvalidACT.php
+    │   │   └── InvalidACTFile.php
+    │   ├── RolesManager.php        # 角色管理
+    │   └── UsersManager.php        # 用户管理
+    ├── Acl/                        # ACL 子组件
+    │   ├── Exception/
+    │   │   └── UserGroupNotFound.php
+    │   ├── Table/                  # ACL 数据表
+    │   ├── Manager.php             # ACL 管理器
+    │   ├── testACL.php
+    │   └── testCreateData.php
+    ├── View/                       # 视图引擎
+    │   ├── ViewInterface.php       # 视图接口
+    │   ├── Simple.php              # 简单模板引擎
+    │   └── NullView.php            # 空视图
+    ├── Cache.php                   # 缓存门面 (PSR-16)
+    │── Config.php                  # 配置管理器 (单例)
+    │── Container.php               # 对象容器 (PSR-11)
+    │── Database.php                # 数据库连接管理
+    │── Env.php                     # 环境检测工具
+    │── Exception.php               # 基础异常类
+    │── Language.php                # 多语言支持
+    │── Log.php                     # 日志服务 (PSR-3)
+    │── Request.php                 # HTTP 请求封装
+    │── Response.php                # HTTP 响应封装
+    │── Router.php                  # HTTP 路由器
+    │── Route.php                   # 单条路由
+    │── Rbac.php                    # RBAC 服务类
+```
+
+### 2.2 应用目录（示例）
+
+```
+demo/
+├── .env                    # 环境变量（基础配置）
+├── .env.local              # 本地开发配置（可选）
+├── .env.production         # 生产环境配置（可选）
+├── App/
+│   ├── Config.php          # 应用配置
+│   ├── Controller/         # 应用控制器
+│   ├── Model/              # 应用模型
+│   └── View/               # 应用视图
+└── public/
+    └── index.php           # Web 入口
 ```
 
 ---
 
-## 3. 核心组件
+## 3. 核心服务类
 
 ### 3.1 FLEA 类
 
-框架的主入口类，提供静态方法管理框架服务：
+框架主入口类，所有方法为静态方法，委托给各服务类：
 
-- `FLEA::loadAppInf()` - 载入应用程序配置
-- `FLEA::getAppInf()` - 获取配置值
-- `FLEA::setAppInf()` - 设置配置值
-- `FLEA::getSingleton()` - 获取单例实例
-- `FLEA::register()` - 注册对象实例
-- `FLEA::isRegistered()` - 检查对象是否已注册
-- `FLEA::getDBO()` - 获取数据库访问对象
-- `FLEA::runMVC()` - 运行 MVC 应用程序
+```php
+class FLEA
+{
+    // 配置管理
+    public static function loadEnv(string $path): void
+    public static function loadAppInf($config = null): void
+    public static function getAppInf(string $option, $default = null)
+    public static function setAppInf($option, $data = null): void
+    public static function setAppInfValue(string $option, string $keyname, $value): void
+    public static function getAppInfValue(string $option, string $keyname, $default = null)
 
-### 3.2 Config (配置管理器)
+    // 对象容器（PSR-11）
+    public static function getSingleton(string $className): object
+    public static function register(object $obj, ?string $name = null): object
+    public static function isRegistered(string $name): bool
 
-单例模式管理框架配置：
+    // 数据库
+    public static function getDBO($dsn = 0): \FLEA\Db\Driver\AbstractDriver
+    public static function parseDSN($dsn): ?array
+
+    // 缓存
+    public static function getCache(string $cacheId, int $time = 900, ...): mixed
+    public static function writeCache(string $cacheId, $data): bool
+    public static function purgeCache(string $cacheId): bool
+
+    // 中间件
+    public static function middleware(\FLEA\Middleware\MiddlewareInterface $mw): void
+
+    // 应用启动
+    public static function runMVC(): void
+    public static function init(bool $loadMVC = false): void
+}
+```
+
+### 3.2 全局辅助函数
+
+在 `src/Functions.php` 中定义的全局函数：
+
+```php
+// 环境变量
+env(string $key, $default = null): mixed
+
+// 日志
+log_message($msg, $level = 'debug', $title = ''): void
+
+// SQL 语句
+sql_statement($sql): \FLEA\Db\SqlStatement
+
+// 路由
+url(string $name, array $params = []): string
+
+// 字符串转换
+kebab_to_pascal(string $value): string
+// order-apply → OrderApply
+// user-list → UserList
+
+// HTML 转义
+h(string $text): string
+t(string $text): string
+
+// Context 上下文
+flea_context(): \FLEA\Context\Context
+
+// 翻译
+_T(string $key, string $language = ''): string
+load_language(string $dictname, string $language = ''): bool
+
+// 调试
+dump($vars, string $label = '', bool $return = false): ?string
+dump_trace(): void
+print_ex(\Throwable $ex, bool $return = false): string
+
+// 文件操作
+safe_file_put_contents(string $filename, string $content): bool
+safe_file_get_contents(string $filename): ?string
+mkdirs(string $dir, int $mode = 0777): bool
+rmdirs(string $dir): bool
+
+// 数组操作
+array_remove_empty(array &$arr, bool $trim = true): void
+array_col_values(array $arr, string $col): array
+array_to_hashmap(array &$arr, string $keyField, ?string $valueField = null): array
+array_group_by(array &$arr, string $keyField): array
+array_to_tree(array $arr, string $fid, string $parentIdKey = 'parent_id', string $childrenIdKey = 'children', bool $returnReferences = false): array
+tree_to_array(array &$node, string $fchildren = 'children'): array
+array_column_sort(array $array, string $key, int $sort = SORT_ASC): array
+array_sortby_multifields(array $rowset, array $args): array
+```
+
+### 3.3 Config (配置管理器)
+
+单例模式，管理应用程序配置：
 
 ```php
 namespace FLEA;
 
 class Config
 {
-    public array $appInf = [];       // 应用程序配置
-    public array $objects = [];      // 对象实例容器
-    public array $dbo = [];          // 数据库访问对象
+    public array $appInf = [];
+
+    public static function getInstance(): self
+    public function getAppInf(string $option, $default = null)
+    public function setAppInf($option, $data = null): void
+    public function getAppInfValue(string $option, string $keyname, $default = null)
+    public function setAppInfValue(string $option, string $keyname, $value): void
+    public function mergeAppInf(array $config): void
 }
 ```
 
-### 3.3 MVC 架构
+### 3.4 Container (对象容器)
 
-#### 控制器 (Controller)
+实现 PSR-11 依赖注入容器：
+
+```php
+namespace FLEA;
+
+class Container implements \Psr\Container\ContainerInterface
+{
+    public function get(string $id): mixed       // PSR-11: 获取对象
+    public function has(string $id): bool        // PSR-11: 检查是否存在
+    public function register(object $obj, ?string $name = null): object
+    public function singleton(string $className): object
+    public function all(): array
+}
+```
+
+### 3.5 Database (数据库连接管理)
+
+管理数据库连接池：
+
+```php
+namespace FLEA;
+
+class Database
+{
+    public static function getInstance(): self
+    public function connect($dsn = 0): \FLEA\Db\Driver\AbstractDriver
+    public function parseDSN($dsn): ?array
+}
+```
+
+### 3.6 Cache (缓存门面)
+
+PSR-16 缓存门面：
+
+```php
+namespace FLEA;
+
+class Cache
+{
+    public static function provider(): \Psr\SimpleCache\CacheInterface
+}
+```
+
+**配置项 `cacheProvider`**:
+- `null` (默认) → `FLEA\Cache\FileCache`
+- `\FLEA\Cache\RedisCache::class` → Redis
+
+### 3.7 Log (日志服务)
+
+实现 PSR-3 LoggerInterface：
+
+```php
+namespace FLEA;
+
+class Log extends \Psr\Log\AbstractLogger
+{
+    public string $traceId;
+    public bool $enabled = true;
+    public ?string $logFileDir;
+    public ?string $logFilename;
+
+    public function log($level, $message, array $context = []): void  // PSR-3
+    public function flush(): void
+    public function getTraceId(): string
+}
+```
+
+### 3.8 Env (环境检测工具)
+
+```php
+namespace FLEA;
+
+class Env
+{
+    public static function isEnv(string $env): bool
+    public static function isLocal(): bool
+    public static function isProduction(): bool
+    public static function isDevelopment(): bool
+}
+```
+
+---
+
+## 4. Context 上下文组件
+
+Context 提供请求级别的状态管理服务，支持多种存储驱动和身份标识，用于替代传统的 `$_SESSION`。
+
+### 4.1 Context 核心类
+
+```php
+namespace FLEA\Context;
+
+class Context
+{
+    public function get(string $key, mixed $default = null): mixed
+    public function set(string $key, mixed $value, ?int $ttl = null): bool
+    public function remove(string $key): bool
+    public function has(string $key): bool
+}
+```
+
+### 4.2 驱动接口
+
+```php
+namespace FLEA\Context;
+
+interface DriverInterface
+{
+    public function get(string $key, mixed $default = null): mixed;
+    public function set(string $key, mixed $value, ?int $ttl = null): bool;
+    public function remove(string $key): bool;
+    public function has(string $key): bool;
+}
+```
+
+### 4.3 身份标识接口
+
+```php
+namespace FLEA\Context;
+
+interface IdentityInterface
+{
+    public function getId(): string;
+}
+```
+
+### 4.4 内置驱动
+
+| 驱动 | 类 | 说明 |
+|------|-----|------|
+| SessionDriver | `FLEA\Context\Driver\SessionDriver` | 使用 `$_SESSION` 存储 |
+| RedisDriver | `FLEA\Context\Driver\RedisDriver` | 使用 Redis 存储 |
+| FileDriver | `FLEA\Context\Driver\FileDriver` | 使用文件系统存储 |
+| DatabaseSessionDriver | `FLEA\Context\Driver\DatabaseSessionDriver` | 使用数据库存储 |
+
+### 4.5 内置身份标识
+
+| 身份标识 | 类 | 说明 |
+|----------|-----|------|
+| SessionIdentity | `FLEA\Context\Identity\SessionIdentity` | 使用 session_id() |
+| JwtIdentity | `FLEA\Context\Identity\JwtIdentity` | 从 JWT 提取用户 ID |
+| ApiKeyIdentity | `FLEA\Context\Identity\ApiKeyIdentity` | 使用 API Key 哈希 |
+| RequestIdIdentity | `FLEA\Context\Identity\RequestIdIdentity` | 使用 X-Request-ID |
+
+### 4.6 配置项
+
+```php
+return [
+    // Context 驱动：session/redis/file/database
+    'contextDriver' => env('CONTEXT_DRIVER', 'session'),
+
+    // 身份标识：session/jwt/api-key/request-id
+    'contextIdentity' => env('CONTEXT_IDENTITY', 'session'),
+
+    // 各驱动的详细配置
+    'context' => [
+        'redis' => [
+            'host' => env('CONTEXT_REDIS_HOST', '127.0.0.1'),
+            'port' => (int) env('CONTEXT_REDIS_PORT', 6379),
+            'password' => env('CONTEXT_REDIS_PASSWORD', ''),
+            'prefix' => env('CONTEXT_REDIS_PREFIX', 'fleaphp:context:'),
+        ],
+        'file' => [
+            'path' => env('CONTEXT_FILE_PATH', ''),
+        ],
+        'database' => [
+            'tableName' => env('CONTEXT_DB_TABLE', 'contexts'),
+            'fieldId' => env('CONTEXT_DB_FIELD_ID', 'context_id'),
+            'fieldData' => env('CONTEXT_DB_FIELD_DATA', 'context_data'),
+            'fieldActivity' => env('CONTEXT_DB_FIELD_ACTIVITY', 'activity'),
+            'lifeTime' => (int) env('CONTEXT_DB_LIFETIME', 3600),
+        ],
+    ],
+];
+```
+
+### 4.7 全局辅助函数
+
+```php
+// 获取 Context 实例
+$context = flea_context();
+
+// 读写数据
+flea_context()->set('user_id', 123);
+$user_id = flea_context()->get('user_id');
+```
+
+---
+
+## 5. HTTP 组件
+
+### 5.1 Request (请求封装)
+
+```php
+namespace FLEA;
+
+class Request
+{
+    public static function current(): self
+
+    // 请求方法
+    public function method(): string
+    public function isGet(): bool
+    public function isPost(): bool
+    public function isPut(): bool
+    public function isDelete(): bool
+    public function isAjax(): bool
+    public function isJson(): bool
+
+    // 数据获取
+    public function input(string $key, $default = null): mixed
+    public function json(string $key = null, $default = null): mixed
+    public function get(string $key, $default = null): mixed
+    public function post(string $key, $default = null): mixed
+    public function param(string $key, $default = null): mixed
+    public function all(): array
+
+    // 请求头/认证
+    public function header(string $name, $default = null): ?string
+    public function bearerToken(): ?string
+    public function ip(): string
+    public function uri(): string
+}
+```
+
+### 5.2 Response (响应封装)
+
+```php
+namespace FLEA;
+
+class Response
+{
+    public static function make(): self
+    public function code(int $code): self
+    public function header(string $name, string $value): self
+    public function json($data): void
+    public function text(string $content): void
+
+    // 快捷方法
+    public static function success($data = null, string $message = 'ok', int $httpCode = 200): void
+    public static function error(string $message, int $httpCode = 400, int $errCode = -1): void
+    public static function paginate(array $items, int $total, int $page, int $pageSize): void
+    public static function send($data, int $code = 200): void
+}
+```
+
+**统一响应结构**:
+```json
+// 成功
+{"code": 0, "message": "ok", "data": {...}}
+
+// 错误
+{"code": -1, "message": "error message", "data": null}
+```
+
+### 5.3 Router (路由器)
+
+```php
+namespace FLEA;
+
+class Router
+{
+    // 路由注册
+    public static function get(string $path, string $handler, array $middlewares = []): \FLEA\Route
+    public static function post(string $path, string $handler, array $middlewares = []): \FLEA\Route
+    public static function put(string $path, string $handler, array $middlewares = []): \FLEA\Route
+    public static function patch(string $path, string $handler, array $middlewares = []): \FLEA\Route
+    public static function delete(string $path, string $handler, array $middlewares = []): \FLEA\Route
+    public static function any(string $path, string $handler, array $middlewares = []): \FLEA\Route
+    public static function group(string $prefix, callable $callback, array $middlewares = []): void
+
+    // RESTful 资源路由
+    public static function resource(string $name, string $controller, array $options = []): void
+
+    // 命名路由
+    public static function urlFor(string $name, array $params = []): string
+
+    // 路由匹配
+    public static function dispatch(): bool
+    public static function getMatchedMiddlewares(): array
+    public static function routes(): array
+}
+```
+
+**路由语法**:
+```php
+Router::get('/users', 'UserController@index');
+Router::get('/users/{id:\d+}', 'UserController@show');
+Router::post('/users', 'UserController@store', [new AuthMiddleware()]);
+Router::group('/admin', fn() => {
+    Router::get('/stats', 'AdminController@stats');
+}, [new AuthMiddleware()]);
+```
+
+**RESTful 资源路由**:
+```php
+// 生成全部 7 条路由
+Router::resource('post', 'PostController');
+
+// 只保留部分方法
+Router::resource('post', 'PostController', ['only' => ['index', 'show']]);
+
+// 排除部分方法
+Router::resource('post', 'PostController', ['except' => ['create', 'edit']]);
+```
+
+生成的路由表：
+
+| 方法 | URI | 处理器 | 路由名 |
+|------|-----|--------|--------|
+| GET | /{name} | {controller}@index | {name}.index |
+| GET | /{name}/create | {controller}@create | {name}.create |
+| POST | /{name} | {controller}@store | {name}.store |
+| GET | /{name}/{id} | {controller}@show | {name}.show |
+| GET | /{name}/{id}/edit | {controller}@edit | {name}.edit |
+| PUT | /{name}/{id} | {controller}@update | {name}.update |
+| PUT | /{name}/{id} | {controller}@update | {name}.update.post (fallback) |
+| DELETE | /{name}/{id} | {controller}@destroy | {name}.destroy |
+| POST | /{name}/{id} | {controller}@destroy | {name}.destroy.post (fallback) |
+
+**说明**：
+- `resource()` 方法一行代码生成 7 条 RESTful 路由
+- 支持 `only`（白名单）和 `except`（黑名单）选项过滤路由
+- update 和 destroy 额外注册 POST fallback 路由，兼容 HTML 表单只支持 GET/POST 的限制
+- 路由名格式：`{name}.{action}`（如 `post.index`、`post.update.post`）
+
+### 5.4 Route (单条路由)
+
+```php
+namespace FLEA;
+
+class Route
+{
+    public function name(string $name): self  // 命名路由，支持链式调用
+}
+```
+
+### 5.5 Middleware (中间件)
+
+```php
+namespace FLEA\Middleware;
+
+interface MiddlewareInterface
+{
+    public function handle(callable $next): void;
+}
+```
+
+**管道实现**:
+```php
+namespace FLEA\Middleware;
+
+class Pipeline
+{
+    public static function create(): self
+    public function pipe(MiddlewareInterface $middleware): self
+    public function run(callable $destination): void
+}
+```
+
+**已实现中间件**:
+- `CorsMiddleware` - CORS 跨域支持
+- `AuthMiddleware` - JWT 认证
+- `RateLimitMiddleware` - 请求限流
+
+### 5.6 Auth/Jwt (JWT 认证)
+
+```php
+namespace FLEA\Auth;
+
+class Jwt
+{
+    public static function encode(array $payload, ?int $ttl = null): string
+    public static function decode(string $token): array
+    public static function verify(string $token): bool
+}
+```
+
+**配置项**:
+- `jwtSecret`: 签名密钥（必须）
+- `jwtTtl`: 有效期（秒），默认 7200
+- `jwtIssuer`: 签发者（可选）
+
+---
+
+## 6. MVC 架构
+
+### 6.1 控制器 (Controller)
 
 ```php
 namespace FLEA\Controller;
 
 class Action
 {
-    protected string $controllerName = '';    // 当前控制器名
-    protected string $actionName = '';        // 当前动作名
-    protected ?\FLEA\Dispatcher\Simple $dispatcher = null;  // 调度器
-    public $components = [];                  // 组件列表
-    protected array $renderCallbacks = [];    // 渲染回调
+    protected string $controllerName;
+    protected string $actionName;
+    protected ?\FLEA\Dispatcher\Simple $dispatcher;
+    public $components = [];
 
-    // 生命周期方法
-    public function setController($controllerName, $actionName): void
+    // 生命周期
+    public function setController(string $controllerName, string $actionName): void
     public function setDispatcher(\FLEA\Dispatcher\Simple $dispatcher): void
     public function beforeExecute($actionMethod): void
     public function afterExecute($actionMethod): void
@@ -120,39 +671,13 @@ class Action
     protected function url(?string $actionName = null, ?array $args = null, ?string $anchor = null): string
     protected function forward(?string $controllerName = null, ?string $actionName = null): void
     protected function getView(): \FLEA\View\ViewInterface
-    protected function executeView(string $__flea_internal_viewName, ?array $data = null): void
+    protected function executeView(string $viewName, ?array $data = null): void
     protected function isPost(): bool
     protected function isAjax(): bool
-    protected function registerEvent(string $controlName, string $event, string $action, ?array $attribs = null): string
-    protected function registerRenderCallback($callback): void
 }
 ```
 
-#### 模型 (Model)
-
-```php
-namespace FLEA\Db;
-
-class TableDataGateway
-{
-    public string $tableName = '';          // 表名
-    public string $fullTableName = '';     // 完整表名
-    public $primaryKey = null;              // 主键 (string|array)
-    public array $hasOne = [];             // 一对一关联
-    public array $belongsTo = [];          // 从属关联
-    public array $hasMany = [];            // 一对多关联
-    public array $manyToMany = [];         // 多对多关联
-
-    // CRUD 方法
-    public function find($conditions, $sort = null, $fields = '*', $queryLinks = true): ?array
-    public function findAll($conditions = null, $sort = null, $limit = null, $fields = '*', $queryLinks = true): array
-    public function create(array &$row, bool $saveLinks = true): int
-    public function update(array &$row, bool $saveLinks = true): bool
-    public function remove(array &$row, bool $removeLink = true): bool
-}
-```
-
-#### 视图 (View)
+### 6.2 视图 (View)
 
 ```php
 namespace FLEA\View;
@@ -165,17 +690,16 @@ interface ViewInterface
 }
 ```
 
+**Simple 视图实现**:
 ```php
 namespace FLEA\View;
 
 class Simple implements ViewInterface
 {
-    public ?string $templateDir = null;    // 模板目录
-    public int $cacheLifetime;              // 缓存过期时间
-    public bool $enableCache;               // 是否启用缓存
-    public string $cacheDir;                // 缓存目录
-    public array $vars = [];                // 模板变量
-    public array $cacheState = [];          // 缓存状态
+    public ?string $templateDir;
+    public int $cacheLifetime;
+    public bool $enableCache;
+    public string $cacheDir;
 
     public function assign($name, $value = null): void
     public function display(string $file, ?string $cacheId = null): void
@@ -186,34 +710,31 @@ class Simple implements ViewInterface
 }
 ```
 
+**NullView (空视图)**:
 ```php
 namespace FLEA\View;
 
 class NullView implements ViewInterface
 {
-    public function assign($key, $value = null): void
-    public function display(string $template): void
-    public function fetch(string $template, ?string $cacheId = null): string
+    public function assign($key, $value = null): void {}
+    public function display(string $template): void {}
+    public function fetch(string $template, ?string $cacheId = null): string { return ''; }
 }
 ```
 
-### 3.4 Dispatcher (调度器)
+### 6.3 调度器 (Dispatcher)
 
 ```php
 namespace FLEA\Dispatcher;
 
 class Simple
 {
-    protected array $request = [];           // 请求信息
-    protected array $requestBackup = [];     // 原始请求
-
     public function __construct(array &$request)
-    public function dispatching()              // 执行调度
+    public function dispatching()
     public function getControllerName(): string
     public function getActionName(): string
     public function setControllerName(string $controllerName): void
     public function setActionName(string $actionName): void
-    public function parseUrl(string $url): array
     public function getControllerClass(string $controllerName): string
 
     protected function executeAction(string $controllerName, string $actionName, string $controllerClass)
@@ -221,103 +742,92 @@ class Simple
 }
 ```
 
-#### Auth (认证调度器)
-
-```php
-namespace FLEA\Dispatcher;
-
-class Auth extends Simple
-{
-    protected ?\FLEA\Rbac $auth = null;       // 验证服务对象
-
-    public function __construct(array $request)
-    public function dispatching()
-    public function getAuthProvider(): \FLEA\Rbac
-    public function setAuthProvider(\FLEA\Rbac $auth): void
-    public function setUser(array $userData, $rolesData = null): void
-    public function getUser(): array
-    public function getUserRoles(): array
-    public function clearUser(): void
-    public function check(string $controllerName, ?string $actionName = null, ?string $controllerClass = null): bool
-    public function getControllerACT(string $controllerName, string $controllerClass): ?array
-    public function getControllerACTFromDefaultFile(string $controllerName): ?array
-
-    protected function loadACTFile(string $actFilename): array
-}
-```
-
 ---
 
-## 4. 数据库组件
+## 7. 数据库组件
 
-### 4.1 TableDataGateway
-
-核心数据访问类，提供完整的 CRUD 操作：
-
-**查询方法**:
-- `find()` - 查询单条记录
-- `findByField()` - 按字段查询
-- `findByPkv()` - 按主键查询
-- `findAll()` - 查询多条记录
-- `findCount()` - 统计记录数
-
-**操作方法**:
-- `create()` - 创建记录 (返回 insert ID)
-- `save()` - 保存记录
-- `update()` - 更新记录
-- `updateByConditions()` - 按条件更新
-- `remove()` - 删除记录
-- `removeByPkv()` - 按主键删除
-
-**关联类型**:
-| 常量 | 值 | 说明 |
-|------|-----|------|
-| HAS_ONE | 1 | 一对一关联 |
-| BELONGS_TO | 2 | 从属关联 |
-| HAS_MANY | 3 | 一对多关联 |
-| MANY_TO_MANY | 4 | 多对多关联 |
-
-### 4.2 ActiveRecord
-
-ActiveRecord 模式实现：
+### 7.1 TableDataGateway
 
 ```php
 namespace FLEA\Db;
 
-class ActiveRecord
+class TableDataGateway
 {
-    public $aggregation = [];     // 聚合对象定义
-    public $table;                // TableDataGateway 实例
-    public $idname;               // 主键属性名
-    public $mapping = false;      // 字段映射
-    public $init = false;         // 是否已初始化
+    public string $schema;
+    public string $tableName;
+    public string $fullTableName;
+    public $primaryKey;  // string|array|null
+    public array $hasOne;
+    public array $belongsTo;
+    public array $hasMany;
+    public array $manyToMany;
+    public array $meta;
+    public bool $autoValidating;
+    public ?\FLEA\Helper\Verifier $verifier;
 
-    public static function define(): array
-    public function __construct($conditions = null)
-    public function init(): void
-    public function load($conditions): void
-    public function save(): void
-    public function delete(): void
-    public function setId($id): void
-    public function getId()
-    public function toArray(): array
-    public function attach(array &$row): void
+    // CRUD
+    public function find($conditions, $sort = null, $fields = '*', $queryLinks = true): ?array
+    public function findAll($conditions = null, $sort = null, $limit = null, $fields = '*', $queryLinks = true): array
+    public function findCount($conditions = null): int
+    public function create(array &$row, bool $saveLinks = true): int
+    public function update(array &$row, bool $saveLinks = true): bool
+    public function remove(array &$row, bool $removeLink = true): bool
+    public function save(array &$row): bool
+    public function removeByPkv($id): bool
 }
 ```
 
+**关联常量**:
+| 常量 | 值 | 说明 |
+|------|-----|------|
+| `HAS_ONE` | 1 | 一对一关联 |
+| `BELONGS_TO` | 2 | 从属关联 |
+| `HAS_MANY` | 3 | 一对多关联 |
+| `MANY_TO_MANY` | 4 | 多对多关联 |
+
+### 7.2 Database Driver
+
+```php
+namespace FLEA\Db\Driver;
+
+abstract class AbstractDriver
+{
+    public array $dsn;
+    public ?\PDO $connection;
+
+    public function connect(): void
+    public function disconnect(): void
+    public function execute(string $sql): int|bool
+    public function getOne(string $sql): mixed
+    public function getAll(string $sql): array
+    public function insert(string $table, array $fields, array $values): int
+    public function update(string $table, array $fields, array $values, string $where): bool
+    public function delete(string $table, string $where): bool
+    public function qstr(string $str): string
+    public function qfield(string $field): string
+    public function qtable(string $table): string
+    public function insertID(): int
+    public function affectedRows(): int
+}
+```
+
+### 7.3 SqlStatement
+
+SQL 语句构建辅助类。
+
 ---
 
-## 5. 权限管理
+## 8. 权限管理
 
-### 5.1 RBAC (基于角色的访问控制)
+### 8.1 RBAC
 
 ```php
 namespace FLEA;
 
 class Rbac
 {
-    public string $sessionKey = 'RBAC_USERDATA';  // Session 键名
-    public string $rolesKey = 'RBAC_ROLES';       // 角色数据键名
+    public string $sessionKey;
+    public string $rolesKey;
 
     public function setUser(array $userData, $rolesData = null): void
     public function getUser(): ?array
@@ -329,20 +839,16 @@ class Rbac
 }
 ```
 
-### 5.2 ACL (访问控制列表)
+**注意**：Rbac 内部使用 `flea_context()` 存储用户数据，支持 Session/JWT 等多种存储方式。
+
+### 8.2 ACL
 
 ```php
 namespace FLEA\Acl;
 
 class Manager
 {
-    public array $tableClass = [
-        'users' => \FLEA\Acl\Table\Users::class,
-        'roles' => \FLEA\Acl\Table\Roles::class,
-        'userGroups' => \FLEA\Acl\Table\UserGroups::class,
-        'permissions' => \FLEA\Acl\Table\Permissions::class,
-        // ...
-    ];
+    public array $tableClass;
 
     public function __construct(array $tableClass = [])
     public function getUserWithPermissions($conditions): ?array
@@ -351,148 +857,152 @@ class Manager
 
 ---
 
-## 6. 辅助组件
+## 9. 辅助组件
 
-### 6.1 Pager (分页器)
+### 9.1 Pager (分页器)
 
 ```php
 namespace FLEA\Helper;
 
 class Pager
 {
-    public $source;                    // 数据源 (TableDataGateway 或 SQL)
-    public ?\FLEA\Db\Driver\AbstractDriver $dbo = null;  // 数据库访问对象
-    public $conditions;                // 查询条件
-    public ?string $sortby = null;     // 排序
-    public int $basePageIndex = 0;     // 页码基数
-    public int $pageSize = -1;         // 每页记录数
-    public int $totalCount = -1;       // 总记录数
-    public int $pageCount = -1;        // 总页数
-    public int $currentPage = -1;      // 当前页索引
-    public int $currentPageNumber = -1;// 当前页页码
+    public $source;
+    public ?\FLEA\Db\Driver\AbstractDriver $dbo;
+    public $conditions;
+    public ?string $sortby;
+    public int $basePageIndex;
+    public int $pageSize;
+    public int $totalCount;
+    public int $pageCount;
+    public int $currentPage;
 
     public function __construct($source, $currentPage, $pageSize = 20, $conditions = null, $sortby = null, $basePageIndex = 0)
-    public function setBasePageIndex(int $index): void
-    public function setPage(int $page): void
-    public function setCount(int $count): void
-    public function setDBO(\FLEA\Db\Driver\AbstractDriver $dbo): void
     public function findAll($fields = '*', bool $queryLinks = true): array
     public function getPagerData(bool $returnPageNumbers = true): array
-    public function getNavbarIndexs(int $currentPage = 0, int $navbarLen = 8): array
-    public function renderPageJumper(string $caption = '%u', string $jsfunc = 'fnOnPageChanged'): void
 }
 ```
 
-### 6.2 Ajax
+### 9.2 Verifier (数据验证)
 
 ```php
-namespace FLEA;
+namespace FLEA\Helper;
 
-class Ajax
+class Verifier
 {
-    public $events;           // 已注册事件
-    public $paramsType = [];  // 参数类型定义
-
-    public function registerEvent($control, $event, $url, $attribs = null): string
-    public function dumpJs($return = false, $wrapper = true): ?string
+    public static function checkAll(array &$data, array &$rules, $skip = 0): array
+    public static function check($value, &$rule): bool|string
 }
 ```
 
-### 6.3 Log (日志服务)
-
-实现 PSR-3 LoggerInterface：
+### 9.3 Image (图像处理)
 
 ```php
-namespace FLEA;
+namespace FLEA\Helper;
 
-class Log extends AbstractLogger
+class Image
 {
-    public string $log = '';               // 运行期间日志
-    public string $dateFormat = 'Y-m-d H:i:s';
-    public ?string $logFileDir = null;     // 日志目录
-    public ?string $logFilename = null;    // 日志文件
-    public bool $enabled = true;           // 是否启用
-    public ?array $errorLevel = null;      // 错误级别
-
-    public function log($level, $message, array $context = []): void
+    public static function createFromFile(string $file): self
+    public function saveAsJpeg(string $file, int $quality = 80): void
+    public function saveAsPng(string $file): void
+    public function saveAsGif(string $file): void
 }
 ```
 
-### 6.4 Session (数据库存储)
+### 9.4 FileUploader (文件上传)
 
 ```php
-namespace FLEA\Session;
+namespace FLEA\Helper;
 
-class Db
+class FileUploader
 {
-    public $dbo = null;                      // 数据库访问对象
-    public ?string $tableName = null;        // Session 表名
-    public ?string $fieldId = null;          // Session ID 字段
-    public ?string $fieldData = null;        // Session 数据字段
-    public ?string $fieldActivity = null;    // 活动时间字段
-    public int $lifeTime = 0;               // 有效期
+    public array $files;
+    public int $count;
 
-    public function __construct()
-    public function sessionOpen(string $savePath, string $sessionName): bool
-    public function sessionClose(): bool
-    public function sessionRead(string $sessid): string
-    public function sessionWrite(string $sessid, string $data): bool
-    public function sessionDestroy(string $sessid): bool
-    public function sessionGc(int $maxlifetime): bool
-    public function getOnlineCount(int $lifetime = -1): int
+    public function existsFile(string $inputName): bool
+    public function getFile(string $inputName): ?File
+    public function check(string $inputName, array $rules): array
+    public function move(string $inputName, string $targetDir): ?string
+    public function batchMove(string $inputName, string $targetDir): array
 }
+```
+
+### 9.5 ImgCode (验证码)
+
+```php
+namespace FLEA\Helper;
+
+class ImgCode
+{
+    public string $code;
+    public int $expired;
+
+    public function image(int $type = 0, int $length = 4, int $lefttime = 900): void
+    public function check(string $code): bool
+    public function checkCaseSensitive(string $code): bool
+    public function clear(): void
+}
+```
+
+**注意**：ImgCode 内部使用 `flea_context()` 存储验证码，支持 Session/Redis 等多种存储方式。
+
+---
+
+## 10. 配置系统
+
+### 10.1 配置加载顺序
+
+1. `FLEA\Config\Defaults` 加载框架默认配置
+2. `FLEA::loadEnv()` 加载 `.env` 环境变量
+3. `FLEA::loadAppInf()` 加载应用配置（覆盖默认配置）
+4. 环境变量覆盖应用配置
+
+### 10.2 关键配置项
+
+```php
+return [
+    // 数据库
+    'dbDSN' => [
+        'driver' => env('DB_DRIVER', 'mysql'),
+        'host' => env('DB_HOST', '127.0.0.1'),
+        'port' => env('DB_PORT', '3306'),
+        'login' => env('DB_USERNAME', 'root'),
+        'password' => env('DB_PASSWORD', ''),
+        'database' => env('DB_DATABASE', ''),
+    ],
+
+    // 路由
+    'dispatcher' => \FLEA\Dispatcher\Simple::class,
+    'defaultController' => 'Index',
+    'defaultAction' => 'index',
+    'actionMethodPrefix' => 'action',
+    'actionMethodSuffix' => '',
+
+    // 视图
+    'view' => \FLEA\View\Simple::class,
+    'viewConfig' => ['templateDir' => 'App/View', 'cacheDir' => 'cache'],
+
+    // 缓存
+    'cacheProvider' => \FLEA\Cache\FileCache::class,
+
+    // Context（请求上下文）
+    'contextDriver' => env('CONTEXT_DRIVER', 'session'),
+    'contextIdentity' => env('CONTEXT_IDENTITY', 'session'),
+
+    // 日志
+    'logEnabled' => env('LOG_ENABLED', false),
+    'logFilename' => env('LOG_FILENAME', 'app.log'),
+
+    // JWT
+    'jwtSecret' => env('JWT_SECRET', ''),
+    'jwtTtl' => (int) env('JWT_TTL', 7200),
+];
 ```
 
 ---
 
-## 7. 配置系统
+## 11. 异常处理
 
-### 7.1 配置加载顺序
-
-1. `FLEA.php` 自动加载
-2. 根据 `DEPLOY_MODE` 常量加载默认配置
-   - 调试模式: `Config/DEBUG_MODE_CONFIG.php`
-   - 部署模式: `Config/DEPLOY_MODE_CONFIG.php`
-3. 应用程序配置通过 `FLEA::loadAppInf()` 加载
-
-### 7.2 关键配置项
-
-```php
-// 数据库配置
-'dbDSN' => 'mysql://user:pass@localhost/dbname',
-
-// 调度器配置
-'dispatcher' => \FLEA\Dispatcher\Simple::class,
-'controllerAccessor' => 'controller',
-'actionAccessor' => 'action',
-
-// 视图配置
-'view' => \FLEA\View\Simple::class,
-'viewConfig' => [
-    'templateDir' => './View',
-    'cacheDir' => './cache',
-    'cacheLifeTime' => 900,
-    'enableCache' => false,
-],
-
-// Session 配置
-'sessionProvider' => \FLEA\Session\Db::class,
-'sessionDbTableName' => 'sessions',
-
-// 日志配置
-'logFileDir' => './logs',
-'logFilename' => 'app.log',
-'logErrorLevel' => [LogLevel::ERROR, LogLevel::WARNING],
-
-// RBAC 配置
-'RBACSessionKey' => 'USER_DATA',
-```
-
----
-
-## 8. 异常处理
-
-### 8.1 通用异常
+### 11.1 通用异常
 
 | 异常类 | 说明 |
 |--------|------|
@@ -505,73 +1015,98 @@ class Db
 | `NotImplemented` | 方法未实现 |
 | `TypeMismatch` | 类型不匹配 |
 | `ValidationFailed` | 验证失败 |
+| `ExistsKeyName` | 键已存在 |
+| `NotExistsKeyName` | 键不存在 |
 
-### 8.2 数据库异常
+### 11.2 数据库异常
 
 | 异常类 | 说明 |
 |--------|------|
-| `MissingDSN` | 缺少 DSN 配置 |
-| `InvalidDSN` | 无效的 DSN |
-| `InvalidInsertID` | 无效的插入 ID |
+| `MissingDSN` | 缺少 DSN |
+| `InvalidDSN` | 无效 DSN |
+| `InvalidInsertID` | 无效插入 ID |
 | `MissingPrimaryKey` | 缺少主键 |
 | `PrimaryKeyExists` | 主键已存在 |
-| `SqlQuery` | SQL 查询错误 |
+| `SqlQuery` | SQL 错误 |
 | `MissingLink` | 关联不存在 |
 
----
+### 11.3 调度器异常
 
-## 9. 请求生命周期
+| 异常类 | 说明 |
+|--------|------|
+| `CheckFailed` | 参数检查失败 |
 
-```
-1. 载入 FLEA.php
-   ↓
-2. 初始化配置 (Config)
-   ↓
-3. FLEA::runMVC()
-   ↓
-4. Dispatcher 解析请求 (controller/action)
-   ↓
-5. 实例化控制器
-   ↓
-6. 执行 beforeExecute()
-   ↓
-7. 执行动作方法 (actionXxx)
-   ↓
-8. 执行 afterExecute()
-   ↓
-9. 渲染视图
-   ↓
-10. 输出响应
-```
+### 11.4 RBAC 异常
+
+| 异常类 | 说明 |
+|--------|------|
+| `InvalidACT` | 无效的动作 |
+| `InvalidACTFile` | 无效的 ACT 文件 |
+
+### 11.5 ACL 异常
+
+| 异常类 | 说明 |
+|--------|------|
+| `UserGroupNotFound` | 用户组未找到 |
 
 ---
 
-## 10. 扩展点
+## 12. 请求生命周期
 
-### 10.1 自定义控制器
+```
+1. require FLEA.php
+   ↓
+2. FLEA::loadEnv() 加载环境变量
+   ↓
+3. FLEA::loadAppInf() 加载应用配置
+   ↓
+4. FLEA::runMVC()
+   - FLEA::init() 初始化服务
+     - 设置时区
+     - 注册异常处理器
+     - 初始化缓存目录
+     - 绑定 Context 到容器
+     - 设置响应头
+   ↓
+5. Router::dispatch() 匹配路由
+   - 匹配成功：设置 handler 和 middlewares
+   - 匹配失败：返回 404
+   ↓
+6. 中间件管道执行
+   - 全局中间件（FLEA::middleware() 注册）
+   - 路由级中间件（Router::get/post 等注册）
+   ↓
+7. Dispatcher 解析 controller/action
+   ↓
+8. 实例化控制器 → beforeExecute() → actionXxx() → afterExecute()
+   ↓
+9. 视图渲染
+   ↓
+10. 输出响应（包含 X-Trace-Id 头）
+```
+
+---
+
+## 13. 扩展点
+
+### 13.1 自定义控制器
 
 ```php
 namespace App\Controller;
 
 use FLEA\Controller\Action;
 
-class MyController extends Action
+class PostController extends Action
 {
-    public function __construct()
-    {
-        parent::__construct('My');
-    }
-
     public function actionIndex(): void
     {
-        // 处理逻辑
-        $this->view->assign('data', $result);
-        $this->view->display('my/index.php');
+        $this->getView()->assign('posts', $posts);
+        $this->getView()->display('post/index.php');
     }
 }
 ```
 
-### 10.2 自定义模型
+### 13.2 自定义模型
 
 ```php
 namespace App\Model;
@@ -581,89 +1116,152 @@ use FLEA\Db\TableDataGateway;
 class Post extends TableDataGateway
 {
     public string $tableName = 'posts';
-    public $primaryKey = 'id';
+    public string $primaryKey = 'id';
 
     public function getPublishedPosts(int $limit = 10, int $offset = 0): array
     {
-        return $this->findAll(
-            ['status' => 1],
-            'created_at DESC',
-            [$limit, $offset]
-        );
+        return $this->findAll(['status' => 1], 'created_at DESC', [$limit, $offset]);
     }
 }
 ```
 
-### 10.3 自定义调度器
+### 13.3 自定义中间件
 
-继承 `FLEA\Dispatcher\Simple` 并重写 `executeAction()` 方法。
+```php
+use FLEA\Middleware\MiddlewareInterface;
 
-### 10.4 自定义视图引擎
+class MyMiddleware implements MiddlewareInterface
+{
+    public function handle(callable $next): void
+    {
+        // 前置处理
+        $next();  // 调用下一个中间件或处理器
+        // 后置处理
+    }
+}
+```
 
-实现 `FLEA\View\ViewInterface` 接口。
+### 13.4 自定义视图引擎
+
+```php
+use FLEA\View\ViewInterface;
+
+class TwigView implements ViewInterface
+{
+    public function assign($key, $value = null): void {}
+    public function display(string $template): void {}
+    public function fetch(string $template, ?string $cacheId = null): string {}
+}
+```
+
+### 13.5 自定义 Context 驱动
+
+```php
+use FLEA\Context\DriverInterface;
+
+class CustomDriver implements DriverInterface
+{
+    public function get(string $key, mixed $default = null): mixed { }
+    public function set(string $key, mixed $value, ?int $ttl = null): bool { }
+    public function remove(string $key): bool { }
+    public function has(string $key): bool { }
+}
+```
 
 ---
 
-## 11. 约定规范
+## 14. 约定规范
 
-### 11.1 命名约定
+### 14.1 命名约定
 
-- **控制器**: `XxxController` (首字母大写)
-- **模型**: `Xxx` (表名单数形式)
-- **动作方法**: `actionXxx()` (驼峰式)
-- **视图文件**: `{controller}/{action}.php`
+| 类型 | 约定 | 示例 |
+|------|------|------|
+| 控制器 | 首字母大写 + Controller | `PostController` |
+| 模型 | 表名单数形式 | `Post` |
+| 动作方法 | action + 驼峰 | `actionIndex()` |
+| 视图文件 | `{controller}/{action}.php` | `post/index.php` |
 
-### 11.2 URL 格式
+### 14.2 URL 格式
 
 ```
 标准模式：index.php?controller=Post&action=view&id=1
 PATHINFO 模式：index.php/Post/view/id/1
-URL 重写：/Post/view/id/1
+URL 重写模式：/Post/view/id/1
 ```
 
-### 11.3 数据库约定
+### 14.3 数据库约定
 
-- 时间戳字段: `created_at`, `updated_at`
-- 主键字段: `id` 或 `{tablename}_id`
-- 外键字段: `{tablename}_id`
+| 类型 | 约定 | 示例 |
+|------|------|------|
+| 时间戳 | `created_at`, `updated_at` |
+| 主键 | `id` 或 `{table}_id` |
+| 外键 | `{table}_id` |
 
 ---
 
-## 12. PHP 7.4 特性
+## 15. PHP 7.4 特性
 
 框架使用了以下 PHP 7.4 特性：
 
 - **属性类型声明**: `public string $tableName`
 - **可空类型**: `public ?string $sort = null`
 - **箭头函数**: `fn($x) => $x * 2`
-- **解构赋值**: `[$a, $b] = $array`
 - **空合并运算符**: `$value ?? $default`
+- **联合类型**: `int|bool`
 
 ---
 
-## 13. 依赖项
+## 16. 依赖项
 
-- **PHP**: 7.4+
-- **PSR-3**: `psr/log:^1.1` (日志接口)
-- **数据库**: MySQL 5.0+ (或其他 PDO 支持的数据库)
-- **Web 服务器**: Apache/Nginx (可选，用于 URL 重写)
-
----
-
-## 14. 版本历史
-
-- **当前版本**: 1.7.1524
-- **主要更新**:
-  - PSR-4 自动加载
-  - PHP 7.4 类型声明
-  - PSR-3 日志接口
-  - 移除构造函数中的 `@return` 注解
-  - `create()` 方法返回类型改为 `int`
+| 依赖 | 版本 | 说明 |
+|------|------|------|
+| PHP | 7.4+ | 运行环境 |
+| psr/log | ^1.0 | 日志接口 |
+| psr/container | ^2.0 | 容器接口 |
+| psr/simple-cache | ^1.0 | 缓存接口 |
+| vlucas/phpdotenv | ^5.5 | 环境变量加载 |
 
 ---
 
-## 15. 参考
+## 17. 版本历史
+
+### v2.0.0 (当前版本)
+
+**重大重构**:
+- 新增 PSR-11 容器 (`Container`)
+- 新增 PSR-16 缓存 (`Cache`)
+- 新增路由器 (`Router`/`Route`)
+- 新增中间件系统 (`Middleware`/`Pipeline`)
+- 新增 HTTP 封装 (`Request`/`Response`)
+- 新增 JWT 认证 (`Auth/Jwt`)
+- 新增 Context 上下文组件（替代 Session）
+- 移除 `Ajax.php`
+- 移除 `WebControls.php`
+- 移除 `ActiveRecord.php`
+- 移除 `Session/Db.php`
+
+**配置变更**:
+- 新增 `cacheProvider` 配置项
+- 新增 `jwtSecret`/`jwtTtl` 配置项
+- 新增 `contextDriver`/`contextIdentity` 配置项
+
+**目录结构变更**:
+- `src/FLEA/FLEA/` → `src/FLEA/`
+- `src/FLEA/FLEA.php` → `src/FLEA.php`
+- `src/FLEA/Functions.php` → `src/Functions.php`
+
+### v1.7.1524
+
+- PSR-4 自动加载
+- PHP 7.4 类型声明
+- PSR-3 日志接口
+- `create()` 方法返回类型改为 `int`
+
+---
+
+## 18. 参考文档
 
 - [CLAUDE.md](CLAUDE.md) - 开发规范
-- [CHANGES.md](CHANGES.md) - 代码修改记录
+- [CHANGES.md](CHANGES.md) - FLEA 目录代码修改记录
+- [APP_CHANGES.md](APP_CHANGES.md) - App 目录代码修改记录
 - [GIT_COMMIT.md](GIT_COMMIT.md) - Git 提交记录

@@ -1,0 +1,162 @@
+<?php
+
+namespace FLEA\Helper;
+
+/**
+ * 文件上传辅助类
+ *
+ * 实现了一个简单的、可扩展的文件上传助手，支持多文件上传和级联模式。
+ * 提供文件检查、移动、获取文件信息等功能。
+ *
+ * 主要功能：
+ * - 自动解析 $_FILES 数组
+ * - 支持级联模式（按字段名分组）
+ * - 文件检查（类型、大小）
+ * - 批量移动文件
+ *
+ * 用法示例：
+ * ```php
+ * $allowExts = 'jpg,png,gif';
+ * $maxSize = 150 * 1024; // 150KB
+ * $uploadDir = __DIR__ . '/upload';
+ *
+ * $uploader = new FileUploader();
+ * $files = $uploader->getFiles();
+ * foreach ($files as $file) {
+ *     if (!$file->check($allowExts, $maxSize)) {
+ *         // 上传的文件类型不符或者超过了大小限制
+ *         return false;
+ *     }
+ *     // 生成唯一的文件名
+ *     $id = md5(time() . $file->getFilename() . $file->getSize() . $file->getTmpName());
+ *     $filename = $id . '.' . strtolower($file->getExt());
+ *     $file->move($uploadDir . '/' . $filename);
+ * }
+ * ```
+ *
+ * @package FLEA
+ * @author  toohamster
+ * @version 2.0.0
+ */
+class FileUploader
+{
+    /**
+     * 所有的 UploadFile 对象实例
+     *
+     * @var array
+     */
+    public array $files = [];
+
+    /**
+     * 可用的上传文件对象数量
+     *
+     * @var int
+     */
+    public int $count = 0;
+
+    /**
+     * 构造函数
+     *
+     * @param boolean $cascade
+     */
+    public function __construct(bool $cascade = false)
+    {
+        if (is_array($_FILES)) {
+            foreach ($_FILES as $field => $struct) {
+                if (!isset($struct['error'])) { continue; }
+                if (is_array($struct['error'])) {
+                    $arr = [];
+                    for ($i = 0; $i < count($struct['error']); $i++) {
+
+                        if ($struct['error'][$i] != UPLOAD_ERR_NO_FILE) {
+                            $arr[] = new \FLEA\Helper\FileUploader_File($struct, $field, $i);
+                            if (!$cascade) {
+                                $this->files["{$field}{$i}"] =& $arr[count($arr) - 1];
+                            }
+                        }
+                    }
+                    if ($cascade) {
+                        $this->files[$field] = $arr;
+                    }
+                } else {
+                    if ($struct['error'] != UPLOAD_ERR_NO_FILE) {
+                        $this->files[$field] = new \FLEA\Helper\FileUploader_File($struct, $field);
+                    }
+                }
+            }
+        }
+        $this->count = count($this->files);
+    }
+
+    /**
+     * 可用的上传文件对象数量
+     *
+     * @return int
+     */
+    public function getCount(): int
+    {
+        return $this->count;
+    }
+
+    /**
+     * 返回所有的上传文件对象
+     *
+     * @return array
+     */
+    public function getFiles(): array
+    {
+        return $this->files;
+    }
+
+    /**
+     * 检查指定名字的上传文件对象是否存在
+     *
+     * @param string $name
+     *
+     * @return boolean
+     */
+    public function existsFile(string $name): bool
+    {
+        return isset($this->files[$name]);
+    }
+
+    /**
+     * 返回指定名字的上传文件对象
+     *
+     * @param string $name
+     *
+     * @return \FLEA\Helper\FileUploader_File
+     */
+    public function getFile($name)
+    {
+        if (!isset($this->files[$name])) {
+            throw new \FLEA\Exception\ExpectedFile('$_FILES[' . $name . ']');
+        }
+        return $this->files[$name];
+    }
+
+    /**
+     * 检查指定的上传文件是否存在
+     *
+     * @param string $name
+     *
+     * @return boolean
+     */
+    public function isFileExist(string $name): bool
+    {
+        return isset($this->files[$name]);
+    }
+
+    /**
+     * 批量移动上传的文件到目标目录
+     *
+     * @param string $destDir
+     */
+    public function batchMove(string $destDir): void
+    {
+        foreach ($this->files as $file) {
+            /* @var $file \FLEA\Helper\FileUploader_File */
+            $file->move($destDir . '/' . $file->getFilename());
+        }
+    }
+}

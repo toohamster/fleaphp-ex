@@ -4,6 +4,88 @@
 
 ---
 
+## 2026-03-30
+
+### feat: 新增 Router::resource() RESTful 资源路由方法
+
+**修改的文件:**
+- `src/FLEA/Router.php`
+
+**新增方法:**
+```php
+public static function resource(string $name, string $controller, array $options = []): void
+```
+
+**功能说明:**
+- 一行代码生成 7 条 RESTful 路由（index/create/store/show/edit/update/destroy）
+- 支持 `only`（白名单）和 `except`（黑名单）选项过滤路由
+- update 和 destroy 额外注册 POST fallback 路由，兼容 HTML 表单只支持 GET/POST 的限制
+- 路由名格式：`{name}.{action}`（如 `post.index`、`post.update.post`）
+
+**生成的路由表:**
+
+| 方法 | URI | 处理器 | 路由名 |
+|------|-----|--------|--------|
+| GET | /{name} | {controller}@index | {name}.index |
+| GET | /{name}/create | {controller}@create | {name}.create |
+| POST | /{name} | {controller}@store | {name}.store |
+| GET | /{name}/{id} | {controller}@show | {name}.show |
+| GET | /{name}/{id}/edit | {controller}@edit | {name}.edit |
+| PUT | /{name}/{id} | {controller}@update | {name}.update |
+| PUT | /{name}/{id} | {controller}@update | {name}.update.post (fallback) |
+| DELETE | /{name}/{id} | {controller}@destroy | {name}.destroy |
+| POST | /{name}/{id} | {controller}@destroy | {name}.destroy.post (fallback) |
+
+**用法示例:**
+```php
+// 生成全部 7 条路由
+Router::resource('post', 'PostController');
+
+// 只保留部分方法
+Router::resource('post', 'PostController', ['only' => ['index', 'show']]);
+
+// 排除部分方法
+Router::resource('post', 'PostController', ['except' => ['create', 'edit']]);
+```
+
+**文档更新:**
+- 更新 `SPEC.md` 补充 resource 路由说明
+
+---
+
+## 2026-03-30
+
+### feat: 新增 kebab_to_pascal() 全局函数及 URL 路由支持
+
+**修改的文件:**
+- `src/Functions.php` - 新增 kebab_to_pascal() 函数
+- `src/FLEA/Dispatcher/Simple.php` - 修改 getControllerClass() 和 executeAction() 方法
+
+**新增全局函数:**
+```php
+function kebab_to_pascal(string $value): string
+```
+
+**功能说明:**
+- 将 kebab-case（短横线命名）转换为 PascalCase（大驼峰命名）
+- 用于将 URL 路径中的短横线命名转换为 PHP 类名/方法名格式
+
+**转换示例:**
+| URL 路径 | 控制器转换 | 动作转换 | 最终调用 |
+|----------|-----------|---------|----------|
+| `/order-apply` | order-apply → OrderApply | - | `OrderApplyController` |
+| `/order-apply/create` | order-apply → OrderApply | create → Create | `OrderApplyController::actionCreate()` |
+| `/user-profile-settings` | user-profile-settings → UserProfileSettings | - | `UserProfileSettingsController` |
+
+**使用场景:**
+- 兜底路由 `/{controller}/{action}` 自动支持 kebab-case URL
+- Laravel 风格的路由命名：`/user-profile` → `UserProfileController`
+
+**文档更新:**
+- 更新 `SPEC.md` 补充 kebab_to_pascal 函数说明
+
+---
+
 ## 2026-03-02
 
 ### refactor: 全项目 PSR-1/PSR-12 合规性修复及 PHP 7.4 风格优化

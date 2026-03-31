@@ -1,16 +1,29 @@
 {
-    "name": "toohamster/fleaphp-ex",
-    "description": "A lightweight PHP framework with MVC architecture, database abstraction layer, and RBAC support",
+    "name": "fleaphp/framework",
+    "description": "FLEA - Lightweight PHP MVC Framework with PSR compliance, RESTful routing, middleware pipeline, JWT authentication, and RBAC support",
     "type": "library",
+    "bin": ["bin/flea-cli"],
     "keywords": [
         "framework",
         "mvc",
-        "database",
+        "psr-11",
+        "psr-16",
+        "psr-3",
+        "router",
+        "middleware",
+        "jwt",
+        "restful",
         "orm",
         "rbac",
+        "lightweight",
         "php"
     ],
-    "license": "LGPL-2.1-or-later",
+    "support": {
+        "issues": "https://github.com/toohamster/fleaphp-ex/issues",
+        "source": "https://github.com/toohamster/fleaphp-ex",
+        "docs": "https://github.com/toohamster/fleaphp-ex/blob/master/SPEC.md"
+    },
+    "license": "MIT",
     "authors": [
         {
             "name": "toohamster",
@@ -19,25 +32,23 @@
     ],
     "require": {
         "php": ">=7.4",
-        "psr/log": "^1.1"
+        "psr/log": "^1.0",
+        "psr/container": "^2.0",
+        "psr/simple-cache": "^1.0",
+        "vlucas/phpdotenv": "^5.5"
     },
     "autoload": {
         "psr-4": {
-            "FLEA\\": "FLEA/FLEA/"
+            "FLEA\\": "src/FLEA/"
         },
         "files": [
-            "FLEA/Functions.php",
-            "FLEA/FLEA.php"
+            "src/Functions.php",
+            "src/FLEA.php"
         ]
     },
     "autoload-dev": {
         "psr-4": {
             "FLEA\\Tests\\": "tests/"
         }
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "minimum-stability": "stable",
-    "prefer-stable": true
+    }
 }
