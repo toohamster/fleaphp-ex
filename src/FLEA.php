@@ -664,6 +664,9 @@ class FLEA
         // 自动绑定 Context 到容器（如果配置了 contextDriver）
         self::bindContextToContainer();
 
+        // 初始化链路追踪上下文
+        \FLEA\Context\TraceContext::init();
+
         define('RESPONSE_CHARSET', self::getAppInf('responseCharset'));
         define('DATABASE_CHARSET', self::getAppInf('databaseCharset'));
 
@@ -672,9 +675,6 @@ class FLEA
         }
 
         // 输出 traceId 响应头（在任何响应体之前）
-        if (self::getAppInf('logEnabled')) {
-            $log = self::getSingleton(\FLEA\Log::class);
-            header('X-Trace-Id: ' . $log->getTraceId());
-        }
+        header('X-Trace-Id: ' . \FLEA\Context\TraceContext::getFullTraceId());
     }
 }

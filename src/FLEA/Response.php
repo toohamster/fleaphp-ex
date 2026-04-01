@@ -269,7 +269,7 @@ class Response
      * 发送响应头
      *
      * 设置 HTTP 状态码、Content-Type 和自定义头。
-     * 自动添加 X-Trace-Id 响应头（如果日志服务已注册）。
+     * X-Trace-Id 由 FLEA::init() 统一输出。
      *
      * @param string $contentType Content-Type 值
      *
@@ -280,11 +280,6 @@ class Response
         if (headers_sent()) { return; }
         http_response_code($this->statusCode);
         header("Content-Type: {$contentType}; charset=utf-8");
-
-        // 附加 traceId
-        if (\FLEA::isRegistered(\FLEA\Log::class)) {
-            header('X-Trace-Id: ' . \FLEA::registry(\FLEA\Log::class)->getTraceId());
-        }
 
         foreach ($this->headers as $name => $value) {
             header("{$name}: {$value}");
