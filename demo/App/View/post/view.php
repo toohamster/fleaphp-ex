@@ -33,72 +33,63 @@
 
         header h1 {
             text-align: center;
-            font-size: 2.5em;
         }
 
         nav {
             text-align: center;
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
         nav a {
             color: white;
             text-decoration: none;
             margin: 0 15px;
-            font-size: 1.1em;
-            padding: 5px 10px;
-            border-radius: 3px;
-            transition: background 0.3s;
         }
 
         nav a:hover {
-            background: rgba(255,255,255,0.2);
+            text-decoration: underline;
         }
 
         .post {
             background: white;
-            padding: 40px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 30px;
             margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .post h1 {
             color: #333;
             margin-bottom: 15px;
-            font-size: 2.2em;
-            line-height: 1.3;
         }
 
         .post-meta {
             color: #666;
             font-size: 0.9em;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
         }
 
         .post-content {
-            font-size: 1.1em;
-            line-height: 1.8;
             color: #444;
-            white-space: pre-wrap;
-            word-wrap: break-word;
+            line-height: 1.8;
         }
 
         .post-actions {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
+            margin-top: 25px;
+            display: flex;
+            gap: 10px;
         }
 
-        .post-actions a {
-            display: inline-block;
-            margin-right: 10px;
-            padding: 8px 20px;
-            text-decoration: none;
+        .btn-primary, .btn-danger {
+            padding: 10px 20px;
+            border: none;
             border-radius: 5px;
-            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
         }
 
         .btn-primary {
@@ -107,37 +98,43 @@
         }
 
         .btn-primary:hover {
-            background: #357abd;
+            background: #3a7bc8;
         }
 
         .btn-danger {
-            background: #e74c3c;
+            background: #dc3545;
             color: white;
         }
 
         .btn-danger:hover {
-            background: #c0392b;
+            background: #c82333;
         }
 
         .comments-section {
             background: white;
-            padding: 30px;
             border-radius: 8px;
+            padding: 30px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .comments-section h2 {
-            color: #333;
             margin-bottom: 20px;
-            font-size: 1.8em;
+            color: #333;
+        }
+
+        .no-comments {
+            color: #666;
+            text-align: center;
+            padding: 30px;
         }
 
         .comment {
-            padding: 20px;
-            margin-bottom: 20px;
-            background: #f9f9f9;
-            border-radius: 5px;
-            border-left: 4px solid #4a90e2;
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+
+        .comment:last-child {
+            border-bottom: none;
         }
 
         .comment-author {
@@ -147,25 +144,25 @@
         }
 
         .comment-date {
-            color: #999;
             font-size: 0.85em;
+            color: #999;
             margin-bottom: 10px;
         }
 
         .comment-content {
-            color: #555;
+            color: #444;
             line-height: 1.6;
         }
 
         .comment-form {
             margin-top: 30px;
             padding-top: 20px;
-            border-top: 1px solid #eee;
+            border-top: 2px solid #4a90e2;
         }
 
         .comment-form h3 {
+            margin-bottom: 20px;
             color: #333;
-            margin-bottom: 15px;
         }
 
         .form-group {
@@ -175,8 +172,7 @@
         .form-group label {
             display: block;
             margin-bottom: 5px;
-            color: #666;
-            font-weight: 500;
+            color: #555;
         }
 
         .form-group input,
@@ -185,68 +181,66 @@
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            font-size: 1em;
-            font-family: inherit;
+            font-size: 14px;
         }
 
         .form-group textarea {
-            min-height: 100px;
+            height: 100px;
             resize: vertical;
         }
 
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #4a90e2;
-            box-shadow: 0 0 0 3px rgba(74,144,226,0.1);
-        }
-
         .btn-submit {
-            background: #4a90e2;
+            background: #28a745;
             color: white;
-            padding: 10px 30px;
+            padding: 12px 25px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 1em;
-            transition: background 0.3s;
+            font-size: 14px;
         }
 
         .btn-submit:hover {
-            background: #357abd;
+            background: #218838;
         }
 
-        .no-comments {
-            text-align: center;
-            color: #999;
-            padding: 30px;
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #4a90e2;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
         }
 
         footer {
             text-align: center;
-            padding: 30px 0;
-            margin-top: 50px;
+            padding: 20px;
             color: #666;
-            border-top: 1px solid #ddd;
+            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
     <header>
         <div class="container">
-            <h1>📝 我的博客</h1>
+            <h1>我的博客</h1>
             <nav>
-                <a href="<?php echo url('post.index'); ?>">返回首页</a>
+                <a href="/">首页</a>
+                <a href="/post">文章列表</a>
+                <a href="/post/create">写文章</a>
             </nav>
         </div>
     </header>
 
     <div class="container">
+        <a href="/post" class="back-link">← 返回文章列表</a>
+
         <article class="post">
             <h1><?php echo htmlspecialchars($post['title']); ?></h1>
             <div class="post-meta">
-                <span>作者：<?php echo htmlspecialchars($post['author']); ?></span>
-                <span> | </span>
+                <span>作者：<?php echo htmlspecialchars($post['author'] ?? '匿名'); ?></span>
                 <span>发布时间：<?php echo date('Y-m-d H:i', strtotime($post['created_at'])); ?></span>
                 <span> | </span>
                 <span>更新时间：<?php echo date('Y-m-d H:i', strtotime($post['updated_at'])); ?></span>
@@ -256,7 +250,7 @@
             </div>
             <div class="post-actions">
                 <a href="<?php echo url('post.edit', ['id' => $post['id']]); ?>" class="btn-primary">编辑文章</a>
-                <a href="<?php echo url('post.delete', ['id' => $post['id']]); ?>" class="btn-danger">删除文章</a>
+                <button type="button" class="btn-danger" onclick="deletePost(<?php echo $post['id']; ?>)">删除文章</button>
             </div>
         </article>
 
@@ -286,7 +280,7 @@
 
             <div class="comment-form">
                 <h3>发表评论</h3>
-                <form action="<?php echo url('post.comment'); ?>" method="POST">
+                <form method="POST" action="<?php echo url('post.comment'); ?>">
                     <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
 
                     <div class="form-group">
@@ -311,7 +305,34 @@
     </div>
 
     <footer>
-        <p>&copy; <?php echo date('Y'); ?> 我的博客. 基于 FLEA 框架开发.</p>
+        <p>&copy; <?php echo date('Y'); ?> 我的博客。基于 FLEA 框架开发.</p>
     </footer>
+
+    <script>
+    function deletePost(id) {
+        if (!confirm('确定要删除这篇文章吗？')) {
+            return;
+        }
+
+        fetch('/post/' + id + '/delete', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.code === 0) {
+                alert('文章删除成功');
+                location.href = '/post';
+            } else {
+                alert('删除失败：' + data.message);
+            }
+        })
+        .catch(err => {
+            alert('网络错误：' + err);
+        });
+    }
+    </script>
 </body>
 </html>

@@ -162,21 +162,18 @@ class PostController extends Action
      */
     public function actionDelete(): void
     {
-        $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+        $id = \FLEA\Request::current()->param('id');
 
         if (!$id) {
-            throw new \FLEA\Exception\InvalidArguments('文章ID不能为空');
+            \FLEA\Response::error('文章 ID 不能为空', 400);
+            return;
         }
 
-        if (isset($_GET['confirm']) && $_GET['confirm'] === 'yes') {
-            $result = $this->postModel->deletePost($id);
-            if ($result) {
-                echo '<script>alert("文章删除成功"); location.href="?controller=Post&action=index";</script>';
-            } else {
-                echo '<script>alert("文章删除失败"); history.back();</script>';
-            }
+        $result = $this->postModel->deletePost((int)$id);
+        if ($result) {
+            \FLEA\Response::success(null, '文章删除成功');
         } else {
-            echo '<script>if(confirm("确定要删除这篇文章吗？")) { location.href="?controller=Post&action=delete&id=' . $id . '&confirm=yes"; } else { history.back(); }</script>';
+            \FLEA\Response::error('文章删除失败', 500);
         }
     }
 
