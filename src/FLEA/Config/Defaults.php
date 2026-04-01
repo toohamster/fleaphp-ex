@@ -75,7 +75,7 @@ class Defaults
 
             // 缓存
             'cacheProvider' => \FLEA\Cache\FileCache::class,
-            'internalCacheDir' => env('CACHE_DIR', \sys_get_tempdir() . DS . 'fleaphp_cache'),
+            'internalCacheDir' => env('CACHE_DIR', sys_get_temp_dir() . DS . 'fleaphp_cache'),
 
             // Session
             'sessionProvider' => null,
