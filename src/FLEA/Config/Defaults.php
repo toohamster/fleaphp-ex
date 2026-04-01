@@ -75,7 +75,7 @@ class Defaults
 
             // 缓存
             'cacheProvider' => \FLEA\Cache\FileCache::class,
-            'internalCacheDir' => env('CACHE_DIR', 'cache'),
+            'internalCacheDir' => env('CACHE_DIR', sys_get_tempdir() . DS . 'fleaphp_cache'),
 
             // Session
             'sessionProvider' => null,
@@ -134,12 +134,6 @@ class Defaults
 
             // 中间件
             'middlewares' => [],
-
-            // 请求过滤
-            'requestFilters' => [],
-
-            // 自动加载
-            'autoLoad' => [],
 
             // JWT
             'jwtSecret' => env('JWT_SECRET', ''),

@@ -80,9 +80,22 @@ JWT_SECRET=your-secret-key-change-this
 JWT_TTL=7200
 
 # 日志配置
-LOG_ENABLED=false
+LOG_ENABLED=true
 LOG_LEVEL=debug
+LOG_FILENAME=app.log
+LOG_FILE_DIR=cache
 ```
+
+**日志配置说明**：
+
+| 配置项 | 说明 | 默认值 |
+|--------|------|--------|
+| `LOG_ENABLED` | 是否启用日志 | `false` |
+| `LOG_LEVEL` | 日志级别（debug/info/warning/error） | `debug` |
+| `LOG_FILENAME` | 日志文件名 | `app.log` |
+| `LOG_FILE_DIR` | 日志文件目录（相对路径或绝对路径） | `cache` |
+
+**注意**：`logFileDir` 配置支持相对路径和绝对路径。使用相对路径时，建议使用 `__DIR__ . '/../cache'` 形式指定绝对路径，避免因工作目录不同导致路径解析失败。
 
 ### 3. 初始化数据库
 

@@ -656,15 +656,9 @@ class FLEA
         set_exception_handler(self::getAppInf('exceptionHandler'));
 
         // 缓存目录
-        if (!self::getAppInf('internalCacheDir')) {
-            self::setAppInf('internalCacheDir', __DIR__ . '/_Cache');
-        }
-
-        foreach ((array)self::getAppInf('requestFilters') as $file) {
-            if (file_exists($file)) { require_once($file); }
-        }
-        foreach ((array)self::getAppInf('autoLoad') as $file) {
-            if (file_exists($file)) { require_once($file); }
+        $cacheDir = self::getAppInf('internalCacheDir');
+        if (!is_dir($cacheDir)) {
+            mkdirs($cacheDir, 0777);
         }
 
         // 自动绑定 Context 到容器（如果配置了 contextDriver）

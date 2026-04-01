@@ -990,6 +990,7 @@ return [
 
     // 日志
     'logEnabled' => env('LOG_ENABLED', false),
+    'logFileDir' => env('LOG_FILE_DIR', 'cache'),  // 日志文件目录
     'logFilename' => env('LOG_FILENAME', 'app.log'),
 
     // JWT
