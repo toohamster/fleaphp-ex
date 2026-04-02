@@ -4,6 +4,25 @@
 
 ---
 
+### feat: 新增 HttpClient 服务间 HTTP 调用功能
+
+**修改的文件:**
+- `src/FLEA/Helper/HttpClient.php` - 新增 HTTP 客户端类
+- `SPEC.md` - 更新目录结构
+- `MICROSERVICES.md` - 更新已支持微服务能力
+- `CHANGES.md` - 记录代码修改
+- `USER_GUIDE.md` - 新增分布式链路追踪章节
+
+**主要改动:**
+1. 新增 HttpClient 类，封装 cURL 发起服务间 HTTP 调用
+2. 支持 GET/POST/PUT/DELETE/PATCH 方法
+3. 自动解析 JSON 响应
+4. 自动传递 TraceID 形成分布式调用链
+5. 支持自定义请求头和超时设置
+6. 返回统一结构：success/statusCode/headers/body/data/error
+
+---
+
 ### fix: 修复 SqlStatement 类型检测 + 删除功能 AJAX 化
 
 **修改的文件:**
@@ -959,3 +978,96 @@ Driver 层最后一个实例属性 `$PARAM_STYLE` 改为 `protected const`；Tab
 
 **FLEA/FLEA/Helper/Pager.php**
 - 属性加类型声明：所有 `int` 分页属性、`?string $_sortby`、`?\FLEA\Db\Driver\AbstractDriver $dbo`
+
+---
+
+## 2026-04-02
+
+### feat: 新增 TraceContext 链路追踪功能
+
+新增 `TraceContext` 类支持分布式链路追踪，自动生成 TraceID 和 SpanID。
+
+**修改的文件:**
+- `src/FLEA/Context/TraceContext.php` - 新增链路追踪上下文类
+- `src/Functions.php` - 新增 `generate_traceid()` 全局函数
+- `SPEC.md` - 更新目录结构和方法列表
+- `CHANGES.md` - 记录 TraceContext 功能
+
+**功能特性:**
+- 自动生成 TraceID（22 位：8 位时间戳 + 6 位随机数 + 8 位客户端 ID）
+- 自动生成 SpanID（16 位十六进制字符串）
+- 支持线程安全的上下文存储
+
+---
+
+### fix: 修复 SqlStatement 类型检测逻辑
+
+**修改的文件:**
+- `src/FLEA/Db/SqlStatement.php` - 使用 instanceof PDOStatement 判断类型
+
+**问题描述:**
+原代码使用 `is_string()` 判断，无法正确区分 PDOStatement 对象和字符串。
+
+**修复方案:**
+改用 `instanceof PDOStatement` 明确判断类型，非法类型抛出 `TypeMismatch` 异常。
+
+---
+
+### refactor: Simple 视图引擎日志优化
+
+**修改的文件:**
+- `src/FLEA/View/Simple.php` - 将日志从构造函数移到 fetch() 方法
+
+**优化说明:**
+日志记录渲染的视图文件，从构造函数移到 fetch() 方法，避免在构造时记录未实际使用的视图。
+
+---
+
+### docs: 添加 GitHub Token 获取方法到发布流程
+
+**修改的文件:**
+- `CLAUDE.md` - 添加 GitHub Token 获取方法和发布流程更新
+
+**流程说明:**
+- 从 git config 提取 GitHub Token 用于 GitHub API 认证
+- 发布流程必须先检查未提交修改
+-
+---
+
+### feat: 新增 Str::extract() 字符串命名参数提取方法
+
+新增 `Str` 字符串工具类，提供 `extract()` 方法从字符串中提取命名参数。
+
+**修改的文件:**
+- `src/FLEA/Helper/Str.php` - 新增字符串工具类
+- `src/FLEA/CHANGES.md` - 记录代码修改
+- `docs/Str-extract-usage.md` - 新增使用文档
+- `tests/test_str_extract.php` - 新增测试脚本
+
+**功能特性:**
+- 将模式字符串转换为正则表达式，自动提取命名参数
+- 支持自定义分隔符（默认 `{}`）
+- 支持忽略大小写匹配
+- 支持空白压缩
+- 支持去除提取值的首尾空格
+
+**用法示例:**
+```php
+// 基本用法
+Str::extract('380-250-80-j', '{width}-{height}-{quality}-{format}');
+// ['width' => '380', 'height' => '250', 'quality' => '80', 'format' => 'j']
+
+// 提取 URL 路径
+Str::extract('/2012/08/12/test.html', '/{year}/{month}/{day}/{title}.html');
+// ['year' => '2012', 'month' => '08', 'day' => '12', 'title' => 'test']
+
+// 自定义分隔符
+Str::extract('The time is 4:35pm', 'The time is :time', ['delimiters' => [':', '']]);
+// ['time' => '4:35pm']
+
+// 忽略大小写
+Str::extract('HELLO World', 'hello {name}', ['case_insensitive' => true]);
+// ['name' => 'World']
+```
+
+---

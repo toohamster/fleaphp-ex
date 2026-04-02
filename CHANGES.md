@@ -6,6 +6,52 @@
 
 ## 2026-04-02
 
+### feat: 新增 HttpClient HTTP 客户端
+
+**修改的文件:**
+- `src/FLEA/Helper/HttpClient.php` (新增)
+- `SPEC.md` (更新目录结构)
+- `MICROSERVICES.md` (更新已支持能力)
+
+**功能特性:**
+- 支持 GET、POST、PUT、DELETE、PATCH 方法
+- 自动解析 JSON 响应
+- 支持自定义请求头和超时设置
+- 自动传递 TraceID（用于链路追踪）
+
+**用法示例:**
+```php
+// 简单 GET
+$result = \FLEA\Helper\HttpClient::get('http://api.example.com/users');
+
+// POST 请求
+$result = \FLEA\Helper\HttpClient::post('http://api.example.com/users', [
+    'name' => 'John',
+    'email' => 'john@example.com',
+]);
+
+// 检查响应
+if ($result['success']) {
+    $data = $result['data'];  // 已自动解析 JSON
+} else {
+    $error = $result['error'];
+}
+```
+
+**返回结构:**
+```php
+[
+    'success'    => true/false,
+    'statusCode' => 200,
+    'headers'    => [...],
+    'body'       => '...',
+    'data'       => [...],  // 自动 json_decode 后的数据
+    'error'      => '...',  // 错误消息
+]
+```
+
+---
+
 ### fix: 修复 SqlStatement 类型检测问题
 
 **修改的文件:**

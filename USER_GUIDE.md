@@ -920,6 +920,123 @@ CONTEXT_REQUEST_ID_HEADER=X-Request-ID
 
 ---
 
+## 分布式链路追踪
+
+FLEA 框架内置分布式链路追踪支持，通过 TraceContext 实现服务间调用链的自动追踪。
+
+### TraceContext 功能
+
+```php
+use FLEA\Context\TraceContext;
+
+// 获取 TraceID（全局唯一请求 ID）
+$traceId = TraceContext::getTraceId();
+
+// 获取完整 TraceID（含 SpanID）
+$fullId = TraceContext::getFullTraceId();  // 格式：trace_id-span_id
+
+// 获取当前 SpanID
+$spanId = TraceContext::getSpanId();
+
+// 生成子 SpanID（用于下游调用）
+$childSpan = TraceContext::childSpan();
+```
+
+### TraceID 格式
+
+```
+abc123ef456-1.2.1
+│         │   │
+│         │   └─ SpanID 层级（服务调用深度）
+│         └─ SpanID
+└─ TraceID（22 位：8 位时间戳 +6 位随机数 +8 位客户端 ID）
+```
+
+### 服务间 TraceID 传递
+
+**HttpClient 自动传递 TraceID：**
+
+当使用 `HttpClient` 发起服务间调用时，框架自动将 TraceID 添加到请求头：
+
+```php
+// 服务 A 调用服务 B
+$result = \FLEA\Helper\HttpClient::get('http://service-b/api/users');
+// 自动添加请求头：X-Trace-Id: abc123-1
+```
+
+**被调用服务接收 TraceID：**
+
+PHP 自动将 HTTP 请求头转换为 `$_SERVER` 变量：
+
+| HTTP 请求头 | PHP $_SERVER 变量 |
+|------------|------------------|
+| `X-Trace-Id` | `$_SERVER['HTTP_X_TRACE_ID']` |
+| `Traceparent` | `$_SERVER['HTTP_TRACEPARENT']` |
+
+TraceContext 从 `$_SERVER` 读取外部传入的 TraceID，形成完整调用链。
+
+**调用链示例：**
+
+```
+用户请求 → 服务 A     → 服务 B     → 服务 C
+          ↓         ↓         ↓
+       abc123-1  abc123-1.1  abc123-1.1.1
+```
+
+### 日志中的 TraceID
+
+日志自动记录 TraceID，便于问题排查：
+
+```php
+log_message('处理用户请求', \Psr\Log\LogLevel::INFO);
+// 输出：[2026-04-02 12:00:00] INFO: 处理用户请求 [trace_id=abc123-1.2]
+```
+
+### 完整示例
+
+```php
+// 服务 A：接收用户请求
+class OrderController extends Action
+{
+    public function actionCreate(): void
+    {
+        // 获取当前 TraceID
+        $traceId = TraceContext::getTraceId();
+        log_message('创建订单请求');  // 自动记录 TraceID
+
+        // 调用服务 B（自动传递 TraceID）
+        $result = HttpClient::post('http://service-b/api/payment', [
+            'order_id' => 123,
+            'amount' => 99.99,
+        ]);
+
+        if ($result['success']) {
+            Response::success($result['data']);
+        } else {
+            Response::error('支付失败', 500);
+        }
+    }
+}
+
+// 服务 B：接收服务 A 的调用
+class PaymentController extends Action
+{
+    public function actionPayment(): void
+    {
+        // TraceContext::init() 自动从 HTTP_X_TRACE_ID 读取
+        $traceId = TraceContext::getTraceId();  // 与服务 A 相同
+        $fullId = TraceContext::getFullTraceId();  // abc123-1.1
+
+        log_message('处理支付');  // 日志中记录相同 TraceID
+
+        // 处理支付逻辑...
+        Response::success(['payment_id' => 456]);
+    }
+}
+```
+
+---
+
 ## 日志与缓存
 
 ### 日志服务
