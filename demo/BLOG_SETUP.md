@@ -58,6 +58,15 @@ DB_PORT=3306
 DB_USERNAME=root
 DB_PASSWORD=your_password
 DB_DATABASE=blog
+
+# 日志配置
+LOG_ENABLED=true
+LOG_LEVEL=debug
+LOG_FILENAME=app.log
+
+# 缓存配置
+CACHE_DRIVER=file
+CACHE_DIR=cache
 ```
 
 **配置说明**：
@@ -72,6 +81,11 @@ DB_DATABASE=blog
 | `DB_USERNAME` | 数据库用户名 | `root` |
 | `DB_PASSWORD` | 数据库密码 | 需修改 |
 | `DB_DATABASE` | 数据库名 | `blog` |
+| `LOG_ENABLED` | 是否启用日志 | `true` |
+| `LOG_LEVEL` | 日志级别（debug/info/warning/error） | `debug` |
+| `LOG_FILENAME` | 日志文件名 | `app.log` |
+| `CACHE_DRIVER` | 缓存驱动（file/redis） | `file` |
+| `CACHE_DIR` | 缓存目录 | `cache` |
 
 ### 4. 初始化数据库
 

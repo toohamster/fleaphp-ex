@@ -813,7 +813,23 @@ abstract class AbstractDriver
 
 ### 7.3 SqlStatement
 
-SQL 语句构建辅助类。
+SQL 语句封装类，用于统一管理 SQL 语句字符串和 PDOStatement 对象。
+
+```php
+namespace FLEA\Db;
+
+class SqlStatement
+{
+    // 构造函数：只接受 string 或 PDOStatement
+    public function __construct($sql)
+    public function isResource(): bool           // 是否为 PDOStatement 对象
+    public function getSql(): \PDOStatement|string
+    public static function create($sql): self    // 工厂方法
+}
+```
+
+**异常**：
+- `\FLEA\Exception\TypeMismatch` - 当传入参数不是 string 或 PDOStatement 时抛出
 
 ---
 
