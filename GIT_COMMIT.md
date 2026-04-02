@@ -959,3 +959,56 @@ Driver 层最后一个实例属性 `$PARAM_STYLE` 改为 `protected const`；Tab
 
 **FLEA/FLEA/Helper/Pager.php**
 - 属性加类型声明：所有 `int` 分页属性、`?string $_sortby`、`?\FLEA\Db\Driver\AbstractDriver $dbo`
+
+---
+
+## 2026-04-02
+
+### feat: 新增 TraceContext 链路追踪功能
+
+新增 `TraceContext` 类支持分布式链路追踪，自动生成 TraceID 和 SpanID。
+
+**修改的文件:**
+- `src/FLEA/Context/TraceContext.php` - 新增链路追踪上下文类
+- `src/Functions.php` - 新增 `generate_traceid()` 全局函数
+- `SPEC.md` - 更新目录结构和方法列表
+- `CHANGES.md` - 记录 TraceContext 功能
+
+**功能特性:**
+- 自动生成 TraceID（22 位：8 位时间戳 + 6 位随机数 + 8 位客户端 ID）
+- 自动生成 SpanID（16 位十六进制字符串）
+- 支持线程安全的上下文存储
+
+---
+
+### fix: 修复 SqlStatement 类型检测逻辑
+
+**修改的文件:**
+- `src/FLEA/Db/SqlStatement.php` - 使用 instanceof PDOStatement 判断类型
+
+**问题描述:**
+原代码使用 `is_string()` 判断，无法正确区分 PDOStatement 对象和字符串。
+
+**修复方案:**
+改用 `instanceof PDOStatement` 明确判断类型，非法类型抛出 `TypeMismatch` 异常。
+
+---
+
+### refactor: Simple 视图引擎日志优化
+
+**修改的文件:**
+- `src/FLEA/View/Simple.php` - 将日志从构造函数移到 fetch() 方法
+
+**优化说明:**
+日志记录渲染的视图文件，从构造函数移到 fetch() 方法，避免在构造时记录未实际使用的视图。
+
+---
+
+### docs: 添加 GitHub Token 获取方法到发布流程
+
+**修改的文件:**
+- `CLAUDE.md` - 添加 GitHub Token 获取方法和发布流程更新
+
+**流程说明:**
+- 从 git config 提取 GitHub Token 用于 GitHub API 认证
+- 发布流程必须先检查未提交修改
