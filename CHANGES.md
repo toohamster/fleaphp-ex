@@ -31,6 +31,22 @@ $stmt = new SqlStatement(123);         // int 不允许
 $stmt = new SqlStatement(new stdClass); // 其他对象不允许
 ```
 
+### refactor: 优化 Simple 视图日志记录
+
+**修改的文件:**
+- `src/FLEA/View/Simple.php`
+
+**修改内容:**
+- 移除构造函数中的日志记录
+- 在 `fetch()` 方法中添加日志，记录渲染的视图文件路径和缓存 ID
+- 便于调试模板渲染问题
+
+**日志示例:**
+```
+Rendering view: post/index.php
+Rendering view: post/view.php (cacheId: article_123)
+```
+
 ---
 
 ## 2026-03-30

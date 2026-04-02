@@ -42,6 +42,7 @@ src/
     │   ├── Context.php             # 核心类
     │   ├── DriverInterface.php     # 驱动接口
     │   ├── IdentityInterface.php   # 身份标识接口
+    │   ├── TraceContext.php        # 链路追踪上下文
     │   ├── Driver/                 # 存储驱动
     │   │   ├── SessionDriver.php   # Session 存储
     │   │   ├── RedisDriver.php     # Redis 存储
@@ -211,6 +212,12 @@ t(string $text): string
 
 // Context 上下文
 flea_context(): \FLEA\Context\Context
+
+// 链路追踪
+generate_traceid(): string
+TraceContext::getTraceId(): string
+TraceContext::getFullTraceId(): string
+TraceContext::childSpan(): string
 
 // 翻译
 _T(string $key, string $language = ''): string
@@ -445,6 +452,94 @@ $context = flea_context();
 // 读写数据
 flea_context()->set('user_id', 123);
 $user_id = flea_context()->get('user_id');
+```
+
+---
+
+## 4.8 TraceContext (链路追踪上下文)
+
+TraceContext 提供分布式链路追踪的 TraceID 和 SpanID 管理，支持接收外部传入的 trace_id，形成完整的调用链。
+
+### TraceID 格式
+
+```
+{trace_id}-{span_id}
+示例：abc123-1.2.1
+```
+
+- `trace_id`: 全局唯一追踪 ID（62 进制 5 位随机字符串）
+- `span_id`: Span 层级标识（如 `0`、`0.1`、`0.1.1`）
+
+### 核心 API
+
+```php
+namespace FLEA\Context;
+
+class TraceContext
+{
+    // 初始化 TraceID（框架自动调用）
+    public static function init(): void
+
+    // 获取 TraceID
+    public static function getTraceId(): string
+
+    // 获取 SpanID
+    public static function getSpanId(): string
+
+    // 获取完整的 TraceID（含 SpanID）
+    public static function getFullTraceId(): string
+
+    // 生成子 SpanID（用于下游调用）
+    public static function childSpan(): string
+
+    // 从 Context 获取 TraceID（便捷方法）
+    public static function fromContext(): string
+}
+```
+
+### 支持的请求头
+
+| 请求头 | 说明 | 格式示例 |
+|--------|------|----------|
+| `X-Trace-Id` | FLEA 框架标准 | `abc123-0.1` |
+| `Traceparent` | W3C 标准 | `00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01` |
+
+### 使用示例
+
+```php
+// 框架自动初始化，无需手动调用
+
+// 获取 TraceID（用于日志记录）
+$traceId = TraceContext::getTraceId();
+
+// 获取完整 TraceID（用于响应头）
+$fullId = TraceContext::getFullTraceId();
+header('X-Trace-Id: ' . $fullId);
+
+// 发起下游调用时生成子 SpanID
+$childSpan = TraceContext::childSpan();
+$response = http_post($url, [], ['X-Trace-Id: ' . $childSpan]);
+```
+
+### 配置项
+
+```php
+return [
+    // 日志配置中启用 TraceID
+    'logEnabled' => env('LOG_ENABLED', false),
+    'logFileDir' => env('LOG_FILE_DIR', 'cache'),
+    'logFilename' => env('LOG_FILENAME', 'app.log'),
+];
+```
+
+**日志自动集成**：启用日志后，每条日志会自动附加 TraceID。
+
+### 响应头
+
+框架自动在响应中添加 `X-Trace-Id` 头：
+
+```
+X-Trace-Id: abc123-1.2.1
 ```
 
 ---
@@ -1083,6 +1178,7 @@ return [
      - 注册异常处理器
      - 初始化缓存目录
      - 绑定 Context 到容器
+     - 初始化 TraceContext（链路追踪）
      - 设置响应头
    ↓
 5. Router::dispatch() 匹配路由
@@ -1101,6 +1197,12 @@ return [
    ↓
 10. 输出响应（包含 X-Trace-Id 头）
 ```
+
+**TraceID 集成点**：
+- 第 4 步：`TraceContext::init()` 初始化 TraceID 和 SpanID
+- 支持从 `X-Trace-Id` 或 `Traceparent` 请求头获取外部传入的 trace_id
+- 日志服务自动记录 TraceID
+- 响应头自动返回 `X-Trace-Id`
 
 ---
 
@@ -1241,6 +1343,33 @@ URL 重写模式：/Post/view/id/1
 ---
 
 ## 17. 版本历史
+
+### v2.2.0 (开发中)
+
+**新功能**:
+- 新增链路追踪组件 `TraceContext`，支持分布式追踪
+- 新增 `generate_traceid()` 全局函数
+- 日志自动集成 TraceID
+- 响应头自动添加 `X-Trace-Id`
+- 支持 W3C `Traceparent` 请求头格式
+- 新增 MICROSERVICES.md 微服务开发指南
+
+**Bug 修复**:
+- 修复 SqlStatement 类型检测问题，使用 `instanceof PDOStatement` 准确判断
+- 非法类型时抛出 `TypeMismatch` 异常
+- 修复 Defaults.php 中 `sys_get_temp_dir()` 命名空间错误
+
+**重构**:
+- 移除废弃的 `requestFilters` 和 `autoLoad` 配置项
+- 移除 Response.php 中多余的 X-Trace-Id 输出逻辑
+- 移除 Simple 视图构造函数中的日志，改为在 fetch() 方法中记录渲染的视图文件
+
+### v2.1.0
+
+**新功能**:
+- 新增 RESTful 资源路由 `Router::resource()`
+- 新增 kebab_to_pascal() 全局函数及 URL 路由支持
+- 支持 Laravel 风格的 kebab-case URL 路由
 
 ### v2.0.0 (当前版本)
 
