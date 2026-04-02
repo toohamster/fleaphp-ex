@@ -29,15 +29,25 @@
 - 明确需求后再操作，不确定先问，不猜测
 - 只做用户明确要求的事，完成后立即停止
 - 发起 MR 和打 Tag 使用 GitHub API（`curl`），不使用 `gh` CLI
+
+**GitHub Token 获取方法**：
+调用 GitHub API 前，必须从 git 配置中提取 token：
+```bash
+git config --get remote.origin.url
+# 输出：https://username:token@github.com/owner/repo.git
+# 提取 token 后用于：curl -H "Authorization: Bearer $TOKEN" ...
+```
+
 - **版本发布指令**：用户说"**发布到 master**"或"**发布新版本**"时，执行完整发布流程：
 
   **A. 有功能分支时：**
   1. 检查未提交修改，如有则先提交
   2. 推送功能分支到远程
-  3. 创建 Pull Request 到 master
-  4. 自动合并 PR
-  5. 自动生成版本号并打标签
-  6. 创建 GitHub Release（含发布说明）
+  3. **从 git config 提取 GitHub Token**
+  4. 创建 Pull Request 到 master
+  5. 自动合并 PR
+  6. 自动生成版本号并打标签
+  7. 创建 GitHub Release（含发布说明）
 
   **B. 已在 master 时：**
   1. 检查未提交修改，如有则先提交
