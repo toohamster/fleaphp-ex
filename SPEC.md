@@ -83,6 +83,7 @@ src/
     │   ├── FileUploader/
     │   │   └── File.php
     │   ├── FileUploader.php        # 文件上传
+    │   ├── HttpClient.php          # HTTP 客户端（服务间调用）
     │   ├── Image.php               # 图像处理
     │   ├── ImgCode.php             # 验证码
     │   ├── Pager.php               # 分页器
