@@ -1031,3 +1031,43 @@ Driver 层最后一个实例属性 `$PARAM_STYLE` 改为 `protected const`；Tab
 **流程说明:**
 - 从 git config 提取 GitHub Token 用于 GitHub API 认证
 - 发布流程必须先检查未提交修改
+-
+---
+
+### feat: 新增 Str::extract() 字符串命名参数提取方法
+
+新增 `Str` 字符串工具类，提供 `extract()` 方法从字符串中提取命名参数。
+
+**修改的文件:**
+- `src/FLEA/Helper/Str.php` - 新增字符串工具类
+- `src/FLEA/CHANGES.md` - 记录代码修改
+- `docs/Str-extract-usage.md` - 新增使用文档
+- `tests/test_str_extract.php` - 新增测试脚本
+
+**功能特性:**
+- 将模式字符串转换为正则表达式，自动提取命名参数
+- 支持自定义分隔符（默认 `{}`）
+- 支持忽略大小写匹配
+- 支持空白压缩
+- 支持去除提取值的首尾空格
+
+**用法示例:**
+```php
+// 基本用法
+Str::extract('380-250-80-j', '{width}-{height}-{quality}-{format}');
+// ['width' => '380', 'height' => '250', 'quality' => '80', 'format' => 'j']
+
+// 提取 URL 路径
+Str::extract('/2012/08/12/test.html', '/{year}/{month}/{day}/{title}.html');
+// ['year' => '2012', 'month' => '08', 'day' => '12', 'title' => 'test']
+
+// 自定义分隔符
+Str::extract('The time is 4:35pm', 'The time is :time', ['delimiters' => [':', '']]);
+// ['time' => '4:35pm']
+
+// 忽略大小写
+Str::extract('HELLO World', 'hello {name}', ['case_insensitive' => true]);
+// ['name' => 'World']
+```
+
+---
