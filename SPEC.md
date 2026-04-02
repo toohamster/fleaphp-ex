@@ -88,6 +88,7 @@ src/
     │   ├── ImgCode.php             # 验证码
     │   ├── Pager.php               # 分页器
     │   ├── SendFile.php            # 文件下载
+    │   ├── Str.php                 # 字符串工具（命名参数提取）
     │   └── Verifier.php            # 数据验证
     ├── Middleware/                 # 中间件
     │   ├── MiddlewareInterface.php # 中间件接口
@@ -1057,6 +1058,45 @@ class ImgCode
 
 **注意**：ImgCode 内部使用 `flea_context()` 存储验证码，支持 Session/Redis 等多种存储方式。
 
+### 9.6 Str (字符串工具)
+
+```php
+namespace FLEA\Helper;
+
+class Str
+{
+    // 从字符串提取命名参数
+    public static function extract(string $string, string $pattern, array $options = []): array
+}
+```
+
+**extract() 选项**:
+| 选项 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `delimiters` | array | `['{', '}']` | 自定义分隔符 |
+| `strip_values` | bool | `false` | 去除提取值的首尾空格 |
+| `case_insensitive` | bool | `false` | 忽略大小写匹配 |
+| `collapse_whitespace` | bool | `false` | 压缩连续空白为单个空格 |
+
+**用法示例**:
+```php
+// 基本用法
+Str::extract('380-250-80-j', '{width}-{height}-{quality}-{format}');
+// ['width' => '380', 'height' => '250', 'quality' => '80', 'format' => 'j']
+
+// 提取 URL 路径
+Str::extract('/2012/08/12/test.html', '/{year}/{month}/{day}/{title}.html');
+// ['year' => '2012', 'month' => '08', 'day' => '12', 'title' => 'test']
+
+// 自定义分隔符
+Str::extract('The time is 4:35pm', 'The time is :time', ['delimiters' => [':', '']]);
+// ['time' => '4:35pm']
+
+// 忽略大小写
+Str::extract('HELLO World', 'hello {name}', ['case_insensitive' => true]);
+// ['name' => 'World']
+```
+
 ---
 
 ## 10. 配置系统
@@ -1354,6 +1394,7 @@ URL 重写模式：/Post/view/id/1
 - 响应头自动添加 `X-Trace-Id`
 - 支持 W3C `Traceparent` 请求头格式
 - 新增 MICROSERVICES.md 微服务开发指南
+- 新增 `Str::extract()` 字符串工具，支持命名参数提取
 
 **Bug 修复**:
 - 修复 SqlStatement 类型检测问题，使用 `instanceof PDOStatement` 准确判断
