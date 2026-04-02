@@ -4,6 +4,25 @@
 
 ---
 
+### feat: 新增 HttpClient 服务间 HTTP 调用功能
+
+**修改的文件:**
+- `src/FLEA/Helper/HttpClient.php` - 新增 HTTP 客户端类
+- `SPEC.md` - 更新目录结构
+- `MICROSERVICES.md` - 更新已支持微服务能力
+- `CHANGES.md` - 记录代码修改
+- `USER_GUIDE.md` - 新增分布式链路追踪章节
+
+**主要改动:**
+1. 新增 HttpClient 类，封装 cURL 发起服务间 HTTP 调用
+2. 支持 GET/POST/PUT/DELETE/PATCH 方法
+3. 自动解析 JSON 响应
+4. 自动传递 TraceID 形成分布式调用链
+5. 支持自定义请求头和超时设置
+6. 返回统一结构：success/statusCode/headers/body/data/error
+
+---
+
 ### fix: 修复 SqlStatement 类型检测 + 删除功能 AJAX 化
 
 **修改的文件:**
