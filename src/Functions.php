@@ -198,9 +198,7 @@ function __FLEA_EXCEPTION_HANDLER(\Throwable $ex): void
         if (!headers_sent()) {
             http_response_code(500);
             header('Content-Type: application/json; charset=utf-8');
-            if (FLEA::getAppInf('logEnabled') && FLEA::isRegistered(\FLEA\Log::class)) {
-                header('X-Trace-Id: ' . FLEA::registry(\FLEA\Log::class)->getTraceId());
-            }
+            header('X-Trace-Id: ' . \FLEA\Context\TraceContext::getFullTraceId());
         }
         $payload = ['error' => $ex->getMessage(), 'code' => $ex->getCode()];
         if (!\FLEA\Env::isProd()) {

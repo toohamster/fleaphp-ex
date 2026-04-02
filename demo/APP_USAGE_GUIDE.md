@@ -313,15 +313,45 @@ public function actionEdit(): void
 
 #### actionDelete() — 删除文章
 
-删除指定文章。
+以 AJAX 方式删除指定文章，返回 JSON 响应。
 
 ```php
 public function actionDelete(): void
 ```
 
-- 获取文章 ID
+- 获取文章 ID（从请求参数）
 - 调用 `$this->postModel->deletePost($id)` 删除
-- 重定向到文章列表页
+- 删除成功：返回 `\FLEA\Response::success(null, '文章删除成功')`
+- 删除失败：返回 `\FLEA\Response::error('文章删除失败', 500)`
+
+**前端 JavaScript 调用示例**：
+
+```javascript
+function deletePost(id) {
+    if (!confirm('确定要删除这篇文章吗？')) {
+        return;
+    }
+
+    fetch('/post/' + id + '/delete', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.code === 0) {
+            alert('删除成功');
+            location.href = '/post';
+        } else {
+            alert('删除失败：' + data.message);
+        }
+    })
+    .catch(err => {
+        alert('网络错误：' + err);
+    });
+}
+```
 
 ---
 

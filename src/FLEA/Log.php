@@ -37,11 +37,6 @@ use Psr\Log\AbstractLogger;
 class Log extends AbstractLogger
 {
     /**
-     * @var string 当前请求的唯一追踪 ID
-     */
-    public string $traceId    = '';
-
-    /**
      * @var string 日期时间格式（默认 'Y-m-d H:i:s'）
      */
     public string $dateFormat = 'Y-m-d H:i:s';
@@ -84,8 +79,6 @@ class Log extends AbstractLogger
      */
     public function __construct()
     {
-        $this->traceId = $this->generateTraceId();
-
         $dir = \FLEA::getAppInf('logFileDir') ?: \FLEA::getAppInf('internalCacheDir');
         $dir = realpath($dir);
         if (!$dir || !is_dir($dir) || !is_writable($dir)) {
@@ -102,7 +95,7 @@ class Log extends AbstractLogger
         // 记录请求入口
         $uri = $_SERVER['REQUEST_URI'] ?? 'cli';
         $this->buffer = sprintf("[%s] [%s] [info] %s %s\n",
-            date($this->dateFormat), $this->traceId,
+            date($this->dateFormat), \FLEA\Context\TraceContext::getFullTraceId(),
             $_SERVER['REQUEST_METHOD'] ?? 'CLI', $uri
         );
 
@@ -140,7 +133,7 @@ class Log extends AbstractLogger
 
         $this->buffer .= sprintf("[%s] [%s] [%s] %s\n",
             date($this->dateFormat),
-            $this->traceId,
+            \FLEA\Context\TraceContext::getFullTraceId(),
             $levelStr,
             $this->interpolate((string)$message, $context)
         );
@@ -160,7 +153,7 @@ class Log extends AbstractLogger
 
         $elapsed = microtime(true) - microtime_float(FLEA_LOADED_TIME);
         $this->buffer .= sprintf("[%s] [%s] [info] elapsed %.4fs\n",
-            date($this->dateFormat), $this->traceId, $elapsed
+            date($this->dateFormat), \FLEA\Context\TraceContext::getFullTraceId(), $elapsed
         );
 
         $fp = fopen($this->logFilename, 'a');
@@ -169,37 +162,6 @@ class Log extends AbstractLogger
         fwrite($fp, $this->buffer);
         flock($fp, LOCK_UN);
         fclose($fp);
-    }
-
-    /**
-     * 获取当前请求的 TraceId
-     *
-     * TraceId 是 5 位 62 进制随机字符串，用于唯一标识一次请求。
-     *
-     * 用法示例：
-     * ```php
-     * $traceId = $log->getTraceId();
-     * // 用于响应头或日志追踪
-     * header('X-Trace-Id: ' . $traceId);
-     * ```
-     *
-     * @return string TraceId
-     */
-    public function getTraceId(): string
-    {
-        return $this->traceId;
-    }
-
-    /**
-     * 生成 TraceId
-     *
-     * @return string 5 位 62 进制随机字符串
-     *
-     * @see    generate_traceid()
-     */
-    private function generateTraceId(): string
-    {
-        return generate_traceid();
     }
 
     /**

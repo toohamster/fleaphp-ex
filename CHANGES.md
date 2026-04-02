@@ -4,6 +4,51 @@
 
 ---
 
+## 2026-04-02
+
+### fix: 修复 SqlStatement 类型检测问题
+
+**修改的文件:**
+- `src/FLEA/Db/SqlStatement.php`
+
+**问题描述:**
+- 原代码使用 `is_object()` 判断是否为 PDOStatement，会匹配任何对象类型
+- `isResource()` 检测结果不准确
+
+**修复内容:**
+- 使用 `instanceof \PDOStatement` 准确判断是否为 PDOStatement
+- 非法类型（非 string 且非 PDOStatement）时抛出 `\FLEA\Exception\TypeMismatch` 异常
+- 异常信息包含参数名、预期类型、实际类型
+
+**代码示例:**
+```php
+// 正确使用
+$stmt = new SqlStatement('SELECT * FROM users');  // string
+$stmt = new SqlStatement($pdoStmt);               // PDOStatement
+
+// 错误使用：抛出 TypeMismatch 异常
+$stmt = new SqlStatement(123);         // int 不允许
+$stmt = new SqlStatement(new stdClass); // 其他对象不允许
+```
+
+### refactor: 优化 Simple 视图日志记录
+
+**修改的文件:**
+- `src/FLEA/View/Simple.php`
+
+**修改内容:**
+- 移除构造函数中的日志记录
+- 在 `fetch()` 方法中添加日志，记录渲染的视图文件路径和缓存 ID
+- 便于调试模板渲染问题
+
+**日志示例:**
+```
+Rendering view: post/index.php
+Rendering view: post/view.php (cacheId: article_123)
+```
+
+---
+
 ## 2026-03-30
 
 ### feat: 新增 Router::resource() RESTful 资源路由方法

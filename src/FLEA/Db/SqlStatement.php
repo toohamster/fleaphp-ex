@@ -54,11 +54,24 @@ class SqlStatement
      * 构造函数
      *
      * @param \PDOStatement|string $sql SQL 语句字符串或 PDOStatement 对象
+     *
+     * @throws \FLEA\Exception\TypeMismatch 当 $sql 不是字符串或 PDOStatement 时抛出
      */
     public function __construct($sql)
     {
-        $this->sql = $sql;
-        $this->isResource = is_object($sql);
+        if ($sql instanceof \PDOStatement) {
+            $this->isResource = true;
+            $this->sql = $sql;
+        } elseif (is_string($sql)) {
+            $this->isResource = false;
+            $this->sql = $sql;
+        } else {
+            throw new \FLEA\Exception\TypeMismatch(
+                'sql',
+                'string or PDOStatement',
+                is_object($sql) ? get_class($sql) : gettype($sql)
+            );
+        }
     }
 
     /**

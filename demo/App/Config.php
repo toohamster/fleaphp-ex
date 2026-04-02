@@ -24,7 +24,7 @@ return [
     'view' => \FLEA\View\Simple::class,
     'viewConfig' => [
         'templateDir' => __DIR__ . '/View',
-        'cacheDir' => __DIR__ . '/../../cache',
+        'cacheDir' => __DIR__ . '/../cache',
         'cacheLifeTime' => 900,
         'enableCache' => false,
     ],
@@ -33,6 +33,11 @@ return [
     'displayErrors' => env('APP_DEBUG', true),
     'friendlyErrorsMessage' => true,
     'displaySource' => true,
+
+    // 日志配置
+    'logEnabled' => env('LOG_ENABLED', false),
+    'logFileDir' => __DIR__ . '/../cache',
+    'logFilename' => env('LOG_FILENAME', 'app.log'),
 
     // Session 配置
     'sessionProvider' => null,

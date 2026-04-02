@@ -4,6 +4,24 @@
 
 ---
 
+### fix: 修复 SqlStatement 类型检测 + 删除功能 AJAX 化
+
+**修改的文件:**
+- `src/FLEA/Db/SqlStatement.php` - 修复类型检测逻辑
+- `demo/App/Controller/PostController.php` - actionDelete 改为 AJAX 返回 JSON
+- `demo/App/View/post/view.php` - 删除按钮改为 AJAX 提交
+- `src/FLEA.php` - 清理重复注释行
+- `CLAUDE.md` - 添加查 SPEC.md 规则
+- `.gitignore` - 忽略 requirements/ 目录
+
+**主要改动:**
+1. SqlStatement 使用 `instanceof PDOStatement` 准确判断类型
+2. 非法类型时抛出 `TypeMismatch` 异常
+3. 删除文章功能改为 AJAX 提交，保持按钮样式一致
+4. 删除前弹 JS 确认框，成功后返回列表页
+
+---
+
 ### feat: 新增 kebab_to_pascal() 函数及 URL 路由支持
 
 新增 `kebab_to_pascal()` 全局函数，支持 Laravel 风格的 kebab-case URL 路由。
@@ -17,7 +35,7 @@
 - 兜底路由 `/{controller}/{action}` 自动支持短横线命名
 - 控制器和动作方法名自动转换
 
-**转换示例:**
+**转换示例:****
 - `/order-apply` → OrderApplyController
 - `/user-profile-settings` → UserProfileSettingsController
 - `/create-new` → actionCreateNew

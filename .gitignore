@@ -17,6 +17,9 @@ demo/uploads/
 .phpstorm.meta.php
 .vscode/
 
+# Requirements analysis
+requirements/
+
 # Composer
 vendor/
 composer.phar

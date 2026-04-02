@@ -76,8 +76,6 @@ class Simple implements ViewInterface
      */
     public function __construct(?string $templateDir = null)
     {
-        log_message('Construction \FLEA\View\Simple', \Psr\Log\LogLevel::DEBUG);
-
         $this->templateDir = $templateDir;
         $this->cacheLifetime = 900;
         $this->enableCache = true;
@@ -144,6 +142,8 @@ class Simple implements ViewInterface
      */
     public function fetch(string $file, ?string $cacheId = null): string
     {
+        log_message('Rendering view: ' . $file . ($cacheId ? ' (cacheId: ' . $cacheId . ')' : ''), \Psr\Log\LogLevel::DEBUG);
+
         if ($this->enableCache) {
             $cacheFile = $this->_getCacheFile($file, $cacheId);
             if ($this->isCached($file, $cacheId)) {

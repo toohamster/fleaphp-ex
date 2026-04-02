@@ -4,6 +4,23 @@
 
 ---
 
+## 2026-04-02
+
+### feat: 实现 AJAX 方式删除文章
+
+**App/Controller/PostController.php**
+- `actionDelete()` 方法改用 `\FLEA\Request::current()->param('id')` 获取参数
+- 删除成功时返回 JSON 响应：`\FLEA\Response::success(null, '文章删除成功')`
+- 删除失败时返回 JSON 错误：`\FLEA\Response::error('文章删除失败', 500)`
+
+**App/View/post/view.php**
+- 删除按钮从 `<a>` 链接改为 `<button>` 元素
+- 添加 JavaScript `deletePost()` 函数，使用 `fetch()` 发送 AJAX 请求
+- 删除前弹出确认对话框
+- 根据 JSON 响应显示成功或失败提示
+
+---
+
 ## 2026-03-02
 
 ### refactor: App 应用代码 PSR-1/PSR-12 合规性修复

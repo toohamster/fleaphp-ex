@@ -52,9 +52,7 @@ class ErrorRenderer
     public function __construct(\Throwable $ex)
     {
         $this->ex = $ex;
-        $this->traceId = \FLEA::isRegistered(\FLEA\Log::class)
-            ? \FLEA::registry(\FLEA\Log::class)->getTraceId()
-            : '';
+        $this->traceId = \FLEA\Context\TraceContext::getFullTraceId();
     }
 
     /**
@@ -63,9 +61,7 @@ class ErrorRenderer
      */
     public static function renderProduction(\Throwable $ex): void
     {
-        $traceId = \FLEA::isRegistered(\FLEA\Log::class)
-            ? \FLEA::registry(\FLEA\Log::class)->getTraceId()
-            : '';
+        $traceId = \FLEA\Context\TraceContext::getFullTraceId();
 
         // HTTP 状态码：优先用异常 code，不合法则用 500
         $code = $ex->getCode();

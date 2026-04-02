@@ -80,9 +80,22 @@ JWT_SECRET=your-secret-key-change-this
 JWT_TTL=7200
 
 # 日志配置
-LOG_ENABLED=false
+LOG_ENABLED=true
 LOG_LEVEL=debug
+LOG_FILENAME=app.log
+LOG_FILE_DIR=cache
 ```
+
+**日志配置说明**：
+
+| 配置项 | 说明 | 默认值 |
+|--------|------|--------|
+| `LOG_ENABLED` | 是否启用日志 | `false` |
+| `LOG_LEVEL` | 日志级别（debug/info/warning/error） | `debug` |
+| `LOG_FILENAME` | 日志文件名 | `app.log` |
+| `LOG_FILE_DIR` | 日志文件目录（相对路径或绝对路径） | `cache` |
+
+**注意**：`logFileDir` 配置支持相对路径和绝对路径。使用相对路径时，建议使用 `__DIR__ . '/../cache'` 形式指定绝对路径，避免因工作目录不同导致路径解析失败。
 
 ### 3. 初始化数据库
 
@@ -449,13 +462,52 @@ class PostController extends Action
         $this->getView()->display('post/edit.php');
     }
 
-    // 删除
+    // 删除（AJAX 方式）
     public function actionDelete(): void
     {
-        $id = $this->request->input('id');
-        $this->postModel->remove($id);
-        \FLEA\Response::success();
+        $id = $this->request->param('id');
+
+        if (!$id) {
+            \FLEA\Response::error('文章 ID 不能为空', 400);
+            return;
+        }
+
+        $result = $this->postModel->deletePost((int)$id);
+        if ($result) {
+            \FLEA\Response::success(null, '文章删除成功');
+        } else {
+            \FLEA\Response::error('文章删除失败', 500);
+        }
     }
+}
+```
+
+**前端 AJAX 调用示例**：
+
+```javascript
+function deletePost(id) {
+    if (!confirm('确定要删除吗？')) {
+        return;
+    }
+
+    fetch('/post/' + id + '/delete', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.code === 0) {
+            alert('删除成功');
+            location.href = '/post';
+        } else {
+            alert('删除失败：' + data.message);
+        }
+    })
+    .catch(err => {
+        alert('网络错误：' + err);
+    });
 }
 ```
 
@@ -542,6 +594,31 @@ $postModel->update([
 // 删除
 $postModel->remove(1);
 $postModel->removeByPkv(1);
+```
+
+### 原生 SQL 查询
+
+```php
+use FLEA;
+
+$dbo = FLEA::getDBO();
+
+// 执行原生 SQL（自动包装为 SqlStatement）
+$rows = $dbo->getAll(sql_statement('SELECT * FROM posts WHERE status = 1'));
+
+// 带参数绑定
+$row = $dbo->getOne(sql_statement('SELECT COUNT(*) as cnt FROM posts'));
+
+// SqlStatement 类
+use FLEA\Db\SqlStatement;
+
+// 只接受 string 或 PDOStatement
+$stmt = new SqlStatement('SELECT * FROM users');
+// 或
+$pdoStmt = $pdo->prepare('SELECT * FROM users');
+$stmt = new SqlStatement($pdoStmt);
+
+// 非法类型会抛出 TypeMismatch 异常
 ```
 
 ### 关联关系
