@@ -6,6 +6,43 @@
 
 ## 2026-04-03
 
+### feat: 实现 View + Response 架构重构（v2.1.0）
+
+**新增文件 (12 个):**
+- `src/FLEA/View/ViewInterface.php` - 视图顶层接口
+- `src/FLEA/View/StreamingViewInterface.php` - 流式视图接口
+- `src/FLEA/View/FileTemplateView.php` - 文件模板视图
+- `src/FLEA/View/JsonView.php` - JSON 数据视图
+- `src/FLEA/View/CsvView.php` - CSV 导出视图
+- `src/FLEA/View/RedirectView.php` - 重定向视图
+- `src/FLEA/View/BinaryView.php` - 二进制文件视图
+- `src/FLEA/View/SseView.php` - SSE 流式视图
+- `src/FLEA/View/CallbackView.php` - 回调视图
+- `src/FLEA/View/CallbackViewBuilder.php` - 回调视图构建器
+- `src/FLEA/View/RendererConfig.php` - 渲染器配置类
+- `src/FLEA/View/SimpleRenderer.php` - 简单 PHP 模板渲染器
+
+**修改文件 (8 个):**
+- `src/FLEA/View/NullView.php` - 重构为空对象模式
+- `src/FLEA/View.php` - 新增视图工厂类（12 个静态方法）
+- `src/FLEA/Response.php` - 新增 fromView() 和 send() 处理 ViewInterface
+- `src/FLEA/Dispatcher/Simple.php` - 新增 handleActionResult() 兼容旧代码
+- `src/FLEA.php` - 新增 initViewRenderer() 初始化渲染器配置
+- `src/FLEA/View/Simple.php` - 已删除
+- `src/FLEA/Helper/SendFile.php` - 已删除（功能由 `View::binary()` 覆盖）
+- `src/FLEA/Helper/ImgCode.php` - 重构，新增 generate(), getImageData(), getContentType(), hex2rgb() 方法
+
+**更新文档:**
+- `SPEC.md` - 更新 View 和 Response 章节，添加新架构说明
+- `src/FLEA/CHANGES.md` - 新增重构记录
+
+**主要特性:**
+- View 负责内容生成，Response 负责 HTTP 响应细节
+- 支持 9 种具体 View 类，覆盖 HTML/JSON/CSV/Redirect/Binary/SSE/Callback 等场景
+- 迁移策略：旧代码自动兼容（void 返回），新代码推荐用 View::html() 等工厂方法
+
+---
+
 ### docs: 确定 View + Response 架构重构方案细节
 
 更新 `requirements/005-view-response-架构重构方案.md`：

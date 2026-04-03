@@ -665,6 +665,9 @@ class FLEA
         // 初始化链路追踪上下文
         \FLEA\Context\TraceContext::init();
 
+        // 初始化 View 渲染器配置
+        self::initViewRenderer();
+
         define('RESPONSE_CHARSET', self::getAppInf('responseCharset'));
         define('DATABASE_CHARSET', self::getAppInf('databaseCharset'));
 
@@ -674,5 +677,22 @@ class FLEA
 
         // 输出 traceId 响应头（在任何响应体之前）
         header('X-Trace-Id: ' . \FLEA\Context\TraceContext::getFullTraceId());
+    }
+
+    /**
+     * 初始化 View 渲染器配置
+     *
+     * 从配置中读取 viewConfig，创建 RendererConfig 对象，
+     * 并设置到 SimpleRenderer 中。
+     *
+     * @return void
+     */
+    private static function initViewRenderer(): void
+    {
+        $viewConfig = (array) self::getAppInf('viewConfig');
+        if (!empty($viewConfig)) {
+            $rendererConfig = new \FLEA\View\RendererConfig($viewConfig);
+            \FLEA\View\SimpleRenderer::configure($rendererConfig);
+        }
     }
 }

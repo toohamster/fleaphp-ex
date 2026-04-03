@@ -129,7 +129,9 @@ class Simple
             if (method_exists($controller, 'afterExecute')) {
                 $controller->afterExecute($actionMethod);
             }
-            return $ret;
+
+            // 处理返回值
+            return $this->handleActionResult($ret);
         } while (false);
 
         if ($callback) {
@@ -278,5 +280,28 @@ class Simple
             return false;
         }
         return true;
+    }
+
+    /**
+     * 处理 Action 返回值
+     *
+     * 根据返回值类型进行不同的处理：
+     * - ViewInterface：通过 Response 发送视图响应
+     * - void/null：旧代码已自行输出，不做处理
+     *
+     * @param mixed $result Action 方法的返回值
+     * @return mixed 处理后的结果
+     */
+    protected function handleActionResult($result)
+    {
+        // ViewInterface 返回值：通过 Response 发送响应
+        if ($result instanceof \FLEA\View\ViewInterface) {
+            $response = \FLEA\Response::fromView($result);
+            $response->send();
+            return null;
+        }
+
+        // void 返回或 null：旧代码已自行输出（display/echo），不做处理
+        return $result;
     }
 }

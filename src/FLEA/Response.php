@@ -2,6 +2,13 @@
 
 namespace FLEA;
 
+use FLEA\View\ViewInterface;
+use FLEA\View\StreamingViewInterface;
+use FLEA\View\RedirectView;
+use FLEA\View\CsvView;
+use FLEA\View\BinaryView;
+use FLEA\View\JsonView;
+
 /**
  * HTTP 响应封装
  *
@@ -11,6 +18,7 @@ namespace FLEA;
  * - 链式设置：code()、header() 方法链式调用
  * - JSON 响应：json() 发送 JSON 数据
  * - 统一格式：success()、error()、paginate() 统一响应结构
+ * - View 支持：fromView() 根据 ViewInterface 发送响应
  *
  * 用法示例：
  * ```php
@@ -28,13 +36,13 @@ namespace FLEA;
  * // 分页响应
  * Response::paginate($items, $total, $page, $pageSize);
  *
- * // 直接输出 JSON
- * Response::send($data);
+ * // 从 View 创建响应
+ * Response::fromView($view)->send();
  * ```
  *
  * @package FLEA
  * @author  toohamster
- * @version 2.0.0
+ * @version 2.1.0
  */
 class Response
 {
@@ -47,6 +55,11 @@ class Response
      * @var array 自定义响应头
      */
     private array  $headers    = [];
+
+    /**
+     * @var ViewInterface|null 视图对象
+     */
+    private ?ViewInterface $view = null;
 
     /**
      * 构造函数（私有）
@@ -66,6 +79,19 @@ class Response
     public static function make(): self
     {
         return new self();
+    }
+
+    /**
+     * 从 View 创建 Response
+     *
+     * @param ViewInterface $view 视图对象
+     * @return self Response 实例
+     */
+    public static function fromView(ViewInterface $view): self
+    {
+        $response = new self();
+        $response->view = $view;
+        return $response;
     }
 
     // 链式设置
@@ -108,6 +134,75 @@ class Response
     }
 
     // 发送响应
+
+    /**
+     * 发送响应
+     *
+     * 根据 View 类型发送响应，或输出已设置的数据
+     *
+     * @return void
+     */
+    public function send(): void
+    {
+        if ($this->view !== null) {
+            $this->sendFromView();
+            return;
+        }
+
+        // 兼容旧代码：如果没有 view，使用原来的 json/text 方法
+        // 需要调用 json() 或 text() 来实际输出
+    }
+
+    /**
+     * 根据 View 发送响应
+     *
+     * @return void
+     */
+    private function sendFromView(): void
+    {
+        // 流式视图（SSE、实时推送等）
+        if ($this->view instanceof StreamingViewInterface) {
+            $this->view->stream();
+            return;
+        }
+
+        // 重定向视图
+        if ($this->view instanceof RedirectView) {
+            http_response_code($this->view->getStatusCode());
+            header("Location: " . $this->view->getUrl());
+            return;
+        }
+
+        // 设置 Content-Type
+        header("Content-Type: " . $this->view->getContentType() . "; charset=utf-8");
+
+        // CSV 和 BinaryView 需要下载头
+        if ($this->view instanceof CsvView || $this->view instanceof BinaryView) {
+            header("Content-Disposition: attachment; filename=\"" . $this->view->getFilename() . "\"");
+        }
+
+        // JSON 视图设置状态码
+        if ($this->view instanceof JsonView) {
+            http_response_code($this->view->getStatusCode());
+        }
+
+        // BinaryView 支持流式输出
+        if ($this->view instanceof BinaryView) {
+            $content = $this->view->getContent();
+            if (is_resource($content)) {
+                // 大文件流式输出
+                fpassthru($content);
+                fclose($content);
+                return;
+            }
+            // 小文件直接输出
+            echo $content;
+            return;
+        }
+
+        // 输出内容
+        echo $this->view->getContent();
+    }
 
     /**
      * 发送 JSON 响应
@@ -258,7 +353,7 @@ class Response
      *
      * @return void
      */
-    public static function send($data, int $code = 200): void
+    public static function doSend($data, int $code = 200): void
     {
         self::make()->code($code)->json($data);
     }

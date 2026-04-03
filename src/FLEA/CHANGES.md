@@ -1,3 +1,61 @@
+# FLEA View + Response 架构重构变更日志
+
+## 2026-04-03
+
+### View + Response 架构重构（v2.3.0）
+
+**新增文件 (12 个):**
+
+1. **View 接口**
+   - `View/ViewInterface.php` - 视图顶层接口
+   - `View/StreamingViewInterface.php` - 流式视图接口
+
+2. **具体 View 类 (9 个)**
+   - `View/FileTemplateView.php` - 文件模板视图
+   - `View/JsonView.php` - JSON 数据视图
+   - `View/CsvView.php` - CSV 导出视图
+   - `View/RedirectView.php` - 重定向视图
+   - `View/BinaryView.php` - 二进制文件视图
+   - `View/SseView.php` - SSE 流式视图
+   - `View/CallbackView.php` - 回调视图
+   - `View/CallbackViewBuilder.php` - 回调视图构建器
+   - `View/NullView.php` - 空视图（重构）
+
+3. **渲染器组件 (2 个)**
+   - `View/RendererConfig.php` - 渲染器配置类
+   - `View/SimpleRenderer.php` - 简单 PHP 模板渲染器
+
+4. **工厂类**
+   - `View.php` - View 工厂类（12 个静态方法）
+
+**修改文件 (7 个):**
+- `Response.php` - 新增 `fromView()` 和 `send()` 方法
+- `Dispatcher/Simple.php` - 新增 `handleActionResult()` 方法
+- `FLEA.php` - 新增 `initViewRenderer()` 方法
+- `View/NullView.php` - 重构为实现新接口
+- `View/Simple.php` - 已删除
+- `Helper/SendFile.php` - 已删除（功能由 `View::binary()` 覆盖）
+- `Helper/ImgCode.php` - 重构，新增 `generate()`, `getImageData()`, `getContentType()`, `hex2rgb()` 方法
+
+**核心设计思想:**
+- View 负责内容生成，Response 负责 HTTP 响应细节
+- 支持 9 种具体 View 类，覆盖 HTML/JSON/CSV/Redirect/Binary/SSE/Callback 等场景
+- 旧代码自动兼容（Dispatcher 兼容 void 返回）
+- 新代码推荐使用 `View::html()` 等工厂方法
+
+**迁移指南:**
+```php
+// 旧代码（已废弃）
+$view = new \FLEA\View\Simple();
+$view->assign('posts', $posts);
+$view->display('post/index.php');
+
+// 新代码（推荐）
+return View::html('post/index.php', ['posts' => $posts]);
+```
+
+---
+
 # FLEA\Helper\Str 变更日志
 
 ## 2026-04-02

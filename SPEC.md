@@ -1,4 +1,4 @@
-# FleaPHP 框架规格说明书 v2.0
+# FleaPHP 框架规格说明书 v2.3
 
 ## 1. 概述
 
@@ -6,7 +6,7 @@ FleaPHP 是一个轻量级的 PHP MVC 框架，采用 PSR-4 自动加载机制�
 
 | 项目 | 说明 |
 |------|------|
-| **版本** | 2.0.0 |
+| **版本** | 2.3.0 (开发中) |
 | **命名空间** | `FLEA\` |
 | **PHP 要求** | 7.4+ |
 | **许可证** | MIT |
@@ -85,9 +85,8 @@ src/
     │   ├── FileUploader.php        # 文件上传
     │   ├── HttpClient.php          # HTTP 客户端（服务间调用）
     │   ├── Image.php               # 图像处理
-    │   ├── ImgCode.php             # 验证码
+    │   ├── ImgCode.php             # 验证码（v2.1.0 重构）
     │   ├── Pager.php               # 分页器
-    │   ├── SendFile.php            # 文件下载
     │   ├── Str.php                 # 字符串工具（命名参数提取）
     │   └── Verifier.php            # 数据验证
     ├── Middleware/                 # 中间件
@@ -109,10 +108,20 @@ src/
     │   ├── Manager.php             # ACL 管理器
     │   ├── testACL.php
     │   └── testCreateData.php
-    ├── View/                       # 视图引擎
-    │   ├── ViewInterface.php       # 视图接口
-    │   ├── Simple.php              # 简单模板引擎
-    │   └── NullView.php            # 空视图
+    ├── View/                       # 视图引擎（v2.1.0 重构）
+    │   ├── ViewInterface.php       # 视图顶层接口
+    │   ├── StreamingViewInterface.php  # 流式视图接口（SSE 等）
+    │   ├── FileTemplateView.php    # 文件模板视图（HTML/XML/Markdown 等）
+    │   ├── JsonView.php            # JSON 数据视图
+    │   ├── CsvView.php             # CSV 导出视图（支持 Excel 兼容模式）
+    │   ├── RedirectView.php        # 重定向视图
+    │   ├── BinaryView.php          # 二进制文件视图（PDF/Excel/图片下载）
+    │   ├── SseView.php             # SSE 流式视图
+    │   ├── CallbackView.php        # 回调视图（特殊场景扩展）
+    │   ├── CallbackViewBuilder.php # 回调视图构建器（链式 API）
+    │   ├── RendererConfig.php      # 渲染器配置类
+    │   ├── SimpleRenderer.php      # 简单 PHP 模板渲染器（静态类）
+    │   └── NullView.php            # 空视图（空对象模式）
     ├── Cache.php                   # 缓存门面 (PSR-16)
     │── Config.php                  # 配置管理器 (单例)
     │── Container.php               # 对象容器 (PSR-11)
@@ -582,7 +591,7 @@ class Request
 }
 ```
 
-### 5.2 Response (响应封装)
+### 5.2 Response (响应封装) - v2.1.0 更新
 
 ```php
 namespace FLEA;
@@ -590,8 +599,10 @@ namespace FLEA;
 class Response
 {
     public static function make(): self
+    public static function fromView(\FLEA\View\ViewInterface $view): self
     public function code(int $code): self
     public function header(string $name, string $value): self
+    public function send(): void  // 发送 View 响应
     public function json($data): void
     public function text(string $content): void
 
@@ -599,9 +610,18 @@ class Response
     public static function success($data = null, string $message = 'ok', int $httpCode = 200): void
     public static function error(string $message, int $httpCode = 400, int $errCode = -1): void
     public static function paginate(array $items, int $total, int $page, int $pageSize): void
-    public static function send($data, int $code = 200): void
+    public static function doSend($data, int $code = 200): void  // 原名 send()，避免冲突
 }
 ```
+
+**View 响应处理**：
+- `fromView()` 创建 Response 实例并绑定 View
+- `send()` 根据 View 类型自动处理：
+  - `StreamingViewInterface`：调用 `stream()` 流式输出
+  - `RedirectView`：发送 Location 头
+  - `CsvView`/`BinaryView`：添加 Content-Disposition 头
+  - `JsonView`：设置状态码
+  - 其他：输出 `getContent()` 内容
 
 **统一响应结构**:
 ```json
@@ -774,49 +794,171 @@ class Action
 }
 ```
 
-### 6.2 视图 (View)
+### 6.2 视图 (View) - v2.1.0 重构
 
+**新架构设计思想**：View 负责内容生成，Response 负责 HTTP 响应细节
+
+**顶层接口**:
 ```php
 namespace FLEA\View;
 
 interface ViewInterface
 {
-    public function assign($key, $value = null): void;
-    public function display(string $template): void;
-    public function fetch(string $template, ?string $cacheId = null): string;
+    public function getContentType(): string;
+    public function getContent(): string;
 }
-```
 
-**Simple 视图实现**:
-```php
-namespace FLEA\View;
-
-class Simple implements ViewInterface
+interface StreamingViewInterface extends ViewInterface
 {
-    public ?string $templateDir;
-    public int $cacheLifetime;
-    public bool $enableCache;
-    public string $cacheDir;
-
-    public function assign($name, $value = null): void
-    public function display(string $file, ?string $cacheId = null): void
-    public function fetch(string $file, ?string $cacheId = null): string
-    public function isCached(string $file, ?string $cacheId = null): bool
-    public function cleanCache(string $file, ?string $cacheId = null): void
-    public function cleanAllCache(): void
+    public function stream(): void;
 }
 ```
 
-**NullView (空视图)**:
+**具体视图实现**:
+
 ```php
 namespace FLEA\View;
 
+// 文件模板视图（HTML/XML/Markdown 等）
+class FileTemplateView implements ViewInterface
+{
+    public function __construct(?string $template = null, array $vars = [], string $contentType = 'text/html', ?RendererConfig $config = null)
+    public function setTemplate(string $template): self
+    public function assign($key, $value = null): self
+    public function setRendererConfig(RendererConfig $config): self
+    public function getContentType(): string
+    public function getContent(): string
+}
+
+// JSON 数据视图
+class JsonView implements ViewInterface
+{
+    public function __construct($data, int $statusCode = 200)
+    public function getContentType(): string
+    public function getContent(): string
+    public function getStatusCode(): int
+}
+
+// CSV 导出视图
+class CsvView implements ViewInterface
+{
+    public function __construct(array $rows, string $delimiter = ',', string $filename = 'export.csv', bool $excelCompatible = false)
+    public function getContentType(): string
+    public function getContent(): string
+    public function getFilename(): string
+}
+
+// 重定向视图
+class RedirectView implements ViewInterface
+{
+    public function __construct(string $url, int $statusCode = 302)
+    public function getContentType(): string
+    public function getContent(): string
+    public function getUrl(): string
+    public function getStatusCode(): int
+}
+
+// 二进制文件视图（支持流式输出）
+class BinaryView implements ViewInterface
+{
+    public function __construct(string $filePath, string $filename, string $mimeType)
+    public function getContentType(): string
+    public function getContent(): string|resource
+    public function getFilename(): string
+}
+
+// SSE 流式视图
+class SseView implements StreamingViewInterface
+{
+    public function __construct(callable $generator)
+    public function getContentType(): string
+    public function getContent(): string
+    public function stream(): void
+}
+
+// 回调视图（特殊场景扩展）
+class CallbackView implements ViewInterface
+{
+    public function __construct($data, string $contentType, callable $callback)
+    public function getContentType(): string
+    public function getContent(): string
+}
+
+// 回调视图构建器（链式 API）
+class CallbackViewBuilder
+{
+    public function type(string $contentType): self
+    public function handler(callable $callback): self
+    public function toView($data): CallbackView
+}
+
+// 空视图（空对象模式）
 class NullView implements ViewInterface
 {
-    public function assign($key, $value = null): void {}
-    public function display(string $template): void {}
-    public function fetch(string $template, ?string $cacheId = null): string { return ''; }
+    public function __construct(string $contentType = 'text/html')
+    public function getContentType(): string
+    public function getContent(): string
 }
+```
+
+**渲染器配置**:
+```php
+namespace FLEA\View;
+
+class RendererConfig
+{
+    public ?string $templateDir = null;
+    public string $cacheDir = './cache';
+    public int $cacheLifetime = 900;
+    public bool $enableCache = true;
+
+    public function __construct(array $config = [])
+}
+
+class SimpleRenderer
+{
+    public static function configure(RendererConfig $config): void
+    public static function render(string $template, array $vars = [], ?RendererConfig $config = null): string
+}
+```
+
+**视图工厂类**:
+```php
+namespace FLEA;
+
+class View
+{
+    public static function render(string $template, array $vars = [], string $contentType = 'text/html'): FileTemplateView
+    public static function html(string $template, array $vars = []): FileTemplateView
+    public static function xml(string $template, array $vars = []): FileTemplateView
+    public static function json($data, int $status = 200): JsonView
+    public static function csv(array $rows, string $filename = 'export.csv', string $delimiter = ',', bool $excelCompatible = false): CsvView
+    public static function redirect(string $url, int $code = 302): RedirectView
+    public static function binary(string $filePath, string $filename, string $mimeType): BinaryView
+    public static function sse(callable $generator): SseView
+    public static function callback($data, string $contentType, callable $callback): CallbackView
+    public static function build(): CallbackViewBuilder
+    public static function pdf(string $filePath, string $filename = 'document.pdf'): BinaryView
+    public static function excel(string $filePath, string $filename = 'data.xlsx'): BinaryView
+    public static function image(string $filePath, string $filename = 'image.jpg', string $mimeType = 'image/jpeg'): BinaryView
+}
+```
+
+**迁移指南（旧代码）**：
+
+旧版 `Simple` 视图已删除，旧代码需要改写：
+
+```php
+// 旧代码（已废弃）
+$view = new \FLEA\View\Simple();
+$view->assign('posts', $posts);
+$view->display('post/index.php');
+
+// 新代码（推荐）
+return View::html('post/index.php', ['posts' => $posts]);
+
+// 或直接实例化
+return new FileTemplateView('post/index.php', ['posts' => $posts]);
 ```
 
 ### 6.3 调度器 (Dispatcher)
@@ -1039,7 +1181,7 @@ class FileUploader
 }
 ```
 
-### 9.5 ImgCode (验证码)
+### 9.5 ImgCode (验证码) - v2.1.0 重构
 
 ```php
 namespace FLEA\Helper;
@@ -1048,11 +1190,39 @@ class ImgCode
 {
     public string $code;
     public int $expired;
+    public string $imagetype = 'jpeg';
 
-    public function image(int $type = 0, int $length = 4, int $lefttime = 900): void
+    // 生成验证码
+    public function generate(int $type = 0, int $length = 4, int $lefttime = 900): void
+
+    // 获取图像二进制内容（配合 View 使用）
+    public function getImageData(?array $options = null): string
+
+    // 获取 Content-Type
+    public function getContentType(): string
+
+    // 验证
     public function check(string $code): bool
     public function checkCaseSensitive(string $code): bool
     public function clear(): void
+
+    // 工具方法
+    public static function hex2rgb(string $color, string $default = 'ffffff'): array
+}
+```
+
+**新用法（配合 View）**：
+```php
+// 控制器返回验证码图像
+public function actionCaptcha(): ViewInterface
+{
+    $imgCode = new ImgCode();
+    $imgCode->generate();
+    return View::binary(
+        $imgCode->getImageData(),
+        'captcha.jpg',
+        $imgCode->getContentType()
+    );
 }
 ```
 
@@ -1130,8 +1300,13 @@ return [
     'actionMethodSuffix' => '',
 
     // 视图
-    'view' => \FLEA\View\Simple::class,
-    'viewConfig' => ['templateDir' => 'App/View', 'cacheDir' => 'cache'],
+    // 'view' => \FLEA\View\Simple::class,  // 已删除，改用 View::html() 等工厂方法
+    'viewConfig' => [
+        'templateDir' => 'App/View',
+        'cacheDir' => 'cache',
+        'cacheLifetime' => 900,
+        'enableCache' => true,
+    ],
 
     // 缓存
     'cacheProvider' => \FLEA\Cache\FileCache::class,
@@ -1251,19 +1426,32 @@ return [
 
 ### 13.1 自定义控制器
 
+**新代码（推荐）**：
 ```php
 namespace App\Controller;
 
 use FLEA\Controller\Action;
+use FLEA\View\ViewInterface;
+use FLEA\View;
 
 class PostController extends Action
 {
-    public function actionIndex(): void
+    public function actionIndex(): ViewInterface
     {
-        $this->getView()->assign('posts', $posts);
-        $this->getView()->display('post/index.php');
+        $posts = $this->model->getPublishedPosts(10);
+        return View::html('post/index.php', ['posts' => $posts]);
     }
 }
+```
+
+**旧代码（已废弃，需改写）**：
+```php
+// 旧代码 - 需要改写
+$this->getView()->assign('posts', $posts);
+$this->getView()->display('post/index.php');
+
+// 改为
+return View::html('post/index.php', ['posts' => $posts]);
 ```
 
 ### 13.2 自定义模型
@@ -1385,7 +1573,25 @@ URL 重写模式：/Post/view/id/1
 
 ## 17. 版本历史
 
-### v2.2.0 (开发中)
+### v2.3.0 (开发中)
+
+**View + Response 架构重构**:
+- 新增 `ViewInterface` 和 `StreamingViewInterface` 接口
+- 新增 9 个具体 View 类：`FileTemplateView`、`JsonView`、`CsvView`、`RedirectView`、`BinaryView`、`SseView`、`CallbackView`、`CallbackViewBuilder`、`NullView`
+- 新增 `RendererConfig` 和 `SimpleRenderer` 渲染器组件
+- 新增 `View` 工厂类（12 个静态方法）
+- 重构 `Response` 类支持 `ViewInterface`
+- 重构 `Dispatcher` 兼容旧代码
+- 删除已废弃的 `Simple` 视图类（旧代码需改用 `View::html()` 等工厂方法）
+- 删除 `SendFile.php`（功能由 `View::binary()` 覆盖）
+- 重构 `ImgCode` 类，新增 `generate()`, `getImageData()`, `getContentType()` 方法
+
+### v2.2.1
+
+**Bug 修复**:
+- 修复链路追踪相关问题
+
+### v2.2.0
 
 **新功能**:
 - 新增链路追踪组件 `TraceContext`，支持分布式追踪
@@ -1405,13 +1611,6 @@ URL 重写模式：/Post/view/id/1
 - 移除废弃的 `requestFilters` 和 `autoLoad` 配置项
 - 移除 Response.php 中多余的 X-Trace-Id 输出逻辑
 - 移除 Simple 视图构造函数中的日志，改为在 fetch() 方法中记录渲染的视图文件
-
-### v2.1.0
-
-**新功能**:
-- 新增 RESTful 资源路由 `Router::resource()`
-- 新增 kebab_to_pascal() 全局函数及 URL 路由支持
-- 支持 Laravel 风格的 kebab-case URL 路由
 
 ### v2.0.0 (当前版本)
 
