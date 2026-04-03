@@ -4,6 +4,112 @@
 
 ---
 
+## 2026-04-03
+
+### docs: 删除 SimpleView，简化方案
+
+更新 `requirements/005-view-response-架构重构方案.md`：
+
+**主要改动:**
+
+1. **删除 SimpleView 类**
+   - 原因：无法提供有价值的兼容性
+   - 旧代码必须改写，SimpleView 无法避免修改
+   - 新代码使用 `View::html()` 等工厂方法
+
+2. **Simple.php 改为直接废弃**
+   - 不保留兼容层
+   - 文档中说明迁移方式
+
+3. **更新文件列表**
+   - 从 19 个文件减少到 18 个
+   - 删除 `SimpleView.php`
+   - `Simple.php` 标记为废弃
+
+4. **更新待决策事项**
+   - 标记 SimpleView 已解决（已删除）
+
+**修改的文件:**
+- `requirements/005-view-response-架构重构方案.md`
+
+---
+
+### docs: 更新 View+Response 架构重构方案为 PHP 7.4 兼容版本（完）
+
+更新 `requirements/005-view-response-架构重构方案.md`，完善 View+Response 架构设计：
+
+**本次新增内容:**
+
+1. **RendererConfig 配置类**
+   - 封装模板渲染配置（templateDir, cacheDir, cacheLifetime, enableCache）
+   - 构造函数支持数组初始化
+   - 从 `viewConfig` 配置自动加载
+
+2. **SimpleRenderer 渲染器**
+   - 纯静态类，专注模板渲染和缓存
+   - `configure()` 设置全局配置
+   - `render()` 支持临时覆盖配置
+   - 缓存检查、保存逻辑
+
+3. **FileTemplateView 改造**
+   - 持有 `RendererConfig` 引用
+   - `getContent()` 委托给 `SimpleRenderer::render()`
+   - 支持 `setRendererConfig()` 临时覆盖
+
+4. **NullView 改造**
+   - 符合新 ViewInterface 接口
+   - 空对象模式，避免 null 检查
+   - 用于 204 No Content 场景
+
+5. **SimpleView 适配器（可选）**
+   - 继承 FileTemplateView
+   - 保留旧版 `display()`, `fetch()` 方法
+   - 向后兼容，新代码推荐用 `View::html()`
+
+6. **架构设计图**
+   - Config → FLEA::boot() → SimpleRenderer::configure()
+   - Controller → FileTemplateView → SimpleRenderer
+
+**修改的文件:**
+- `requirements/005-view-response-架构重构方案.md`
+
+---
+
+### docs: 更新 View+Response 架构重构方案为 PHP 7.4 兼容版本
+
+更新 `requirements/005-view-response-架构重构方案.md`，完善 View+Response 架构设计：
+
+**主要改进:**
+
+1. **HtmlView 重命名为 FileTemplateView**
+   - 支持任意文件类型模板（HTML、XML、Markdown、专有 JSON 等）
+   - 构造函数接受 `contentType` 参数，可显式指定内容类型
+   - 用法：`View::html()`, `View::xml()`, `View::render()`
+
+2. **新增 CallbackView 和 CallbackViewBuilder**
+   - 支持特殊场景扩展（Protocol Buffers、GraphQL、MessagePack、Twig 等）
+   - 用户传入 `$data`、指定 `contentType`、提供回调函数
+   - 链式构建器 API：`View::build()->type()->handler()->toView()`
+
+3. **完善 View 工厂类**
+   - 13 个静态方法：render, html, xml, json, csv, redirect, binary, sse, callback, build, pdf, excel, image
+   - 所有方法完整的 PHPDoc 注释
+
+4. **PHP 7.4 语法兼容**
+   - 移除 `mixed` 类型声明，改用 `@var mixed` docblock
+   - 移除联合类型 `string|resource`，改用 `@return` 注释
+   - 使用传统构造函数语法（属性在内部赋值）
+   - 保留箭头函数 `fn()` 和空合并运算符 `??`
+
+5. **Response 类改为 PHP 7.4 语法**
+   - 移除构造函数属性提升
+   - 使用传统属性声明
+
+**修改的文件:**
+- `requirements/005-view-response-架构重构方案.md`
+
+---
+
 ### feat: 新增 HttpClient 服务间 HTTP 调用功能
 
 **修改的文件:**
