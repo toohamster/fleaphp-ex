@@ -6,6 +6,40 @@
 
 ## 2026-04-03
 
+### docs: 确定 View + Response 架构重构方案细节
+
+更新 `requirements/005-view-response-架构重构方案.md`：
+
+**主要改动:**
+
+1. **确定 View 工厂类类名**
+   - 使用 `FLEA\View`（与 Cache、Config、Container 保持一致）
+   - 不放在 `FLEA\View\Factory` 子命名空间
+   - 不与子命名空间 `FLEA\View\*` 冲突
+
+2. **确定 FileTemplateView 参数**
+   - `contentType` 参数不设为必填
+   - 默认值为 `text/html`
+
+3. **确定迁移策略**
+   - 旧控制器代码需要自动适配
+   - Dispatcher 兼容 void 返回（旧代码自行输出）
+   - 旧代码的 `SimpleView::display()/fetch()` 仍能工作
+   - 新代码推荐使用 `View::html()` 等工厂方法
+
+4. **更新文档中的类名和示例**
+   - `ViewFactory` → `View`
+   - `HtmlView` → `FileTemplateView`
+   - 所有用法示例更新为 `View::xxx()` 语法
+
+5. **更新待决策事项**
+   - 标记所有决策已解决
+
+**修改的文件:**
+- `requirements/005-view-response-架构重构方案.md`
+
+---
+
 ### docs: 删除 SimpleView，简化方案
 
 更新 `requirements/005-view-response-架构重构方案.md`：
