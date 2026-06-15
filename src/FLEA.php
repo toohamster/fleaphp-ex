@@ -684,15 +684,7 @@ class FLEA
         // 初始化 View 渲染器配置
         self::initViewRenderer();
 
-        define('RESPONSE_CHARSET', self::getAppInf('responseCharset'));
         define('DATABASE_CHARSET', self::getAppInf('databaseCharset'));
-
-        if (self::getAppInf('autoResponseHeader')) {
-            header('Content-Type: text/html; charset=' . self::getAppInf('responseCharset'));
-        }
-
-        // 输出 traceId 响应头（在任何响应体之前）
-        header('X-Trace-Id: ' . \FLEA\Context\TraceContext::getFullTraceId());
     }
 
     /**
