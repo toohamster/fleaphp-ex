@@ -2,6 +2,9 @@
 
 namespace FLEA\Middleware;
 
+use FLEA\Response;
+use FLEA\View;
+
 /**
  * CORS 跨域资源共享中间件
  *
@@ -14,38 +17,23 @@ namespace FLEA\Middleware;
  * - corsAllowHeaders: 允许的头部，默认 'Content-Type,Authorization,X-Requested-With'
  * - corsMaxAge: 预检请求缓存时间（秒），默认 86400
  *
- * 用法示例：
- * ```php
- * // 在配置文件中设置
- * return [
- *     'corsAllowOrigin' => 'https://example.com',
- *     'corsAllowMethods' => 'GET,POST,OPTIONS',
- * ];
- *
- * // 或在代码中动态设置
- * FLEA::setAppInf('corsAllowOrigin', 'https://example.com');
- * ```
- *
  * @package FLEA
  * @author  toohamster
- * @version 2.0.0
+ * @version 2.3.0
  */
 class CorsMiddleware implements MiddlewareInterface
 {
     /**
      * 处理 CORS 请求
      *
-     * 添加 CORS 响应头并处理预检请求。
-     *
      * @param callable $next 下一个中间件或请求处理器
      *
-     * @return void
+     * @return mixed
      */
-    public function handle(callable $next): void
+    public function handle(callable $next)
     {
         if (headers_sent()) {
-            $next();
-            return;
+            return $next();
         }
 
         $origin  = \FLEA::getAppInf('corsAllowOrigin')  ?? '*';
@@ -58,12 +46,12 @@ class CorsMiddleware implements MiddlewareInterface
         header("Access-Control-Allow-Headers: {$headers}");
         header("Access-Control-Max-Age: {$maxAge}");
 
-        // OPTIONS 预检请求直接返回
+        // OPTIONS 预检请求直接返回空响应
         if (strtoupper($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
             http_response_code(204);
-            exit;
+            return Response::fromView(View::text(''));
         }
 
-        $next();
+        return $next();
     }
 }

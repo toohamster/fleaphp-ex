@@ -6,6 +6,36 @@
 
 ## 2026-04-03
 
+### feat: Response + 中间件集成（Signal 发布/订阅机制）
+
+**新增文件 (1 个):**
+- `src/FLEA/Internal/Signal.php` - 内部发布/订阅机制，控制响应发送时机
+
+**修改文件 (8 个):**
+- `src/FLEA/Response.php` - 重构为 View 包装器，`send()` 受 Signal 控制，移除所有 `exit`
+- `src/FLEA/Middleware/MiddlewareInterface.php` - `handle()` 不再声明 `void` 返回类型
+- `src/FLEA/Middleware/Pipeline.php` - `run()` 返回执行结果
+- `src/FLEA/Middleware/CorsMiddleware.php` - 改为返回 `$next()` 结果，OPTIONS 返回 Response
+- `src/FLEA/Middleware/AuthMiddleware.php` - 认证失败返回 `Response::error()`
+- `src/FLEA/Middleware/RateLimitMiddleware.php` - 限流返回 `Response::error()`
+- `src/FLEA/Dispatcher/Simple.php` - `handleActionResult()` 包装 ViewInterface 为 Response 返回
+- `src/FLEA.php` - `runMVC()` 统一使用 Pipeline，发布 Signal 后再 `send()`
+
+**更新文档:**
+- `FLEA/CHANGES.md` - 新增重构记录
+- `SPEC.md` - 更新 Response、Middleware、Pipeline、生命周期章节
+- `GIT_COMMIT.md` - 新增提交说明
+
+**主要特性:**
+- 移除所有 `exit` 调用，支持协程/多线程、测试抓取输出、中间件后置逻辑
+- 中间件遵循洋葱模型，通过返回 Response 短路，不直接调用 `send()`
+- Controller action 返回 ViewInterface 自动包装为 Response，由 FLEA::runMVC() 统一发送
+- Signal 机制防止中间件中途调用 `send()` 破坏链路
+
+---
+
+## 2026-04-03
+
 ### feat: 实现 View + Response 架构重构（v2.1.0）
 
 **新增文件 (12 个):**

@@ -49,6 +49,9 @@ use FLEA\Config;
 use FLEA\Container;
 use FLEA\Database;
 use FLEA\Cache;
+use FLEA\Internal\Signal;
+use FLEA\Response;
+use FLEA\View;
 
 class FLEA
 {
@@ -582,7 +585,7 @@ class FLEA
     {
         self::init();
 
-        $dispatch = function() {
+        $dispatch = function () {
             $dispatcherClass = self::getAppInf('dispatcher');
             if (!class_exists($dispatcherClass, true)) {
                 throw new \FLEA\Exception\ExpectedClass($dispatcherClass);
@@ -590,7 +593,7 @@ class FLEA
             $dispatcher = new $dispatcherClass($_GET);
             self::register($dispatcher, $dispatcherClass);
             /** @var \FLEA\Dispatcher\Simple $dispatcher */
-            $dispatcher->dispatching();
+            return $dispatcher->dispatching();
         };
 
         // 一切走 Router，注册兜底路由（可通过 routerDefaultRoute=false 关闭）
@@ -601,22 +604,36 @@ class FLEA
             );
         }
 
+        // 路由匹配失败，直接返回 404
         if (!\FLEA\Router::dispatch()) {
-            \FLEA\Response::error('Not Found', 404);
+            $response = Response::fromView(View::html('404.html', ['statusCode' => 404]));
+            Signal::publish('response.send');
+            $response->send();
+            return;
         }
 
         // 全局中间件 + 路由级中间件
-        $all = array_merge(self::$middlewares, \FLEA\Router::getMatchedMiddlewares());
-
-        if (empty($all)) {
-            $dispatch();
-        } else {
-            $pipeline = \FLEA\Middleware\Pipeline::create();
-            foreach ($all as $mw) {
-                $pipeline->pipe($mw);
-            }
-            $pipeline->run($dispatch);
+        $pipeline = \FLEA\Middleware\Pipeline::create();
+        foreach (self::$middlewares as $mw) {
+            $pipeline->pipe($mw);
         }
+        foreach (\FLEA\Router::getMatchedMiddlewares() as $mw) {
+            $pipeline->pipe($mw);
+        }
+
+        // 执行 Pipeline，获取返回值
+        $result = $pipeline->run($dispatch);
+
+        // 统一处理返回值
+        if ($result instanceof Response) {
+            // 发布"允许发送"信号
+            Signal::publish('response.send');
+            // 发送响应
+            $result->send();
+            return;
+        }
+
+        // null: 旧代码已自行输出
     }
 
     /**

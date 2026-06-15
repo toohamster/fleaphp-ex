@@ -41,10 +41,9 @@ class RateLimitMiddleware implements MiddlewareInterface
      *
      * @param callable $next 下一个中间件或请求处理器
      *
-     * @return void
-     * @throws \FLEA\Exception\HttpException 频率超限时抛出 429 异常
+     * @return mixed
      */
-    public function handle(callable $next): void
+    public function handle(callable $next)
     {
         $max    = (int)(\FLEA::getAppInf('rateLimitMax')    ?? 60);
         $window = (int)(\FLEA::getAppInf('rateLimitWindow') ?? 60);
@@ -60,7 +59,7 @@ class RateLimitMiddleware implements MiddlewareInterface
                 header('X-RateLimit-Limit: ' . $max);
                 header('X-RateLimit-Remaining: 0');
             }
-            \FLEA\Response::error('Too Many Requests', 429);
+            return \FLEA\Response::error('Too Many Requests', 429);
         }
 
         // 首次请求设置 TTL，后续递增
@@ -75,7 +74,7 @@ class RateLimitMiddleware implements MiddlewareInterface
             header('X-RateLimit-Remaining: ' . ($max - $count - 1));
         }
 
-        $next();
+        return $next();
     }
 
     private function resolveKey(string $by): string

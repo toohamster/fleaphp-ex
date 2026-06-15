@@ -598,21 +598,31 @@ namespace FLEA;
 
 class Response
 {
-    public static function make(): self
+    // 工厂方法
     public static function fromView(\FLEA\View\ViewInterface $view): self
-    public function code(int $code): self
-    public function header(string $name, string $value): self
-    public function send(): void  // 发送 View 响应
-    public function json($data): void
-    public function text(string $content): void
+    public static function success($data = null, string $message = 'ok', int $httpCode = 200): self
+    public static function error(string $message, int $httpCode = 400, int $errCode = -1): self
+    public static function paginate(array $items, int $total, int $page, int $pageSize): self
 
-    // 快捷方法
-    public static function success($data = null, string $message = 'ok', int $httpCode = 200): void
-    public static function error(string $message, int $httpCode = 400, int $errCode = -1): void
-    public static function paginate(array $items, int $total, int $page, int $pageSize): void
-    public static function doSend($data, int $code = 200): void  // 原名 send()，避免冲突
+    // 链式设置
+    public function withHeader(string $name, string $value): self
+    public function withStatus(int $statusCode): self
+
+    // 获取器
+    public function getView(): \FLEA\View\ViewInterface
+    public function getStatusCode(): int
+    public function getHeaders(): array
+
+    // 发送响应（受 Signal 控制）
+    public function send(): void
 }
 ```
+
+**Signal 信号机制**：
+- Response 构造时订阅 `response.send` 信号
+- `$canSend` 初始为 false，收到信号后才可发送
+- 只有 `FLEA::runMVC()` 在所有中间件执行完毕后发布 `response.send` 信号
+- 中间件中调用 `send()` 会抛出 `RuntimeException`
 
 **View 响应处理**：
 - `fromView()` 创建 Response 实例并绑定 View
@@ -721,7 +731,11 @@ namespace FLEA\Middleware;
 
 interface MiddlewareInterface
 {
-    public function handle(callable $next): void;
+    /**
+     * @param callable $next 下一个中间件或请求处理器
+     * @return mixed 返回 Response 表示短路，返回 $next() 的结果表示继续
+     */
+    public function handle(callable $next);
 }
 ```
 
@@ -733,7 +747,7 @@ class Pipeline
 {
     public static function create(): self
     public function pipe(MiddlewareInterface $middleware): self
-    public function run(callable $destination): void
+    public function run(callable $destination): mixed  // 返回 Response 或 null
 }
 ```
 
@@ -1399,19 +1413,24 @@ return [
    ↓
 5. Router::dispatch() 匹配路由
    - 匹配成功：设置 handler 和 middlewares
-   - 匹配失败：返回 404
+   - 匹配失败：返回 404（发布 Signal → send）
    ↓
-6. 中间件管道执行
+6. 中间件管道执行（Pipeline::run）
    - 全局中间件（FLEA::middleware() 注册）
    - 路由级中间件（Router::get/post 等注册）
+   - 中间件可返回 Response 短路，或 return $next() 继续
    ↓
 7. Dispatcher 解析 controller/action
+   - 执行 action，返回 ViewInterface
+   - handleActionResult() 包装为 Response
    ↓
 8. 实例化控制器 → beforeExecute() → actionXxx() → afterExecute()
    ↓
-9. 视图渲染
+9. 视图渲染（ViewInterface）
    ↓
-10. 输出响应（包含 X-Trace-Id 头）
+10. Pipeline 返回 Response → FLEA::runMVC() 发布 Signal → send()
+   ↓
+11. 输出响应（包含 X-Trace-Id 头）
 ```
 
 **TraceID 集成点**：
@@ -1480,11 +1499,24 @@ use FLEA\Middleware\MiddlewareInterface;
 
 class MyMiddleware implements MiddlewareInterface
 {
-    public function handle(callable $next): void
+    public function handle(callable $next)
     {
         // 前置处理
-        $next();  // 调用下一个中间件或处理器
+        $result = $next();  // 调用下一个中间件或处理器
         // 后置处理
+        return $result;
+    }
+}
+
+// 短路中间件示例
+class AuthMiddleware implements MiddlewareInterface
+{
+    public function handle(callable $next)
+    {
+        if (!$this->isAuthenticated()) {
+            return \FLEA\Response::error('Unauthorized', 401);
+        }
+        return $next();
     }
 }
 ```
@@ -1574,6 +1606,17 @@ URL 重写模式：/Post/view/id/1
 ## 17. 版本历史
 
 ### v2.3.0 (开发中)
+
+**Response + 中间件集成**:
+- 新增 `FLEA\Internal\Signal` 内部发布/订阅机制，控制响应发送时机
+- 重构 `Response` 类为 View 包装器，`send()` 受 Signal 控制
+  - 移除所有 `exit` 调用
+  - `success()`, `error()`, `paginate()` 返回 Response 对象（不直接输出）
+  - 新增 `withHeader()`, `withStatus()` 链式方法
+- 重构 `MiddlewareInterface::handle()` 不再声明 `void` 返回类型
+- 重构 `Pipeline::run()` 返回执行结果
+- 重构 `Dispatcher\Simple::handleActionResult()` 包装 ViewInterface 为 Response 返回
+- 重构 `FLEA::runMVC()` 统一使用 Pipeline，发布 Signal 后再 send()
 
 **View + Response 架构重构**:
 - 新增 `ViewInterface` 和 `StreamingViewInterface` 接口

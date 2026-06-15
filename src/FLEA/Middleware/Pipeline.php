@@ -82,17 +82,18 @@ class Pipeline
      *
      * 用法示例：
      * ```php
-     * $pipeline->run(function() {
+     * $result = $pipeline->run(function() {
      *     // 核心应用逻辑
-     *     return Response::send(['status' => 'ok']);
+     *     return Response::fromView(View::json(['status' => 'ok']));
      * });
+     * // $result 可能是 Response 或 null
      * ```
      *
      * @param callable $destination 最终要执行的目标（控制器/闭包）
      *
-     * @return void
+     * @return mixed 返回 Response 或 null
      */
-    public function run(callable $destination): void
+    public function run(callable $destination)
     {
         $pipeline = array_reduce(
             array_reverse($this->middlewares),
@@ -100,6 +101,6 @@ class Pipeline
             $destination
         );
 
-        $pipeline();
+        return $pipeline();
     }
 }

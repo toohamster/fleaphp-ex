@@ -40,10 +40,9 @@ class AuthMiddleware implements MiddlewareInterface
      *
      * @param callable $next 下一个中间件或请求处理器
      *
-     * @return void
-     * @throws \FLEA\Exception\HttpException 认证失败时抛出 401 异常
+     * @return mixed
      */
-    public function handle(callable $next): void
+    public function handle(callable $next)
     {
         $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 
@@ -51,18 +50,17 @@ class AuthMiddleware implements MiddlewareInterface
         $exclude = (array)\FLEA::getAppInf('authExclude');
         foreach ($exclude as $path) {
             if ($uri === $path || mb_str_starts_with($uri, rtrim($path, '/') . '/')) {
-                $next();
-                return;
+                return $next();
             }
         }
 
         $token = \FLEA\Request::current()->bearerToken();
 
         if (!$token || !$this->validate($token)) {
-            \FLEA\Response::error('Unauthorized', 401);
+            return \FLEA\Response::error('Unauthorized', 401);
         }
 
-        $next();
+        return $next();
     }
 
     private function validate(string $token): bool
