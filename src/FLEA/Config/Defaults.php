@@ -125,8 +125,6 @@ class Defaults
             'errorMessagesFile' => '',
 
             // 响应
-            'responseCharset' => 'UTF-8',
-            'autoResponseHeader' => true,
             'forceJsonResponse' => false,
 
             // 调度器

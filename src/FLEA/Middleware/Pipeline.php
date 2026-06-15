@@ -80,14 +80,21 @@ class Pipeline
      * 使用 array_reduce 从后向前构建中间件调用链，
      * 形成洋葱模型嵌套结构。
      *
+     * 框架内置 TraceIdMiddleware 自动作为最外层，
+     * 确保 X-Trace-Id 响应头在任何情况下都能输出。
+     *
      * @param callable $destination 最终要执行的目标（控制器/闭包）
      *
      * @return void
      */
     public function run(callable $destination): void
     {
+        // 框架内置中间件（最外层）
+        $builtIn = [new TraceIdMiddleware()];
+        $all = array_merge($builtIn, $this->middlewares);
+
         $pipeline = array_reduce(
-            array_reverse($this->middlewares),
+            array_reverse($all),
             fn(callable $carry, MiddlewareInterface $mw) => fn() => $mw->handle($carry),
             $destination
         );
