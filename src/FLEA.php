@@ -49,6 +49,9 @@ use FLEA\Config;
 use FLEA\Container;
 use FLEA\Database;
 use FLEA\Cache;
+use FLEA\Internal\Signal;
+use FLEA\Response;
+use FLEA\View;
 
 class FLEA
 {
@@ -582,7 +585,7 @@ class FLEA
     {
         self::init();
 
-        $dispatch = function() {
+        $dispatch = function () {
             $dispatcherClass = self::getAppInf('dispatcher');
             if (!class_exists($dispatcherClass, true)) {
                 throw new \FLEA\Exception\ExpectedClass($dispatcherClass);
@@ -601,22 +604,35 @@ class FLEA
             );
         }
 
+        // 路由匹配失败
         if (!\FLEA\Router::dispatch()) {
-            \FLEA\Response::error('Not Found', 404);
+            Response::current()
+                ->withStatus(404)
+                ->setView(View::html('404.html', ['statusCode' => 404]));
+            Signal::publish('response.send');
+            Response::current()->send();
+            return;
         }
 
         // 全局中间件 + 路由级中间件
-        $all = array_merge(self::$middlewares, \FLEA\Router::getMatchedMiddlewares());
-
-        if (empty($all)) {
-            $dispatch();
-        } else {
-            $pipeline = \FLEA\Middleware\Pipeline::create();
-            foreach ($all as $mw) {
-                $pipeline->pipe($mw);
-            }
-            $pipeline->run($dispatch);
+        $pipeline = \FLEA\Middleware\Pipeline::create();
+        foreach (self::$middlewares as $mw) {
+            $pipeline->pipe($mw);
         }
+        foreach (\FLEA\Router::getMatchedMiddlewares() as $mw) {
+            $pipeline->pipe($mw);
+        }
+
+        // 执行中间件管道（void，响应通过 Response::current() 设置）
+        $pipeline->run($dispatch);
+
+        // 发布信号并发送响应
+        $response = Response::current();
+        if ($response->hasContent()) {
+            Signal::publish('response.send');
+            $response->send();
+        }
+        // null: 旧代码已自行输出
     }
 
     /**
@@ -665,6 +681,9 @@ class FLEA
         // 初始化链路追踪上下文
         \FLEA\Context\TraceContext::init();
 
+        // 初始化 View 渲染器配置
+        self::initViewRenderer();
+
         define('RESPONSE_CHARSET', self::getAppInf('responseCharset'));
         define('DATABASE_CHARSET', self::getAppInf('databaseCharset'));
 
@@ -674,5 +693,22 @@ class FLEA
 
         // 输出 traceId 响应头（在任何响应体之前）
         header('X-Trace-Id: ' . \FLEA\Context\TraceContext::getFullTraceId());
+    }
+
+    /**
+     * 初始化 View 渲染器配置
+     *
+     * 从配置中读取 viewConfig，创建 RendererConfig 对象，
+     * 并设置到 SimpleRenderer 中。
+     *
+     * @return void
+     */
+    private static function initViewRenderer(): void
+    {
+        $viewConfig = (array) self::getAppInf('viewConfig');
+        if (!empty($viewConfig)) {
+            $rendererConfig = new \FLEA\View\RendererConfig($viewConfig);
+            \FLEA\View\SimpleRenderer::configure($rendererConfig);
+        }
     }
 }

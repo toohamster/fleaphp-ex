@@ -2,69 +2,59 @@
 
 namespace FleaPhpDemo\Controller;
 
+use FLEA\Response;
+use FLEA\View;
+use FLEA\View\ViewInterface;
 use FleaPhpDemo\Model\Post;
 use FleaPhpDemo\Model\Comment;
 use FLEA\Controller\Action;
 
 /**
  * 文章控制器
+ *
+ * 演示新版架构：action 方法返回 ViewInterface 或 Response，
+ * 由框架统一处理响应发送。
  */
 class PostController extends Action
 {
-    /**
-     * @var Post
-     */
     protected Post $postModel;
 
-    /**
-     * @var Comment
-     */
     protected Comment $commentModel;
 
-    /**
-     * @var \FLEA\View\ViewInterface
-     */
-    public $view;
-
-    /**
-     * 构造函数
-     */
-    public function __construct()
+    public function __construct(string $controllerName)
     {
-        parent::__construct('Post');
+        parent::__construct($controllerName);
         $this->postModel = new Post();
         $this->commentModel = new Comment();
-        $this->view = $this->getView();
     }
 
     /**
      * 文章列表页
      */
-    public function actionIndex(): void
+    public function actionIndex(): ViewInterface
     {
-        $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+        $page = max(1, intval($_GET['page'] ?? 1));
         $pageSize = 10;
         $offset = ($page - 1) * $pageSize;
 
-        // 不启用关联查询，只获取文章数据
         $posts = $this->postModel->getPublishedPosts($pageSize, $offset);
         $total = $this->postModel->getTotalCount();
         $totalPages = ceil($total / $pageSize);
 
-        $this->view->assign('posts', $posts);
-        $this->view->assign('page', $page);
-        $this->view->assign('totalPages', $totalPages);
-        $this->view->assign('total', $total);
-
-        $this->view->display('post/index.php');
+        return View::html('post/index.php', [
+            'posts'      => $posts,
+            'page'       => $page,
+            'totalPages' => $totalPages,
+            'total'      => $total,
+        ]);
     }
 
     /**
      * 文章详情页
      */
-    public function actionView(): void
+    public function actionView(): ViewInterface
     {
-        $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+        $id = intval($_GET['id'] ?? 0);
 
         if (!$id) {
             throw new \FLEA\Exception\InvalidArguments('文章ID不能为空');
@@ -76,52 +66,50 @@ class PostController extends Action
             throw new \FLEA\Exception\InvalidArguments('文章不存在');
         }
 
-        // 从关联中获取评论数据
         $comments = $post['comments'] ?? [];
         $commentCount = count($comments);
 
-        $this->view->assign('post', $post);
-        $this->view->assign('comments', $comments);
-        $this->view->assign('commentCount', $commentCount);
-
-        $this->view->display('post/view.php');
+        return View::html('post/view.php', [
+            'post'         => $post,
+            'comments'     => $comments,
+            'commentCount' => $commentCount,
+        ]);
     }
 
     /**
      * 创建文章
      */
-    public function actionCreate(): void
+    public function actionCreate()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
-                'title' => $_POST['title'] ?? '',
+                'title'   => $_POST['title'] ?? '',
                 'content' => $_POST['content'] ?? '',
-                'author' => $_POST['author'] ?? '匿名',
-                'status' => 1
+                'author'  => $_POST['author'] ?? '匿名',
+                'status'  => 1,
             ];
 
             if (empty($data['title']) || empty($data['content'])) {
-                echo '<script>alert("标题和内容不能为空"); history.back();</script>';
-                return;
+                return Response::error('标题和内容不能为空', 400);
             }
 
             $id = $this->postModel->createPost($data);
             if ($id) {
-                echo '<script>alert("文章创建成功"); location.href="?controller=Post&action=index";</script>';
-            } else {
-                echo '<script>alert("文章创建失败"); history.back();</script>';
+                return Response::success(null, '文章创建成功');
             }
-        } else {
-            $this->view->display('post/create.php');
+
+            return Response::error('文章创建失败', 500);
         }
+
+        return View::html('post/create.php');
     }
 
     /**
      * 编辑文章
      */
-    public function actionEdit(): void
+    public function actionEdit()
     {
-        $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+        $id = intval($_GET['id'] ?? 0);
 
         if (!$id) {
             throw new \FLEA\Exception\InvalidArguments('文章ID不能为空');
@@ -135,72 +123,69 @@ class PostController extends Action
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
-                'title' => $_POST['title'] ?? '',
+                'title'   => $_POST['title'] ?? '',
                 'content' => $_POST['content'] ?? '',
-                'author' => $_POST['author'] ?? '匿名'
+                'author'  => $_POST['author'] ?? '匿名',
             ];
 
             if (empty($data['title']) || empty($data['content'])) {
-                echo '<script>alert("标题和内容不能为空"); history.back();</script>';
-                return;
+                return Response::error('标题和内容不能为空', 400);
             }
 
             $result = $this->postModel->updatePost($id, $data);
             if ($result) {
-                echo '<script>alert("文章更新成功"); location.href="?controller=Post&action=view&id=' . $id . '";</script>';
-            } else {
-                echo '<script>alert("文章更新失败"); history.back();</script>';
+                return Response::success(null, '文章更新成功');
             }
-        } else {
-            $this->view->assign('post', $post);
-            $this->view->display('post/edit.php');
+
+            return Response::error('文章更新失败', 500);
         }
+
+        return View::html('post/edit.php', ['post' => $post]);
     }
 
     /**
      * 删除文章
      */
-    public function actionDelete(): void
+    public function actionDelete(): Response
     {
         $id = \FLEA\Request::current()->param('id');
 
         if (!$id) {
-            \FLEA\Response::error('文章 ID 不能为空', 400);
-            return;
+            return Response::error('文章ID不能为空', 400);
         }
 
-        $result = $this->postModel->deletePost((int)$id);
-        if ($result) {
-            \FLEA\Response::success(null, '文章删除成功');
-        } else {
-            \FLEA\Response::error('文章删除失败', 500);
-        }
+        $result = $this->postModel->deletePost((int) $id);
+
+        return $result
+            ? Response::success(null, '文章删除成功')
+            : Response::error('文章删除失败', 500);
     }
 
     /**
      * 添加评论
      */
-    public function actionComment(): void
+    public function actionComment()
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $data = [
-                'post_id' => $_POST['post_id'] ?? 0,
-                'author' => $_POST['author'] ?? '匿名',
-                'email' => $_POST['email'] ?? '',
-                'content' => $_POST['content'] ?? ''
-            ];
-
-            if (empty($data['post_id']) || empty($data['content'])) {
-                echo '<script>alert("评论内容不能为空"); history.back();</script>';
-                return;
-            }
-
-            $id = $this->commentModel->createComment($data);
-            if ($id) {
-                echo '<script>alert("评论发表成功"); location.href="?controller=Post&action=view&id=' . $data['post_id'] . '";</script>';
-            } else {
-                echo '<script>alert("评论发表失败"); history.back();</script>';
-            }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return View::html('post/comment.php');
         }
+
+        $data = [
+            'post_id' => intval($_POST['post_id'] ?? 0),
+            'author'  => $_POST['author'] ?? '匿名',
+            'email'   => $_POST['email'] ?? '',
+            'content' => $_POST['content'] ?? '',
+        ];
+
+        if (empty($data['post_id']) || empty($data['content'])) {
+            return Response::error('评论内容不能为空', 400);
+        }
+
+        $id = $this->commentModel->createComment($data);
+        if ($id) {
+            return Response::success(null, '评论发表成功');
+        }
+
+        return Response::error('评论发表失败', 500);
     }
 }

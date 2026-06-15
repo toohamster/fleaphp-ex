@@ -4,6 +4,213 @@
 
 ---
 
+## 2026-04-03
+
+### feat: Response + 中间件集成（Signal 发布/订阅机制）
+
+**新增文件 (1 个):**
+- `src/FLEA/Internal/Signal.php` - 内部发布/订阅机制，控制响应发送时机
+
+**修改文件 (8 个):**
+- `src/FLEA/Response.php` - 重构为 View 包装器，`send()` 受 Signal 控制，移除所有 `exit`
+- `src/FLEA/Middleware/MiddlewareInterface.php` - `handle()` 不再声明 `void` 返回类型
+- `src/FLEA/Middleware/Pipeline.php` - `run()` 返回执行结果
+- `src/FLEA/Middleware/CorsMiddleware.php` - 改为返回 `$next()` 结果，OPTIONS 返回 Response
+- `src/FLEA/Middleware/AuthMiddleware.php` - 认证失败返回 `Response::error()`
+- `src/FLEA/Middleware/RateLimitMiddleware.php` - 限流返回 `Response::error()`
+- `src/FLEA/Dispatcher/Simple.php` - `handleActionResult()` 包装 ViewInterface 为 Response 返回
+- `src/FLEA.php` - `runMVC()` 统一使用 Pipeline，发布 Signal 后再 `send()`
+
+**更新文档:**
+- `FLEA/CHANGES.md` - 新增重构记录
+- `SPEC.md` - 更新 Response、Middleware、Pipeline、生命周期章节
+- `GIT_COMMIT.md` - 新增提交说明
+
+**主要特性:**
+- 移除所有 `exit` 调用，支持协程/多线程、测试抓取输出、中间件后置逻辑
+- 中间件遵循洋葱模型，通过返回 Response 短路，不直接调用 `send()`
+- Controller action 返回 ViewInterface 自动包装为 Response，由 FLEA::runMVC() 统一发送
+- Signal 机制防止中间件中途调用 `send()` 破坏链路
+
+---
+
+## 2026-04-03
+
+### feat: 实现 View + Response 架构重构（v2.1.0）
+
+**新增文件 (12 个):**
+- `src/FLEA/View/ViewInterface.php` - 视图顶层接口
+- `src/FLEA/View/StreamingViewInterface.php` - 流式视图接口
+- `src/FLEA/View/FileTemplateView.php` - 文件模板视图
+- `src/FLEA/View/JsonView.php` - JSON 数据视图
+- `src/FLEA/View/CsvView.php` - CSV 导出视图
+- `src/FLEA/View/RedirectView.php` - 重定向视图
+- `src/FLEA/View/BinaryView.php` - 二进制文件视图
+- `src/FLEA/View/SseView.php` - SSE 流式视图
+- `src/FLEA/View/CallbackView.php` - 回调视图
+- `src/FLEA/View/CallbackViewBuilder.php` - 回调视图构建器
+- `src/FLEA/View/RendererConfig.php` - 渲染器配置类
+- `src/FLEA/View/SimpleRenderer.php` - 简单 PHP 模板渲染器
+
+**修改文件 (8 个):**
+- `src/FLEA/View/NullView.php` - 重构为空对象模式
+- `src/FLEA/View.php` - 新增视图工厂类（12 个静态方法）
+- `src/FLEA/Response.php` - 新增 fromView() 和 send() 处理 ViewInterface
+- `src/FLEA/Dispatcher/Simple.php` - 新增 handleActionResult() 兼容旧代码
+- `src/FLEA.php` - 新增 initViewRenderer() 初始化渲染器配置
+- `src/FLEA/View/Simple.php` - 已删除
+- `src/FLEA/Helper/SendFile.php` - 已删除（功能由 `View::binary()` 覆盖）
+- `src/FLEA/Helper/ImgCode.php` - 重构，新增 generate(), getImageData(), getContentType(), hex2rgb() 方法
+
+**更新文档:**
+- `SPEC.md` - 更新 View 和 Response 章节，添加新架构说明
+- `src/FLEA/CHANGES.md` - 新增重构记录
+
+**主要特性:**
+- View 负责内容生成，Response 负责 HTTP 响应细节
+- 支持 9 种具体 View 类，覆盖 HTML/JSON/CSV/Redirect/Binary/SSE/Callback 等场景
+- 迁移策略：旧代码自动兼容（void 返回），新代码推荐用 View::html() 等工厂方法
+
+---
+
+### docs: 确定 View + Response 架构重构方案细节
+
+更新 `requirements/005-view-response-架构重构方案.md`：
+
+**主要改动:**
+
+1. **确定 View 工厂类类名**
+   - 使用 `FLEA\View`（与 Cache、Config、Container 保持一致）
+   - 不放在 `FLEA\View\Factory` 子命名空间
+   - 不与子命名空间 `FLEA\View\*` 冲突
+
+2. **确定 FileTemplateView 参数**
+   - `contentType` 参数不设为必填
+   - 默认值为 `text/html`
+
+3. **确定迁移策略**
+   - 旧控制器代码需要自动适配
+   - Dispatcher 兼容 void 返回（旧代码自行输出）
+   - 旧代码的 `SimpleView::display()/fetch()` 仍能工作
+   - 新代码推荐使用 `View::html()` 等工厂方法
+
+4. **更新文档中的类名和示例**
+   - `ViewFactory` → `View`
+   - `HtmlView` → `FileTemplateView`
+   - 所有用法示例更新为 `View::xxx()` 语法
+
+5. **更新待决策事项**
+   - 标记所有决策已解决
+
+**修改的文件:**
+- `requirements/005-view-response-架构重构方案.md`
+
+---
+
+### docs: 删除 SimpleView，简化方案
+
+更新 `requirements/005-view-response-架构重构方案.md`：
+
+**主要改动:**
+
+1. **删除 SimpleView 类**
+   - 原因：无法提供有价值的兼容性
+   - 旧代码必须改写，SimpleView 无法避免修改
+   - 新代码使用 `View::html()` 等工厂方法
+
+2. **Simple.php 改为直接废弃**
+   - 不保留兼容层
+   - 文档中说明迁移方式
+
+3. **更新文件列表**
+   - 从 19 个文件减少到 18 个
+   - 删除 `SimpleView.php`
+   - `Simple.php` 标记为废弃
+
+4. **更新待决策事项**
+   - 标记 SimpleView 已解决（已删除）
+
+**修改的文件:**
+- `requirements/005-view-response-架构重构方案.md`
+
+---
+
+### docs: 更新 View+Response 架构重构方案为 PHP 7.4 兼容版本（完）
+
+更新 `requirements/005-view-response-架构重构方案.md`，完善 View+Response 架构设计：
+
+**本次新增内容:**
+
+1. **RendererConfig 配置类**
+   - 封装模板渲染配置（templateDir, cacheDir, cacheLifetime, enableCache）
+   - 构造函数支持数组初始化
+   - 从 `viewConfig` 配置自动加载
+
+2. **SimpleRenderer 渲染器**
+   - 纯静态类，专注模板渲染和缓存
+   - `configure()` 设置全局配置
+   - `render()` 支持临时覆盖配置
+   - 缓存检查、保存逻辑
+
+3. **FileTemplateView 改造**
+   - 持有 `RendererConfig` 引用
+   - `getContent()` 委托给 `SimpleRenderer::render()`
+   - 支持 `setRendererConfig()` 临时覆盖
+
+4. **NullView 改造**
+   - 符合新 ViewInterface 接口
+   - 空对象模式，避免 null 检查
+   - 用于 204 No Content 场景
+
+5. **SimpleView 适配器（可选）**
+   - 继承 FileTemplateView
+   - 保留旧版 `display()`, `fetch()` 方法
+   - 向后兼容，新代码推荐用 `View::html()`
+
+6. **架构设计图**
+   - Config → FLEA::boot() → SimpleRenderer::configure()
+   - Controller → FileTemplateView → SimpleRenderer
+
+**修改的文件:**
+- `requirements/005-view-response-架构重构方案.md`
+
+---
+
+### docs: 更新 View+Response 架构重构方案为 PHP 7.4 兼容版本
+
+更新 `requirements/005-view-response-架构重构方案.md`，完善 View+Response 架构设计：
+
+**主要改进:**
+
+1. **HtmlView 重命名为 FileTemplateView**
+   - 支持任意文件类型模板（HTML、XML、Markdown、专有 JSON 等）
+   - 构造函数接受 `contentType` 参数，可显式指定内容类型
+   - 用法：`View::html()`, `View::xml()`, `View::render()`
+
+2. **新增 CallbackView 和 CallbackViewBuilder**
+   - 支持特殊场景扩展（Protocol Buffers、GraphQL、MessagePack、Twig 等）
+   - 用户传入 `$data`、指定 `contentType`、提供回调函数
+   - 链式构建器 API：`View::build()->type()->handler()->toView()`
+
+3. **完善 View 工厂类**
+   - 13 个静态方法：render, html, xml, json, csv, redirect, binary, sse, callback, build, pdf, excel, image
+   - 所有方法完整的 PHPDoc 注释
+
+4. **PHP 7.4 语法兼容**
+   - 移除 `mixed` 类型声明，改用 `@var mixed` docblock
+   - 移除联合类型 `string|resource`，改用 `@return` 注释
+   - 使用传统构造函数语法（属性在内部赋值）
+   - 保留箭头函数 `fn()` 和空合并运算符 `??`
+
+5. **Response 类改为 PHP 7.4 语法**
+   - 移除构造函数属性提升
+   - 使用传统属性声明
+
+**修改的文件:**
+- `requirements/005-view-response-架构重构方案.md`
+
+---
+
 ### feat: 新增 HttpClient 服务间 HTTP 调用功能
 
 **修改的文件:**

@@ -5,6 +5,9 @@
  * 在 FLEA::runMVC() 之前加载，注册的优先路由会先匹配
  */
 
+// 注册全局中间件（演示中间件用法）
+\FLEA::middleware(new \FLEA\Middleware\CorsMiddleware());
+
 // 文章相关路由
 \FLEA\Router::get('/post', 'PostController@index')->name('post.index');
 \FLEA\Router::get('/post/create', 'PostController@create')->name('post.create');

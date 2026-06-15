@@ -11,7 +11,7 @@ namespace FLEA\Middleware;
  * - 在调用 $next 前执行逻辑（请求处理前）
  * - 调用 $next() 将请求传递给下一个中间件
  * - 在调用 $next 后执行逻辑（请求处理后）
- * - 短路请求（不调用 $next，直接返回响应）
+ * - 短路请求（不调用 $next，通过 Response::current() 设置响应状态）
  *
  * 用法示例：
  * ```php
@@ -20,23 +20,21 @@ namespace FLEA\Middleware;
  *     public function handle(callable $next): void
  *     {
  *         // 请求处理前：验证用户身份
- *         if (!isset($_SESSION['user_id'])) {
- *             \FLEA\Response::error('未授权', 401);
- *             return; // 短路，不再继续
+ *         if (!$this->validate()) {
+ *             \FLEA\Response::current()->withStatus(401)
+ *                 ->setView(\FLEA\View::json(['error' => 'Unauthorized']));
+ *             return; // 短路
  *         }
  *
  *         // 继续执行下一个中间件或控制器
  *         $next();
- *
- *         // 请求处理后：记录访问日志
- *         log_message('用户访问', 'info');
  *     }
  * }
  * ```
  *
  * @package FLEA
  * @author  toohamster
- * @version 2.0.0
+ * @version 2.3.0
  * @see     \FLEA\Middleware\Pipeline
  */
 interface MiddlewareInterface
