@@ -44,10 +44,11 @@ git config --get remote.origin.url
   1. 检查未提交修改，如有则先提交
   2. 推送功能分支到远程
   3. **从 git config 提取 GitHub Token**
-  4. 创建 Pull Request 到 master
-  5. 自动合并 PR
-  6. 自动生成版本号并打标签
-  7. 创建 GitHub Release（含发布说明）
+  4. **对比远程 master，确认未合并的新提交**：`git fetch origin && git log origin/master..HEAD`
+  5. 创建 Pull Request 到 master
+  6. 自动合并 PR
+  7. 自动生成版本号并打标签
+  8. 创建 GitHub Release（含发布说明）
 
   **B. 已在 master 时：**
   1. 检查未提交修改，如有则先提交
