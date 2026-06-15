@@ -79,7 +79,7 @@ class PostController extends Action
     /**
      * 创建文章
      */
-    public function actionCreate(): ViewInterface|Response
+    public function actionCreate()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
@@ -107,7 +107,7 @@ class PostController extends Action
     /**
      * 编辑文章
      */
-    public function actionEdit(): ViewInterface|Response
+    public function actionEdit()
     {
         $id = intval($_GET['id'] ?? 0);
 
@@ -164,7 +164,7 @@ class PostController extends Action
     /**
      * 添加评论
      */
-    public function actionComment(): Response|ViewInterface
+    public function actionComment()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             return View::html('post/comment.php');
