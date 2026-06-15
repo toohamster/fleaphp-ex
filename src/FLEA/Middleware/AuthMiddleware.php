@@ -13,23 +13,9 @@ namespace FLEA\Middleware;
  * - authValidator: 自定义验证器回调，接收 token 参数返回 bool
  * - authExclude: 不需要认证的路径列表，['/health', '/ping']
  *
- * 用法示例：
- * ```php
- * // 使用静态 token 列表
- * FLEA::setAppInf('authTokens', ['my-secret-token']);
- *
- * // 使用 JWT 验证器
- * FLEA::setAppInf('authValidator', function(string $token): bool {
- *     return JwtHelper::verify($token);
- * });
- *
- * // 排除健康检查路径
- * FLEA::setAppInf('authExclude', ['/health', '/ping']);
- * ```
- *
  * @package FLEA
  * @author  toohamster
- * @version 2.0.0
+ * @version 2.3.0
  */
 class AuthMiddleware implements MiddlewareInterface
 {
@@ -41,7 +27,6 @@ class AuthMiddleware implements MiddlewareInterface
      * @param callable $next 下一个中间件或请求处理器
      *
      * @return void
-     * @throws \FLEA\Exception\HttpException 认证失败时抛出 401 异常
      */
     public function handle(callable $next): void
     {
@@ -59,7 +44,14 @@ class AuthMiddleware implements MiddlewareInterface
         $token = \FLEA\Request::current()->bearerToken();
 
         if (!$token || !$this->validate($token)) {
-            \FLEA\Response::error('Unauthorized', 401);
+            \FLEA\Response::current()
+                ->withStatus(401)
+                ->setView(\FLEA\View::json([
+                    'code'    => -1,
+                    'message' => 'Unauthorized',
+                    'data'    => null,
+                ], 401));
+            return;
         }
 
         $next();

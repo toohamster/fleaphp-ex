@@ -1,9 +1,9 @@
-# FleaPHP v2.0
+# FleaPHP v2.3
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PHP 7.4+](https://img.shields.io/badge/PHP-7.4+-blue.svg)](https://www.php.net/)
 
-轻量级 PHP MVC 框架，采用 PSR 标准，支持 Router、Middleware、JWT 认证和 Context 上下文管理。
+轻量级 PHP MVC 框架，采用 PSR 标准，支持 Router、Middleware、JWT 认证、Context 上下文和响应门面模式。
 
 ---
 
@@ -13,6 +13,7 @@
 - **MVC 架构**：清晰的模型 - 视图 - 控制器分离
 - **路由器**：RESTful 路由、路由分组、命名路由
 - **中间件**：洋葱模型管道，支持 CORS/认证/限流
+- **响应门面**：`Response::current()` 单例入口，对标 `Request::current()`
 - **JWT 认证**：HS256 签名，支持 Token 刷新
 - **Context 上下文**：可插拔的状态管理（Session/Redis/File/Database）
 - **TableDataGateway**：简洁的数据库 CRUD 和关联查询

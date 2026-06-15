@@ -9,27 +9,32 @@ namespace FLEA\Helper;
  * 默认使用 Context 组件存储验证码，支持 Session/Redis/File 多种后端。
  *
  * 主要功能：
- * - 生成随机验证码图像
+ * - 生成随机验证码
  * - 支持数字、字母、混合三种类型
  * - 自定义字体、颜色、背景色
  * - 上下文存储和过期验证
  * - 区分大小写/不区分大小写验证
+ * - 获取验证码图像二进制内容（与 View 配合使用）
  *
  * 用法示例：
  * ```php
- * // 在控制器中生成验证码
- * function actionImgcode() {
- *     $imgcode = FLEA::getSingleton(ImgCode::class);
- *     $imgcode->image();
+ * // 新用法：配合 View 返回验证码图像
+ * public function actionCaptcha(): ViewInterface
+ * {
+ *     $imgCode = new ImgCode();
+ *     $imgCode->generate();
+ *     return View::binary(
+ *         $imgCode->getImageData(),
+ *         'captcha.jpg',
+ *         $imgCode->getContentType()
+ *     );
  * }
  *
- * // 在模板中显示验证码
- * <img src="<?php echo url('Post.imgcode'); ?>" />
- *
  * // 验证用户提交的验证码
- * function actionSubmit() {
- *     $imgcode = FLEA::getSingleton(ImgCode::class);
- *     if ($imgcode->check($_POST['imgcode'])) {
+ * public function actionSubmit(): void
+ * {
+ *     $imgCode = new ImgCode();
+ *     if ($imgCode->check($_POST['imgcode'])) {
  *         // 验证通过
  *     }
  * }
@@ -37,7 +42,7 @@ namespace FLEA\Helper;
  *
  * @package FLEA
  * @author  toohamster
- * @version 2.0.0
+ * @version 2.3.0
  */
 class ImgCode
 {
@@ -60,17 +65,7 @@ class ImgCode
      *
      * @var string
      */
-    public $imagetype = 'jpeg';
-
-    /**
-     * 指示是否在生成验证码图片时保留已有的验证码
-     *
-     * 保留已有的验证码可以让用户在各个不同的页面都看到一致的验证码。
-     * 只有这个验证码使用后，已有的验证码才会失效。
-     *
-     * @var boolean
-     */
-    public $keepCode = false;
+    public string $imagetype = 'jpeg';
 
     /**
      * 存储键名前缀
@@ -80,20 +75,118 @@ class ImgCode
     private string $keyPrefix = 'IMGCODE';
 
     /**
-     * 构造函数
+     * 生成验证码
+     *
+     * @param int $type 验证码类型：0-数字，1-字母，其他 - 数字和字母
+     * @param int $length 验证码长度
+     * @param int $lefttime 验证码有效时间（秒）
+     * @return void
      */
-    public function __construct()
+    public function generate(int $type = 0, int $length = 4, int $lefttime = 900): void
     {
-        $this->code = flea_context()->get($this->keyPrefix, '');
-        $this->expired = flea_context()->get($this->keyPrefix . '_EXPIRED', 0);
+        // 生成验证码种子
+        switch ($type) {
+        case 0:
+            $seed = '0123456789';
+            break;
+        case 1:
+            $seed = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+            break;
+        default:
+            $seed = '346789ABCDEFGHJKLMNPQRTUVWXYabcdefghjklmnpqrtuvwxy';
+        }
+        if ($length <= 0) { $length = 4; }
+        $code = '';
+        [$usec, $sec] = explode(" ", microtime());
+        srand($sec + $usec * 100000);
+        $len = strlen($seed) - 1;
+        for ($i = 0; $i < $length; $i++) {
+            $code .= substr($seed, rand(0, $len), 1);
+        }
+
+        // 存储验证码到上下文
+        flea_context()->set($this->keyPrefix, $code, $lefttime);
+        flea_context()->set($this->keyPrefix . '_EXPIRED', time() + $lefttime, $lefttime);
+
+        $this->code = $code;
+        $this->expired = time() + $lefttime;
+    }
+
+    /**
+     * 获取验证码图像的二进制内容（不直接输出）
+     *
+     * 与 image() 方法不同，此方法返回图像内容而不是直接输出。
+     * 可以与 View::binary() 配合使用，实现更灵活的响应。
+     *
+     * 用法示例：
+     * ```php
+     * // 控制器中返回验证码图像
+     * public function actionCaptcha(): ViewInterface
+     * {
+     *     $imgCode = new ImgCode();
+     *     $imgCode->generate();
+     *     return View::binary(
+     *         $imgCode->getImageData(),
+     *         'captcha.jpg',
+     *         $imgCode->getContentType()
+     *     );
+     * }
+     * ```
+     *
+     * @param array|null $options 附加选项（字体、颜色、背景等）
+     * @return string 图像二进制内容
+     */
+    public function getImageData(?array $options = null): string
+    {
+        if ($this->code === '') {
+            throw new \RuntimeException('Call generate() first to generate a code');
+        }
+
+        // 创建图像
+        $img = $this->createImage($options);
+
+        // 获取图像内容到字符串
+        ob_start();
+        switch (strtolower($this->imagetype)) {
+        case 'png':
+            imagepng($img);
+            break;
+        case 'gif':
+            imagegif($img);
+            break;
+        case 'jpg':
+        default:
+            imagejpeg($img);
+        }
+        $content = ob_get_clean();
+        imagedestroy($img);
+        unset($img);
+
+        return $content;
+    }
+
+    /**
+     * 获取图像 Content-Type
+     *
+     * @return string 如 'image/jpeg', 'image/png', 'image/gif'
+     */
+    public function getContentType(): string
+    {
+        switch (strtolower($this->imagetype)) {
+        case 'png':
+            return 'image/png';
+        case 'gif':
+            return 'image/gif';
+        default:
+            return 'image/jpeg';
+        }
     }
 
     /**
      * 检查图像验证码是否有效
      *
-     * @param string $code
-     *
-     * @return boolean
+     * @param string $code 用户提交的验证码
+     * @return bool 验证通过返回 true
      */
     public function check(string $code): bool
     {
@@ -107,9 +200,8 @@ class ImgCode
     /**
      * 检查图像验证码是否有效（区分大小写）
      *
-     * @param string $code
-     *
-     * @return boolean
+     * @param string $code 用户提交的验证码
+     * @return bool 验证通过返回 true
      */
     public function checkCaseSensitive(string $code): bool
     {
@@ -122,6 +214,8 @@ class ImgCode
 
     /**
      * 清除上下文存储中的 imgcode 相关信息
+     *
+     * @return void
      */
     public function clear(): void
     {
@@ -130,55 +224,13 @@ class ImgCode
     }
 
     /**
-     * 利用 GD 库产生验证码图像
+     * 创建验证码图像资源
      *
-     * 目前 $options 参数支持下列选项：
-     * -  paddingLeft, paddingRight, paddingTop, paddingBottom
-     * -  border, borderColor
-     * -  font, color, bgcolor
-     *
-     * 如果 font 为 0-5，则使用 GD 库内置的字体。
-     * 如果要指定字体文件，则 font 选项必须为字体文件的绝对路径，例如：
-     * <code>
-     * $options = array('font' => '/var/www/example/myfont.gdf');
-     * image($type, $length, $lefttime, $options);
-     * </code>
-     *
-     * @param int $type 验证码包含的字符类型，0 - 数字、1 - 字母、其他值 - 数字和字母
-     * @param int $length 验证码长度
-     * @param int $leftime 验证码有效时间（秒）
-     * @param array $options 附加选项，可以指定字体、宽度和高度等参数
+     * @param array|null $options 选项（字体、颜色、背景、边框等）
+     * @return resource GD 图像资源
      */
-    public function image(int $type = 0, int $length = 4, int $lefttime = 900, ?array $options = null): void
+    private function createImage(?array $options = null)
     {
-        if ($this->keepCode && $this->code != '') {
-            $code = $this->code;
-        } else {
-            // 生成验证码
-            switch ($type) {
-            case 0:
-                $seed = '0123456789';
-                break;
-            case 1:
-                $seed = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-                break;
-            default:
-                $seed = '346789ABCDEFGHJKLMNPQRTUVWXYabcdefghjklmnpqrtuvwxy';
-            }
-            if ($length <= 0) { $length = 4; }
-            $code = '';
-            [$usec, $sec] = explode(" ", microtime());
-            srand($sec + $usec * 100000);
-            $len = strlen($seed) - 1;
-            for ($i = 0; $i < $length; $i++) {
-                $code .= substr($seed, rand(0, $len), 1);
-            }
-            // 存储验证码到上下文
-            flea_context()->set($this->keyPrefix, $code, $lefttime);
-        }
-        // 存储过期时间
-        flea_context()->set($this->keyPrefix . '_EXPIRED', time() + $lefttime, $lefttime);
-
         // 设置选项
         $paddingLeft = (int)($options['paddingLeft'] ?? 3);
         $paddingRight = (int)($options['paddingRight'] ?? 3);
@@ -204,7 +256,7 @@ class ImgCode
         $fontHeight = imagefontheight($font);
 
         // 确定图像的宽度和高度
-        $width = $fontWidth * strlen($code) + $paddingLeft + $paddingRight +
+        $width = $fontWidth * strlen($this->code) + $paddingLeft + $paddingRight +
                 $border * 2 + 1;
         $height = $fontHeight + $paddingTop + $paddingBottom + $border * 2 + 1;
 
@@ -213,51 +265,39 @@ class ImgCode
 
         // 绘制边框
         if ($border) {
-            [$r, $g, $b] = $this->_hex2rgb($bdColor);
+            [$r, $g, $b] = self::hex2rgb($bdColor);
             $borderColor = imagecolorallocate($img, $r, $g, $b);
             imagefilledrectangle($img, 0, 0, $width, $height, $borderColor);
         }
 
         // 绘制背景
-        [$r, $g, $b] = $this->_hex2rgb($bgcolor);
+        [$r, $g, $b] = self::hex2rgb($bgcolor);
         $backgroundColor = imagecolorallocate($img, $r, $g, $b);
         imagefilledrectangle($img, $border, $border,
                 $width - $border - 1, $height - $border - 1, $backgroundColor);
 
         // 绘制文字
-        [$r, $g, $b] = $this->_hex2rgb($color);
+        [$r, $g, $b] = self::hex2rgb($color);
         $textColor = imagecolorallocate($img, $r, $g, $b);
         imagestring($img, $font, $paddingLeft + $border, $paddingTop + $border,
-                $code, $textColor);
+                $this->code, $textColor);
 
-        // 输出图像
-        switch (strtolower($this->imagetype)) {
-        case 'png':
-            header("Content-type: " . image_type_to_mime_type(IMAGETYPE_PNG));
-            imagepng($img);
-            break;
-        case 'gif':
-            header("Content-type: " . image_type_to_mime_type(IMAGETYPE_GIF));
-            imagegif($img);
-            break;
-        case 'jpg':
-        default:
-            header("Content-type: " . image_type_to_mime_type(IMAGETYPE_JPEG));
-            imagejpeg($img);
-        }
-
-        imagedestroy($img);
-        unset($img);
+        return $img;
     }
 
     /**
-     * 将 16 进制颜色值转换为 rgb 值
+     * 将 16 进制颜色值转换为 RGB 数组
      *
-     * @param string $hex
+     * 支持多种格式：
+     * - '0xffffff' 或 '0xfff'
+     * - '#ffffff' 或 '#fff'
+     * - 'ffffff' 或 'fff'
      *
-     * @return array
+     * @param string $color 16 进制颜色值
+     * @param string $default 默认颜色值（当输入格式无效时）
+     * @return array [r, g, b] 如 [255, 255, 255]
      */
-    protected function _hex2rgb(string $color, string $defualt = 'ffffff'): array
+    public static function hex2rgb(string $color, string $default = 'ffffff'): array
     {
         $color = strtolower($color);
         if (substr($color, 0, 2) == '0x') {
@@ -272,7 +312,7 @@ class ImgCode
             $b = hexdec(substr($color, 2, 1));
             return [$r, $g, $b];
         } elseif ($l != 6) {
-            $color = $defualt;
+            $color = $default;
         }
 
         $r = hexdec(substr($color, 0, 2));

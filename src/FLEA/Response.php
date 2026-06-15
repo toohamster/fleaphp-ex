@@ -2,241 +2,136 @@
 
 namespace FLEA;
 
+use FLEA\Internal\Signal;
+use FLEA\View\ViewInterface;
+
 /**
- * HTTP 响应封装
+ * HTTP 响应门面（Facade）
  *
- * 统一 JSON 响应格式，支持链式调用。
- *
- * 主要功能：
- * - 链式设置：code()、header() 方法链式调用
- * - JSON 响应：json() 发送 JSON 数据
- * - 统一格式：success()、error()、paginate() 统一响应结构
+ * 统一入口，管理单例、订阅信号、委托给 HttpResponse。
+ * 与 Request::current() 对称，提供一致的使用体验。
  *
  * 用法示例：
  * ```php
- * // 链式调用
- * Response::make()->code(201)->header('X-Custom', 'val')->json($data);
+ * // 获取当前响应实例
+ * $res = Response::current();
  *
- * // 成功响应
+ * // 链式设置
+ * $res->withStatus(401)->setView(View::json(['error' => 'Unauthorized']));
+ *
+ * // 快捷方法
  * Response::success($data);
- * // {"code":0,"message":"ok","data":{...}}
- *
- * // 错误响应
  * Response::error('Not found', 404);
- * // {"code":-1,"message":"Not found","data":null}
- *
- * // 分页响应
  * Response::paginate($items, $total, $page, $pageSize);
- *
- * // 直接输出 JSON
- * Response::send($data);
  * ```
  *
  * @package FLEA
  * @author  toohamster
- * @version 2.0.0
+ * @version 2.3.0
  */
 class Response
 {
     /**
-     * @var int HTTP 状态码
+     * @var self|null 单例实例
      */
-    private int    $statusCode = 200;
+    private static $instance = null;
 
     /**
-     * @var array 自定义响应头
+     * @var HttpResponse 内部适配器
      */
-    private array  $headers    = [];
+    private $http;
 
     /**
      * 构造函数（私有）
      */
-    private function __construct() {}
-
-    /**
-     * 创建 Response 实例
-     *
-     * 用法示例：
-     * ```php
-     * Response::make()->code(201)->json($data);
-     * ```
-     *
-     * @return self Response 实例
-     */
-    public static function make(): self
+    private function __construct()
     {
-        return new self();
-    }
+        $this->http = new HttpResponse();
 
-    // 链式设置
-
-    /**
-     * 设置 HTTP 状态码
-     *
-     * 用法示例：
-     * ```php
-     * Response::make()->code(201)->json($data);
-     * ```
-     *
-     * @param int $code HTTP 状态码
-     *
-     * @return self 返回自身实例（链式调用）
-     */
-    public function code(int $code): self
-    {
-        $this->statusCode = $code;
-        return $this;
+        // 订阅"允许发送"信号
+        Signal::subscribe('response.send', function () {
+            $this->http->allowSend();
+        });
     }
 
     /**
-     * 设置响应头
+     * 获取当前响应实例
      *
-     * 用法示例：
-     * ```php
-     * Response::make()->header('X-Custom', 'value')->json($data);
-     * ```
-     *
-     * @param string $name  响应头名称
-     * @param string $value 响应头值
-     *
-     * @return self 返回自身实例（链式调用）
+     * @return self
      */
-    public function header(string $name, string $value): self
+    public static function current()
     {
-        $this->headers[$name] = $value;
-        return $this;
-    }
-
-    // 发送响应
-
-    /**
-     * 发送 JSON 响应
-     *
-     * 输出 JSON 格式数据并终止程序。
-     * 自动设置 Content-Type 为 application/json。
-     *
-     * 用法示例：
-     * ```php
-     * Response::make()->json(['users' => $users]);
-     * ```
-     *
-     * @param mixed $data 要输出的数据
-     *
-     * @return void
-     */
-    public function json($data): void
-    {
-        $this->sendHeaders('application/json');
-        echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        exit;
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
     }
 
     /**
-     * 发送文本响应
+     * 从 View 创建（快捷工厂）
      *
-     * 输出纯文本内容并终止程序。
-     * 自动设置 Content-Type 为 text/plain。
-     *
-     * 用法示例：
-     * ```php
-     * Response::make()->text('Hello World');
-     * ```
-     *
-     * @param string $content 要输出的文本内容
-     *
-     * @return void
+     * @param ViewInterface $view 视图对象
+     * @return self
      */
-    public function text(string $content): void
+    public static function fromView(ViewInterface $view)
     {
-        $this->sendHeaders('text/plain');
-        echo $content;
-        exit;
-    }
-
-    // 快捷方法（统一响应结构）
-
-    /**
-     * 成功响应
-     *
-     * 输出统一的 JSON 响应格式：
-     * ```json
-     * {"code":0,"message":"ok","data":{...}}
-     * ```
-     *
-     * 用法示例：
-     * ```php
-     * Response::success($data);
-     * Response::success($data, '操作成功');
-     * Response::success(null, '创建成功', 201);
-     * ```
-     *
-     * @param mixed  $data      响应数据
-     * @param string $message   响应消息（默认 'ok'）
-     * @param int    $httpCode  HTTP 状态码（默认 200）
-     *
-     * @return void
-     */
-    public static function success($data = null, string $message = 'ok', int $httpCode = 200): void
-    {
-        self::make()->code($httpCode)->json([
-            'code'    => 0,
-            'message' => $message,
-            'data'    => $data,
-        ]);
+        $instance = self::current();
+        $instance->http->setView($view);
+        return $instance;
     }
 
     /**
-     * 错误响应
+     * 错误响应（快捷方法）
      *
-     * 输出统一的 JSON 错误响应格式：
-     * ```json
-     * {"code":<errCode>,"message":"...","data":null}
-     * ```
-     *
-     * 用法示例：
-     * ```php
-     * Response::error('Not found', 404);
-     * Response::error('参数错误', 400, 1001);
-     * ```
-     *
-     * @param string $message   错误消息
-     * @param int    $httpCode  HTTP 状态码（默认 400）
-     * @param int    $errCode   业务错误码（默认 -1）
-     *
-     * @return void
+     * @param mixed $message 错误消息
+     * @param int   $httpCode HTTP 状态码（默认 400）
+     * @param int   $errCode  业务错误码（默认 -1）
+     * @return self
      */
-    public static function error(string $message, int $httpCode = 400, int $errCode = -1): void
+    public static function error($message, $httpCode = 400, $errCode = -1)
     {
-        self::make()->code($httpCode)->json([
+        $res = self::current();
+        $res->http->setView(View::json([
             'code'    => $errCode,
             'message' => $message,
             'data'    => null,
-        ]);
+        ], $httpCode));
+        $res->http->withStatus($httpCode);
+        return $res;
     }
 
     /**
-     * 分页响应
+     * 成功响应（快捷方法）
      *
-     * 输出统一的分页数据格式：
-     * ```json
-     * {"code":0,"message":"ok","data":{"items":[...],"total":100,"page":1,"page_size":20}}
-     * ```
-     *
-     * 用法示例：
-     * ```php
-     * Response::paginate($items, $total, $page, $pageSize);
-     * ```
-     *
-     * @param array $items   当前页数据列表
-     * @param int   $total   总记录数
-     * @param int   $page    当前页码
-     * @param int   $pageSize 每页条数
-     *
-     * @return void
+     * @param mixed  $data     响应数据
+     * @param string $message  响应消息（默认 'ok'）
+     * @param int    $httpCode HTTP 状态码（默认 200）
+     * @return self
      */
-    public static function paginate(array $items, int $total, int $page, int $pageSize): void
+    public static function success($data = null, $message = 'ok', $httpCode = 200)
     {
-        self::success([
+        $res = self::current();
+        $res->http->setView(View::json([
+            'code'    => 0,
+            'message' => $message,
+            'data'    => $data,
+        ], $httpCode));
+        $res->http->withStatus($httpCode);
+        return $res;
+    }
+
+    /**
+     * 分页响应（快捷方法）
+     *
+     * @param array $items    当前页数据列表
+     * @param int   $total    总记录数
+     * @param int   $page     当前页码
+     * @param int   $pageSize 每页条数
+     * @return self
+     */
+    public static function paginate(array $items, $total, $page, $pageSize)
+    {
+        return self::success([
             'items'     => $items,
             'total'     => $total,
             'page'      => $page,
@@ -245,44 +140,89 @@ class Response
     }
 
     /**
-     * 直接输出 JSON（最简用法）
+     * 添加响应头
      *
-     * 用法示例：
-     * ```php
-     * Response::send(['status' => 'ok']);
-     * Response::send($data, 200);
-     * ```
-     *
-     * @param mixed $data 要输出的数据
-     * @param int   $code HTTP 状态码（默认 200）
-     *
-     * @return void
+     * @param string $name  响应头名称
+     * @param string $value 响应头值
+     * @return self
      */
-    public static function send($data, int $code = 200): void
+    public function withHeader($name, $value)
     {
-        self::make()->code($code)->json($data);
+        $this->http->withHeader($name, $value);
+        return $this;
     }
 
-    // 内部
+    /**
+     * 设置状态码
+     *
+     * @param int $statusCode HTTP 状态码
+     * @return self
+     */
+    public function withStatus($statusCode)
+    {
+        $this->http->withStatus($statusCode);
+        return $this;
+    }
 
     /**
-     * 发送响应头
+     * 设置视图
      *
-     * 设置 HTTP 状态码、Content-Type 和自定义头。
-     * X-Trace-Id 由 FLEA::init() 统一输出。
-     *
-     * @param string $contentType Content-Type 值
-     *
-     * @return void
+     * @param ViewInterface $view 视图对象
+     * @return self
      */
-    private function sendHeaders(string $contentType): void
+    public function setView(ViewInterface $view)
     {
-        if (headers_sent()) { return; }
-        http_response_code($this->statusCode);
-        header("Content-Type: {$contentType}; charset=utf-8");
+        $this->http->setView($view);
+        return $this;
+    }
 
-        foreach ($this->headers as $name => $value) {
-            header("{$name}: {$value}");
-        }
+    /**
+     * 获取 View 对象
+     *
+     * @return ViewInterface|null
+     */
+    public function getView()
+    {
+        return $this->http->getView();
+    }
+
+    /**
+     * 获取状态码
+     *
+     * @return int
+     */
+    public function getStatusCode()
+    {
+        return $this->http->getStatusCode();
+    }
+
+    /**
+     * 获取响应头
+     *
+     * @return array
+     */
+    public function getHeaders()
+    {
+        return $this->http->getHeaders();
+    }
+
+    /**
+     * 判断是否有内容
+     *
+     * @return bool
+     */
+    public function hasContent()
+    {
+        return $this->http->getView() !== null;
+    }
+
+    /**
+     * 发送响应（委托给 HttpResponse）
+     *
+     * @throws \RuntimeException 如果在未收到信号时调用
+     */
+    public function send()
+    {
+        $this->http->send();
     }
 }
