@@ -286,20 +286,17 @@ class Simple
      * 处理 Action 返回值
      *
      * 根据返回值类型进行不同的处理：
-     * - ViewInterface：包装为 Response 返回
+     * - ViewInterface：设置到 Response
      * - void/null：旧代码已自行输出，不做处理
      *
      * @param mixed $result Action 方法的返回值
-     * @return mixed 处理后的结果（Response 或 null）
      */
     protected function handleActionResult($result)
     {
-        // ViewInterface 返回值：包装为 Response
+        // ViewInterface 返回值：设置到 Response
         if ($result instanceof \FLEA\View\ViewInterface) {
-            return \FLEA\Response::fromView($result);
+            \FLEA\Response::current()->setView($result);
         }
-
         // void 返回或 null：旧代码已自行输出（display/echo），不做处理
-        return $result;
     }
 }

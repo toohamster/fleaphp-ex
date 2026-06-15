@@ -591,13 +591,16 @@ class Request
 }
 ```
 
-### 5.2 Response (响应封装) - v2.1.0 更新
+### 5.2 Response (响应门面) - v2.3.0 重构
 
 ```php
 namespace FLEA;
 
-class Response
+class Response  // 门面（Facade），单例
 {
+    // 获取当前实例
+    public static function current(): self
+
     // 工厂方法
     public static function fromView(\FLEA\View\ViewInterface $view): self
     public static function success($data = null, string $message = 'ok', int $httpCode = 200): self
@@ -607,25 +610,50 @@ class Response
     // 链式设置
     public function withHeader(string $name, string $value): self
     public function withStatus(int $statusCode): self
+    public function setView(\FLEA\View\ViewInterface $view): self
 
     // 获取器
-    public function getView(): \FLEA\View\ViewInterface
+    public function getView(): ?\FLEA\View\ViewInterface
     public function getStatusCode(): int
     public function getHeaders(): array
+    public function hasContent(): bool
 
-    // 发送响应（受 Signal 控制）
+    // 发送响应（受 Signal 控制，委托给 HttpResponse）
     public function send(): void
 }
 ```
 
+**HttpResponse（适配器）**:
+```php
+namespace FLEA;
+
+class HttpResponse  // 数据容器 + 实际发送
+{
+    public function allowSend(): void
+    public function setView(\FLEA\View\ViewInterface $view): self
+    public function withHeader(string $name, string $value): self
+    public function withStatus(int $statusCode): self
+    public function getView(): ?\FLEA\View\ViewInterface
+    public function getStatusCode(): int
+    public function getHeaders(): array
+    public function send(): void
+}
+```
+
+**门面模式**：
+- `Response` 是单例门面，通过 `Response::current()` 获取
+- 内部持有 `HttpResponse` 实例，所有操作委托给它
+- `Response` 订阅 Signal 信号，收到后通知 `HttpResponse` 允许发送
+- `HttpResponse` 不依赖 Signal，只接收 `allowSend()` 指令
+
 **Signal 信号机制**：
-- Response 构造时订阅 `response.send` 信号
-- `$canSend` 初始为 false，收到信号后才可发送
+- `Response` 构造时订阅 `response.send` 信号
+- 响应内容设置在任何地方都可以进行（action、中间件）
 - 只有 `FLEA::runMVC()` 在所有中间件执行完毕后发布 `response.send` 信号
 - 中间件中调用 `send()` 会抛出 `RuntimeException`
 
 **View 响应处理**：
-- `fromView()` 创建 Response 实例并绑定 View
+- `setView()` / `fromView()` 绑定 View 到 HttpResponse
 - `send()` 根据 View 类型自动处理：
   - `StreamingViewInterface`：调用 `stream()` 流式输出
   - `RedirectView`：发送 Location 头
@@ -733,9 +761,9 @@ interface MiddlewareInterface
 {
     /**
      * @param callable $next 下一个中间件或请求处理器
-     * @return mixed 返回 Response 表示短路，返回 $next() 的结果表示继续
+     * @return void
      */
-    public function handle(callable $next);
+    public function handle(callable $next): void;
 }
 ```
 
@@ -747,7 +775,7 @@ class Pipeline
 {
     public static function create(): self
     public function pipe(MiddlewareInterface $middleware): self
-    public function run(callable $destination): mixed  // 返回 Response 或 null
+    public function run(callable $destination): void  // void 返回
 }
 ```
 
@@ -1413,24 +1441,27 @@ return [
    ↓
 5. Router::dispatch() 匹配路由
    - 匹配成功：设置 handler 和 middlewares
-   - 匹配失败：返回 404（发布 Signal → send）
+   - 匹配失败：Response::current() 设置 404（发布 Signal → send）
    ↓
-6. 中间件管道执行（Pipeline::run）
+6. 中间件管道执行（Pipeline::run，void 返回）
    - 全局中间件（FLEA::middleware() 注册）
    - 路由级中间件（Router::get/post 等注册）
-   - 中间件可返回 Response 短路，或 return $next() 继续
+   - 中间件通过 Response::current() 操作响应（设置状态/视图/头）
+   - 短路中间件设置完 Response 后不调用 $next()
    ↓
 7. Dispatcher 解析 controller/action
    - 执行 action，返回 ViewInterface
-   - handleActionResult() 包装为 Response
+   - handleActionResult() 设置到 Response::current()
    ↓
 8. 实例化控制器 → beforeExecute() → actionXxx() → afterExecute()
    ↓
-9. 视图渲染（ViewInterface）
+9. 视图渲染（ViewInterface 设置到 Response）
    ↓
-10. Pipeline 返回 Response → FLEA::runMVC() 发布 Signal → send()
-   ↓
-11. 输出响应（包含 X-Trace-Id 头）
+10. Pipeline 结束
+    ↓
+11. FLEA::runMVC() 发布 Signal → Response::send()
+    ↓
+12. 输出响应（包含 X-Trace-Id 头）
 ```
 
 **TraceID 集成点**：
@@ -1499,24 +1530,26 @@ use FLEA\Middleware\MiddlewareInterface;
 
 class MyMiddleware implements MiddlewareInterface
 {
-    public function handle(callable $next)
+    public function handle(callable $next): void
     {
         // 前置处理
-        $result = $next();  // 调用下一个中间件或处理器
+        $next();  // 调用下一个中间件或处理器
         // 后置处理
-        return $result;
     }
 }
 
 // 短路中间件示例
 class AuthMiddleware implements MiddlewareInterface
 {
-    public function handle(callable $next)
+    public function handle(callable $next): void
     {
         if (!$this->isAuthenticated()) {
-            return \FLEA\Response::error('Unauthorized', 401);
+            \FLEA\Response::current()
+                ->withStatus(401)
+                ->setView(\FLEA\View::json(['error' => 'Unauthorized']));
+            return;  // 不调用 $next，短路
         }
-        return $next();
+        $next();
     }
 }
 ```
@@ -1607,16 +1640,12 @@ URL 重写模式：/Post/view/id/1
 
 ### v2.3.0 (开发中)
 
-**Response + 中间件集成**:
-- 新增 `FLEA\Internal\Signal` 内部发布/订阅机制，控制响应发送时机
-- 重构 `Response` 类为 View 包装器，`send()` 受 Signal 控制
-  - 移除所有 `exit` 调用
-  - `success()`, `error()`, `paginate()` 返回 Response 对象（不直接输出）
-  - 新增 `withHeader()`, `withStatus()` 链式方法
-- 重构 `MiddlewareInterface::handle()` 不再声明 `void` 返回类型
-- 重构 `Pipeline::run()` 返回执行结果
-- 重构 `Dispatcher\Simple::handleActionResult()` 包装 ViewInterface 为 Response 返回
-- 重构 `FLEA::runMVC()` 统一使用 Pipeline，发布 Signal 后再 send()
+**Response + 中间件集成（门面/适配器模式）**:
+- 新增 `FLEA\Internal\Signal` 内部发布/订阅机制
+- 新增 `FLEA\HttpResponse` 响应数据容器 + 实际发送逻辑
+- 重构 `FLEA\Response` 为门面（Facade）模式：单例入口、信号订阅、委托调用
+- 中间件接口和 Pipeline 保持稳定（`handle()` 保持 `void`，`Pipeline::run()` 保持 `void`）
+- 重构 `FLEA::runMVC()`：Pipeline void 返回后通过 `Response::current()` 发布信号并发送
 
 **View + Response 架构重构**:
 - 新增 `ViewInterface` 和 `StreamingViewInterface` 接口

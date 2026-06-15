@@ -2,9 +2,6 @@
 
 namespace FLEA\Middleware;
 
-use FLEA\Response;
-use FLEA\View;
-
 /**
  * CORS 跨域资源共享中间件
  *
@@ -28,12 +25,13 @@ class CorsMiddleware implements MiddlewareInterface
      *
      * @param callable $next 下一个中间件或请求处理器
      *
-     * @return mixed
+     * @return void
      */
-    public function handle(callable $next)
+    public function handle(callable $next): void
     {
         if (headers_sent()) {
-            return $next();
+            $next();
+            return;
         }
 
         $origin  = \FLEA::getAppInf('corsAllowOrigin')  ?? '*';
@@ -49,9 +47,10 @@ class CorsMiddleware implements MiddlewareInterface
         // OPTIONS 预检请求直接返回空响应
         if (strtoupper($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
             http_response_code(204);
-            return Response::fromView(View::text(''));
+            \FLEA\Response::current()->setView(\FLEA\View::text(''));
+            return;
         }
 
-        return $next();
+        $next();
     }
 }

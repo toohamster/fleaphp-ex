@@ -593,7 +593,7 @@ class FLEA
             $dispatcher = new $dispatcherClass($_GET);
             self::register($dispatcher, $dispatcherClass);
             /** @var \FLEA\Dispatcher\Simple $dispatcher */
-            return $dispatcher->dispatching();
+            $dispatcher->dispatching();
         };
 
         // 一切走 Router，注册兜底路由（可通过 routerDefaultRoute=false 关闭）
@@ -604,11 +604,13 @@ class FLEA
             );
         }
 
-        // 路由匹配失败，直接返回 404
+        // 路由匹配失败
         if (!\FLEA\Router::dispatch()) {
-            $response = Response::fromView(View::html('404.html', ['statusCode' => 404]));
+            Response::current()
+                ->withStatus(404)
+                ->setView(View::html('404.html', ['statusCode' => 404]));
             Signal::publish('response.send');
-            $response->send();
+            Response::current()->send();
             return;
         }
 
@@ -621,18 +623,15 @@ class FLEA
             $pipeline->pipe($mw);
         }
 
-        // 执行 Pipeline，获取返回值
-        $result = $pipeline->run($dispatch);
+        // 执行中间件管道（void，响应通过 Response::current() 设置）
+        $pipeline->run($dispatch);
 
-        // 统一处理返回值
-        if ($result instanceof Response) {
-            // 发布"允许发送"信号
+        // 发布信号并发送响应
+        $response = Response::current();
+        if ($response->hasContent()) {
             Signal::publish('response.send');
-            // 发送响应
-            $result->send();
-            return;
+            $response->send();
         }
-
         // null: 旧代码已自行输出
     }
 

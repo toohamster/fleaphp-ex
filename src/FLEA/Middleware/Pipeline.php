@@ -24,7 +24,7 @@ namespace FLEA\Middleware;
  *          ->pipe(new AuthMiddleware())
  *          ->pipe(new RateLimitMiddleware());
  *
- * // 执行管道
+ * // 执行管道（void 返回，响应通过 Response::current() 设置）
  * $pipeline->run(function() {
  *     // 核心应用逻辑
  *     echo "Hello World";
@@ -33,7 +33,7 @@ namespace FLEA\Middleware;
  *
  * @package FLEA
  * @author  toohamster
- * @version 2.0.0
+ * @version 2.3.0
  * @see     \FLEA\Middleware\MiddlewareInterface
  */
 class Pipeline
@@ -80,20 +80,11 @@ class Pipeline
      * 使用 array_reduce 从后向前构建中间件调用链，
      * 形成洋葱模型嵌套结构。
      *
-     * 用法示例：
-     * ```php
-     * $result = $pipeline->run(function() {
-     *     // 核心应用逻辑
-     *     return Response::fromView(View::json(['status' => 'ok']));
-     * });
-     * // $result 可能是 Response 或 null
-     * ```
-     *
      * @param callable $destination 最终要执行的目标（控制器/闭包）
      *
-     * @return mixed 返回 Response 或 null
+     * @return void
      */
-    public function run(callable $destination)
+    public function run(callable $destination): void
     {
         $pipeline = array_reduce(
             array_reverse($this->middlewares),
@@ -101,6 +92,6 @@ class Pipeline
             $destination
         );
 
-        return $pipeline();
+        $pipeline();
     }
 }

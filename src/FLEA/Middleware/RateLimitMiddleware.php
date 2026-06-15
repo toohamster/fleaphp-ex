@@ -17,20 +17,9 @@ namespace FLEA\Middleware;
  * - X-RateLimit-Limit: 最大请求次数
  * - X-RateLimit-Remaining: 剩余请求次数
  *
- * 用法示例：
- * ```php
- * // 限制每个 IP 每分钟最多 100 次请求
- * FLEA::setAppInf('rateLimitMax', 100);
- * FLEA::setAppInf('rateLimitWindow', 60);
- * FLEA::setAppInf('rateLimitBy', 'ip');
- *
- * // 按 Token 限流（适用于 API 场景）
- * FLEA::setAppInf('rateLimitBy', 'token');
- * ```
- *
  * @package FLEA
  * @author  toohamster
- * @version 2.0.0
+ * @version 2.3.0
  */
 class RateLimitMiddleware implements MiddlewareInterface
 {
@@ -41,9 +30,9 @@ class RateLimitMiddleware implements MiddlewareInterface
      *
      * @param callable $next 下一个中间件或请求处理器
      *
-     * @return mixed
+     * @return void
      */
-    public function handle(callable $next)
+    public function handle(callable $next): void
     {
         $max    = (int)(\FLEA::getAppInf('rateLimitMax')    ?? 60);
         $window = (int)(\FLEA::getAppInf('rateLimitWindow') ?? 60);
@@ -59,7 +48,14 @@ class RateLimitMiddleware implements MiddlewareInterface
                 header('X-RateLimit-Limit: ' . $max);
                 header('X-RateLimit-Remaining: 0');
             }
-            return \FLEA\Response::error('Too Many Requests', 429);
+            \FLEA\Response::current()
+                ->withStatus(429)
+                ->setView(\FLEA\View::json([
+                    'code'    => -1,
+                    'message' => 'Too Many Requests',
+                    'data'    => null,
+                ], 429));
+            return;
         }
 
         // 首次请求设置 TTL，后续递增
@@ -74,7 +70,7 @@ class RateLimitMiddleware implements MiddlewareInterface
             header('X-RateLimit-Remaining: ' . ($max - $count - 1));
         }
 
-        return $next();
+        $next();
     }
 
     private function resolveKey(string $by): string
